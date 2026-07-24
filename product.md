@@ -23,6 +23,67 @@ O jogo de cartas yugioh (antiga geracao)
         os jogadores so poderam ter ate 3 cartas iguais no baralho
         o jogador que jogar o primeiro turno nao eh permitido atacar
 
+
+Guardiões Estelares
+
+Cada monstro possui dois Guardiões Estelares.
+
+Exemplo:
+
+Sun
+Moon
+Mars
+Jupiter
+
+Durante a invocação, o jogador escolhe um dos dois.
+
+O sistema deve calcular automaticamente:
+
+vantagem
+desvantagem
+bônus de ataque
+
+conforme a tabela clássica do jogo.
+
+Ataques
+
+Cada monstro pode:
+
+atacar apenas uma vez por turno
+
+Não pode:
+
+atacar no turno em que foi invocado (caso essa seja a regra adotada)
+atacar se estiver em modo Defesa
+Posições dos monstros
+
+Monstros podem ficar:
+
+Ataque virado para cima
+Ataque virado para baixo
+Defesa virado para cima
+Defesa virado para baixo
+
+Terrenos
+
+Existe apenas um terreno ativo.
+
+Exemplos:
+
+Forest
+Wasteland
+Mountain
+Sogen
+Yami
+Umi
+
+Cada terreno:
+
+fortalece determinadas classes
+enfraquece outras
+
+O cálculo deve ser automático.
+
 tipos de carta:
     cartas monstro: "card": {
         "id": 1, `id da carta`
@@ -111,3 +172,13 @@ O menu do jogo tera as seguintes opcoes, cada uma delas tera sua propria sessao
     Library
     Password
     Save
+
+
+Pontos extras
+
+Motor de regras (Game Engine): separar toda a lógica de jogo da interface (frontend), facilitando testes e futuras expansões.
+Sistema de efeitos: modelar os efeitos das cartas por eventos (onSummon, onAttack, onDestroy, onTurnStart, etc.) para evitar lógica fixa por carta.
+IA dos NPCs: definir níveis de dificuldade e estratégias diferentes por duelista.
+Banco de dados das cartas: manter todas as cartas, fusões, drops, terrenos e compatibilidades em arquivos de dados (JSON ou banco), evitando regras codificadas diretamente.
+Arquitetura multiplayer: o modo online deve utilizar um servidor autoritativo, garantindo que todas as ações sejam validadas no servidor e evitando trapaças.
+Compatibilidade com o jogo original: definir quais mecânicas serão reproduzidas exatamente como no Forbidden Memories e quais serão modernizadas (por exemplo, animações, interface, ranking, matchmaking e qualidade de vida).
