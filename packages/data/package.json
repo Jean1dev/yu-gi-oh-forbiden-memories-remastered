@@ -1,0 +1,21 @@
+{
+  "name": "@yugioh/data",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./ingestao": "./src/ingestao/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --dir src",
+    "test:integration": "vitest run --dir tests"
+  },
+  "dependencies": {
+    "@yugioh/shared": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "fast-check": "4.9.0"
+  }
+}
