@@ -9,12 +9,16 @@
 module.exports = {
   forbidden: [
     {
-      name: "ingestion-core-is-pure",
+      name: "domain-cores-are-pure",
       comment:
-        "The ingestion core takes already-read content and returns in-memory structures, so it " +
-        "stays testable without a filesystem. All I/O belongs to packages/data/scripts.",
+        "Domain cores — the ingestion of F01, the integrity gate of F02 and whatever comes next " +
+        "— take already-read content and return in-memory structures, so they stay testable " +
+        "without a filesystem. All I/O belongs to the scripts and apps at the boundary.",
       severity: "error",
-      from: { path: "^packages/data/src/", pathNot: "\\.test\\.ts$" },
+      from: {
+        path: "^packages/(shared|data|rules|engine|ai)/src/",
+        pathNot: "\\.test\\.ts$",
+      },
       to: { path: "^(node:|fs$|path$|os$|child_process$)" },
     },
     {

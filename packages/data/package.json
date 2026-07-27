@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./ingestao": "./src/ingestao/index.ts"
+    "./ingestion": "./src/ingestion/index.ts",
+    "./validation": "./src/validation/index.ts"
   },
   "scripts": {
     "data:ingest": "node scripts/ingest-cards.ts",
+    "data:validate": "node scripts/validate-cards.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --dir src",
     "test:integration": "vitest run --dir tests"

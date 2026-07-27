@@ -2,11 +2,26 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "data:ingest": {
-      "inputs": ["../../cards-data/**", "src/ingestion/**", "scripts/**"],
-      "outputs": ["generated/**"]
+      "inputs": ["../../cards-data/**", "src/ingestion/**", "scripts/ingest-cards.ts"],
+      "outputs": [
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/ingestion-report.json"
+      ]
+    },
+    "data:validate": {
+      "dependsOn": ["data:ingest"],
+      "inputs": [
+        "src/validation/**",
+        "src/ingestion/art-manifest.ts",
+        "scripts/validate-cards.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json"
+      ],
+      "outputs": ["generated/validation-report.json", "generated/dataset-seal.json"]
     },
     "build": {
-      "dependsOn": ["^build", "@yugioh/data#data:ingest"],
+      "dependsOn": ["^build", "@yugioh/data#data:validate"],
       "outputs": ["dist/**", ".next/**"]
     },
     "typecheck": {

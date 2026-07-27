@@ -1,5 +1,10 @@
 export { aggregateCards, type CandidateCard, type CardAggregation } from "./aggregate-cards.ts";
-export { buildArtManifest, type ArtManifest, type ArtManifestResult } from "./art-manifest.ts";
+export {
+  ArtManifestSchema,
+  buildArtManifest,
+  type ArtManifest,
+  type ArtManifestResult,
+} from "./art-manifest.ts";
 export {
   SourceCardSchema,
   SourceEnvelopeSchema,

@@ -1,9 +1,19 @@
-import type { Card, CardNumber } from "@yugioh/shared";
+import { CardNumberSchema, type Card, type CardNumber } from "@yugioh/shared";
+import { z } from "zod";
 
 import { normalizeCardNumber } from "./normalize-card.ts";
 
 /** Maps a card number to the relative path of its art file. */
 export type ArtManifest = Readonly<Record<CardNumber, string>>;
+
+/**
+ * Contract of `arts-manifest.json` when it is read back from disk.
+ *
+ * The manifest leaves this package as data and comes back as an untrusted file,
+ * so whoever reads it validates it at the boundary before it becomes state
+ * (docs/arquitetura.md §4.1) — F02 is the first such reader.
+ */
+export const ArtManifestSchema = z.record(CardNumberSchema, z.string().min(1));
 
 export type ArtManifestResult = Readonly<{
   /** Contains an entry only for art that actually exists on disk. */
