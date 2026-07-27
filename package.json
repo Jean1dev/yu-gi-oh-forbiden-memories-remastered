@@ -1,0 +1,32 @@
+{
+  "name": "yu-gi-oh-forbidden-memories-remastered",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.7.0",
+  "scripts": {
+    "data:ingest": "turbo run data:ingest",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "lint": "eslint . && pnpm run lint:boundaries",
+    "lint:boundaries": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.10.0",
+    "dependency-cruiser": "18.1.0",
+    "eslint": "10.7.0",
+    "prettier": "3.9.6",
+    "turbo": "2.10.7",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0",
+    "vitest": "4.1.10"
+  }
+}

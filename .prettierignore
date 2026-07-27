@@ -1,0 +1,10 @@
+# Prettier owns source code only. Documentation, source data and generated
+# artifacts are left exactly as they are.
+docs/
+.agents/
+.claude/
+cards-data/
+packages/data/generated/
+pnpm-lock.yaml
+node_modules/
+*.md
