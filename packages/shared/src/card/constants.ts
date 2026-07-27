@@ -41,6 +41,52 @@ export const CANONICAL_CARD_TOTAL = 722;
 export const CARD_NUMBER_LENGTH = 3;
 
 /**
+ * The 24 classes observed in the source dataset, used by F02 to detect drift or
+ * a typo in a future build of the source.
+ *
+ * This is *not* a closed enum for the `classe` field itself, which stays a free
+ * string in the canonical schema (spec F01, Decision 8): it is a reference list
+ * a validated dataset is expected to stay within (spec F02, Decision 3).
+ */
+export const KNOWN_CLASSES = [
+  "Aqua",
+  "Beast",
+  "Beast-Warrior",
+  "Dinosaur",
+  "Dragon",
+  "Equip",
+  "Fairy",
+  "Fiend",
+  "Fish",
+  "Insect",
+  "Machine",
+  "Magic",
+  "Plant",
+  "Pyro",
+  "Reptile",
+  "Ritual",
+  "Rock",
+  "Sea Serpent",
+  "Spellcaster",
+  "Thunder",
+  "Trap",
+  "Warrior",
+  "Winged Beast",
+  "Zombie",
+] as const;
+
+/**
+ * Canonical path of the fallback art, relative to the repository root, in the
+ * same coordinate system the art manifest uses.
+ *
+ * Fixed here so F02 can rule on art coverage today and F04 inherits the same
+ * path when it resolves art at runtime, instead of redefining it (spec F02,
+ * Decision 5). The image file itself is still a pending asset: while it does not
+ * exist on disk, a card with no art in the manifest invalidates the dataset.
+ */
+export const DEFAULT_ART_PLACEHOLDER_PATH = "cards-data/placeholder.jpg";
+
+/**
  * Canonical key order of a serialized card. This is what makes `cards.json`
  * byte-deterministic (spec F01 §3, a precondition for the F10 content hash).
  */
