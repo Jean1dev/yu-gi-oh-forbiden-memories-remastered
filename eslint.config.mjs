@@ -26,6 +26,14 @@ export default tseslint.config(
     },
   },
   {
+    // Tooling config that has to stay CommonJS to be loaded by its own tool.
+    files: ["**/*.cjs"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: { module: "writable", require: "readonly", __dirname: "readonly" },
+    },
+  },
+  {
     // The I/O adapter is the only boundary with the system, so stdout is its job.
     files: ["packages/*/scripts/**/*.ts"],
     rules: {
