@@ -73,6 +73,9 @@ export {
   SerializedCollectionSchema,
   type CollectionRow,
 } from "./collection/schema.ts";
+export type { CardPoolLookup } from "./initial-deck/catalog.ts";
+export type { InitialPoolConfig } from "./initial-deck/types.ts";
+export { InitialPoolConfigSchema } from "./initial-deck/schema.ts";
 export {
   DuelEventSchema,
   DuelStateSchema,
