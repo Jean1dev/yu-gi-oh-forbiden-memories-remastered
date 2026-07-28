@@ -18,6 +18,14 @@ here rather than in `apps/web` (spec build-deck/F01, Decision 1 —
   `enrichCollection` (cross-references a `Collection` with the catalog),
   `deriveOwnedCardNumbers` (the boolean owned/not-owned reading the Library,
   cross-PRD, consumes).
+- `initial-deck` (`./src/initial-deck`, build-deck/F02): the signup deck
+  draw — `resolveInitialPool` (config + catalog fallback, minimum 14 distinct
+  numbers), `drawInitialDeck` (Fisher-Yates draw against an injected
+  `RandomSource`, structurally exactly 40 cards with at most 3 copies each),
+  `verifyGeneratedDeckInvariants` (safety-net assertion over the drawn deck),
+  `generateInitialDeck` (composes the three into the single call `apps/web`
+  consumes). Sibling subsystem to `collection`, same package charter
+  (spec build-deck/F02, Decision 2).
 
 ## Dependency direction
 
@@ -34,8 +42,11 @@ Decision 12; guidelines §12.2).
 
 ## Runtime assumptions
 
-None. Every exported function is pure: no I/O, no system clock, no
-randomness. Inputs and outputs are plain, JSON-serializable data.
+None. Every exported function is pure: no I/O, no system clock, no internal
+randomness. `initial-deck`'s draw takes a `RandomSource` as a parameter
+instead of calling `Math.random()` itself (guidelines §12.2) — deterministic
+given the same source, not itself a source of nondeterminism. Inputs and
+outputs are plain, JSON-serializable data.
 
 ## Test command
 
