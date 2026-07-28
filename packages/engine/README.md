@@ -13,6 +13,9 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   `createEvent`, `openReactionWindow`, `closeReactionWindow`, `hasOpenReactionWindow`.
 - `prng` (`./src/prng`): the engine's one seeded source of randomness —
   `createMulberry32`, `shuffle`.
+- `initialization` (`./src/initialization`, motor-duelo-1x1 F03): produces the first `DuelState` of
+  a duel — `buildInitializationInput` (validates and resolves the two decks + seed) and `initDuel`
+  (pure, total, builds the state).
 
 ## Dependency direction
 
@@ -21,10 +24,18 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
 `apps/*` package, React, the DOM, `fetch`, WebSocket, Node built-ins, or Supabase — enforced by
 `.dependency-cruiser.cjs` at the repository root.
 
+`packages/rules` does not exist yet (`free-duel`/F02, which owns the deck validator, is not
+implemented). `buildInitializationInput` therefore takes the validator as an injected
+`DeckValidator` dependency instead of importing `packages/rules` directly — the same pattern
+already used for the card catalog (`CardCatalogLookup`). Whoever wires the real `montarDeckPronto`
+in later passes it as this dependency unchanged, since the shapes match by construction.
+
 ## Runtime assumptions
 
-None. Every exported function is pure: no I/O, no UI, no system clock, no random number generator.
-Inputs and outputs are plain, JSON-serializable data (`DuelState`, `DuelEvent`, `ReactionWindow`).
+None. Every exported function is pure and total: no I/O, no UI, no system clock, no external
+entropy. `prng`/`initialization` use a PRNG, but only the seeded, deterministic kind — never
+`Math.random()` or any other unseeded source. Inputs and outputs are plain, JSON-serializable data
+(`DuelState`, `DuelEvent`, `ReactionWindow`).
 
 ## Test command
 
