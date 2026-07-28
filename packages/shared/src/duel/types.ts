@@ -1,7 +1,8 @@
 import type { Card } from "../card/types.ts";
+import type { ReactionWindow } from "./events.ts";
+import type { PlayerId } from "./player.ts";
 
-/** One of the two sides of the duel. */
-export type PlayerId = "P1" | "P2";
+export type { PlayerId } from "./player.ts";
 
 /** The current phase of the turn. */
 export type Phase = "draw" | "main" | "battle" | "end";
@@ -63,4 +64,6 @@ export type DuelState = Readonly<{
   activePlayer: PlayerId;
   turn: number;
   phase: Phase;
+  /** Absent = normal flow; present = engine paused awaiting external resolution. */
+  pending?: ReactionWindow | undefined;
 }>;
