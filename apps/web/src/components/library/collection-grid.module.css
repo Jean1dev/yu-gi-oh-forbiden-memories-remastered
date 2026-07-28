@@ -1,0 +1,18 @@
+.grid {
+  display: grid;
+  /* auto-fill with a fixed minimum and a flexible maximum: one column fits at
+     320px, as many as fit at 1920px, no breakpoint list to keep in sync and
+     no fixed pixel track width — the usual cause of horizontal scroll
+     (spec library/F02 §3, Grade responsiva). */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.skeletonItem {
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
