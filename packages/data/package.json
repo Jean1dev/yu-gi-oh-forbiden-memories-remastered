@@ -14,6 +14,7 @@
     "./validation": "./src/validation/index.ts"
   },
   "scripts": {
+    "data:guardian-matrix": "node scripts/build-guardian-matrix.ts",
     "data:ingest": "node scripts/ingest-cards.ts",
     "data:validate": "node scripts/validate-cards.ts",
     "data:validate-fusions": "node scripts/validate-fusions.ts",
