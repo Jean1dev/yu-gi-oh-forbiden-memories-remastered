@@ -94,6 +94,18 @@ module.exports = {
       to: { circular: true },
     },
     {
+      name: "combat-modifier-placeholders-depend-only-on-shared",
+      comment:
+        "packages/rules/src/guardian-star, terrain and effect-system (motor-duelo-1x1/F04) are " +
+        "placeholder ports for cross-PRD engines that do not exist yet. Already covered by " +
+        "rules-depends-only-on-shared, but singled out here because these three subsystems are " +
+        "the ones a future GuardianStar/Terrain/Effect System PRD will replace — narrower scope " +
+        "documents that intent explicitly.",
+      severity: "error",
+      from: { path: "^packages/rules/src/(guardian-star|terrain|effect-system)/" },
+      to: { path: "^packages/(?!rules|shared)" },
+    },
+    {
       name: "duel-state-is-pure",
       comment:
         "packages/shared/src/duel/** is DuelState, the single source of truth of the 1x1 duel " +
