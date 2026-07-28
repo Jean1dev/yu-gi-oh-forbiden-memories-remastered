@@ -1,5 +1,5 @@
 {
-  "name": "@yugioh/shared",
+  "name": "@yugioh/engine",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,10 +8,11 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --dir src --passWithNoTests",
+    "test:integration": "vitest run --dir tests --passWithNoTests"
   },
   "dependencies": {
-    "zod": "4.4.3"
+    "@yugioh/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.10.0",
