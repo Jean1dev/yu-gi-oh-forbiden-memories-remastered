@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./catalog": "./src/catalog/index.ts",
     "./ingestion": "./src/ingestion/index.ts",
     "./validation": "./src/validation/index.ts"
   },
