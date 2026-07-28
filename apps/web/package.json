@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --dir src --passWithNoTests",
     "test:integration": "vitest run --dir tests --passWithNoTests"
