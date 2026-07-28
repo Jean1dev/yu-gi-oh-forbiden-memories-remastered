@@ -26,6 +26,16 @@ here rather than in `apps/web` (spec build-deck/F01, Decision 1 —
   `generateInitialDeck` (composes the three into the single call `apps/web`
   consumes). Sibling subsystem to `collection`, same package charter
   (spec build-deck/F02, Decision 2).
+- `library` (`./src/library`, library/F01): the Library's catalog x
+  collection cross-reference — `buildLibraryIndex` (every card of the game
+  gets an entry, obtained or not; a `cardNumber` owned outside the catalog is
+  excluded from the count and reported in `obtainedOutsideCatalog`),
+  `resolveArtReference` (art / placeholder / silhouette, never consulting the
+  art lookup for a not-obtained card), `calculateProgress` / `findEntry` /
+  `isObtained` (the read-side the "X of 722 obtained" indicator and F05's
+  detail screen consume). Another sibling subsystem, same package charter
+  extension `collection` already opened (spec library/F01, Decision 1 —
+  `docs/arquitetura.md` §2 registration still pending, same as noted there).
 
 ## Dependency direction
 
