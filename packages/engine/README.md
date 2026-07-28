@@ -11,6 +11,8 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
 
 - `events` (`./src/events`): the trigger-event vocabulary mechanics —
   `createEvent`, `openReactionWindow`, `closeReactionWindow`, `hasOpenReactionWindow`.
+- `prng` (`./src/prng`): the engine's one seeded source of randomness —
+  `createMulberry32`, `shuffle`.
 
 ## Dependency direction
 
