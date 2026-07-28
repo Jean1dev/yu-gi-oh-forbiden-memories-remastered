@@ -46,6 +46,12 @@ export type {
   SpellZone,
 } from "./duel/types.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
+export type {
+  EffectiveAtkDef,
+  EquipmentModifierProvider,
+  GuardianModifierProvider,
+  TerrainModifierProvider,
+} from "./duel/combat-modifiers.ts";
 export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
 export type {
   DuelEvent,
