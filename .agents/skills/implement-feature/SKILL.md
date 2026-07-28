@@ -22,7 +22,17 @@ reporta o resultado contra os Critérios de Aceite declarados no PRD do módulo.
 **Pré-requisito:** a feature precisa ter spec e plano gerados pelo skill `spec-writer`. Sem eles,
 este skill aborta e aponta para o `spec-writer`.
 
-**Escreva o relatório final e as mensagens de commit em Português.**
+**Escreva todo o código-fonte em Inglês — identificadores, tipos, schemas, nomes de arquivo/pasta e
+comentários — mesmo quando a spec/PRD descreve o domínio em Português. Escreva o relatório final e
+as mensagens de commit em Português.**
+
+O PRD e a spec são documentação em Português; isso não se estende ao código. Traduza o vocabulário
+de domínio para Inglês ao nomear (`EstadoDuelo` → `DuelState`, `mão` → `hand`, `turno` → `turn`),
+seguindo os próprios exemplos de nomenclatura de `TypeScript-development-guidelines.md` (§5.2–5.3:
+`PlayerId`, `PlayerState`, `DuelSnapshot`) e o precedente já implementado no pacote (`Card`,
+`CardSchema`, `normalizeCard`). Exceção: campos que já existem como contrato externo herdado
+verbatim da fonte de dados (ex.: `numero`, `guardiao1`, `tipo` em `Card`) permanecem como estão —
+não traduza um contrato que esta execução não está definindo.
 
 ## ENTRADA
 
@@ -190,6 +200,9 @@ o índice da fase.
 **5.2 — Implementar**
 
 Leia as seções da spec relevantes à fase. Crie/edite os arquivos para cumprir os passos da fase.
+Se a spec nomeou tipos/campos/arquivos em Português, traduza para Inglês ao escrever o código —
+isso é adaptação de nomenclatura (registre em `Desvios` se o nome final divergir do da spec), não
+um desvio de comportamento.
 
 **Bootstrap do monorepo:** este projeto pode ainda não ter `package.json`, `pnpm-workspace.yaml`,
 `turbo.json` ou o pacote-alvo. Se o `plan.md` já cobre o bootstrap, siga o plano. Se **não** cobre e
@@ -435,11 +448,16 @@ nem mova o arquivo de pacote só para o portão passar. Se a spec pedir algo que
   exercitá-las contra um ambiente local antes de dar como prontas, ou soft-falhar a checagem.
 - Executar o Passo 6 inteiro antes de reportar.
 - Derivar o status exclusivamente do 6.6.
+- Escrever todo o código-fonte (identificadores, tipos, comentários, nomes de arquivo/pasta) em
+  Inglês, mesmo quando a spec usa vocabulário em Português — exceto contratos externos já
+  existentes nessa língua, que permanecem como estão.
 - Escrever relatório e commits em Português.
 
 **NUNCA:**
 - Declarar `sucesso` com regressões, itens ausentes na spec, portão vermelho ou falhas não resolvidas
   — mesmo que toda fase tenha commitado limpa.
+- Nomear tipos, funções, campos, arquivos ou pastas em Português só porque a spec ou o PRD usam
+  esse vocabulário — traduza para Inglês ao escrever código (ver nota no topo deste arquivo).
 - Pular o checklist de Critérios de Aceite ou sua rastreabilidade ao PRD (núcleo imutável).
 - Pular o Passo 6 ou qualquer Portão de Arquitetura.
 - Criar ou trocar de branch.
