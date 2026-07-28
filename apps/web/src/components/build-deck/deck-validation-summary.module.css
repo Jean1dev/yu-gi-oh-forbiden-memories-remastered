@@ -1,0 +1,28 @@
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.counter {
+  font-weight: bold;
+}
+
+.valid {
+  font-weight: bold;
+  color: #1a7f37;
+}
+
+.invalid {
+  font-weight: bold;
+  color: #cf222e;
+}
+
+.violations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

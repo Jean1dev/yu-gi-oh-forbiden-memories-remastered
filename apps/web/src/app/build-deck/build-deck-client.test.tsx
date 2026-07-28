@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CollectionPanelActions, CollectionPanelState } from "../../hooks/use-collection-panel.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
+import type { CollectionState } from "../../hooks/use-collection.ts";
+import { useCollection } from "../../hooks/use-collection.ts";
 import type { ActiveDeckState } from "../../hooks/use-active-deck.ts";
 import { useActiveDeck } from "../../hooks/use-active-deck.ts";
 import type { UseDeckDraftResult } from "../../hooks/use-deck-draft.ts";
@@ -14,6 +16,9 @@ import { BuildDeckClient } from "./build-deck-client.tsx";
 
 vi.mock("../../hooks/use-collection-panel.ts", () => ({
   useCollectionPanel: vi.fn(),
+}));
+vi.mock("../../hooks/use-collection.ts", () => ({
+  useCollection: vi.fn(),
 }));
 vi.mock("../../hooks/use-active-deck.ts", () => ({
   useActiveDeck: vi.fn(),
@@ -26,6 +31,7 @@ vi.mock("../../hooks/use-unsaved-changes-warning.ts", () => ({
 }));
 
 const mockedPanelHook = vi.mocked(useCollectionPanel);
+const mockedCollectionHook = vi.mocked(useCollection);
 const mockedActiveDeckHook = vi.mocked(useActiveDeck);
 const mockedDeckDraftHook = vi.mocked(useDeckDraft);
 const mockedUnsavedChangesHook = vi.mocked(useUnsavedChangesWarning);
@@ -55,10 +61,16 @@ function mockDeckDraft(overrides: Partial<UseDeckDraftResult> = {}): void {
   mockedDeckDraftHook.mockReturnValue({ ...DEFAULT_DRAFT_RESULT, ...overrides });
 }
 
+const READY_COLLECTION_STATE: CollectionState = {
+  status: "ready",
+  loaded: { origin: "server", collection: new Map(), syncedAt: "2026-07-28T00:00:00.000Z" },
+};
+
 /** The steady state every pre-existing (F04) branch test starts from: an active deck already resolved. */
 function mockReadyActiveDeckAndDraft(): void {
   mockActiveDeck({ status: "ready", activeDeck: new Map() });
   mockDeckDraft();
+  mockedCollectionHook.mockReturnValue(READY_COLLECTION_STATE);
   mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
 }
 
@@ -141,6 +153,7 @@ describe("BuildDeckClient", () => {
   it("shows the preparing-initial-deck message while the active deck row has not been created yet", () => {
     mockActiveDeck({ status: "pending" });
     mockDeckDraft();
+    mockedCollectionHook.mockReturnValue(READY_COLLECTION_STATE);
     mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
     mockPanel({ status: "loading" });
 

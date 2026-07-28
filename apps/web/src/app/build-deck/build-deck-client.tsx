@@ -7,12 +7,14 @@ import { BlockMessage } from "../../components/build-deck/block-message.tsx";
 import { CollectionFailure } from "../../components/build-deck/collection-failure.tsx";
 import { CollectionPanel } from "../../components/build-deck/collection-panel.tsx";
 import { DeckEditor } from "../../components/build-deck/deck-editor.tsx";
+import { DeckValidationSummary } from "../../components/build-deck/deck-validation-summary.tsx";
 import { EmptyCollectionState } from "../../components/build-deck/empty-collection-state.tsx";
 import { BUILD_DECK_MESSAGES } from "../../components/build-deck/messages.ts";
 import { PanelSkeleton } from "../../components/build-deck/panel-skeleton.tsx";
 import { useActiveDeck } from "../../hooks/use-active-deck.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
 import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
+import { useDeckValidation } from "../../hooks/use-deck-validation.ts";
 import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
 import { buildCatalogLookup } from "../../lib/build-deck/catalog-lookup.ts";
 import { useDeckDraftStore } from "../../stores/deck-draft-store.ts";
@@ -31,12 +33,14 @@ const EMPTY_CARDS: readonly Card[] = [];
 /**
  * The state machine driving `/build-deck`: skeleton, failure, empty
  * collection, or the ready panel plus the deck-in-edition editor
- * (build-deck/F05). Owns the composition root for F04 (`useCollectionPanel`)
- * and F05 (`useActiveDeck`/`useDeckDraft`/`useUnsavedChangesWarning`): the
- * spec's Seção 2 names `page.tsx` as the wiring point, but `page.tsx` in this
- * codebase is a server-only component (it loads the catalog via `fs`) — every
- * client hook already lived here since F04, so F05's wiring joins it here
- * too instead of splitting the composition root across two files.
+ * (build-deck/F05) and its live validation summary (build-deck/F06). Owns
+ * the composition root for F04 (`useCollectionPanel`), F05
+ * (`useActiveDeck`/`useDeckDraft`/`useUnsavedChangesWarning`) and F06
+ * (`useDeckValidation`): the spec's Seção 2 names `page.tsx` as the wiring
+ * point, but `page.tsx` in this codebase is a server-only component (it loads
+ * the catalog via `fs`) — every client hook already lived here since F04, so
+ * each new feature's wiring joins it here too instead of splitting the
+ * composition root across multiple files.
  */
 export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
   const cards = catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS;
@@ -55,6 +59,7 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
   }, [activeDeckState, initializeDraft]);
 
   const draftState = useDeckDraft();
+  const validation = useDeckValidation();
   const { confirmInternalNavigation } = useUnsavedChangesWarning(draftState.hasUnsavedChanges);
   const panel = useCollectionPanel(cards, draftState.activeDeckLookup);
 
@@ -116,6 +121,7 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
         onSelectCard={panel.select}
       />
       <BlockMessage lastBlock={draftState.lastBlock} />
+      <DeckValidationSummary validation={validation} catalog={catalog} />
       <DeckEditor
         draft={draftState.draft}
         catalog={catalog}
