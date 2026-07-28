@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./art": "./src/art/index.ts",
+    "./catalog": "./src/catalog/index.ts",
+    "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
     "./ingestion": "./src/ingestion/index.ts",
     "./validation": "./src/validation/index.ts"
   },

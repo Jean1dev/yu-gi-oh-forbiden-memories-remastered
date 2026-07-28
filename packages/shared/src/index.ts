@@ -10,7 +10,13 @@ export {
   KNOWN_CLASSES,
 } from "./card/constants.ts";
 export type { Card, CardCatalogLookup, CardNumber, CardType, GuardianStar } from "./card/types.ts";
-export { CardNumberSchema, CardSchema, CardTypeSchema, GuardianStarSchema } from "./card/schema.ts";
+export {
+  CardNumberSchema,
+  CardPasswordSchema,
+  CardSchema,
+  CardTypeSchema,
+  GuardianStarSchema,
+} from "./card/schema.ts";
 export {
   DatasetSealSchema,
   VIOLATION_CATEGORIES,
