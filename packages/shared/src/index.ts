@@ -22,7 +22,7 @@ export {
   type ValidationViolation,
   type ViolationCategory,
 } from "./card/validation-report.ts";
-export { INITIAL_LP, TOTAL_MONSTER_ZONES, TOTAL_SPELL_ZONES } from "./duel/constants.ts";
+export { EVENT_TYPES, INITIAL_LP, TOTAL_MONSTER_ZONES, TOTAL_SPELL_ZONES } from "./duel/constants.ts";
 export type {
   DuelState,
   MonsterPosition,
@@ -33,13 +33,30 @@ export type {
   PlayerState,
   SpellZone,
 } from "./duel/types.ts";
+export type {
+  DuelEvent,
+  EventType,
+  JsonValue,
+  ReactionWindow,
+  ZoneIndex,
+  ZoneReference,
+  ZoneType,
+} from "./duel/events.ts";
+export type { ApplyResult } from "./duel/apply-result.ts";
 export {
+  DuelEventSchema,
   DuelStateSchema,
+  EventTypeSchema,
+  JsonValueSchema,
   MonsterPositionSchema,
   MonsterZoneSchema,
   PhaseSchema,
   PlayerFieldSchema,
   PlayerIdSchema,
   PlayerStateSchema,
+  ReactionWindowSchema,
   SpellZoneSchema,
+  ZoneIndexSchema,
+  ZoneReferenceSchema,
+  ZoneTypeSchema,
 } from "./duel/schema.ts";

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { Card } from "../card/types.ts";
-import { INITIAL_LP } from "./constants.ts";
-import { DuelStateSchema } from "./schema.ts";
+import { EVENT_TYPES, INITIAL_LP } from "./constants.ts";
+import { DuelEventSchema, DuelStateSchema, ZoneReferenceSchema } from "./schema.ts";
 import type { DuelState, MonsterPosition, PlayerField, PlayerState } from "./types.ts";
 
 const emptyZone = { occupied: false } as const;
@@ -229,5 +229,94 @@ describe("DuelStateSchema", () => {
   it("rejects an object with an unknown field at the root level", () => {
     const state = { ...validState(), extra: "unknown field" };
     expect(DuelStateSchema.safeParse(state).success).toBe(false);
+  });
+
+  it("accepts a state with pending filled", () => {
+    const state = {
+      ...validState(),
+      pending: {
+        type: "reaction_window",
+        event: baseEvent({ type: "onAttackDeclared" }),
+        reactingPlayer: "P2",
+      },
+    };
+    expect(DuelStateSchema.safeParse(state).success).toBe(true);
+  });
+
+  it("accepts a state without pending (optional field)", () => {
+    expect(DuelStateSchema.safeParse(validState()).success).toBe(true);
+  });
+});
+
+function baseEvent(overrides: Record<string, unknown> = {}) {
+  return {
+    type: "onTurnStart",
+    originPlayer: "P1",
+    involvedCards: [],
+    involvedZones: [],
+    context: {},
+    ...overrides,
+  };
+}
+
+describe("EVENT_TYPES", () => {
+  it("contains exactly the ten expected types, including onPositionChange", () => {
+    expect(EVENT_TYPES).toEqual([
+      "onTurnStart",
+      "onDraw",
+      "onSummon",
+      "onSet",
+      "onFlip",
+      "onPositionChange",
+      "onAttackDeclared",
+      "onDamage",
+      "onDestroy",
+      "onTurnEnd",
+    ]);
+  });
+});
+
+describe("DuelEventSchema", () => {
+  it("accepts a well-formed event", () => {
+    expect(DuelEventSchema.safeParse(baseEvent()).success).toBe(true);
+  });
+
+  it("rejects a type outside the ten known ones", () => {
+    expect(DuelEventSchema.safeParse(baseEvent({ type: "onExplode" })).success).toBe(false);
+  });
+
+  it("accepts nested context with string, number, boolean, null, array and object", () => {
+    const context = {
+      a: "text",
+      b: 42,
+      c: true,
+      d: null,
+      e: [1, "two", false, null, { nested: "value" }],
+      f: { inner: { deeper: 1 } },
+    };
+    expect(DuelEventSchema.safeParse(baseEvent({ context })).success).toBe(true);
+  });
+
+  it("rejects context with an undefined value", () => {
+    expect(DuelEventSchema.safeParse(baseEvent({ context: { a: undefined } })).success).toBe(
+      false,
+    );
+  });
+});
+
+describe("ZoneReferenceSchema", () => {
+  it("rejects index 5", () => {
+    expect(
+      ZoneReferenceSchema.safeParse({ player: "P1", zoneType: "monster", index: 5 }).success,
+    ).toBe(false);
+  });
+
+  it("accepts index 0 and index 4", () => {
+    expect(
+      ZoneReferenceSchema.safeParse({ player: "P1", zoneType: "monster", index: 0 }).success,
+    ).toBe(true);
+    expect(
+      ZoneReferenceSchema.safeParse({ player: "P2", zoneType: "spell", index: 4 }).success,
+    ).toBe(true);
   });
 });
