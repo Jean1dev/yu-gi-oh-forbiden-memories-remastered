@@ -61,3 +61,39 @@ export type CollectionSnapshot = Readonly<{
   entries: SerializedCollection;
   syncedAt: string;
 }>;
+
+/**
+ * A reward event handed over by a duel module (Free Duel/Online Duel/Campaign,
+ * all cross-PRD): the card it already chose, to be credited once per `duelId`.
+ * `duelId` names the idempotency key, not the game mode it came from (spec
+ * build-deck/F03, Decision 9) — a Campaign match and an Online Duel session
+ * produce the same shape.
+ */
+export type CardRewardEvent = Readonly<{
+  playerId: string;
+  duelId: string;
+  cardNumber: CardNumber;
+}>;
+
+/**
+ * Outcome of `registerCardReward`, discriminated by `status` (spec build-deck/F03 §3):
+ * `applied` = credited on the server this call; `applied_offline` = credited only to
+ * the local cache and queued; `already_applied` = this `duelId` was processed before
+ * (locally or on the server) — no extra increment happened.
+ */
+export type RewardResult =
+  | Readonly<{ status: "applied"; currentQuantity: number }>
+  | Readonly<{ status: "applied_offline"; localQuantity: number }>
+  | Readonly<{ status: "already_applied"; currentQuantity?: number }>;
+
+/**
+ * One entry in the offline reward queue (`recompensas_pendentes`), keyed by
+ * `duelId` — re-queuing the same id replaces the entry, never duplicates it.
+ */
+export type PendingReward = Readonly<{
+  duelId: string;
+  playerId: string;
+  cardNumber: CardNumber;
+  /** ISO 8601 — preserves sync (FIFO) order. */
+  queuedAt: string;
+}>;

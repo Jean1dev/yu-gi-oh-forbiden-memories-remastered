@@ -35,3 +35,23 @@ export const CollectionSnapshotSchema = z.strictObject({
   /** ISO 8601. */
   syncedAt: z.string().min(1),
 });
+
+/** Validates a reward event at the boundary before any I/O (spec build-deck/F03 §3, step 1). */
+export const CardRewardEventSchema = z.strictObject({
+  playerId: z.string().min(1),
+  duelId: z.string().min(1),
+  cardNumber: CardNumberSchema,
+});
+
+/**
+ * Validates what is read back from the offline reward queue — local storage is
+ * an untrusted boundary, same rule as `CollectionSnapshotSchema` (spec
+ * build-deck/F03 §4).
+ */
+export const PendingRewardSchema = z.strictObject({
+  duelId: z.string().min(1),
+  playerId: z.string().min(1),
+  cardNumber: CardNumberSchema,
+  /** ISO 8601. */
+  queuedAt: z.string().min(1),
+});

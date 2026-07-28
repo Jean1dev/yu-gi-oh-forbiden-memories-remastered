@@ -58,6 +58,7 @@ export type {
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
+  CardRewardEvent,
   Collection,
   CollectionEntry,
   CollectionItem,
@@ -65,11 +66,15 @@ export type {
   CollectionSnapshot,
   EnrichedCollection,
   LoadedCollection,
+  PendingReward,
+  RewardResult,
   SerializedCollection,
 } from "./collection/types.ts";
 export {
+  CardRewardEventSchema,
   CollectionRowSchema,
   CollectionSnapshotSchema,
+  PendingRewardSchema,
   SerializedCollectionSchema,
   type CollectionRow,
 } from "./collection/schema.ts";
