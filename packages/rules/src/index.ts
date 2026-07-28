@@ -3,10 +3,12 @@ export {
   deriveOwnedCardNumbers,
   deserializeCollection,
   enrichCollection,
+  incrementQuantity,
   ownedEntries,
   ownedQuantity,
   owns,
   serializeCollection,
+  validateRewardCardNumber,
 } from "./collection/index.ts";
 export {
   drawInitialDeck,
