@@ -55,3 +55,15 @@ export const PendingRewardSchema = z.strictObject({
   /** ISO 8601. */
   queuedAt: z.string().min(1),
 });
+
+/**
+ * Shape of the `apply_card_reward` RPC response (spec build-deck/F03 §4).
+ * Column names stay as Postgres returns them (snake_case), same rule
+ * `PersistInitialDeckResponseSchema` already follows for `created_now`.
+ */
+export const ApplyCardRewardResponseSchema = z.strictObject({
+  applied: z.boolean(),
+  current_quantity: z.number().int().min(0),
+});
+
+export type ApplyCardRewardResponse = z.infer<typeof ApplyCardRewardResponseSchema>;

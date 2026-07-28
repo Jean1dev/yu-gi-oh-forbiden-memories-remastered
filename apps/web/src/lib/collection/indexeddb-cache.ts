@@ -2,9 +2,19 @@ import { CollectionSnapshotSchema, type CollectionSnapshot } from "@yugioh/share
 
 import { log } from "../logging.ts";
 
-const DATABASE_NAME = "yugioh-build-deck";
-const DATABASE_VERSION = 1;
-const STORE_NAME = "collection";
+/**
+ * Shared with `../reward/offline-queue.ts`: the reward's offline path writes
+ * the collection point-increment and the queue entry in the same IndexedDB
+ * transaction (spec build-deck/F03 §5, "as duas nunca divergem entre si"),
+ * which requires opening this same database and listing both store names in
+ * one `transaction()` call — IndexedDB has no cross-connection transactions.
+ * `DATABASE_VERSION` is 2 as of build-deck/F03 (spec §5): the upgrade adds
+ * `PENDING_REWARDS_STORE_NAME` alongside the collection store opened here.
+ */
+export const DATABASE_NAME = "yugioh-build-deck";
+export const DATABASE_VERSION = 2;
+export const STORE_NAME = "collection";
+export const PENDING_REWARDS_STORE_NAME = "pendingRewards";
 
 /** The collection's local-cache port (spec build-deck/F01 §4 `lerSnapshot`/`gravarSnapshot`). */
 export type CollectionCache = Readonly<{
@@ -12,13 +22,16 @@ export type CollectionCache = Readonly<{
   saveSnapshot(snapshot: CollectionSnapshot): Promise<void>;
 }>;
 
-function openDatabase(): Promise<IDBDatabase> {
+export function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
     request.onupgradeneeded = () => {
       const database = request.result;
       if (!database.objectStoreNames.contains(STORE_NAME)) {
         database.createObjectStore(STORE_NAME, { keyPath: "playerId" });
+      }
+      if (!database.objectStoreNames.contains(PENDING_REWARDS_STORE_NAME)) {
+        database.createObjectStore(PENDING_REWARDS_STORE_NAME, { keyPath: "duelId" });
       }
     };
     request.onsuccess = () => {
@@ -30,7 +43,7 @@ function openDatabase(): Promise<IDBDatabase> {
   });
 }
 
-function requestToPromise<T>(request: IDBRequest<T>): Promise<T> {
+export function requestToPromise<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     request.onsuccess = () => {
       resolve(request.result);

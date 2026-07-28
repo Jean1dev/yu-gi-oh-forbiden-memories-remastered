@@ -1,7 +1,16 @@
+import "fake-indexeddb/auto";
+
 import { randomUUID } from "node:crypto";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { createIndexedDbCollectionCache } from "../src/lib/collection/indexeddb-cache.ts";
+import { loadCatalogAndPool } from "../src/lib/initial-deck/catalog-adapter.ts";
+import { applyOfflineReward, createIndexedDbRewardQueue } from "../src/lib/reward/offline-queue.ts";
+import { registerCardReward } from "../src/lib/reward/register-card-reward.ts";
+import { createSupabaseRewardRepository } from "../src/lib/reward/supabase-repository.ts";
+import { syncRewardQueue } from "../src/lib/reward/sync-reward-queue.ts";
 
 /**
  * Requires a Supabase instance (local via `supabase start`, or a real
@@ -178,5 +187,70 @@ describe.skipIf(!hasSupabaseEnv)("build-deck/F03 reward ledger against a real Su
 
     const { data } = await admin.from("reward_ledger").select("duel_id").eq("player_id", fresh.playerId);
     expect(data).toEqual([]);
+  });
+
+  it("registerCardReward against the real database applies the reward and reflects in collections", async () => {
+    const catalogResult = await loadCatalogAndPool();
+    expect(catalogResult.ok).toBe(true);
+    if (!catalogResult.ok) return;
+
+    const duelId = `test:${randomUUID()}`;
+    const result = await registerCardReward(
+      { playerId: playerA.playerId, duelId, cardNumber: "008" },
+      {
+        catalog: catalogResult.value.catalog,
+        rewardRepository: createSupabaseRewardRepository(playerA.client),
+        rewardQueue: createIndexedDbRewardQueue(),
+        collectionCache: createIndexedDbCollectionCache(),
+        applyOfflineReward,
+        clock: { now: () => new Date() },
+      },
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.status).toBe("applied");
+
+    const { data: row } = await admin
+      .from("collections")
+      .select("quantity")
+      .eq("player_id", playerA.playerId)
+      .eq("numero", "008")
+      .single();
+    expect(row?.quantity).toBe(1);
+  });
+
+  it("syncRewardQueue against the real database drains the queue after reconnecting", async () => {
+    const catalogResult = await loadCatalogAndPool();
+    expect(catalogResult.ok).toBe(true);
+    if (!catalogResult.ok) return;
+
+    const rewardQueue = createIndexedDbRewardQueue();
+    const duelId = `test:${randomUUID()}`;
+    await rewardQueue.enqueueReward({
+      duelId,
+      playerId: playerA.playerId,
+      cardNumber: "009",
+      queuedAt: new Date().toISOString(),
+    });
+
+    const summary = await syncRewardQueue({
+      playerId: playerA.playerId,
+      catalog: catalogResult.value.catalog,
+      rewardRepository: createSupabaseRewardRepository(playerA.client),
+      rewardQueue,
+    });
+
+    expect(summary.applied).toBe(1);
+    expect(summary.removed).toBe(1);
+    expect(await rewardQueue.listPendingRewards(playerA.playerId)).toEqual([]);
+
+    const { data: row } = await admin
+      .from("collections")
+      .select("quantity")
+      .eq("player_id", playerA.playerId)
+      .eq("numero", "009")
+      .single();
+    expect(row?.quantity).toBe(1);
   });
 });

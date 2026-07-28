@@ -71,11 +71,13 @@ export type {
   SerializedCollection,
 } from "./collection/types.ts";
 export {
+  ApplyCardRewardResponseSchema,
   CardRewardEventSchema,
   CollectionRowSchema,
   CollectionSnapshotSchema,
   PendingRewardSchema,
   SerializedCollectionSchema,
+  type ApplyCardRewardResponse,
   type CollectionRow,
 } from "./collection/schema.ts";
 export type { CardPoolLookup } from "./initial-deck/catalog.ts";
