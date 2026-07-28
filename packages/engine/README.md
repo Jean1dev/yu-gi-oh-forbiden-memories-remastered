@@ -21,6 +21,11 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`, `terrain`,
   `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since none of
   those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
+- `serialization` (`./src/serialization`, motor-duelo-1x1 F05): `serialize` (a cloned, reference-
+  independent `Snapshot` of a `DuelState`) and `load` (validates an untrusted `unknown` against
+  `DuelStateSchema` and returns a cloned `DuelState`, or a `Result` error). `Snapshot` is a plain
+  type alias for `DuelState` (`packages/shared`), not a new wrapper — this is the contract the
+  future Online Duel server (cross-PRD) will use to persist and resync sessions.
 
 ## Dependency direction
 

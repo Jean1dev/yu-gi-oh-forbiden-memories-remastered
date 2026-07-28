@@ -19,3 +19,4 @@ export {
   type CombatContext,
   type ModifierProviders,
 } from "./combat/index.ts";
+export { load, serialize } from "./serialization/index.ts";
