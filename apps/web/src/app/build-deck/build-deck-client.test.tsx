@@ -5,22 +5,66 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CollectionPanelActions, CollectionPanelState } from "../../hooks/use-collection-panel.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
+import type { ActiveDeckState } from "../../hooks/use-active-deck.ts";
+import { useActiveDeck } from "../../hooks/use-active-deck.ts";
+import type { UseDeckDraftResult } from "../../hooks/use-deck-draft.ts";
+import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
+import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
 import { BuildDeckClient } from "./build-deck-client.tsx";
 
 vi.mock("../../hooks/use-collection-panel.ts", () => ({
   useCollectionPanel: vi.fn(),
 }));
+vi.mock("../../hooks/use-active-deck.ts", () => ({
+  useActiveDeck: vi.fn(),
+}));
+vi.mock("../../hooks/use-deck-draft.ts", () => ({
+  useDeckDraft: vi.fn(),
+}));
+vi.mock("../../hooks/use-unsaved-changes-warning.ts", () => ({
+  useUnsavedChangesWarning: vi.fn(),
+}));
 
-const mockedHook = vi.mocked(useCollectionPanel);
+const mockedPanelHook = vi.mocked(useCollectionPanel);
+const mockedActiveDeckHook = vi.mocked(useActiveDeck);
+const mockedDeckDraftHook = vi.mocked(useDeckDraft);
+const mockedUnsavedChangesHook = vi.mocked(useUnsavedChangesWarning);
 
 const NOOP_ACTIONS: CollectionPanelActions = { setTerm: vi.fn(), select: vi.fn() };
 
+const DEFAULT_DRAFT_RESULT: UseDeckDraftResult = {
+  draft: new Map(),
+  total: 0,
+  lastBlock: undefined,
+  activeDeckLookup: () => 0,
+  hasUnsavedChanges: false,
+  canAddCard: true,
+  addCard: vi.fn(),
+  removeCard: vi.fn(),
+};
+
 function mockPanel(state: CollectionPanelState): void {
-  mockedHook.mockReturnValue({ ...state, ...NOOP_ACTIONS });
+  mockedPanelHook.mockReturnValue({ ...state, ...NOOP_ACTIONS });
+}
+
+function mockActiveDeck(state: ActiveDeckState): void {
+  mockedActiveDeckHook.mockReturnValue(state);
+}
+
+function mockDeckDraft(overrides: Partial<UseDeckDraftResult> = {}): void {
+  mockedDeckDraftHook.mockReturnValue({ ...DEFAULT_DRAFT_RESULT, ...overrides });
+}
+
+/** The steady state every pre-existing (F04) branch test starts from: an active deck already resolved. */
+function mockReadyActiveDeckAndDraft(): void {
+  mockActiveDeck({ status: "ready", activeDeck: new Map() });
+  mockDeckDraft();
+  mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
 }
 
 describe("BuildDeckClient", () => {
   it("shows the skeleton while the load has not resolved", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({ status: "loading" });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
@@ -29,6 +73,7 @@ describe("BuildDeckClient", () => {
   });
 
   it("shows the collection failure message and no items", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({ status: "error", error: new DomainError("boom", "collection_unavailable") });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
@@ -38,6 +83,7 @@ describe("BuildDeckClient", () => {
   });
 
   it("shows the session-missing message when there is no authenticated player", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({ status: "error", error: new DomainError("no session", "session_missing") });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
@@ -46,6 +92,7 @@ describe("BuildDeckClient", () => {
   });
 
   it("shows the empty state when the player owns no card", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({
       status: "ready",
       origin: "server",
@@ -63,6 +110,7 @@ describe("BuildDeckClient", () => {
   });
 
   it("shows the cache notice when the collection came from local storage", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({
       status: "ready",
       origin: "cache",
@@ -80,6 +128,7 @@ describe("BuildDeckClient", () => {
   });
 
   it("shows the catalog-unavailable failure when the server catalog failed to load", () => {
+    mockReadyActiveDeckAndDraft();
     mockPanel({ status: "loading" });
 
     render(<BuildDeckClient catalogResult={{ status: "error" }} />);
@@ -87,5 +136,33 @@ describe("BuildDeckClient", () => {
     expect(
       screen.getByText("Não foi possível carregar o catálogo de cartas. Tente novamente."),
     ).toBeTruthy();
+  });
+
+  it("shows the preparing-initial-deck message while the active deck row has not been created yet", () => {
+    mockActiveDeck({ status: "pending" });
+    mockDeckDraft();
+    mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
+    mockPanel({ status: "loading" });
+
+    render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
+
+    expect(screen.getByText("Preparando seu deck inicial…")).toBeTruthy();
+  });
+
+  it("shows the block message reported by useDeckDraft", () => {
+    mockReadyActiveDeckAndDraft();
+    mockDeckDraft({ lastBlock: new DomainError("boom", "card_not_owned", { cardNumber: "001" }) });
+    mockPanel({
+      status: "ready",
+      origin: "server",
+      isEmpty: false,
+      items: [],
+      term: "",
+      selectedCardNumber: undefined,
+    });
+
+    render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
+
+    expect(screen.getByText("Carta não está na sua coleção.")).toBeTruthy();
   });
 });

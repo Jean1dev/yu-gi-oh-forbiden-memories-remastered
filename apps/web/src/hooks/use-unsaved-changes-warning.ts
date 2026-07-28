@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 
+import { BUILD_DECK_MESSAGES } from "../components/build-deck/messages.ts";
+
 export type UseUnsavedChangesWarningResult = Readonly<{
   /** Shows the native confirm with the PRD text; `true` means the caller may proceed with navigation. */
   confirmInternalNavigation(): boolean;
 }>;
-
-const CONFIRM_LEAVE_MESSAGE = "Você tem alterações não salvas. Sair sem salvar?";
 
 /**
  * Compensates for the draft having no persistence (spec build-deck/F05,
@@ -37,7 +37,7 @@ export function useUnsavedChangesWarning(hasUnsavedChanges: boolean): UseUnsaved
     if (!hasUnsavedChanges) {
       return true;
     }
-    return window.confirm(CONFIRM_LEAVE_MESSAGE);
+    return window.confirm(BUILD_DECK_MESSAGES.confirmLeaveWithUnsavedChanges);
   }
 
   return { confirmInternalNavigation };

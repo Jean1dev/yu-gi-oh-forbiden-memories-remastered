@@ -14,6 +14,8 @@ export type UseDeckDraftResult = Readonly<{
   /** Memoized by `draft` — feeds F04's `usePainelColecao` in place of the neutral fallback. */
   activeDeckLookup: ActiveDeckLookup;
   hasUnsavedChanges: boolean;
+  /** `false` while F01's collection has not resolved yet — the UI disables "＋" instead of calling `addCard` (spec build-deck/F05 §6). */
+  canAddCard: boolean;
   /** Injects the player's owned collection (F01) internally; a no-op while it is not ready. */
   addCard(cardNumber: CardNumber): void;
   removeCard(cardNumber: CardNumber): void;
@@ -53,6 +55,7 @@ export function useDeckDraft(): UseDeckDraftResult {
     lastBlock,
     activeDeckLookup,
     hasUnsavedChanges,
+    canAddCard: collectionState.status === "ready",
     addCard,
     removeCard: storeRemoveCard,
   };

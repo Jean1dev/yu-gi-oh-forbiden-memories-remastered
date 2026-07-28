@@ -4,7 +4,6 @@ import { enrichCollection, searchByName, withDeckQuantity } from "@yugioh/rules"
 import type {
   ActiveDeckLookup,
   Card,
-  CardCatalogLookup,
   CardNumber,
   CollectionItemWithDeck,
   CollectionOrigin,
@@ -12,6 +11,7 @@ import type {
 } from "@yugioh/shared";
 import { useMemo, useState } from "react";
 
+import { buildCatalogLookup } from "../lib/build-deck/catalog-lookup.ts";
 import { useCollection } from "./use-collection.ts";
 
 export type CollectionPanelState =
@@ -32,11 +32,6 @@ export type CollectionPanelActions = Readonly<{
   setTerm: (term: string) => void;
   select: (cardNumber: CardNumber | undefined) => void;
 }>;
-
-function buildCatalogLookup(cards: readonly Card[]): CardCatalogLookup {
-  const byNumber = new Map(cards.map((card) => [card.numero, card] as const));
-  return (cardNumber) => byNumber.get(cardNumber);
-}
 
 /**
  * Thin adapter combining the loaded collection (F01's `useCollection`), the

@@ -1,14 +1,21 @@
 "use client";
 
 import type { Card } from "@yugioh/shared";
+import { useEffect, useMemo, useRef } from "react";
 
+import { BlockMessage } from "../../components/build-deck/block-message.tsx";
 import { CollectionFailure } from "../../components/build-deck/collection-failure.tsx";
 import { CollectionPanel } from "../../components/build-deck/collection-panel.tsx";
+import { DeckEditor } from "../../components/build-deck/deck-editor.tsx";
 import { EmptyCollectionState } from "../../components/build-deck/empty-collection-state.tsx";
 import { BUILD_DECK_MESSAGES } from "../../components/build-deck/messages.ts";
 import { PanelSkeleton } from "../../components/build-deck/panel-skeleton.tsx";
+import { useActiveDeck } from "../../hooks/use-active-deck.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
-import { unavailableActiveDeck } from "../../lib/build-deck/unavailable-active-deck.ts";
+import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
+import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
+import { buildCatalogLookup } from "../../lib/build-deck/catalog-lookup.ts";
+import { useDeckDraftStore } from "../../stores/deck-draft-store.ts";
 
 /** The catalog, resolved server-side in `page.tsx` via `loadCatalogFromDisk` (fs access is server-only). */
 export type CatalogResult =
@@ -22,21 +29,57 @@ export type BuildDeckClientProps = Readonly<{
 const EMPTY_CARDS: readonly Card[] = [];
 
 /**
- * No real `ActiveDeckLookup` exists yet (build-deck/F02, F05, F07 are
- * expected to provide one) — the neutral fallback keeps every card at "in
- * deck 0" instead of inventing a value (spec build-deck/F04, Decision 3).
+ * The state machine driving `/build-deck`: skeleton, failure, empty
+ * collection, or the ready panel plus the deck-in-edition editor
+ * (build-deck/F05). Owns the composition root for F04 (`useCollectionPanel`)
+ * and F05 (`useActiveDeck`/`useDeckDraft`/`useUnsavedChangesWarning`): the
+ * spec's Seção 2 names `page.tsx` as the wiring point, but `page.tsx` in this
+ * codebase is a server-only component (it loads the catalog via `fs`) — every
+ * client hook already lived here since F04, so F05's wiring joins it here
+ * too instead of splitting the composition root across two files.
  */
-const NO_ACTIVE_DECK = unavailableActiveDeck();
-
-/** The state machine driving `/build-deck`: skeleton, failure, empty collection, or the ready panel. */
 export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
-  const panel = useCollectionPanel(
-    catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS,
-    NO_ACTIVE_DECK,
-  );
+  const cards = catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS;
+  const catalog = useMemo(() => buildCatalogLookup(cards), [cards]);
+
+  const activeDeckState = useActiveDeck();
+  const initializeDraft = useDeckDraftStore((state) => state.initializeDraft);
+  const discardDraft = useDeckDraftStore((state) => state.discardDraft);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (activeDeckState.status === "ready" && !initializedRef.current) {
+      initializedRef.current = true;
+      initializeDraft(activeDeckState.activeDeck);
+    }
+  }, [activeDeckState, initializeDraft]);
+
+  const draftState = useDeckDraft();
+  const { confirmInternalNavigation } = useUnsavedChangesWarning(draftState.hasUnsavedChanges);
+  const panel = useCollectionPanel(cards, draftState.activeDeckLookup);
+
+  function handleLeaveEditor(): void {
+    if (!confirmInternalNavigation()) {
+      return;
+    }
+    discardDraft();
+    window.history.back();
+  }
 
   if (catalogResult.status === "error") {
     return <CollectionFailure message={BUILD_DECK_MESSAGES.catalogUnavailable} />;
+  }
+
+  if (activeDeckState.status === "error") {
+    const message =
+      activeDeckState.error.code === "session_missing"
+        ? BUILD_DECK_MESSAGES.sessionMissing
+        : BUILD_DECK_MESSAGES.collectionUnavailable;
+    return <CollectionFailure message={message} />;
+  }
+
+  if (activeDeckState.status === "loading" || activeDeckState.status === "pending") {
+    return <p role="status">{BUILD_DECK_MESSAGES.preparingInitialDeck}</p>;
   }
 
   if (panel.status === "loading") {
@@ -55,8 +98,14 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
     return <EmptyCollectionState />;
   }
 
+  const selectedCard =
+    panel.selectedCardNumber === undefined ? undefined : catalog(panel.selectedCardNumber);
+
   return (
     <>
+      <button type="button" onClick={handleLeaveEditor}>
+        ◀ Voltar
+      </button>
       {panel.origin === "cache" ? <p role="status">{BUILD_DECK_MESSAGES.cacheNotice}</p> : null}
       <CollectionPanel
         items={panel.items}
@@ -65,6 +114,16 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
         isEmpty={panel.isEmpty}
         selectedCardNumber={panel.selectedCardNumber}
         onSelectCard={panel.select}
+      />
+      <BlockMessage lastBlock={draftState.lastBlock} />
+      <DeckEditor
+        draft={draftState.draft}
+        catalog={catalog}
+        total={draftState.total}
+        selectedCard={selectedCard === undefined ? undefined : { numero: selectedCard.numero, nome: selectedCard.nome }}
+        canAddCard={draftState.canAddCard}
+        onAddCard={draftState.addCard}
+        onRemoveCard={draftState.removeCard}
       />
     </>
   );
