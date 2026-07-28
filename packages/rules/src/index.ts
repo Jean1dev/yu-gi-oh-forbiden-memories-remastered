@@ -20,3 +20,10 @@ export {
   type RandomSource,
   type ResolvedInitialPool,
 } from "./initial-deck/index.ts";
+export {
+  addCardToDraft,
+  createActiveDeckLookupFromDraft,
+  draftDivergesFromActiveDeck,
+  removeCardFromDraft,
+  totalCardsInDraft,
+} from "./deck/index.ts";

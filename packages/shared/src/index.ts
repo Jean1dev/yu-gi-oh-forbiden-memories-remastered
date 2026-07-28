@@ -47,6 +47,7 @@ export type {
 } from "./duel/types.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
 export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
+export type { DeckDraft, DeckEditBlockReason } from "./deck/draft.ts";
 export type {
   DuelEvent,
   EventType,
