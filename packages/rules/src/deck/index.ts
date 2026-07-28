@@ -5,3 +5,4 @@ export {
   removeCardFromDraft,
   totalCardsInDraft,
 } from "./draft.ts";
+export { validateDeckDraft } from "./validation.ts";

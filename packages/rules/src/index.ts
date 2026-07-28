@@ -26,4 +26,5 @@ export {
   draftDivergesFromActiveDeck,
   removeCardFromDraft,
   totalCardsInDraft,
+  validateDeckDraft,
 } from "./deck/index.ts";
