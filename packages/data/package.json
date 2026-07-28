@@ -7,6 +7,7 @@
     "./art": "./src/art/index.ts",
     "./catalog": "./src/catalog/index.ts",
     "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
+    "./drops": "./src/drops/index.ts",
     "./fusion": "./src/fusion/index.ts",
     "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",
     "./guardian-stars": "./src/guardian-stars/index.ts",
