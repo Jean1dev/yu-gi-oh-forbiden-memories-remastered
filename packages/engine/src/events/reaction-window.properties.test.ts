@@ -22,6 +22,7 @@ function emptyState(): DuelState {
     activePlayer: "P1",
     turn: 1,
     phase: "main",
+    seed: 1753617600,
   };
 }
 

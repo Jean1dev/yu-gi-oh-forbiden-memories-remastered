@@ -22,7 +22,13 @@ export {
   type ValidationViolation,
   type ViolationCategory,
 } from "./card/validation-report.ts";
-export { EVENT_TYPES, INITIAL_LP, TOTAL_MONSTER_ZONES, TOTAL_SPELL_ZONES } from "./duel/constants.ts";
+export {
+  EVENT_TYPES,
+  INITIAL_HAND_SIZE,
+  INITIAL_LP,
+  TOTAL_MONSTER_ZONES,
+  TOTAL_SPELL_ZONES,
+} from "./duel/constants.ts";
 export type {
   DuelState,
   MonsterPosition,
@@ -33,6 +39,7 @@ export type {
   PlayerState,
   SpellZone,
 } from "./duel/types.ts";
+export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
 export type {
   DuelEvent,
   EventType,

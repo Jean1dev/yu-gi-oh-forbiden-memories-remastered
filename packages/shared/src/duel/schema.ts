@@ -119,6 +119,7 @@ export const DuelStateSchema = z.strictObject({
   turn: z.number().int().min(1),
   phase: PhaseSchema,
   pending: ReactionWindowSchema.optional(),
+  seed: z.number().int().min(0).max(0xffffffff),
 });
 
 /**

@@ -66,4 +66,6 @@ export type DuelState = Readonly<{
   phase: Phase;
   /** Absent = normal flow; present = engine paused awaiting external resolution. */
   pending?: ReactionWindow | undefined;
+  /** The seed this duel was shuffled with (F03); enables deterministic replay. */
+  seed: number;
 }>;

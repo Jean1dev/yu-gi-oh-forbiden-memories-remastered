@@ -49,6 +49,7 @@ function validState(overrides: Partial<DuelState> = {}): DuelState {
     activePlayer: "P1",
     turn: 1,
     phase: "main",
+    seed: 1753617600,
     ...overrides,
   };
 }
