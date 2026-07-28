@@ -15,7 +15,8 @@ import { syncRewardQueue } from "../src/lib/reward/sync-reward-queue.ts";
 /**
  * Requires a Supabase instance (local via `supabase start`, or a real
  * project) with every migration under `supabase/migrations/` applied,
- * including `0005_create_reward_ledger.sql`, plus `SUPABASE_URL`,
+ * including `0005_create_reward_ledger.sql` and
+ * `0006_fix_apply_card_reward_auth_check.sql`, plus `SUPABASE_URL`,
  * `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ANON_KEY` in the environment —
  * the same three `collection.integration.test.ts` reads. Skips cleanly
  * (skill soft-fail rule for external test dependencies) whenever those three
@@ -65,14 +66,17 @@ describe.skipIf(!hasSupabaseEnv)("build-deck/F03 reward ledger against a real Su
 
   let admin: SupabaseClient;
   let playerA: { client: SupabaseClient; playerId: string };
+  let playerB: { client: SupabaseClient; playerId: string };
 
   beforeAll(async () => {
     admin = createClient(url, serviceRoleKey);
     playerA = await createTestUserClient(admin, url, anonKey);
+    playerB = await createTestUserClient(admin, url, anonKey);
   });
 
   afterAll(async () => {
     await cleanupPlayer(admin, playerA.playerId);
+    await cleanupPlayer(admin, playerB.playerId);
   });
 
   it("migration creates reward_ledger with duel_id as primary key", async () => {
@@ -172,6 +176,33 @@ describe.skipIf(!hasSupabaseEnv)("build-deck/F03 reward ledger against a real Su
     expect(error).toBeNull();
     const row = Array.isArray(data) ? data[0] : data;
     expect(row?.applied).toBe(true);
+  });
+
+  it("the authenticated role cannot execute apply_card_reward for another player's p_player_id", async () => {
+    const duelId = `test:${randomUUID()}`;
+    const { data, error } = await playerB.client.rpc("apply_card_reward", {
+      p_player_id: playerA.playerId,
+      p_duel_id: duelId,
+      p_card_numero: "010",
+    });
+    expect(error).not.toBeNull();
+    expect(error?.message).toMatch(/permission denied/i);
+    expect(data).toBeNull();
+
+    const { data: ledgerRow } = await admin
+      .from("reward_ledger")
+      .select("duel_id")
+      .eq("duel_id", duelId)
+      .maybeSingle();
+    expect(ledgerRow).toBeNull();
+
+    const { data: collectionRow } = await admin
+      .from("collections")
+      .select("quantity")
+      .eq("player_id", playerA.playerId)
+      .eq("numero", "010")
+      .maybeSingle();
+    expect(collectionRow).toBeNull();
   });
 
   it("removing the user from auth.users cascades to their reward_ledger rows", async () => {
