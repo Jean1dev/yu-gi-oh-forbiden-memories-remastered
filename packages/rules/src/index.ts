@@ -7,8 +7,10 @@ export {
   ownedEntries,
   ownedQuantity,
   owns,
+  searchByName,
   serializeCollection,
   validateRewardCardNumber,
+  withDeckQuantity,
 } from "./collection/index.ts";
 export {
   drawInitialDeck,
