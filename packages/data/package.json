@@ -9,6 +9,7 @@
     "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
     "./fusion": "./src/fusion/index.ts",
     "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",
+    "./guardian-stars": "./src/guardian-stars/index.ts",
     "./ingestion": "./src/ingestion/index.ts",
     "./validation": "./src/validation/index.ts"
   },
