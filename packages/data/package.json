@@ -7,6 +7,7 @@
     "./art": "./src/art/index.ts",
     "./catalog": "./src/catalog/index.ts",
     "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
+    "./fusion": "./src/fusion/index.ts",
     "./ingestion": "./src/ingestion/index.ts",
     "./validation": "./src/validation/index.ts"
   },
