@@ -33,9 +33,11 @@ here rather than in `apps/web` (spec build-deck/F01, Decision 1 —
   `resolveArtReference` (art / placeholder / silhouette, never consulting the
   art lookup for a not-obtained card), `calculateProgress` / `findEntry` /
   `isObtained` (the read-side the "X of 722 obtained" indicator and F05's
-  detail screen consume). Another sibling subsystem, same package charter
-  extension `collection` already opened (spec library/F01, Decision 1 —
-  `docs/arquitetura.md` §2 registration still pending, same as noted there).
+  detail screen consume), `onlyObtained` (F02's default status cut, the
+  pattern F04 generalizes into the full status filter). Another sibling
+  subsystem, same package charter extension `collection` already opened
+  (spec library/F01, Decision 1 — `docs/arquitetura.md` §2 registration still
+  pending, same as noted there).
 
 ## Dependency direction
 

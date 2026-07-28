@@ -23,6 +23,7 @@ export {
   calculateProgress,
   findEntry,
   isObtained,
+  onlyObtained,
   resolveArtReference,
   type LibraryCrossReferenceInput,
 } from "./library/index.ts";
