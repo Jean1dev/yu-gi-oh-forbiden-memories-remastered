@@ -20,6 +20,48 @@
       ],
       "outputs": ["generated/validation-report.json", "generated/dataset-seal.json"]
     },
+    "data:validate-fusions": {
+      "dependsOn": ["data:validate"],
+      "inputs": [
+        "src/catalog/**",
+        "src/fusion/**",
+        "scripts/load-catalog-from-disk.ts",
+        "scripts/load-fusion-table-from-disk.ts",
+        "scripts/validate-fusions.ts",
+        "rules-data/fusions.json",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ],
+      "outputs": ["generated/fusion-validation-report.json"]
+    },
+    "data:guardian-matrix": {
+      "dependsOn": ["data:ingest", "data:validate"],
+      "inputs": [
+        "src/guardian-stars/**",
+        "scripts/build-guardian-matrix.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ],
+      "outputs": [
+        "generated/guardian-star-matrix.json",
+        "generated/guardian-star-coverage-report.json"
+      ]
+    },
+    "data:validate-terrain": {
+      "dependsOn": ["data:validate"],
+      "inputs": [
+        "src/catalog/**",
+        "src/terrain/**",
+        "scripts/load-catalog-from-disk.ts",
+        "scripts/load-terrain-table-from-disk.ts",
+        "scripts/validate-terrain-matrix.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ]
+    },
     "build": {
       "dependsOn": ["^build", "@yugioh/data#data:validate"],
       "outputs": ["dist/**", ".next/**"]
