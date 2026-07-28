@@ -10,12 +10,13 @@ import { loadCollection } from "../src/lib/collection/load-collection.ts";
 import { createSupabaseCollectionRepository } from "../src/lib/collection/supabase-repository.ts";
 
 /**
- * Requires a local Supabase instance (`supabase start`) with migration
- * `0001_create_collections.sql` applied, plus `SUPABASE_URL`,
- * `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ANON_KEY` in the environment.
- * None of the three is available in this run, so the whole suite is skipped
- * rather than failing on missing infrastructure (skill soft-fail rule for
- * external test dependencies) — see the final report's Soft-fails section.
+ * Requires a Supabase instance (local via `supabase start`, or a real
+ * project) with every migration under `supabase/migrations/` applied, plus
+ * `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ANON_KEY` in the
+ * environment. Confirmed green against the project's real test Supabase
+ * instance (2026-07-28); skips cleanly (skill soft-fail rule for external
+ * test dependencies) whenever those three aren't set, e.g. a fresh clone
+ * with no `.env.local`.
  */
 const SUPABASE_URL = process.env["SUPABASE_URL"];
 const SERVICE_ROLE_KEY = process.env["SUPABASE_SERVICE_ROLE_KEY"];

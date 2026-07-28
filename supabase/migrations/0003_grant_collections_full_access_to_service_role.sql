@@ -1,0 +1,12 @@
+-- build-deck/F01 — fixes a second gap found live against the test project
+-- (plzmowrjvjenwjqlvxhw): `service_role` had no table-level grant either,
+-- same root cause as 0002 (this project's `public` schema has no default
+-- privilege grants configured). `service_role` is trusted infrastructure —
+-- RLS does not even apply to it in Supabase — so unlike the deliberate
+-- absence of a write policy for `authenticated`/`anon` (spec build-deck/F01,
+-- Decision 8), withholding access here is not an intentional security
+-- boundary, just a missing baseline every Supabase project normally ships
+-- with. Confirmed live: without this, `admin.from("collections").insert(...)`
+-- fails with "permission denied for table collections" even though
+-- `service_role` is meant to bypass RLS entirely.
+grant select, insert, update, delete on public.collections to service_role;
