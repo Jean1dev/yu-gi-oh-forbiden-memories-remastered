@@ -49,6 +49,19 @@
         "generated/guardian-star-coverage-report.json"
       ]
     },
+    "data:validate-terrain": {
+      "dependsOn": ["data:validate"],
+      "inputs": [
+        "src/catalog/**",
+        "src/terrain/**",
+        "scripts/load-catalog-from-disk.ts",
+        "scripts/load-terrain-table-from-disk.ts",
+        "scripts/validate-terrain-matrix.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ]
+    },
     "build": {
       "dependsOn": ["^build", "@yugioh/data#data:validate"],
       "outputs": ["dist/**", ".next/**"]
