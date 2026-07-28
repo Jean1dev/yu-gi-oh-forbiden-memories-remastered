@@ -1,0 +1,22 @@
+{
+  "name": "@yugioh/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@yugioh/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "fast-check": "4.9.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
