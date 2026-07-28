@@ -57,6 +57,38 @@ export type {
   ZoneType,
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
+export type {
+  CardRewardEvent,
+  Collection,
+  CollectionEntry,
+  CollectionItem,
+  CollectionOrigin,
+  CollectionSnapshot,
+  EnrichedCollection,
+  LoadedCollection,
+  PendingReward,
+  RewardResult,
+  SerializedCollection,
+} from "./collection/types.ts";
+export {
+  ApplyCardRewardResponseSchema,
+  CardRewardEventSchema,
+  CollectionRowSchema,
+  CollectionSnapshotSchema,
+  PendingRewardSchema,
+  SerializedCollectionSchema,
+  type ApplyCardRewardResponse,
+  type CollectionRow,
+} from "./collection/schema.ts";
+export type { CardPoolLookup } from "./initial-deck/catalog.ts";
+export type { InitialPoolConfig } from "./initial-deck/types.ts";
+export {
+  ActiveDeckRowSchema,
+  InitialPoolConfigSchema,
+  PersistInitialDeckResponseSchema,
+  type ActiveDeckRow,
+  type PersistInitialDeckResponse,
+} from "./initial-deck/schema.ts";
 export {
   DuelEventSchema,
   DuelStateSchema,

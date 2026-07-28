@@ -51,6 +51,9 @@ packages/
               PRNG semeado. Máquina de estados com janela de reação.
   rules/      Guardian Star / Terrain / Fusion / Effect System. Funções puras que
               consomem tabelas de `data`. Hoje: tabelas vazias → modificador 0.
+              Também cobre regra de montagem de baralho (build-deck F01): posse
+              de carta, limiteCopias = min(quantidade, 3), enriquecimento com o
+              catálogo — "no máximo 3 cópias" é regra de jogo, não de UI.
   ai/         IA de NPCs: (EstadoDuelo público) → Acao. Consome `engine`, não o duplica.
 apps/
   web/        Next.js: Menu, Library, Build Deck, Password, Free Duel (UI + PWA).

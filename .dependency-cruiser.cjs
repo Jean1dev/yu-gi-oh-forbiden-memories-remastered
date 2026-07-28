@@ -36,6 +36,16 @@ module.exports = {
       to: { path: "^packages/(?!shared)" },
     },
     {
+      name: "rules-depends-only-on-shared",
+      comment:
+        "packages/rules may only import packages/shared (build-deck/F01). The card catalog " +
+        "(packages/data) is consumed by injection via CardCatalogLookup, never imported " +
+        "directly, so the collection-ownership rule stays testable without the real dataset.",
+      severity: "error",
+      from: { path: "^packages/rules/" },
+      to: { path: "^packages/(?!rules|shared)" },
+    },
+    {
       name: "engine-depends-only-on-shared",
       comment:
         "packages/engine may only import packages/shared (motor-duelo-1x1/F02). First real " +
@@ -44,6 +54,15 @@ module.exports = {
       severity: "error",
       from: { path: "^packages/engine/" },
       to: { path: "^packages/(?!engine|shared)" },
+    },
+    {
+      name: "web-has-no-engine-or-ai-dependency-yet",
+      comment:
+        "apps/web (build-deck/F01) depends on packages/shared, packages/rules and packages/data " +
+        "so far — no feature has wired packages/engine or packages/ai into the web app yet.",
+      severity: "error",
+      from: { path: "^apps/web/" },
+      to: { path: "^packages/(engine|ai)/" },
     },
     {
       name: "packages-never-import-apps",

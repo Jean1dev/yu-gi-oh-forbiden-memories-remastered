@@ -14,9 +14,10 @@ export type CardNumber = string;
 
 /**
  * Catalog lookup port: `numero` -> full `Card`, or `undefined` if unknown.
- * Declared by `build-deck`/F01 and `free-duel`/F01 (cross-PRD); to be
- * provided by `banco-de-cartas`/F03, not yet implemented. Consumers receive
- * it as an injected dependency and never construct one themselves.
+ * Declared by `build-deck`/F01 and `free-duel`/F01 (cross-PRD); implemented
+ * by `banco-de-cartas`/F03 (`CardCatalog.getByNumero`, `packages/data`).
+ * Consumers receive it as an injected dependency and never construct one
+ * themselves.
  */
 export type CardCatalogLookup = (cardNumber: CardNumber) => Card | undefined;
 

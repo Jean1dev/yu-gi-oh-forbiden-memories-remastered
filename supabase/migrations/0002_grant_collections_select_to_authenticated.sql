@@ -1,0 +1,11 @@
+-- build-deck/F01 — fixes a gap found against the real test project
+-- (plzmowrjvjenwjqlvxhw): this project's `public` schema has no default
+-- privilege grant to `anon`/`authenticated` on new tables, so `collections`
+-- came out of 0001 with RLS enabled but no underlying table-level GRANT.
+-- Postgres checks table-level privilege *before* RLS policies are
+-- evaluated — even a request that satisfies the SELECT policy
+-- (`player_id = auth.uid()`) is refused with "permission denied for table
+-- collections" without this. Not granted to `anon`: an unauthenticated
+-- request should be refused outright, matching `sessao_ausente` in
+-- `apps/web` (spec build-deck/F01 §6).
+grant select on public.collections to authenticated;
