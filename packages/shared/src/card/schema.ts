@@ -12,6 +12,15 @@ export const CardNumberSchema = z
   .string()
   .regex(CARD_NUMBER_PATTERN, "numero must be exactly 3 digits");
 
+/**
+ * The typeable password of a card, on its own.
+ *
+ * Exported because the shape is asserted in two places — when a card is parsed,
+ * and when the catalog decides whether a string a player typed is worth looking
+ * up at all (banco-de-cartas/F03). One definition keeps the two from drifting.
+ */
+export const CardPasswordSchema = z.string().regex(PASSWORD_PATTERN);
+
 export const CardTypeSchema = z.enum(CARD_TYPES);
 
 export const GuardianStarSchema = z.enum(GUARDIAN_STARS);
@@ -33,7 +42,7 @@ export const CardSchema = z.strictObject({
   def: nullableInteger,
   guardiao1: GuardianStarSchema.nullable(),
   guardiao2: GuardianStarSchema.nullable(),
-  password: z.string().regex(PASSWORD_PATTERN).nullable(),
+  password: CardPasswordSchema.nullable(),
   estrelas: nullableInteger,
   tipo: CardTypeSchema,
 });
