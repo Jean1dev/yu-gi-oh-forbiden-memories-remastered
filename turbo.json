@@ -35,6 +35,20 @@
       ],
       "outputs": ["generated/fusion-validation-report.json"]
     },
+    "data:guardian-matrix": {
+      "dependsOn": ["data:ingest", "data:validate"],
+      "inputs": [
+        "src/guardian-stars/**",
+        "scripts/build-guardian-matrix.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ],
+      "outputs": [
+        "generated/guardian-star-matrix.json",
+        "generated/guardian-star-coverage-report.json"
+      ]
+    },
     "build": {
       "dependsOn": ["^build", "@yugioh/data#data:validate"],
       "outputs": ["dist/**", ".next/**"]
