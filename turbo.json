@@ -20,6 +20,21 @@
       ],
       "outputs": ["generated/validation-report.json", "generated/dataset-seal.json"]
     },
+    "data:validate-fusions": {
+      "dependsOn": ["data:validate"],
+      "inputs": [
+        "src/catalog/**",
+        "src/fusion/**",
+        "scripts/load-catalog-from-disk.ts",
+        "scripts/load-fusion-table-from-disk.ts",
+        "scripts/validate-fusions.ts",
+        "rules-data/fusions.json",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ],
+      "outputs": ["generated/fusion-validation-report.json"]
+    },
     "build": {
       "dependsOn": ["^build", "@yugioh/data#data:validate"],
       "outputs": ["dist/**", ".next/**"]

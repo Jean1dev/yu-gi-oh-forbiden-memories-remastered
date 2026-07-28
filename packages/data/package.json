@@ -8,12 +8,14 @@
     "./catalog": "./src/catalog/index.ts",
     "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
     "./fusion": "./src/fusion/index.ts",
+    "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",
     "./ingestion": "./src/ingestion/index.ts",
     "./validation": "./src/validation/index.ts"
   },
   "scripts": {
     "data:ingest": "node scripts/ingest-cards.ts",
     "data:validate": "node scripts/validate-cards.ts",
+    "data:validate-fusions": "node scripts/validate-fusions.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --dir src",
     "test:integration": "vitest run --dir tests"
