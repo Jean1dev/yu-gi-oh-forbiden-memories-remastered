@@ -70,6 +70,7 @@ export type {
   RewardResult,
   SerializedCollection,
 } from "./collection/types.ts";
+export type { ActiveDeckLookup, CollectionItemWithDeck } from "./collection/active-deck.ts";
 export {
   ApplyCardRewardResponseSchema,
   CardRewardEventSchema,
