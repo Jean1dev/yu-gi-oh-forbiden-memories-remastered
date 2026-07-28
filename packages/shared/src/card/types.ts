@@ -13,6 +13,14 @@ export type GuardianStar = (typeof GUARDIAN_STARS)[number];
 export type CardNumber = string;
 
 /**
+ * Catalog lookup port: `numero` -> full `Card`, or `undefined` if unknown.
+ * Declared by `build-deck`/F01 and `free-duel`/F01 (cross-PRD); to be
+ * provided by `banco-de-cartas`/F03, not yet implemented. Consumers receive
+ * it as an injected dependency and never construct one themselves.
+ */
+export type CardCatalogLookup = (cardNumber: CardNumber) => Card | undefined;
+
+/**
  * The canonical card — the shape the whole monorepo consumes. Already
  * normalized: the source `{success, card}` envelope is gone, numeric fields are
  * coerced, and the textual absence sentinels are resolved to `null`.

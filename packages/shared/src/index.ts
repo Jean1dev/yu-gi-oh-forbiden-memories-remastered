@@ -9,7 +9,7 @@ export {
   GUARDIAN_STARS,
   KNOWN_CLASSES,
 } from "./card/constants.ts";
-export type { Card, CardNumber, CardType, GuardianStar } from "./card/types.ts";
+export type { Card, CardCatalogLookup, CardNumber, CardType, GuardianStar } from "./card/types.ts";
 export { CardNumberSchema, CardSchema, CardTypeSchema, GuardianStarSchema } from "./card/schema.ts";
 export {
   DatasetSealSchema,
@@ -40,6 +40,7 @@ export type {
   SpellZone,
 } from "./duel/types.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
+export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
 export type {
   DuelEvent,
   EventType,
