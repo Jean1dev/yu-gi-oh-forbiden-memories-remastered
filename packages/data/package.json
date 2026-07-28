@@ -1,0 +1,27 @@
+{
+  "name": "@yugioh/data",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./ingestion": "./src/ingestion/index.ts",
+    "./validation": "./src/validation/index.ts"
+  },
+  "scripts": {
+    "data:ingest": "node scripts/ingest-cards.ts",
+    "data:validate": "node scripts/validate-cards.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --dir src",
+    "test:integration": "vitest run --dir tests"
+  },
+  "dependencies": {
+    "@yugioh/shared": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "fast-check": "4.9.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
