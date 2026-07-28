@@ -36,6 +36,16 @@ module.exports = {
       to: { path: "^packages/(?!shared)" },
     },
     {
+      name: "engine-depends-only-on-shared",
+      comment:
+        "packages/engine may only import packages/shared (motor-duelo-1x1/F02). First real " +
+        "application of the \"headless engine\" pillar: no data/rules/ai dependency yet, " +
+        "checked from the package's very first commit rather than added later.",
+      severity: "error",
+      from: { path: "^packages/engine/" },
+      to: { path: "^packages/(?!engine|shared)" },
+    },
+    {
       name: "packages-never-import-apps",
       comment: "Lower-level packages never import apps.",
       severity: "error",
