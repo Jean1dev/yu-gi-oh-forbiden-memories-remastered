@@ -46,6 +46,7 @@ export type {
   SpellZone,
 } from "./duel/types.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
+export type { Snapshot } from "./duel/snapshot.ts";
 export type {
   EffectiveAtkDef,
   EquipmentModifierProvider,
