@@ -14,3 +14,8 @@ export {
   type DeckValidator,
   type SeedGenerator,
 } from "./initialization/index.ts";
+export {
+  calculateEffectiveAtkDef,
+  type CombatContext,
+  type ModifierProviders,
+} from "./combat/index.ts";

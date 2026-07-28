@@ -16,6 +16,11 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
 - `initialization` (`./src/initialization`, motor-duelo-1x1 F03): produces the first `DuelState` of
   a duel — `buildInitializationInput` (validates and resolves the two decks + seed) and `initDuel`
   (pure, total, builds the state).
+- `combat` (`./src/combat`, motor-duelo-1x1 F04): `calculateEffectiveAtkDef` — a monster's ATK/DEF
+  base plus the Guardian Star, terrain and equipment modifiers, added term by term. The three
+  modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`, `terrain`,
+  `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since none of
+  those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
 
 ## Dependency direction
 
