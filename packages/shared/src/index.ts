@@ -22,24 +22,24 @@ export {
   type ValidationViolation,
   type ViolationCategory,
 } from "./card/validation-report.ts";
-export { LP_INICIAL, TOTAL_ZONAS_MAGIA, TOTAL_ZONAS_MONSTRO } from "./duelo/constantes.ts";
+export { INITIAL_LP, TOTAL_MONSTER_ZONES, TOTAL_SPELL_ZONES } from "./duel/constants.ts";
 export type {
-  CampoJogador,
-  EstadoDuelo,
-  EstadoJogador,
-  Fase,
-  JogadorId,
-  PosicaoMonstro,
-  ZonaMagia,
-  ZonaMonstro,
-} from "./duelo/tipos.ts";
+  DuelState,
+  MonsterPosition,
+  MonsterZone,
+  Phase,
+  PlayerField,
+  PlayerId,
+  PlayerState,
+  SpellZone,
+} from "./duel/types.ts";
 export {
-  CampoJogadorSchema,
-  EstadoDueloSchema,
-  EstadoJogadorSchema,
-  FaseSchema,
-  JogadorIdSchema,
-  PosicaoMonstroSchema,
-  ZonaMagiaSchema,
-  ZonaMonstroSchema,
-} from "./duelo/schema.ts";
+  DuelStateSchema,
+  MonsterPositionSchema,
+  MonsterZoneSchema,
+  PhaseSchema,
+  PlayerFieldSchema,
+  PlayerIdSchema,
+  PlayerStateSchema,
+  SpellZoneSchema,
+} from "./duel/schema.ts";

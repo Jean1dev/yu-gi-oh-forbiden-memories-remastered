@@ -65,14 +65,14 @@ module.exports = {
       to: { circular: true },
     },
     {
-      name: "duelo-state-is-pure",
+      name: "duel-state-is-pure",
       comment:
-        "packages/shared/src/duelo/** is EstadoDuelo, the single source of truth of the 1x1 " +
-        "duel engine (motor-duelo-1x1/F01). It must stay data-only — no other package, no app, " +
-        "no UI/IO library — so the future engine package (F03+) inherits zero dependencies from " +
-        "it, before that package even exists.",
+        "packages/shared/src/duel/** is DuelState, the single source of truth of the 1x1 duel " +
+        "engine (motor-duelo-1x1/F01). It must stay data-only — no other package, no app, no " +
+        "UI/IO library — so the future engine package (F03+) inherits zero dependencies from it, " +
+        "before that package even exists.",
       severity: "error",
-      from: { path: "^packages/shared/src/duelo/" },
+      from: { path: "^packages/shared/src/duel/" },
       to: {
         path: "^(packages/(?!shared)|apps/|react|react-dom|next|@supabase/|node:|fs$|path$|os$|child_process$)",
       },
