@@ -56,6 +56,15 @@ module.exports = {
       to: { path: "^packages/(?!engine|shared)" },
     },
     {
+      name: "web-has-no-engine-or-ai-dependency-yet",
+      comment:
+        "apps/web (build-deck/F01) depends on packages/shared, packages/rules and packages/data " +
+        "so far — no feature has wired packages/engine or packages/ai into the web app yet.",
+      severity: "error",
+      from: { path: "^apps/web/" },
+      to: { path: "^packages/(engine|ai)/" },
+    },
+    {
       name: "packages-never-import-apps",
       comment: "Lower-level packages never import apps.",
       severity: "error",

@@ -1,0 +1,27 @@
+{
+  "name": "@yugioh/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --dir src --passWithNoTests",
+    "test:integration": "vitest run --dir tests --passWithNoTests"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.110.9",
+    "@yugioh/data": "workspace:*",
+    "@yugioh/rules": "workspace:*",
+    "@yugioh/shared": "workspace:*",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
