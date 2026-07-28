@@ -57,6 +57,22 @@ export type {
   ZoneType,
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
+export type {
+  Collection,
+  CollectionEntry,
+  CollectionItem,
+  CollectionOrigin,
+  CollectionSnapshot,
+  EnrichedCollection,
+  LoadedCollection,
+  SerializedCollection,
+} from "./collection/types.ts";
+export {
+  CollectionRowSchema,
+  CollectionSnapshotSchema,
+  SerializedCollectionSchema,
+  type CollectionRow,
+} from "./collection/schema.ts";
 export {
   DuelEventSchema,
   DuelStateSchema,
