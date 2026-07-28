@@ -98,11 +98,7 @@ export type {
   ObtainedArtReference,
 } from "./library/types.ts";
 export type { CardArtLookup, LibraryCatalogListing } from "./library/catalog.ts";
-export {
-  ArtReferenceSchema,
-  LibraryEntrySchema,
-  LibraryIndexSchema,
-} from "./library/schema.ts";
+export { ArtReferenceSchema, LibraryEntrySchema, LibraryIndexSchema } from "./library/schema.ts";
 export {
   ActiveDeckRowSchema,
   InitialPoolConfigSchema,

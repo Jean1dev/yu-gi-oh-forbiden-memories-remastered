@@ -63,9 +63,7 @@ function buildEntry(card: Card, obtained: boolean, artLookup: CardArtLookup): Li
 export function buildLibraryIndex(input: LibraryCrossReferenceInput): LibraryIndex {
   const { catalog, obtainedCardNumbers, artLookup } = input;
 
-  const sortedCards = [...catalog.listAll()].sort((a, b) =>
-    compareCardNumber(a.numero, b.numero),
-  );
+  const sortedCards = [...catalog.listAll()].sort((a, b) => compareCardNumber(a.numero, b.numero));
 
   const entries: LibraryEntry[] = [];
   const catalogCardNumbers = new Set<CardNumber>();

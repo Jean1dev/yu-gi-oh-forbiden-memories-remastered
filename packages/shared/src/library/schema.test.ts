@@ -118,8 +118,6 @@ describe("LibraryIndexSchema", () => {
   });
 
   it("rejects an index where obtained exceeds total", () => {
-    expect(LibraryIndexSchema.safeParse(index({ total: 722, obtained: 723 })).success).toBe(
-      false,
-    );
+    expect(LibraryIndexSchema.safeParse(index({ total: 722, obtained: 723 })).success).toBe(false);
   });
 });
