@@ -298,4 +298,90 @@ describe("LibraryClient", () => {
       scroll: false,
     });
   });
+
+  it("filters by status and type before delivering the ordered sequence to the grid", () => {
+    navigation.query = "status=todas&tipo=monstro&ordem=numero&direcao=desc";
+    mockState({
+      status: "ready",
+      loaded: {
+        index: buildIndex(["001", "003"]),
+        collectionOrigin: "server",
+        syncedAt: "2026-01-01T00:00:00.000Z",
+      },
+      reload: RELOAD,
+    });
+
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
+    const links = screen.getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "/library/003?status=todas&tipo=monstro&ordem=numero&direcao=desc",
+      "/library/001?status=todas&tipo=monstro&ordem=numero&direcao=desc",
+    ]);
+  });
+
+  it("renders blocked entries for the not-obtained status", () => {
+    navigation.query = "status=nao-obtidas";
+    mockState({
+      status: "ready",
+      loaded: {
+        index: buildIndex(["001"]),
+        collectionOrigin: "server",
+        syncedAt: "2026-01-01T00:00:00.000Z",
+      },
+      reload: RELOAD,
+    });
+
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
+    expect(screen.getAllByText("???")).toHaveLength(2);
+  });
+
+  it("shows the filter-specific empty state when filters remove every card", () => {
+    navigation.query = "status=nao-obtidas&tipo=monstro";
+    mockState({
+      status: "ready",
+      loaded: {
+        index: buildIndex(["001"]),
+        collectionOrigin: "server",
+        syncedAt: "2026-01-01T00:00:00.000Z",
+      },
+      reload: RELOAD,
+    });
+
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
+    expect(screen.getByText("Nenhuma carta corresponde aos filtros selecionados.")).toBeTruthy();
+  });
+
+  it("gives the active-search message precedence over the filter empty state", () => {
+    navigation.query = "q=missing&status=todas";
+    mockState({
+      status: "ready",
+      loaded: {
+        index: buildIndex(["001"]),
+        collectionOrigin: "server",
+        syncedAt: "2026-01-01T00:00:00.000Z",
+      },
+      reload: RELOAD,
+    });
+
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
+    expect(screen.getByText("Nenhuma carta encontrada para 'missing'.")).toBeTruthy();
+    expect(screen.queryByText("Nenhuma carta corresponde aos filtros selecionados.")).toBeNull();
+  });
+
+  it("clears F04 filters while preserving the search term", () => {
+    navigation.query = "q=dragon&status=todas&ordem=atk";
+    mockState({
+      status: "ready",
+      loaded: {
+        index: buildIndex(["001"]),
+        collectionOrigin: "server",
+        syncedAt: "2026-01-01T00:00:00.000Z",
+      },
+      reload: RELOAD,
+    });
+
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
+    fireEvent.click(screen.getByRole("button", { name: "Limpar filtros" }));
+    expect(navigation.replace).toHaveBeenCalledWith("/library?q=dragon", { scroll: false });
+  });
 });

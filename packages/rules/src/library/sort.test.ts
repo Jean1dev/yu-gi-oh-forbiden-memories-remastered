@@ -51,9 +51,17 @@ describe("sortLibraryEntries", () => {
     expect(numbers({ field: "nome", direction: "asc" })).toEqual(["002", "003", "001", "004"]);
   });
 
-  it.each(["atk", "def", "estrelas"] as const)("sorts numeric field %s", (field) => {
-    const result = numbers({ field, direction: "asc" });
-    expect(result.at(-1)).toBe("004");
+  it.each([
+    ["nome", "asc", ["002", "003", "001", "004"]],
+    ["nome", "desc", ["001", "002", "003", "004"]],
+    ["atk", "asc", ["002", "001", "003", "004"]],
+    ["atk", "desc", ["001", "002", "003", "004"]],
+    ["def", "asc", ["003", "002", "001", "004"]],
+    ["def", "desc", ["002", "003", "001", "004"]],
+    ["estrelas", "asc", ["002", "003", "001", "004"]],
+    ["estrelas", "desc", ["001", "003", "002", "004"]],
+  ] as const)("sorts %s in %s direction", (field, direction, expected) => {
+    expect(numbers({ field, direction })).toEqual(expected);
   });
 
   it("keeps absent numeric values at the end in both directions", () => {

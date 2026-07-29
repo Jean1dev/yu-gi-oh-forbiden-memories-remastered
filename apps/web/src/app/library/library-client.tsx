@@ -3,9 +3,10 @@
 import {
   calculateProgress,
   filterLibrarySearch,
+  hasNonDefaultLibraryFilters,
   normalizeLibrarySearchTerm,
-  onlyObtained,
   prepareLibrarySearch,
+  queryLibraryEntries,
 } from "@yugioh/rules";
 import type { LoadedLibrary } from "@yugioh/shared";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,8 @@ import { useMemo } from "react";
 import { CacheNotice } from "../../components/library/cache-notice.tsx";
 import { CollectionGrid } from "../../components/library/collection-grid.tsx";
 import { EmptyState } from "../../components/library/empty-state.tsx";
+import { FilterBar } from "../../components/library/filter-bar.tsx";
+import { FilterNoResults } from "../../components/library/filter-no-results.tsx";
 import { GridSkeleton } from "../../components/library/grid-skeleton.tsx";
 import { LibraryFailure } from "../../components/library/library-failure.tsx";
 import { LIBRARY_MESSAGES } from "../../components/library/messages.ts";
@@ -21,6 +24,7 @@ import { ProgressIndicator } from "../../components/library/progress-indicator.t
 import { LibrarySearchField } from "../../components/library/search-field.tsx";
 import { LibrarySearchNoResults } from "../../components/library/search-no-results.tsx";
 import { useLibrary } from "../../hooks/use-library.ts";
+import { useLibraryFilters } from "../../hooks/use-library-filters.ts";
 import { fromCatalogPayload } from "../../lib/library/catalog-payload.ts";
 import type { LibraryCatalogPayload } from "../../lib/library/types.ts";
 import {
@@ -57,12 +61,23 @@ function ReadyLibrary({
 }>) {
   const term = useMemo(() => readSearchFromUrl(new URLSearchParams(queryString)), [queryString]);
   const { index, collectionOrigin, syncedAt } = loaded;
+  const { filters, setFilters, clearFilters } = useLibraryFilters();
   const progress = calculateProgress(index);
-  const entries = useMemo(() => onlyObtained(index.entries), [index.entries]);
-  const searchIndex = useMemo(() => prepareLibrarySearch(entries), [entries]);
-  const searchedEntries = useMemo(
-    () => filterLibrarySearch(searchIndex, normalizeLibrarySearchTerm(term)),
-    [searchIndex, term],
+  const searchMatches = useMemo(
+    () =>
+      new Set(
+        filterLibrarySearch(prepareLibrarySearch(index.entries), normalizeLibrarySearchTerm(term)),
+      ),
+    [index.entries, term],
+  );
+  const result = useMemo(
+    () =>
+      queryLibraryEntries({
+        entries: index.entries,
+        filters,
+        ...(term.length === 0 ? {} : { search: (entry) => searchMatches.has(entry) }),
+      }),
+    [filters, index.entries, searchMatches, term.length],
   );
 
   function replaceSearch(nextParams: URLSearchParams): void {
@@ -76,10 +91,16 @@ function ReadyLibrary({
     <>
       {collectionOrigin === "cache" ? <CacheNotice syncedAt={syncedAt} /> : null}
       <ProgressIndicator progress={progress} />
-      {progress.obtained === 0 ? (
+      {progress.obtained === 0 && filters.status === "obtidas" ? (
         <EmptyState />
       ) : (
         <>
+          <FilterBar
+            filters={filters}
+            hasNonDefaultFilters={hasNonDefaultLibraryFilters(filters)}
+            onChange={setFilters}
+            onClear={clearFilters}
+          />
           <LibrarySearchField
             term={term}
             onChange={(nextTerm) =>
@@ -87,11 +108,13 @@ function ReadyLibrary({
             }
             onClear={() => replaceSearch(removeSearchFromUrl(new URLSearchParams(queryString)))}
           />
-          {searchedEntries.length === 0 && term.length > 0 ? (
+          {result.entries.length === 0 && term.length > 0 ? (
             <LibrarySearchNoResults term={term} />
+          ) : result.entries.length === 0 ? (
+            <FilterNoResults />
           ) : (
             <CollectionGrid
-              entries={searchedEntries}
+              entries={result.entries}
               emptyLabel={LIBRARY_MESSAGES.emptyCollection}
               detailQueryString={queryString}
             />

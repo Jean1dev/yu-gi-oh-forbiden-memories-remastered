@@ -54,6 +54,16 @@ module.exports = {
       to: { path: "^(react|react-dom|next|@supabase/|node:|fs$|path$|os$|child_process$)" },
     },
     {
+      name: "library-query-is-pure",
+      comment:
+        "Library filtering and sorting operate only on shared contracts; URL, UI, persistence and data access stay in apps/web.",
+      severity: "error",
+      from: { path: "^packages/rules/src/library/(query|status|type-filter|sort)\\.ts$" },
+      to: {
+        path: "^(react|react-dom|next|@supabase/|node:|fs$|path$|os$|child_process$|packages/(data|engine|ai)|apps/)",
+      },
+    },
+    {
       name: "engine-depends-only-on-shared",
       comment:
         "packages/engine may only import packages/shared (motor-duelo-1x1/F02). First real " +
