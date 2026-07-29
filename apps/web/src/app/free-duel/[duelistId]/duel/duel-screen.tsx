@@ -2,11 +2,15 @@
 
 import type { DuelSession, Duelist, ReadyDeck } from "@yugioh/shared";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
+import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
+import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
+import { useSurrender } from "../../../../hooks/use-surrender.ts";
 import { buildMatchInput } from "../../../../lib/free-duel/build-match-input.ts";
+import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
 import { takeDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.ts";
 import { generateDuelSessionId } from "../../../../lib/free-duel/seed-generator.ts";
@@ -30,10 +34,15 @@ function unavailableExternalModules(context: DuelScreenContext): DuelSession {
   };
 }
 
+const unavailableApply: ApplyAction = () => {
+  throw new Error("The duel engine apply contract is unavailable.");
+};
+
 export function DuelScreen({
   duelistId,
   loadContext = loadDefaultContext,
   startMatch = unavailableExternalModules,
+  applyAction = unavailableApply,
 }: {
   readonly duelistId: string;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
@@ -41,10 +50,20 @@ export function DuelScreen({
     context: DuelScreenContext,
     input: ReturnType<typeof buildMatchInput>,
   ) => DuelSession | Promise<DuelSession>;
+  readonly applyAction?: ApplyAction;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<DuelSession>({ status: "not_started" });
+  const matchStarted = useRef(false);
+  const surrenderFlow = useSurrender({
+    session,
+    playerId: "P1",
+    apply: applyAction,
+    onSessionChange: setSession,
+  });
   useEffect(() => {
+    if (matchStarted.current) return;
+    matchStarted.current = true;
     let active = true;
     void loadContext(duelistId).then(async (context) => {
       if (!active) return;
@@ -81,6 +100,15 @@ export function DuelScreen({
       <PlayerHand
         cards={state.players.P1.hand}
         disabled={session.status === "ended" || session.currentDecider !== "P1"}
+      />
+      <SurrenderButton
+        available={surrenderFlow.available}
+        onClick={surrenderFlow.requestConfirmation}
+      />
+      <SurrenderConfirmationDialog
+        open={surrenderFlow.confirmationOpen}
+        onConfirm={surrenderFlow.confirm}
+        onCancel={surrenderFlow.cancel}
       />
       {session.status === "ended" ? <p>Duel ended.</p> : null}
     </main>
