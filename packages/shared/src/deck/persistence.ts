@@ -53,9 +53,16 @@ export type PendingActiveDeckSave = Readonly<{
   queuedAt: string;
 }>;
 
-/** Outcome of one `syncPendingActiveDeckSave` run (spec build-deck/F07 §3, steps 6-10). */
+/**
+ * Outcome of one `syncPendingActiveDeckSave` run (spec build-deck/F07 §3,
+ * steps 6-10). `network_failure` and `session_expired` both keep the
+ * pending save queued (spec Decision 10, PRD §6 F07 Error Handling) — split
+ * into two statuses only so the UI can show the right message, not because
+ * the orchestration treats them differently.
+ */
 export type SyncActiveDeckSummary =
   | Readonly<{ status: "no_pending" }>
   | Readonly<{ status: "synced"; updatedAt: string }>
   | Readonly<{ status: "refused" }>
-  | Readonly<{ status: "network_failure" }>;
+  | Readonly<{ status: "network_failure" }>
+  | Readonly<{ status: "session_expired" }>;
