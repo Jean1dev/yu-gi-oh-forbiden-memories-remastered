@@ -17,21 +17,23 @@ import { dirname, join, resolve } from "node:path";
  */
 let cached: string | undefined;
 
+const WORKSPACE_MARKER = "pnpm-workspace.yaml";
+
 function repoRoot(): string {
   if (cached !== undefined) {
     return cached;
   }
 
-  let current = resolve(process.cwd());
+  let current = resolve(/* turbopackIgnore: true */ process.cwd());
   for (;;) {
-    if (existsSync(join(current, "pnpm-workspace.yaml"))) {
+    if (existsSync(join(/* turbopackIgnore: true */ current, WORKSPACE_MARKER))) {
       cached = current;
       return cached;
     }
     const parent = dirname(current);
     if (parent === current) {
       throw new Error(
-        `Could not locate the monorepo root: no pnpm-workspace.yaml above ${process.cwd()}.`,
+        `Could not locate the monorepo root: no ${WORKSPACE_MARKER} above ${process.cwd()}.`,
       );
     }
     current = parent;
