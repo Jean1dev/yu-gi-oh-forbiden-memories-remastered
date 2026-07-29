@@ -8,6 +8,11 @@ import { OrchestrationFailureNotice } from "../../../../components/free-duel/orc
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
+import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
+import {
+  useDuelResult,
+  type ResolveEndedDuelResult,
+} from "../../../../hooks/use-duel-result.ts";
 import { useSurrender } from "../../../../hooks/use-surrender.ts";
 import { buildMatchInput } from "../../../../lib/free-duel/build-match-input.ts";
 import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
@@ -38,11 +43,27 @@ const unavailableApply: ApplyAction = () => {
   throw new Error("The duel engine apply contract is unavailable.");
 };
 
+function EndedDuelResult({
+  session,
+  resolveResult,
+}: {
+  readonly session: Extract<DuelSession, { status: "ended" }>;
+  readonly resolveResult?: ResolveEndedDuelResult | undefined;
+}) {
+  const viewState = useDuelResult(session, resolveResult);
+  return viewState.status === "loading" ? (
+    <p aria-busy="true">Apurando resultado…</p>
+  ) : (
+    <DuelResult result={viewState.result} />
+  );
+}
+
 export function DuelScreen({
   duelistId,
   loadContext = loadDefaultContext,
   startMatch = unavailableExternalModules,
   applyAction = unavailableApply,
+  resolveResult,
 }: {
   readonly duelistId: string;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
@@ -51,6 +72,7 @@ export function DuelScreen({
     input: ReturnType<typeof buildMatchInput>,
   ) => DuelSession | Promise<DuelSession>;
   readonly applyAction?: ApplyAction;
+  readonly resolveResult?: ResolveEndedDuelResult | undefined;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<DuelSession>({ status: "not_started" });
@@ -110,7 +132,9 @@ export function DuelScreen({
         onConfirm={surrenderFlow.confirm}
         onCancel={surrenderFlow.cancel}
       />
-      {session.status === "ended" ? <p>Duel ended.</p> : null}
+      {session.status === "ended" ? (
+        <EndedDuelResult session={session} resolveResult={resolveResult} />
+      ) : null}
     </main>
   );
 }

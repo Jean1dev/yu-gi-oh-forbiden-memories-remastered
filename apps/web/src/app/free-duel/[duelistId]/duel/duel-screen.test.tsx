@@ -124,4 +124,40 @@ describe("DuelScreen", () => {
     render(<DuelScreen duelistId="missing" loadContext={async () => null} />);
     await waitFor(() => expect(replace).toHaveBeenCalledWith("/free-duel"));
   });
+
+  it("renders the consolidated result for an ended duel", async () => {
+    const session: DuelSession = {
+      status: "ended",
+      duelSessionId: "session-1",
+      duelistId: "seto",
+      finalState: { ...state, phase: "end" },
+    };
+    render(
+      <DuelScreen
+        duelistId="seto"
+        loadContext={loadContext}
+        startMatch={() => session}
+        resolveResult={async () => ({
+          status: "defeat",
+          duelSessionId: "session-1",
+          reason: "rendicao",
+        })}
+      />,
+    );
+    expect(await screen.findByRole("heading", { name: "Derrota" })).toBeTruthy();
+    expect(screen.getByText("Você se rendeu.")).toBeTruthy();
+    expect(screen.queryByText(/estrelas/)).toBeNull();
+  });
+
+  it("fails safely when result contracts are not composed", async () => {
+    const session: DuelSession = {
+      status: "ended",
+      duelSessionId: "session-1",
+      duelistId: "seto",
+      finalState: { ...state, phase: "end" },
+    };
+    render(<DuelScreen duelistId="seto" loadContext={loadContext} startMatch={() => session} />);
+    expect(await screen.findByRole("heading", { name: "Resultado indisponível" })).toBeTruthy();
+    expect(screen.queryByText(/estrelas/)).toBeNull();
+  });
 });
