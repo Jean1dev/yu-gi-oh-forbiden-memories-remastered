@@ -1,4 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Only for the ambient `structuredClone` global (motor-duelo-1x1/F05,
+    // spec Decision 3) — a pure, synchronous WHATWG global with no I/O, not
+    // an opt-in to fs/node:*/process. `.dependency-cruiser.cjs` still blocks
+    // every actual Node import in this package.
+    "types": ["node"]
+  },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

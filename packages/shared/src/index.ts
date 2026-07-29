@@ -46,6 +46,13 @@ export type {
   SpellZone,
 } from "./duel/types.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
+export type { Snapshot } from "./duel/snapshot.ts";
+export type {
+  EffectiveAtkDef,
+  EquipmentModifierProvider,
+  GuardianModifierProvider,
+  TerrainModifierProvider,
+} from "./duel/combat-modifiers.ts";
 export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
 export type {
   DeckDraft,
@@ -102,6 +109,16 @@ export {
 } from "./collection/schema.ts";
 export type { CardPoolLookup } from "./initial-deck/catalog.ts";
 export type { InitialPoolConfig } from "./initial-deck/types.ts";
+export type {
+  ArtReference,
+  CollectionProgress,
+  LibraryEntry,
+  LibraryIndex,
+  LoadedLibrary,
+  ObtainedArtReference,
+} from "./library/types.ts";
+export type { CardArtLookup, LibraryCatalogListing } from "./library/catalog.ts";
+export { ArtReferenceSchema, LibraryEntrySchema, LibraryIndexSchema } from "./library/schema.ts";
 export {
   ActiveDeckRowSchema,
   InitialPoolConfigSchema,

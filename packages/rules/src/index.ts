@@ -28,3 +28,16 @@ export {
   totalCardsInDraft,
   validateDeckDraft,
 } from "./deck/index.ts";
+export {
+  buildLibraryIndex,
+  calculateProgress,
+  findEntry,
+  isObtained,
+  onlyObtained,
+  resolveArtReference,
+  type LibraryCrossReferenceInput,
+} from "./library/index.ts";
+export { neutralGuardianModifier } from "./guardian-star/index.ts";
+export { neutralTerrainModifier } from "./terrain/index.ts";
+export { neutralEquipmentModifier } from "./effect-system/index.ts";
+export { neutralModifierProviders } from "./combat/index.ts";

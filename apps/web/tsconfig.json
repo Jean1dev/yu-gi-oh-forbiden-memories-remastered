@@ -3,7 +3,19 @@
   "compilerOptions": {
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
+    /**
+     * Overrides the monorepo's default `NodeNext` for this package only.
+     * `next` ships no `exports` field, and under `NodeNext` a subpath import
+     * like `next/link` is (mis)treated as an unscoped package specifier
+     * instead of a path inside the already-resolved `next` package, so it
+     * never resolves even though Node itself loads it fine at runtime. This
+     * is Next.js's own documented tsconfig for the App Router (`bundler`
+     * resolution, matching that the app is actually built by Next's bundler,
+     * not by `tsc`, which only runs here for `--noEmit` type-checking).
+     */
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "next-env.d.ts"]
 }
