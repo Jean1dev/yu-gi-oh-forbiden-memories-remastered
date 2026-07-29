@@ -67,6 +67,31 @@ export {
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
 export type { Snapshot } from "./duel/snapshot.ts";
 export type {
+  ConsolidatedDuelResult,
+  ConsolidatedRating,
+  CreateDuelSnapshot,
+  DecisiveDuelEndReason,
+  DuelEndReason,
+  DuelGrade,
+  DuelOutcome,
+  DuelResultUnavailableReason,
+  EndedDuelSession,
+  MinimumRatingReward,
+  RatingEngine,
+  RatingEvaluation,
+  RatingReward,
+  ReadDuelOutcome,
+} from "./duel/result.ts";
+export {
+  ConsolidatedDuelResultSchema,
+  DecisiveDuelEndReasonSchema,
+  DuelEndReasonSchema,
+  DuelOutcomeSchema,
+  MinimumRatingRewardSchema,
+  RatingEvaluationSchema,
+  RatingRewardSchema,
+} from "./duel/result-schema.ts";
+export type {
   EffectiveAtkDef,
   EquipmentModifierProvider,
   GuardianModifierProvider,

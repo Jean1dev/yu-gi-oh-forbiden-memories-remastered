@@ -101,8 +101,8 @@ Toda orquestração, I/O, cache e React ficam em `apps/web`. Nenhum arquivo em `
 ```ts
 type DuelOutcome =
   | { status: "decisive"; winner: PlayerId; loser: PlayerId;
-      reason: "lp_zero" | "deck_out" | "surrender" }
-  | { status: "draw"; winner: null; loser: null; reason: "draw" };
+      reason: "lp_zerado" | "deck_out" | "rendicao" }
+  | { status: "draw"; winner: null; loser: null; reason: "empate" };
 ```
 
 `RatingEvaluation` contém `grade` opaca e `reward: { stars, dropTier }`. `MinimumRatingReward`
@@ -116,7 +116,7 @@ type ConsolidatedDuelResult =
       rating: { source: "rating_engine"; grade: DuelGrade; reward: RatingReward }
             | { source: "minimum_fallback"; grade: null; reward: MinimumRatingReward } }
   | { status: "defeat"; duelSessionId: string; reason: DecisiveReason }
-  | { status: "draw"; duelSessionId: string; reason: "draw" }
+  | { status: "draw"; duelSessionId: string; reason: "empate" }
   | { status: "unavailable"; duelSessionId: string; reason: "missing_outcome" | "invalid_outcome" };
 ```
 
