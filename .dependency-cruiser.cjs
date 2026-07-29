@@ -102,6 +102,13 @@ module.exports = {
       to: { path: "^packages/ai/" },
     },
     {
+      name: "free-duel-deck-rules-are-pure",
+      comment: "Deck validation stays in rules and cannot reach UI or I/O.",
+      severity: "error",
+      from: { path: "^packages/rules/src/deck/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^(node:|react|react-dom|next|@supabase/|apps/)" },
+    },
+    {
       name: "no-circular",
       severity: "error",
       from: {},

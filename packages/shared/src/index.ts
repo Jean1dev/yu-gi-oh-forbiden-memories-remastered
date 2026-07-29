@@ -82,6 +82,8 @@ export {
   ActiveDeckLineSchema,
   ActiveDeckSnapshotSchema,
   DeckCompositionSchema,
+  DeckVerdictSchema,
+  DeckViolationSchema,
   CachedActiveDeckRecordSchema,
   PendingActiveDeckSaveSchema,
   SaveActiveDeckResponseSchema,
