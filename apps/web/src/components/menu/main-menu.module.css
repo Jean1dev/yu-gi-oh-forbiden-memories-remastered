@@ -1,0 +1,100 @@
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  margin-bottom: 0;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-stone);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* The Egyptian gold frame the main screens share (estetica-visual.md §2.3). */
+.frame {
+  border: 1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-night-raised) 80%, transparent);
+  padding: 1rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* Same auto-fill approach as the library grid: no breakpoint list to keep in
+     sync, one column at 320px, more as the viewport allows. */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.item,
+.itemDisabled {
+  display: block;
+  min-height: var(--touch-target);
+  padding: 0.875rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  background: var(--color-night-sunken);
+}
+
+.item:hover {
+  border-color: var(--color-gold-bright);
+  background: color-mix(in srgb, var(--color-gold) 12%, var(--color-night-sunken));
+}
+
+.itemDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.itemLabel {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--color-gold-bright);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.itemDescription {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-stone);
+}
+
+.badge {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--color-stone) 60%, transparent);
+  border-radius: 999px;
+  color: var(--color-stone);
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-stone);
+}
+
+.sessionEmail {
+  color: var(--color-sand);
+}

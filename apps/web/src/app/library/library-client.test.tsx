@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { LibraryState } from "../../hooks/use-library.ts";
 import { useLibrary } from "../../hooks/use-library.ts";
+import type { LibraryCatalogPayload } from "../../lib/library/types.ts";
 import { LibraryClient } from "./library-client.tsx";
 
 vi.mock("../../hooks/use-library.ts", () => ({
@@ -58,11 +59,23 @@ function buildIndex(obtainedNumbers: readonly CardNumber[]): LibraryIndex {
 
 const RELOAD = vi.fn();
 
+/**
+ * `useLibrary` is mocked in this file, so the payload's content never reaches
+ * the assertions — it only has to satisfy the prop `page.tsx` passes. What the
+ * component does with a real one is covered by `catalog-payload.ts`'s own
+ * round-trip and by `library.integration.test.ts` against the 722-card dataset.
+ */
+const CATALOG_PAYLOAD: LibraryCatalogPayload = {
+  status: "ok",
+  cards: [card("001"), card("002"), card("003")],
+  arts: {},
+};
+
 describe("LibraryClient", () => {
   it("shows the skeleton while the load has not resolved", () => {
     mockState({ status: "loading" });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.getByTestId("library-grid-skeleton")).toBeTruthy();
   });
@@ -74,7 +87,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.getByText("Não foi possível carregar as cartas. Tente novamente.")).toBeTruthy();
     expect(screen.queryByRole("list")).toBeNull();
@@ -87,7 +100,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(
       screen.getByText("Não foi possível carregar sua coleção. Tente novamente."),
@@ -102,7 +115,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.getByText("Faça login para ver sua coleção.")).toBeTruthy();
   });
@@ -118,7 +131,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(
       screen.getByText(
@@ -138,7 +151,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     const statuses = screen.getAllByRole("status").map((element) => element.textContent);
     expect(statuses.some((text) => text?.includes("0 de 3 obtidas"))).toBe(true);
@@ -155,7 +168,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.getByText(/Coleção carregada do cache/)).toBeTruthy();
   });
@@ -171,7 +184,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.queryByText(/Coleção carregada do cache/)).toBeNull();
   });
@@ -187,7 +200,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
 
     expect(screen.getAllByRole("link")).toHaveLength(2);
   });
@@ -199,7 +212,7 @@ describe("LibraryClient", () => {
       reload: RELOAD,
     });
 
-    render(<LibraryClient />);
+    render(<LibraryClient catalogResult={CATALOG_PAYLOAD} />);
     fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
 
     expect(RELOAD).toHaveBeenCalled();

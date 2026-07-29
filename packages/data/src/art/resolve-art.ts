@@ -22,7 +22,7 @@ export function resolveArt(
   manifest: ArtManifest,
 ): ResolvedArtReference {
   const numero = numeroOf(entrada);
-  const caminho = manifest[numero];
+  const caminho = Object.hasOwn(manifest, numero) ? manifest[numero] : undefined;
 
   if (caminho !== undefined) {
     return Object.freeze({ numero, tipo: "arte" as const, caminho });

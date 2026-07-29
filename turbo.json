@@ -62,18 +62,36 @@
         "generated/dataset-seal.json"
       ]
     },
+    "dev": {
+      "dependsOn": ["@yugioh/data#data:validate"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ],
+      "cache": false,
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build", "@yugioh/data#data:validate"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ],
       "outputs": ["dist/**", ".next/**"]
     },
     "typecheck": {
-      "dependsOn": ["^build", "@yugioh/data#data:ingest"]
+      "dependsOn": ["^build", "@yugioh/data#data:validate"]
     },
     "test": {
-      "dependsOn": ["^build", "@yugioh/data#data:ingest"]
+      "dependsOn": ["^build", "@yugioh/data#data:validate"]
     },
     "test:integration": {
-      "dependsOn": ["^build", "@yugioh/data#data:ingest"]
+      "dependsOn": ["^build", "@yugioh/data#data:validate"],
+      "env": ["SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"]
     }
   }
 }

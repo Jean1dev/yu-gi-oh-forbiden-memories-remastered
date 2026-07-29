@@ -1,25 +1,21 @@
 import { createArtResolverFromCatalog } from "@yugioh/data/art";
-import { loadCatalogFromDisk } from "@yugioh/data/catalog/disk";
 import {
-  CARD_TYPES,
   DomainError,
   err,
   ok,
-  type Card,
   type CardArtLookup,
   type LibraryCatalogListing,
   type Result,
 } from "@yugioh/shared";
 
-export type LibraryCatalog = Readonly<{
-  listing: LibraryCatalogListing;
-  artLookup: CardArtLookup;
-}>;
+import { cardArtUrl } from "../card-art-url.ts";
+import { getSealedCatalog, listAllCards } from "../catalog/sealed-catalog.ts";
+import type { LibraryCatalog } from "./types.ts";
 
 let memoized: Promise<Result<LibraryCatalog, DomainError>> | undefined;
 
 async function loadOnce(): Promise<Result<LibraryCatalog, DomainError>> {
-  const result = await loadCatalogFromDisk();
+  const result = await getSealedCatalog();
   if (!result.ok) {
     memoized = undefined;
     return err(
@@ -31,41 +27,31 @@ async function loadOnce(): Promise<Result<LibraryCatalog, DomainError>> {
 
   const catalog = result.value;
   const artResolver = createArtResolverFromCatalog(catalog);
+  const cards = listAllCards(catalog);
 
-  // `CardCatalog` has no single "list every card" method of its own; composed
-  // here from the five type indexes it already publishes, the same pattern
-  // `loadCatalogAndPool` (build-deck/F02) used for `CardPoolLookup`.
   const listing: LibraryCatalogListing = {
-    listAll() {
-      const cards: Card[] = [];
-      for (const tipo of CARD_TYPES) {
-        cards.push(...catalog.listByTipo(tipo));
-      }
-      return cards;
-    },
-    totalCount() {
-      return catalog.totalCount();
-    },
+    listAll: () => cards,
+    totalCount: () => catalog.totalCount(),
   };
 
+  // The manifest decides whether a card *has* art; `cardArtUrl` decides where
+  // the browser fetches it from, so Build Deck and the Library address the same
+  // file the same way.
   const artLookup: CardArtLookup = (cardNumber) => {
     const resolved = artResolver.resolve(cardNumber);
-    return resolved.tipo === "arte"
-      ? { kind: "art", path: resolved.caminho }
-      : { kind: "placeholder" };
+    return resolved.tipo === "arte" ? { kind: "art", path: cardArtUrl(cardNumber) } : { kind: "placeholder" };
   };
 
   return ok({ listing, artLookup });
 }
 
 /**
- * Loads the sealed catalog and the art resolver once per process and reuses
- * them on every later call (spec library/F01, Decision 5): both are
- * immutable for the process's lifetime, so re-reading them on every Library
- * opening would spend the PRD's 1s load budget for no benefit. A failed load
- * is not memoized — the next call retries from disk instead of repeating the
- * same failure forever, which is what lets `reload()` recover from a
- * transient read failure.
+ * Adds the Library's view — a flat listing plus art resolution — on top of the
+ * shared sealed catalog, once per process (spec library/F01, Decision 5): both
+ * are immutable for the process's lifetime, so rebuilding them on every Library
+ * opening would spend the PRD's 1s load budget for no benefit. A failed load is
+ * not memoized — the next call retries, which is what lets `reload()` recover
+ * from a transient read failure.
  */
 export function getLibraryCatalog(): Promise<Result<LibraryCatalog, DomainError>> {
   memoized ??= loadOnce();

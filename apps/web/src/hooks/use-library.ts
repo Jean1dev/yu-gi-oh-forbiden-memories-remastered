@@ -1,13 +1,13 @@
 "use client";
 
-import type { DomainError, LoadedLibrary } from "@yugioh/shared";
+import { DomainError, err, ok, type LoadedLibrary } from "@yugioh/shared";
 import { useEffect, useState } from "react";
 
 import { createIndexedDbCollectionCache } from "../lib/collection/indexeddb-cache.ts";
 import { loadCollection } from "../lib/collection/load-collection.ts";
 import { createSupabaseCollectionRepository } from "../lib/collection/supabase-repository.ts";
-import { getLibraryCatalog } from "../lib/library/catalog-library.ts";
 import { loadLibrary } from "../lib/library/load-library.ts";
+import type { LibraryCatalog } from "../lib/library/types.ts";
 import { createSupabaseClient, getAuthenticatedPlayerId } from "../lib/supabase/client.ts";
 
 type LoadOutcome =
@@ -31,8 +31,15 @@ export type LibraryState =
  * cleanup marks the stale run so its result is discarded on arrival, instead
  * of racing to overwrite a newer index with an older one (spec library/F01
  * §6, "Recarregar enquanto um carregamento esta em curso").
+ *
+ * The catalog is **injected**, never loaded here: reading it touches the
+ * filesystem, so it belongs to the server component that renders this hook's
+ * consumer (the same split `/build-deck` uses). `undefined` means the server
+ * could not load it, and short-circuits to `catalog_unavailable` without the
+ * collection ever being read — the fail-safe the PRD requires (library §6 F01
+ * Error Handling: the grid never opens without the card database).
  */
-export function useLibrary(): LibraryState {
+export function useLibrary(catalog: LibraryCatalog | undefined): LibraryState {
   const [outcome, setOutcome] = useState<LoadOutcome | undefined>(undefined);
   const [requestId, setRequestId] = useState(0);
 
@@ -44,7 +51,12 @@ export function useLibrary(): LibraryState {
       const playerId = await getAuthenticatedPlayerId(client);
 
       const result = await loadLibrary({
-        getCatalog: getLibraryCatalog,
+        getCatalog: () =>
+          Promise.resolve(
+            catalog === undefined
+              ? err(new DomainError("Catalog unavailable.", "catalog_unavailable"))
+              : ok(catalog),
+          ),
         loadCollection: () =>
           loadCollection({
             playerId,
@@ -70,7 +82,7 @@ export function useLibrary(): LibraryState {
     return () => {
       stale = true;
     };
-  }, [requestId]);
+  }, [requestId, catalog]);
 
   function reload(): void {
     setRequestId((id) => id + 1);

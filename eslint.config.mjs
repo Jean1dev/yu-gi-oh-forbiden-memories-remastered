@@ -9,6 +9,9 @@ export default tseslint.config(
       "**/.next/**",
       "**/.turbo/**",
       "packages/data/generated/**",
+      // Bundled runtime the Supabase CLI drops here on `supabase start`.
+      // Machine-generated, already gitignored, and not ours to lint.
+      "supabase/.temp/**",
     ],
   },
   js.configs.recommended,
