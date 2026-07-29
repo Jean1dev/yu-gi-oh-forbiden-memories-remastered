@@ -2,6 +2,7 @@
 
 import type { CardNumber, CollectionItemWithDeck } from "@yugioh/shared";
 
+import { cardArtUrl } from "../../lib/card-art-url.ts";
 import { BUILD_DECK_MESSAGES } from "./messages.ts";
 import styles from "./collection-card-item.module.css";
 
@@ -34,7 +35,7 @@ export function CollectionCardItem({ item, selected, onSelectCard }: CollectionC
         }
       }}
     >
-      <img className={styles.art} src={`/cards-data/${card.numero}.jpg`} alt="" loading="lazy" />
+      <img className={styles.art} src={cardArtUrl(card.numero)} alt="" loading="lazy" />
       <span className={styles.name}>{card.nome}</span>
       <span>{card.classe}</span>
       <span>{card.tipo}</span>

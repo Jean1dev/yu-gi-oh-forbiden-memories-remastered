@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { signOut, useSession } from "../../hooks/use-session.ts";
+import { signOut, useSession, type SessionState } from "../../hooks/use-session.ts";
 import styles from "./main-menu.module.css";
 import { MENU_ITEMS, MENU_MESSAGES, type MenuItem } from "./menu-items.ts";
 
@@ -22,23 +22,54 @@ function MenuEntry({ item }: { item: MenuItem }) {
   // A module with no screen yet is rendered, but never as a link: `aria-disabled`
   // plus the visible badge say so twice, because colour alone must not carry
   // state (`docs/estetica-visual.md` §2.2).
-  if (item.status === "soon" || item.href === undefined) {
-    return (
-      <li>
+  return (
+    <li>
+      {item.status === "ready" ? (
+        <Link className={styles.item} href={item.href}>
+          {body}
+        </Link>
+      ) : (
         <span className={styles.itemDisabled} aria-disabled="true">
           {body}
         </span>
-      </li>
-    );
-  }
-
-  return (
-    <li>
-      <Link className={styles.item} href={item.href}>
-        {body}
-      </Link>
+      )}
     </li>
   );
+}
+
+function SessionBar({ session }: { session: SessionState }) {
+  switch (session.status) {
+    case "loading":
+      return <span>{MENU_MESSAGES.loadingSession}</span>;
+    case "misconfigured":
+      return <span role="alert">{MENU_MESSAGES.misconfigured}</span>;
+    case "signed-out":
+      return (
+        <>
+          <span>{MENU_MESSAGES.signedOutPrompt}</span>
+          <Link href="/login">{MENU_MESSAGES.signIn}</Link>
+        </>
+      );
+    case "guest":
+      return (
+        <>
+          <span>{MENU_MESSAGES.guestPrompt}</span>
+          <Link href="/login/link-email">{MENU_MESSAGES.linkEmail}</Link>
+          <button type="button" onClick={() => void signOut()}>
+            {MENU_MESSAGES.signOut}
+          </button>
+        </>
+      );
+    case "authenticated":
+      return (
+        <>
+          <span className={styles.sessionEmail}>{session.email ?? session.playerId}</span>
+          <button type="button" onClick={() => void signOut()}>
+            {MENU_MESSAGES.signOut}
+          </button>
+        </>
+      );
+  }
 }
 
 /**
@@ -61,24 +92,7 @@ export function MainMenu() {
       </header>
 
       <div className={styles.session}>
-        {session.status === "loading" ? <span>{MENU_MESSAGES.loadingSession}</span> : null}
-        {session.status === "misconfigured" ? (
-          <span role="alert">{MENU_MESSAGES.misconfigured}</span>
-        ) : null}
-        {session.status === "anonymous" ? (
-          <>
-            <span>{MENU_MESSAGES.signedOutPrompt}</span>
-            <Link href="/login">{MENU_MESSAGES.signIn}</Link>
-          </>
-        ) : null}
-        {session.status === "authenticated" ? (
-          <>
-            <span className={styles.sessionEmail}>{session.email ?? session.playerId}</span>
-            <button type="button" onClick={() => void signOut()}>
-              {MENU_MESSAGES.signOut}
-            </button>
-          </>
-        ) : null}
+        <SessionBar session={session} />
       </div>
 
       <nav className={styles.frame} aria-label="Menu principal">

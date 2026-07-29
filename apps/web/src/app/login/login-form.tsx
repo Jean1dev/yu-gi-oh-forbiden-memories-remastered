@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { bootstrapAccount } from "../../lib/account/bootstrap-account.ts";
+import { continueAsGuest } from "../../lib/account/continue-as-guest.ts";
 import { log } from "../../lib/logging.ts";
 import { createSupabaseClient } from "../../lib/supabase/client.ts";
 import styles from "./login-form.module.css";
@@ -81,6 +82,27 @@ export function LoginForm() {
     router.push("/");
   }
 
+  async function continueAsGuestHandler(): Promise<void> {
+    setStatus({ kind: "authenticating" });
+
+    let client;
+    try {
+      client = createSupabaseClient();
+    } catch {
+      setStatus({ kind: "failed", message: LOGIN_MESSAGES.misconfigured });
+      return;
+    }
+
+    const result = await continueAsGuest(client);
+    if (!result.ok) {
+      log("warn", "guest_sign_in_failed", { cause: result.error.message });
+      setStatus({ kind: "failed", message: LOGIN_MESSAGES.guestFailed });
+      return;
+    }
+
+    router.push("/");
+  }
+
   return (
     <main className="page">
       <h1>{LOGIN_MESSAGES.title}</h1>
@@ -134,7 +156,19 @@ export function LoginForm() {
           >
             {LOGIN_MESSAGES.signUp}
           </button>
+          <button
+            className={styles.secondary}
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              void continueAsGuestHandler();
+            }}
+          >
+            {LOGIN_MESSAGES.guestCta}
+          </button>
         </div>
+
+        <p className={styles.hint}>{LOGIN_MESSAGES.guestHint}</p>
 
         {status.kind === "bootstrapping" ? (
           <p className={styles.feedback} role="status">

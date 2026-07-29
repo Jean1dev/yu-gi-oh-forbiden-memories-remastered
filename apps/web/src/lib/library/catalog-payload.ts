@@ -8,17 +8,33 @@ import type {
 import type { LibraryCatalog, LibraryCatalogPayload } from "./types.ts";
 
 /**
+ * Cached per catalog rather than per call: `getLibraryCatalog` memoizes one
+ * catalog for the process's lifetime, and resolving art for all 722 cards on
+ * every request to `/library` produces the identical payload each time. Keyed
+ * weakly so a catalog dropped after a failed reload takes its payload with it.
+ */
+const payloads = new WeakMap<LibraryCatalog, LibraryCatalogPayload>();
+
+/**
  * Flattens the catalog into the props `/library`'s page hands to its client
  * component. Called on the server only — its input comes from
  * `getLibraryCatalog`, which reads the disk.
  */
 export function toCatalogPayload(catalog: LibraryCatalog): LibraryCatalogPayload {
+  const cached = payloads.get(catalog);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   const cards = catalog.listing.listAll();
   const arts: Record<CardNumber, ObtainedArtReference> = {};
   for (const card of cards) {
     arts[card.numero] = catalog.artLookup(card.numero);
   }
-  return { status: "ok", cards, arts };
+
+  const payload: LibraryCatalogPayload = { status: "ok", cards, arts };
+  payloads.set(catalog, payload);
+  return payload;
 }
 
 /**

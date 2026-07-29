@@ -17,7 +17,7 @@ import { dirname, join, resolve } from "node:path";
  */
 let cached: string | undefined;
 
-export function repoRoot(): string {
+function repoRoot(): string {
   if (cached !== undefined) {
     return cached;
   }

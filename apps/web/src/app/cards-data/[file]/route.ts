@@ -40,7 +40,13 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  return new Response(new Uint8Array(bytes), {
+  // A view over the bytes already read, not a copy: `Buffer` is a `Uint8Array`
+  // subclass, but the DOM `BodyInit` type does not accept its `ArrayBufferLike`
+  // backing store, and `new Uint8Array(bytes)` would duplicate every art on
+  // every request.
+  const body = new Uint8Array(bytes.buffer as ArrayBuffer, bytes.byteOffset, bytes.byteLength);
+
+  return new Response(body, {
     headers: {
       "Content-Type": "image/jpeg",
       // The dataset is sealed and content-addressed by card number: an art file

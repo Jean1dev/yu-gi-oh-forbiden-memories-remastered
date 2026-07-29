@@ -1,6 +1,6 @@
 "use client";
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
 
 import { createSupabaseClient } from "../lib/supabase/client.ts";
@@ -8,10 +8,23 @@ import { createSupabaseClient } from "../lib/supabase/client.ts";
 /** What `useSession` reports about the current player. */
 export type SessionState =
   | Readonly<{ status: "loading" }>
-  | Readonly<{ status: "anonymous" }>
+  | Readonly<{ status: "signed-out" }>
+  /** A real Supabase anonymous session (`signInAnonymously`) — has a `playerId`, no e-mail yet. */
+  | Readonly<{ status: "guest"; playerId: string }>
   | Readonly<{ status: "authenticated"; playerId: string; email: string | undefined }>
   /** The app has no Supabase configuration at all — a deployment problem, not a player one. */
   | Readonly<{ status: "misconfigured" }>;
+
+/** Classifies a Supabase user (or its absence) into the session states above. */
+function deriveSessionState(user: User | null): SessionState {
+  if (user === null) {
+    return { status: "signed-out" };
+  }
+  if (user.is_anonymous === true) {
+    return { status: "guest", playerId: user.id };
+  }
+  return { status: "authenticated", playerId: user.id, email: user.email };
+}
 
 /**
  * The session every screen reads to decide between "show the game" and "send
@@ -51,23 +64,11 @@ export function useSession(): SessionState {
       if (cancelled) {
         return;
       }
-      setState(
-        error || data.user === null
-          ? { status: "anonymous" }
-          : { status: "authenticated", playerId: data.user.id, email: data.user.email },
-      );
+      setState(deriveSessionState(error ? null : data.user));
     });
 
     const { data: subscription } = client.auth.onAuthStateChange((_event, session) => {
-      setState(
-        session === null
-          ? { status: "anonymous" }
-          : {
-              status: "authenticated",
-              playerId: session.user.id,
-              email: session.user.email,
-            },
-      );
+      setState(deriveSessionState(session === null ? null : session.user));
     });
 
     return () => {

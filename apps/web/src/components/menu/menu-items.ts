@@ -1,40 +1,34 @@
 /**
- * The seven main-menu options of `product.md`, in the game's own order.
+ * One of the seven main-menu options of `product.md`.
  *
- * `status` records what actually exists in this repository today, so the menu
- * never offers a screen that is not there. A module graduates to `"ready"` when
- * its route exists — that is the single edit a future PRD has to make here.
+ * A module either has a route or it does not — modelled as one union rather
+ * than a `status` flag beside an optional `href`, which would let the two
+ * disagree and force every reader to re-check both. `status` records what
+ * actually exists in this repository today, so the menu never offers a screen
+ * that is not there; a module graduates to `"ready"` by gaining an `href`,
+ * which is the single edit a future PRD has to make here.
  */
-export type MenuItemStatus = "ready" | "soon";
+export type MenuItem = Readonly<{ id: string; label: string; description: string }> &
+  (Readonly<{ status: "ready"; href: string }> | Readonly<{ status: "soon" }>);
 
-export type MenuItem = Readonly<{
-  id: string;
-  label: string;
-  description: string;
-  href: string | undefined;
-  status: MenuItemStatus;
-}>;
-
+/** In the game's own order. */
 export const MENU_ITEMS: readonly MenuItem[] = [
   {
     id: "campanha",
     label: "Campanha",
     description: "Progrida pelos duelistas e conquiste novas cartas.",
-    href: undefined,
     status: "soon",
   },
   {
     id: "free-duel",
     label: "Free Duel",
     description: "Duele contra um oponente controlado pela máquina.",
-    href: undefined,
     status: "soon",
   },
   {
     id: "online-duel",
     label: "Online Duel",
     description: "Duele contra outro jogador.",
-    href: undefined,
     status: "soon",
   },
   {
@@ -55,14 +49,12 @@ export const MENU_ITEMS: readonly MenuItem[] = [
     id: "password",
     label: "Password",
     description: "Resgate cartas pelo código de 8 dígitos.",
-    href: undefined,
     status: "soon",
   },
   {
     id: "save",
     label: "Save",
     description: "Salve e carregue seu progresso.",
-    href: undefined,
     status: "soon",
   },
 ];
@@ -75,6 +67,8 @@ export const MENU_MESSAGES = {
   signedOutPrompt: "Entre para acessar sua coleção e seu deck.",
   signIn: "Entrar",
   signOut: "Sair",
+  guestPrompt: "Você está jogando como convidado. Vincule um e-mail para não perder seu progresso.",
+  linkEmail: "Vincular e-mail",
   misconfigured:
     "Configuração do Supabase ausente. Copie apps/web/.env.local.example para apps/web/.env.local e reinicie o servidor.",
 } as const;
