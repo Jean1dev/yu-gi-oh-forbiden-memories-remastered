@@ -71,7 +71,11 @@ describe("surrender integration", () => {
       type: "surrender",
       playerId: "P1",
     });
-    expect(await screen.findByText("Duel ended.")).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Resultado indisponível" }),
+    ).toBeTruthy();
+    expect(screen.getByText("Não foi possível apurar o resultado do duelo.")).toBeTruthy();
+    expect(screen.queryByText(/estrelas/)).toBeNull();
     await waitFor(() =>
       expect(screen.queryByRole("button", { name: "Render-se" })).toBeNull(),
     );
