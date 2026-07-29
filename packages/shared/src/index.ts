@@ -54,6 +54,19 @@ export type {
   DeckEditBlockReason,
 } from "./deck/draft.ts";
 export type {
+  CachedActiveDeckRecord,
+  LoadedActiveDeck,
+  PendingActiveDeckSave,
+  SaveActiveDeckResult,
+  SyncActiveDeckSummary,
+} from "./deck/persistence.ts";
+export {
+  CachedActiveDeckRecordSchema,
+  PendingActiveDeckSaveSchema,
+  SaveActiveDeckResponseSchema,
+  type SaveActiveDeckResponse,
+} from "./deck/schema.ts";
+export type {
   DuelEvent,
   EventType,
   JsonValue,
