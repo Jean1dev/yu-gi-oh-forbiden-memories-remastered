@@ -1,8 +1,19 @@
 import { DetailModal } from "../../../../components/library/detail-modal.tsx";
+import { getLibraryCatalog } from "../../../../lib/library/catalog-library.ts";
+import { toCatalogPayload } from "../../../../lib/library/catalog-payload.ts";
+import type { LibraryCatalogPayload } from "../../../../lib/library/types.ts";
+import { CardDetailClient } from "../../[cardNumber]/card-detail-client.tsx";
+import { libraryReturnDestination } from "../../[cardNumber]/page.tsx";
 
 export type InterceptedCardDetailPageProps = Readonly<{
   params: Promise<{ cardNumber: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }>;
+
+async function loadCatalogPayload(): Promise<LibraryCatalogPayload> {
+  const result = await getLibraryCatalog();
+  return result.ok ? toCatalogPayload(result.value) : { status: "error" };
+}
 
 /**
  * Intercepts a soft navigation from `/library` into `/library/[cardNumber]`
@@ -14,11 +25,16 @@ export type InterceptedCardDetailPageProps = Readonly<{
  */
 export default async function InterceptedCardDetailPage({
   params,
+  searchParams,
 }: InterceptedCardDetailPageProps) {
   const { cardNumber } = await params;
   return (
     <DetailModal>
-      <p>Detalhe da carta {cardNumber} — conteúdo implementado por library/F05.</p>
+      <CardDetailClient
+        cardNumber={cardNumber}
+        returnDestination={libraryReturnDestination(await searchParams)}
+        catalogResult={await loadCatalogPayload()}
+      />
     </DetailModal>
   );
 }
