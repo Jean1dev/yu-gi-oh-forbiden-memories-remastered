@@ -1,1 +1,14 @@
-{"rosterVersion":"1.0.0","duelists":[{"id":"four-copies","name":"Four","portrait":"duelists/four.webp","difficulty":"easy","profile":{"strategy":"fixture","parameters":{}},"deck":["001","001","001","001"],"dropPool":[]}]}
+{
+  "rosterVersion": "1.0.0",
+  "duelists": [
+    {
+      "id": "four-copies",
+      "name": "Four",
+      "portrait": "duelists/four.webp",
+      "difficulty": "easy",
+      "profile": { "strategy": "fixture", "parameters": {} },
+      "deck": ["001", "001", "001", "001"],
+      "dropPool": []
+    }
+  ]
+}

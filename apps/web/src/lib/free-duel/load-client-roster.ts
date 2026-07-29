@@ -62,7 +62,9 @@ export async function loadClientRoster(
   }
   const knownCards = new Set(source.cardNumbers);
   const catalog: CardCatalogLookup = (cardNumber) =>
-    knownCards.has(cardNumber) ? ({ numero: cardNumber } as ReturnType<CardCatalogLookup>) : undefined;
+    knownCards.has(cardNumber)
+      ? ({ numero: cardNumber } as ReturnType<CardCatalogLookup>)
+      : undefined;
   const loaded = loadRoster(source.rawRoster, catalog);
   if (!loaded.ok) {
     log("error", "roster_invalid", { code: loaded.error.code });

@@ -1,12 +1,11 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import type { Card, CardCatalogLookup } from "@yugioh/shared";
 
 import { validateDuelist } from "./validate-duelist.ts";
 
-const knownNumbers = Array.from({ length: 20 }, (_, index) =>
-  String(index + 1).padStart(3, "0"),
-);
+const knownNumbers = Array.from({ length: 20 }, (_, index) => String(index + 1).padStart(3, "0"));
 const validDeck = Array.from({ length: 40 }, (_, index) => knownNumbers[index % 20]);
 const catalog: CardCatalogLookup = (cardNumber) =>
   knownNumbers.includes(cardNumber) ? ({} as Card) : undefined;
@@ -62,7 +61,13 @@ describe("validateDuelist", () => {
   });
 
   it.each([
-    [[{ tier: "rare", cardNumbers: ["001"] }, { tier: "rare", cardNumbers: ["002"] }], "duplicate_drop_tier"],
+    [
+      [
+        { tier: "rare", cardNumbers: ["001"] },
+        { tier: "rare", cardNumbers: ["002"] },
+      ],
+      "duplicate_drop_tier",
+    ],
     [[{ tier: "rare", cardNumbers: [] }], "empty_drop_tier"],
   ])("reports a precise invalid drop pool code", (dropPool, code) => {
     const result = validateDuelist(duelist({ dropPool }), catalog);
@@ -80,6 +85,22 @@ describe("validateDuelist", () => {
     const result = validateDuelist(duelist(override), catalog);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe(code);
+  });
+
+  it("rejects every generated deck whose size is not forty", () => {
+    fc.assert(
+      fc.property(
+        fc
+          .array(fc.constantFrom(...knownNumbers), { minLength: 0, maxLength: 120 })
+          .filter((deck) => deck.length !== 40),
+        (deck) => {
+          const result = validateDuelist(duelist({ deck }), catalog);
+          expect(result.ok).toBe(false);
+          if (!result.ok) expect(result.error.code).toBe("invalid_deck_size");
+        },
+      ),
+      { numRuns: 1_000 },
+    );
   });
 });
 

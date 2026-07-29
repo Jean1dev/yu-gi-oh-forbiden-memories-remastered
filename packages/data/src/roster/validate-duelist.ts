@@ -40,10 +40,7 @@ function validateShape(raw: RawRecord): Result<Duelist, DomainError> {
   if (typeof raw.name !== "string" || raw.name.length === 0 || raw.name.length > 60) {
     return failure("invalid_duelist_name", raw);
   }
-  if (
-    typeof raw.portrait !== "string" ||
-    !/^[a-z0-9/_-]+\.(?:jpg|png|webp)$/.test(raw.portrait)
-  ) {
+  if (typeof raw.portrait !== "string" || !/^[a-z0-9/_-]+\.(?:jpg|png|webp)$/.test(raw.portrait)) {
     return failure("invalid_portrait", raw);
   }
   if (!DifficultyLevelSchema.safeParse(raw.difficulty).success) {

@@ -1,11 +1,4 @@
-import {
-  DomainError,
-  RosterSchema,
-  err,
-  ok,
-  type Result,
-  type Roster,
-} from "@yugioh/shared";
+import { DomainError, RosterSchema, err, ok, type Result, type Roster } from "@yugioh/shared";
 
 import type { CatalogLookup, HiddenDuelist, LoadedRoster, PortraitLookup } from "./types.ts";
 import { validateDuelist } from "./validate-duelist.ts";

@@ -35,9 +35,7 @@ describe("IndexedDB roster cache", () => {
       validatedAt: "2026-07-29T00:00:00.000Z",
       roster,
     });
-    await expect(cache.read({ rosterVersion: "1.0.0", hash: "hash-one" })).resolves.toEqual(
-      roster,
-    );
+    await expect(cache.read({ rosterVersion: "1.0.0", hash: "hash-one" })).resolves.toEqual(roster);
   });
 
   it("invalidates a version or hash mismatch", async () => {

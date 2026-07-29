@@ -3,7 +3,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadRoster, type RosterReport } from "../src/roster/index.ts";
-import { DEFAULT_OPTIONS as CATALOG_OPTIONS, loadCatalogFromDisk } from "./load-catalog-from-disk.ts";
+import {
+  DEFAULT_OPTIONS as CATALOG_OPTIONS,
+  loadCatalogFromDisk,
+} from "./load-catalog-from-disk.ts";
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -45,9 +48,7 @@ export async function runRosterValidation(
     return 1;
   }
 
-  const result = loadRoster(rawRoster, (cardNumber) =>
-    catalogResult.value.getByNumero(cardNumber),
-  );
+  const result = loadRoster(rawRoster, (cardNumber) => catalogResult.value.getByNumero(cardNumber));
   if (!result.ok) {
     console.error(`Roster invalid (${result.error.code}): ${result.error.message}`);
     return 1;

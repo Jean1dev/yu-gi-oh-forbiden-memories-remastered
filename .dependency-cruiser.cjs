@@ -49,7 +49,7 @@ module.exports = {
       name: "engine-depends-only-on-shared",
       comment:
         "packages/engine may only import packages/shared (motor-duelo-1x1/F02). First real " +
-        "application of the \"headless engine\" pillar: no data/rules/ai dependency yet, " +
+        'application of the "headless engine" pillar: no data/rules/ai dependency yet, ' +
         "checked from the package's very first commit rather than added later.",
       severity: "error",
       from: { path: "^packages/engine/" },
@@ -86,6 +86,20 @@ module.exports = {
       severity: "error",
       from: { path: "^packages/[^/]+/src/", pathNot: "\\.test\\.ts$" },
       to: { path: "^packages/[^/]+/tests/" },
+    },
+    {
+      name: "free-duel-roster-core-is-pure",
+      comment: "The roster domain accepts injected data and never reaches UI or I/O.",
+      severity: "error",
+      from: { path: "^packages/data/src/roster/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^(node:|react|react-dom|next|@supabase/|apps/)" },
+    },
+    {
+      name: "free-duel-does-not-import-ai",
+      comment: "F01 transports an opaque difficulty profile and never decides CPU actions.",
+      severity: "error",
+      from: { path: "^(packages/data/src/roster/|apps/web/src/(app|components|lib)/free-duel/)" },
+      to: { path: "^packages/ai/" },
     },
     {
       name: "no-circular",

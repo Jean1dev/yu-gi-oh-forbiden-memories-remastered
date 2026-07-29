@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { loadRoster } from "./load-roster.ts";
@@ -28,7 +29,11 @@ describe("loadRoster", () => {
         duelists: [
           duelist({ id: "first", name: "First" }),
           duelist({ id: "broken", deck: [] }),
-          duelist({ id: "second", name: "Second", dropPool: [{ tier: "rare", cardNumbers: ["001"] }] }),
+          duelist({
+            id: "second",
+            name: "Second",
+            dropPool: [{ tier: "rare", cardNumbers: ["001"] }],
+          }),
           duelist({ id: "first", name: "Duplicate" }),
         ],
       },
@@ -58,5 +63,23 @@ describe("loadRoster", () => {
         report: { missingPortraits: ["duelists/one.webp"], valid: true },
       },
     });
+  });
+
+  it("is total for arbitrary untrusted input", () => {
+    fc.assert(
+      fc.property(fc.anything(), (raw) => {
+        expect(() => loadRoster(raw, catalog)).not.toThrow();
+      }),
+      { numRuns: 1_000 },
+    );
+  });
+
+  it("is deterministic for the same input", () => {
+    fc.assert(
+      fc.property(fc.jsonValue(), (raw) => {
+        expect(loadRoster(raw, catalog)).toEqual(loadRoster(raw, catalog));
+      }),
+      { numRuns: 1_000 },
+    );
   });
 });

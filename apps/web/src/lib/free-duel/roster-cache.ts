@@ -16,7 +16,9 @@ export type RosterCacheRecord = Readonly<{
 }>;
 
 export type RosterCache = Readonly<{
-  read(expected?: Readonly<{ rosterVersion: string; hash: string | null }>): Promise<LoadedRoster | null>;
+  read(
+    expected?: Readonly<{ rosterVersion: string; hash: string | null }>,
+  ): Promise<LoadedRoster | null>;
   write(record: RosterCacheRecord): Promise<void>;
 }>;
 
