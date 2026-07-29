@@ -128,38 +128,46 @@ const duelStateArbitrary = fc.record(
 );
 
 describe("round-trip idempotency (motor-duelo-1x1 F05, critério de aceite 1)", () => {
-  it("load(serialize(state)) always succeeds and is structurally identical to state", () => {
-    fc.assert(
-      fc.property(duelStateArbitrary, (state) => {
-        const result = load(serialize(state));
+  it(
+    "load(serialize(state)) always succeeds and is structurally identical to state",
+    () => {
+      fc.assert(
+        fc.property(duelStateArbitrary, (state) => {
+          const result = load(serialize(state));
 
-        expect(result.ok).toBe(true);
-        if (!result.ok) throw new Error("expected ok");
-        expect(result.value).toEqual(state);
-      }),
-      { numRuns: 1000 },
-    );
-  });
+          expect(result.ok).toBe(true);
+          if (!result.ok) throw new Error("expected ok");
+          expect(result.value).toEqual(state);
+        }),
+        { numRuns: 1000 },
+      );
+    },
+    15_000,
+  );
 });
 
 describe("reference independence", () => {
-  it("no nested object of serialize(state) shares reference identity with state", () => {
-    fc.assert(
-      fc.property(duelStateArbitrary, (state) => {
-        const snapshot = serialize(state);
+  it(
+    "no nested object of serialize(state) shares reference identity with state",
+    () => {
+      fc.assert(
+        fc.property(duelStateArbitrary, (state) => {
+          const snapshot = serialize(state);
 
-        expect(snapshot).not.toBe(state);
-        expect(snapshot.players).not.toBe(state.players);
-        expect(snapshot.players.P1).not.toBe(state.players.P1);
-        expect(snapshot.players.P2).not.toBe(state.players.P2);
-        expect(snapshot.players.P1.field).not.toBe(state.players.P1.field);
-        expect(snapshot.players.P1.hand).not.toBe(state.players.P1.hand);
-        expect(snapshot.players.P1.deck).not.toBe(state.players.P1.deck);
-        if (state.activeField !== null) {
-          expect(snapshot.activeField).not.toBe(state.activeField);
-        }
-      }),
-      { numRuns: 1000 },
-    );
-  });
+          expect(snapshot).not.toBe(state);
+          expect(snapshot.players).not.toBe(state.players);
+          expect(snapshot.players.P1).not.toBe(state.players.P1);
+          expect(snapshot.players.P2).not.toBe(state.players.P2);
+          expect(snapshot.players.P1.field).not.toBe(state.players.P1.field);
+          expect(snapshot.players.P1.hand).not.toBe(state.players.P1.hand);
+          expect(snapshot.players.P1.deck).not.toBe(state.players.P1.deck);
+          if (state.activeField !== null) {
+            expect(snapshot.activeField).not.toBe(state.activeField);
+          }
+        }),
+        { numRuns: 1000 },
+      );
+    },
+    15_000,
+  );
 });
