@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import type { Card } from "../card/types.ts";
-import { ArtReferenceSchema, LibraryEntrySchema, LibraryIndexSchema } from "./schema.ts";
+import {
+  ArtReferenceSchema,
+  LibraryEntrySchema,
+  LibraryFiltersSchema,
+  LibraryIndexSchema,
+  LibraryQueryResultSchema,
+} from "./schema.ts";
 
 function validCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -119,5 +125,50 @@ describe("LibraryIndexSchema", () => {
 
   it("rejects an index where obtained exceeds total", () => {
     expect(LibraryIndexSchema.safeParse(index({ total: 722, obtained: 723 })).success).toBe(false);
+  });
+});
+
+describe("LibraryFiltersSchema", () => {
+  it("accepts a valid nondefault filter state", () => {
+    expect(
+      LibraryFiltersSchema.safeParse({
+        types: ["monstro", "equipamento"],
+        status: "todas",
+        sort: { field: "atk", direction: "desc" },
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects duplicate and unsupported filter types", () => {
+    expect(
+      LibraryFiltersSchema.safeParse({
+        types: ["monstro", "monstro"],
+        status: "obtidas",
+        sort: { field: "numero", direction: "asc" },
+      }).success,
+    ).toBe(false);
+    expect(
+      LibraryFiltersSchema.safeParse({
+        types: ["ritual"],
+        status: "obtidas",
+        sort: { field: "numero", direction: "asc" },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("validates the serializable query result", () => {
+    expect(
+      LibraryQueryResultSchema.safeParse({
+        entries: [],
+        totalBefore: 3,
+        totalAfter: 0,
+        activeFilters: {
+          types: [],
+          status: "obtidas",
+          sort: { field: "numero", direction: "asc" },
+        },
+        hasNonDefaultFilters: false,
+      }).success,
+    ).toBe(true);
   });
 });
