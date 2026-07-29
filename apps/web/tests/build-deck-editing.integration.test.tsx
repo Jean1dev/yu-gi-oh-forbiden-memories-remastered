@@ -4,8 +4,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BuildDeckClient } from "../src/app/build-deck/build-deck-client.tsx";
-import type { ActiveDeckState } from "../src/hooks/use-active-deck.ts";
-import { useActiveDeck } from "../src/hooks/use-active-deck.ts";
+import type { UseActiveDeckPersistenceResult } from "../src/hooks/use-active-deck-persistence.ts";
+import { useActiveDeckPersistence } from "../src/hooks/use-active-deck-persistence.ts";
+import { useActiveDeckSync } from "../src/hooks/use-active-deck-sync.ts";
 import type { CollectionState } from "../src/hooks/use-collection.ts";
 import { useCollection } from "../src/hooks/use-collection.ts";
 import { useDeckDraftStore } from "../src/stores/deck-draft-store.ts";
@@ -13,21 +14,26 @@ import { useDeckDraftStore } from "../src/stores/deck-draft-store.ts";
 /**
  * Full render-tree integration for build-deck/F05: F04's collection panel,
  * F05's editor and store, and the leave-without-saving guard, all wired
- * together exactly as `BuildDeckClient` composes them. Only the two hooks
- * that actually touch Supabase (`useCollection`, `useActiveDeck`) are mocked
- * — everything else (the store, `useDeckDraft`, `useCollectionPanel`,
+ * together exactly as `BuildDeckClient` composes them. Only the hooks that
+ * actually touch Supabase/IndexedDB (`useCollection`,
+ * `useActiveDeckPersistence`, `useActiveDeckSync`) are mocked — everything
+ * else (the store, `useDeckDraft`, `useCollectionPanel`,
  * `useUnsavedChangesWarning`, every component) runs for real, matching the
  * scope of the F04 integration test this feature builds on top of.
  */
 vi.mock("../src/hooks/use-collection.ts", () => ({
   useCollection: vi.fn(),
 }));
-vi.mock("../src/hooks/use-active-deck.ts", () => ({
-  useActiveDeck: vi.fn(),
+vi.mock("../src/hooks/use-active-deck-persistence.ts", () => ({
+  useActiveDeckPersistence: vi.fn(),
+}));
+vi.mock("../src/hooks/use-active-deck-sync.ts", () => ({
+  useActiveDeckSync: vi.fn(),
 }));
 
 const mockedUseCollection = vi.mocked(useCollection);
-const mockedUseActiveDeck = vi.mocked(useActiveDeck);
+const mockedUseActiveDeckPersistence = vi.mocked(useActiveDeckPersistence);
+const mockedUseActiveDeckSync = vi.mocked(useActiveDeckSync);
 
 const DRAGON: Card = {
   id: 1,
@@ -52,7 +58,12 @@ beforeEach(() => {
     loaded: { origin: "server", collection: new Map([["001", 2]]), syncedAt: "2026-07-28T00:00:00.000Z" },
   } as CollectionState);
 
-  mockedUseActiveDeck.mockReturnValue({ status: "ready", activeDeck: new Map() } as ActiveDeckState);
+  mockedUseActiveDeckPersistence.mockReturnValue({
+    state: { status: "ready", activeDeck: new Map(), conflictDetected: false },
+    saveStatus: { kind: "idle" },
+    save: vi.fn(),
+  } as UseActiveDeckPersistenceResult);
+  mockedUseActiveDeckSync.mockReturnValue(undefined);
 });
 
 function selectDragon(): void {

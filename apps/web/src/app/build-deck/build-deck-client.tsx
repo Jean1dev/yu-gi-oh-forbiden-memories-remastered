@@ -11,7 +11,10 @@ import { DeckValidationSummary } from "../../components/build-deck/deck-validati
 import { EmptyCollectionState } from "../../components/build-deck/empty-collection-state.tsx";
 import { BUILD_DECK_MESSAGES } from "../../components/build-deck/messages.ts";
 import { PanelSkeleton } from "../../components/build-deck/panel-skeleton.tsx";
-import { useActiveDeck } from "../../hooks/use-active-deck.ts";
+import { SaveDeckIndicator } from "../../components/build-deck/save-deck-indicator.tsx";
+import { useActiveDeckPersistence } from "../../hooks/use-active-deck-persistence.ts";
+import { useActiveDeckSync } from "../../hooks/use-active-deck-sync.ts";
+import { useCollection } from "../../hooks/use-collection.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
 import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
 import { useDeckValidation } from "../../hooks/use-deck-validation.ts";
@@ -33,20 +36,25 @@ const EMPTY_CARDS: readonly Card[] = [];
 /**
  * The state machine driving `/build-deck`: skeleton, failure, empty
  * collection, or the ready panel plus the deck-in-edition editor
- * (build-deck/F05) and its live validation summary (build-deck/F06). Owns
- * the composition root for F04 (`useCollectionPanel`), F05
- * (`useActiveDeck`/`useDeckDraft`/`useUnsavedChangesWarning`) and F06
- * (`useDeckValidation`): the spec's Seção 2 names `page.tsx` as the wiring
+ * (build-deck/F05), its live validation summary (build-deck/F06) and the
+ * save/persist indicator (build-deck/F07). Owns the composition root for F04
+ * (`useCollectionPanel`), F05 (`useDeckDraft`/`useUnsavedChangesWarning`), F06
+ * (`useDeckValidation`) and F07 (`useActiveDeckPersistence`/
+ * `useActiveDeckSync`): the spec's Seção 2 names `page.tsx` as the wiring
  * point, but `page.tsx` in this codebase is a server-only component (it loads
  * the catalog via `fs`) — every client hook already lived here since F04, so
  * each new feature's wiring joins it here too instead of splitting the
- * composition root across multiple files.
+ * composition root across multiple files. `useActiveDeckPersistence`
+ * supersedes F05's plain `useActiveDeck` as the initial-load source (spec
+ * build-deck/F07 Seção 2), so this is the only place that changes shape for
+ * F05/F06 consumers of the active deck.
  */
 export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
   const cards = catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS;
   const catalog = useMemo(() => buildCatalogLookup(cards), [cards]);
 
-  const activeDeckState = useActiveDeck();
+  const { state: activeDeckState, saveStatus, save } = useActiveDeckPersistence();
+  const syncSummary = useActiveDeckSync();
   const initializeDraft = useDeckDraftStore((state) => state.initializeDraft);
   const discardDraft = useDeckDraftStore((state) => state.discardDraft);
   const initializedRef = useRef(false);
@@ -60,6 +68,7 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
 
   const draftState = useDeckDraft();
   const validation = useDeckValidation();
+  const collectionState = useCollection();
   const { confirmInternalNavigation } = useUnsavedChangesWarning(draftState.hasUnsavedChanges);
   const panel = useCollectionPanel(cards, draftState.activeDeckLookup);
 
@@ -69,6 +78,13 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
     }
     discardDraft();
     window.history.back();
+  }
+
+  function handleSaveDeck(): void {
+    if (collectionState.status !== "ready") {
+      return;
+    }
+    void save(draftState.draft, collectionState.loaded.collection);
   }
 
   if (catalogResult.status === "error") {
@@ -130,6 +146,13 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
         canAddCard={draftState.canAddCard}
         onAddCard={draftState.addCard}
         onRemoveCard={draftState.removeCard}
+      />
+      <SaveDeckIndicator
+        canSave={validation.valid && !validation.loading}
+        saveStatus={saveStatus}
+        conflictDetected={activeDeckState.conflictDetected}
+        syncSummary={syncSummary}
+        onSave={handleSaveDeck}
       />
     </>
   );

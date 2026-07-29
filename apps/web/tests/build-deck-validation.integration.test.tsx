@@ -4,8 +4,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BuildDeckClient } from "../src/app/build-deck/build-deck-client.tsx";
-import type { ActiveDeckState } from "../src/hooks/use-active-deck.ts";
-import { useActiveDeck } from "../src/hooks/use-active-deck.ts";
+import type { UseActiveDeckPersistenceResult } from "../src/hooks/use-active-deck-persistence.ts";
+import { useActiveDeckPersistence } from "../src/hooks/use-active-deck-persistence.ts";
+import { useActiveDeckSync } from "../src/hooks/use-active-deck-sync.ts";
 import type { CollectionState } from "../src/hooks/use-collection.ts";
 import { useCollection } from "../src/hooks/use-collection.ts";
 import { useDeckDraftStore } from "../src/stores/deck-draft-store.ts";
@@ -15,24 +16,31 @@ import { useDeckDraftStore } from "../src/stores/deck-draft-store.ts";
  * F05's editor and store, and F06's `DeckValidationSummary`, wired together
  * exactly as `BuildDeckClient` composes them — same scope as F05's own
  * integration test (`build-deck-editing.integration.test.tsx`), which this
- * one builds on top of. Only `useCollection` and `useActiveDeck` are mocked.
+ * one builds on top of. Only `useCollection`, `useActiveDeckPersistence` and
+ * `useActiveDeckSync` are mocked (build-deck/F07 superseded F05's
+ * `useActiveDeck` as the initial-load source; see that spec's Seção 2).
  *
  * The "already inconsistent draft" scenario (spec build-deck/F06 §7) seeds
- * the mocked `useActiveDeck`'s `activeDeck` with a composition `addCard`
- * would never produce (bypassing its cap checks) — `BuildDeckClient`'s mount
- * effect (`initializeDraft`) then hydrates the real Zustand store from it, so
- * this reaches F06 exactly like a persisted deck that got corrupted upstream
- * would, without mocking `useDeckDraft` itself (spec's suggested approach).
+ * the mocked `useActiveDeckPersistence`'s `activeDeck` with a composition
+ * `addCard` would never produce (bypassing its cap checks) —
+ * `BuildDeckClient`'s mount effect (`initializeDraft`) then hydrates the real
+ * Zustand store from it, so this reaches F06 exactly like a persisted deck
+ * that got corrupted upstream would, without mocking `useDeckDraft` itself
+ * (spec's suggested approach).
  */
 vi.mock("../src/hooks/use-collection.ts", () => ({
   useCollection: vi.fn(),
 }));
-vi.mock("../src/hooks/use-active-deck.ts", () => ({
-  useActiveDeck: vi.fn(),
+vi.mock("../src/hooks/use-active-deck-persistence.ts", () => ({
+  useActiveDeckPersistence: vi.fn(),
+}));
+vi.mock("../src/hooks/use-active-deck-sync.ts", () => ({
+  useActiveDeckSync: vi.fn(),
 }));
 
 const mockedUseCollection = vi.mocked(useCollection);
-const mockedUseActiveDeck = vi.mocked(useActiveDeck);
+const mockedUseActiveDeckPersistence = vi.mocked(useActiveDeckPersistence);
+const mockedUseActiveDeckSync = vi.mocked(useActiveDeckSync);
 
 const DRAGON: Card = {
   id: 1,
@@ -60,7 +68,16 @@ function fillerDeckOfThirtyNine(): Map<string, number> {
 
 beforeEach(() => {
   useDeckDraftStore.setState({ originalActiveDeck: new Map(), draft: new Map(), lastBlock: undefined });
+  mockedUseActiveDeckSync.mockReturnValue(undefined);
 });
+
+function mockActiveDeck(activeDeck: Map<string, number>): void {
+  mockedUseActiveDeckPersistence.mockReturnValue({
+    state: { status: "ready", activeDeck, conflictDetected: false },
+    saveStatus: { kind: "idle" },
+    save: vi.fn(),
+  } as UseActiveDeckPersistenceResult);
+}
 
 function selectDragon(): void {
   fireEvent.click(screen.getByRole("button", { name: "Blue-eyes White Dragon" }));
@@ -73,7 +90,7 @@ function clickAdd(): void {
 describe("build-deck/F06 validation flow", () => {
   it("reaching exactly forty cards with no other violation clears the violation list and shows 40/40", () => {
     const fillers = fillerDeckOfThirtyNine();
-    mockedUseActiveDeck.mockReturnValue({ status: "ready", activeDeck: fillers } as ActiveDeckState);
+    mockActiveDeck(fillers);
     mockedUseCollection.mockReturnValue({
       status: "ready",
       loaded: {
@@ -99,7 +116,7 @@ describe("build-deck/F06 validation flow", () => {
   });
 
   it("blocking the fourth copy in F05 never lets a copy_limit_exceeded violation reach F06", () => {
-    mockedUseActiveDeck.mockReturnValue({ status: "ready", activeDeck: new Map() } as ActiveDeckState);
+    mockActiveDeck(new Map());
     mockedUseCollection.mockReturnValue({
       status: "ready",
       loaded: { origin: "server", collection: new Map([["001", 3]]), syncedAt: "2026-07-28T00:00:00.000Z" },
@@ -118,10 +135,7 @@ describe("build-deck/F06 validation flow", () => {
   });
 
   it("shows the specific messages for an active deck already inconsistent with the copy cap and ownership", () => {
-    mockedUseActiveDeck.mockReturnValue({
-      status: "ready",
-      activeDeck: new Map([["001", 5]]),
-    } as ActiveDeckState);
+    mockActiveDeck(new Map([["001", 5]]));
     mockedUseCollection.mockReturnValue({
       status: "ready",
       loaded: { origin: "server", collection: new Map([["001", 2]]), syncedAt: "2026-07-28T00:00:00.000Z" },

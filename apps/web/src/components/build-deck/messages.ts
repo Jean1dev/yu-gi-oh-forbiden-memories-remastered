@@ -18,6 +18,16 @@ export const BUILD_DECK_MESSAGES = {
   maxCopiesLimit: "Máximo de 3 cópias por carta.",
   addCardPrompt: "Selecione uma carta na coleção para adicionar.",
   confirmLeaveWithUnsavedChanges: "Você tem alterações não salvas. Sair sem salvar?",
+  /** build-deck/F07 §6: deck inválido recusado tanto por F06 quanto pela RPC (defesa em profundidade). */
+  deckSaveRefused: "Deck inválido: exatamente 40 cartas, máx. 3 cópias, apenas cartas possuídas.",
+  deckSaved: "Deck salvo.",
+  deckSavedOffline: "Salvo offline — sincronizando quando a conexão voltar.",
+  deckSynced: "Deck sincronizado.",
+  deckSaveSessionExpired: "Faça login novamente para sincronizar seu deck.",
+  deckSavePersistenceUnavailable: "Não foi possível salvar seu deck agora. Tente novamente.",
+  deckSaving: "Salvando…",
+  deckConflictNotice: "Seu deck foi atualizado em outro dispositivo; a versão mais recente foi mantida.",
+  saveDeckButton: "Salvar deck",
 } as const;
 
 export function noSearchResultsMessage(term: string): string {

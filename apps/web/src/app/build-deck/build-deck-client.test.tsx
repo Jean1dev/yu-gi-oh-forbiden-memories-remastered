@@ -7,8 +7,12 @@ import type { CollectionPanelActions, CollectionPanelState } from "../../hooks/u
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
 import type { CollectionState } from "../../hooks/use-collection.ts";
 import { useCollection } from "../../hooks/use-collection.ts";
-import type { ActiveDeckState } from "../../hooks/use-active-deck.ts";
-import { useActiveDeck } from "../../hooks/use-active-deck.ts";
+import type {
+  ActiveDeckPersistenceState,
+  UseActiveDeckPersistenceResult,
+} from "../../hooks/use-active-deck-persistence.ts";
+import { useActiveDeckPersistence } from "../../hooks/use-active-deck-persistence.ts";
+import { useActiveDeckSync } from "../../hooks/use-active-deck-sync.ts";
 import type { UseDeckDraftResult } from "../../hooks/use-deck-draft.ts";
 import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
 import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
@@ -20,8 +24,11 @@ vi.mock("../../hooks/use-collection-panel.ts", () => ({
 vi.mock("../../hooks/use-collection.ts", () => ({
   useCollection: vi.fn(),
 }));
-vi.mock("../../hooks/use-active-deck.ts", () => ({
-  useActiveDeck: vi.fn(),
+vi.mock("../../hooks/use-active-deck-persistence.ts", () => ({
+  useActiveDeckPersistence: vi.fn(),
+}));
+vi.mock("../../hooks/use-active-deck-sync.ts", () => ({
+  useActiveDeckSync: vi.fn(),
 }));
 vi.mock("../../hooks/use-deck-draft.ts", () => ({
   useDeckDraft: vi.fn(),
@@ -32,7 +39,8 @@ vi.mock("../../hooks/use-unsaved-changes-warning.ts", () => ({
 
 const mockedPanelHook = vi.mocked(useCollectionPanel);
 const mockedCollectionHook = vi.mocked(useCollection);
-const mockedActiveDeckHook = vi.mocked(useActiveDeck);
+const mockedActiveDeckHook = vi.mocked(useActiveDeckPersistence);
+const mockedActiveDeckSyncHook = vi.mocked(useActiveDeckSync);
 const mockedDeckDraftHook = vi.mocked(useDeckDraft);
 const mockedUnsavedChangesHook = vi.mocked(useUnsavedChangesWarning);
 
@@ -53,8 +61,9 @@ function mockPanel(state: CollectionPanelState): void {
   mockedPanelHook.mockReturnValue({ ...state, ...NOOP_ACTIONS });
 }
 
-function mockActiveDeck(state: ActiveDeckState): void {
-  mockedActiveDeckHook.mockReturnValue(state);
+function mockActiveDeck(state: ActiveDeckPersistenceState): void {
+  const result: UseActiveDeckPersistenceResult = { state, saveStatus: { kind: "idle" }, save: vi.fn() };
+  mockedActiveDeckHook.mockReturnValue(result);
 }
 
 function mockDeckDraft(overrides: Partial<UseDeckDraftResult> = {}): void {
@@ -68,9 +77,10 @@ const READY_COLLECTION_STATE: CollectionState = {
 
 /** The steady state every pre-existing (F04) branch test starts from: an active deck already resolved. */
 function mockReadyActiveDeckAndDraft(): void {
-  mockActiveDeck({ status: "ready", activeDeck: new Map() });
+  mockActiveDeck({ status: "ready", activeDeck: new Map(), conflictDetected: false });
   mockDeckDraft();
   mockedCollectionHook.mockReturnValue(READY_COLLECTION_STATE);
+  mockedActiveDeckSyncHook.mockReturnValue(undefined);
   mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
 }
 
@@ -154,6 +164,7 @@ describe("BuildDeckClient", () => {
     mockActiveDeck({ status: "pending" });
     mockDeckDraft();
     mockedCollectionHook.mockReturnValue(READY_COLLECTION_STATE);
+    mockedActiveDeckSyncHook.mockReturnValue(undefined);
     mockedUnsavedChangesHook.mockReturnValue({ confirmInternalNavigation: vi.fn(() => true) });
     mockPanel({ status: "loading" });
 
