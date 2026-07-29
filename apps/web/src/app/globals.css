@@ -1,0 +1,125 @@
+/**
+ * App shell styling: the reset plus the design tokens every screen reads.
+ *
+ * The palette and typography follow `docs/estetica-visual.md` §2.2 — Egyptian /
+ * millennium (gold and amber, stone and sand, deep night blue, black), a
+ * decorative serif for titles and a legible sans for dense data such as the
+ * 722-card library. Nothing here is a component style: those stay in the CSS
+ * Modules next to the components they belong to.
+ */
+
+:root {
+  --color-night: #0b1020;
+  --color-night-raised: #141a30;
+  --color-night-sunken: #070a16;
+  --color-gold: #d4a63c;
+  --color-gold-bright: #f0cd70;
+  --color-sand: #e8ddc4;
+  --color-stone: #9aa0b4;
+  --color-danger: #e2686b;
+  --color-success: #6fbf8b;
+
+  --font-display: "Trajan Pro", "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius: 6px;
+  --touch-target: 44px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Wide content (the card grid, the collection panel) scrolls inside its own
+     container; the page itself never scrolls sideways, 320px to 1920px. */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse at 50% -10%, #1b2444 0%, transparent 60%),
+    var(--color-night);
+  color: var(--color-sand);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-gold-bright);
+  margin: 0 0 0.5em;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--color-gold-bright);
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  min-height: var(--touch-target);
+  padding: 0 1rem;
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-gold-bright);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-gold) 18%, transparent);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+input {
+  font: inherit;
+  min-height: var(--touch-target);
+  padding: 0 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-stone) 45%, transparent);
+  border-radius: var(--radius);
+  background: var(--color-night-sunken);
+  color: var(--color-sand);
+}
+
+/* Accessibility floor from `docs/estetica-visual.md` §2.2: focus is always
+   visible, and never removed without a replacement. */
+:focus-visible {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 2px;
+}
+
+[role="alert"] {
+  color: var(--color-danger);
+}
+
+/** The gold frame the main screens share (`estetica-visual.md` §2.3). */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}

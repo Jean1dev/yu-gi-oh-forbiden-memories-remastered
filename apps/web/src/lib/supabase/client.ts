@@ -5,8 +5,20 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * session and the collection through. Throws on missing configuration: this
  * runs once at app start, and a misconfigured deployment should fail loudly
  * rather than serve every request a confusing downstream error.
+ *
+ * One instance per process, reused by every caller. Each hook that needs a
+ * client calls this independently, and a second instance over the same storage
+ * key makes Supabase's auth layer warn — two `GoTrueClient`s refreshing the
+ * same token concurrently is a real race, not just noise. Sharing one is also
+ * what the session contract wants: `onAuthStateChange` in one screen has to see
+ * the sign-in another screen performed.
  */
+let browserClient: SupabaseClient | undefined;
+
 export function createSupabaseClient(): SupabaseClient {
+  if (browserClient !== undefined) {
+    return browserClient;
+  }
   const url = process.env["NEXT_PUBLIC_SUPABASE_URL"];
   const publishableKey = process.env["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"];
   if (url === undefined || publishableKey === undefined) {
@@ -14,7 +26,8 @@ export function createSupabaseClient(): SupabaseClient {
       "Missing Supabase configuration: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be set.",
     );
   }
-  return createClient(url, publishableKey);
+  browserClient = createClient(url, publishableKey);
+  return browserClient;
 }
 
 /**

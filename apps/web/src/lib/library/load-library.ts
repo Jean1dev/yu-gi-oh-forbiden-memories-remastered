@@ -7,7 +7,7 @@ import {
   type Result,
 } from "@yugioh/shared";
 
-import type { LibraryCatalog } from "./catalog-library.ts";
+import type { LibraryCatalog } from "./types.ts";
 
 export type LoadLibraryDeps = Readonly<{
   /** Expected to already memoize on its own (`getLibraryCatalog`) — this never caches it itself. */

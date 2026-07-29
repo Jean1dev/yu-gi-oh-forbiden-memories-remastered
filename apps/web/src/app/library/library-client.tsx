@@ -1,6 +1,7 @@
 "use client";
 
 import { calculateProgress, onlyObtained } from "@yugioh/rules";
+import { useMemo } from "react";
 
 import { CacheNotice } from "../../components/library/cache-notice.tsx";
 import { CollectionGrid } from "../../components/library/collection-grid.tsx";
@@ -10,6 +11,13 @@ import { LibraryFailure } from "../../components/library/library-failure.tsx";
 import { LIBRARY_MESSAGES } from "../../components/library/messages.ts";
 import { ProgressIndicator } from "../../components/library/progress-indicator.tsx";
 import { useLibrary } from "../../hooks/use-library.ts";
+import { fromCatalogPayload } from "../../lib/library/catalog-payload.ts";
+import type { LibraryCatalogPayload } from "../../lib/library/types.ts";
+
+export type LibraryClientProps = Readonly<{
+  /** Resolved server-side in `page.tsx` via `loadCatalogFromDisk` (fs access is server-only). */
+  catalogResult: LibraryCatalogPayload;
+}>;
 
 function failureMessage(code: string): string {
   if (code === "catalog_unavailable") {
@@ -33,9 +41,14 @@ function failureMessage(code: string): string {
  * A catalog failure never mounts the grid (PRD library §6 F01 Error
  * Handling); a collection failure shows the same failure state, so no card
  * is ever rendered as obtained while the collection could not be read.
+ *
+ * The catalog arrives as a prop and is rehydrated into its two lookups here,
+ * the same composition `BuildDeckClient` does with `buildCatalogLookup`: the
+ * loader reads the filesystem, so it can only run in `page.tsx`.
  */
-export function LibraryClient() {
-  const state = useLibrary();
+export function LibraryClient({ catalogResult }: LibraryClientProps) {
+  const catalog = useMemo(() => fromCatalogPayload(catalogResult), [catalogResult]);
+  const state = useLibrary(catalog);
 
   if (state.status === "loading") {
     return <GridSkeleton />;

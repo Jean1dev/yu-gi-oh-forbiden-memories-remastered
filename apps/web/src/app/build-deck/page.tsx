@@ -1,6 +1,7 @@
 import { loadCatalogFromDisk } from "@yugioh/data/catalog/disk";
 import { CARD_TYPES, type Card } from "@yugioh/shared";
 
+import { generatedDataDir } from "../../lib/server/repo-root.ts";
 import { BuildDeckClient, type CatalogResult } from "./build-deck-client.tsx";
 
 /**
@@ -13,7 +14,10 @@ import { BuildDeckClient, type CatalogResult } from "./build-deck-client.tsx";
  * `CardPoolLookup`.
  */
 async function loadCatalogResult(): Promise<CatalogResult> {
-  const result = await loadCatalogFromDisk();
+  // Explicit `generatedDir`: the loader's default is derived from
+  // `import.meta.url`, which Next may rewrite when it bundles the module
+  // (see `lib/server/repo-root.ts`).
+  const result = await loadCatalogFromDisk({ generatedDir: generatedDataDir() });
   if (!result.ok) {
     return { status: "error" };
   }
@@ -27,5 +31,13 @@ async function loadCatalogResult(): Promise<CatalogResult> {
 
 export default async function BuildDeckPage() {
   const catalogResult = await loadCatalogResult();
-  return <BuildDeckClient catalogResult={catalogResult} />;
+  // The page frame lives here rather than in `BuildDeckClient`, whose every
+  // branch (failure, skeleton, empty collection, editor) returns a fragment —
+  // wrapping once at the route keeps all of them inside the same container.
+  return (
+    <main className="page">
+      <h1>Build Deck</h1>
+      <BuildDeckClient catalogResult={catalogResult} />
+    </main>
+  );
 }

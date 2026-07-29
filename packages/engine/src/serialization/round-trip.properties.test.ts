@@ -86,8 +86,10 @@ const zoneReferenceArbitrary = fc.record({
   index: fc.constantFrom(0, 1, 2, 3, 4),
 });
 
+const contextKeyArbitrary = fc.string().filter((key) => key !== "__proto__");
+
 const contextArbitrary = fc.dictionary(
-  fc.string(),
+  contextKeyArbitrary,
   fc.oneof(fc.string(), fc.integer(), fc.boolean()),
 );
 

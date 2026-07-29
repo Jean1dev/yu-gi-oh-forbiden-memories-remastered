@@ -10,6 +10,8 @@ import {
   type Result,
 } from "@yugioh/shared";
 
+import { generatedDataDir } from "../server/repo-root.ts";
+
 export type CatalogAndPool = Readonly<{
   catalog: CardCatalogLookup;
   poolLookup: CardPoolLookup;
@@ -28,9 +30,15 @@ export type CatalogAndPool = Readonly<{
  * `catalog_unavailable` — the same code F01 already uses for the same
  * condition — so `ensureInitialDeck` never has to special-case where the
  * failure came from.
+ *
+ * Server-only: it reads the filesystem, so it belongs to a route handler or a
+ * server component, never to a `"use client"` module.
  */
 export async function loadCatalogAndPool(): Promise<Result<CatalogAndPool, DomainError>> {
-  const result = await loadCatalogFromDisk();
+  // Explicit `generatedDir` for the same reason `catalog-library.ts` passes one:
+  // the loader's default is derived from `import.meta.url`, which a bundler may
+  // rewrite (see `lib/server/repo-root.ts`).
+  const result = await loadCatalogFromDisk({ generatedDir: generatedDataDir() });
   if (!result.ok) {
     return err(
       new DomainError(`Catalog unavailable: ${result.error.message}`, "catalog_unavailable", {

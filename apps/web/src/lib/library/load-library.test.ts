@@ -11,8 +11,8 @@ import {
 } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 
-import type { LibraryCatalog } from "./catalog-library.ts";
 import { loadLibrary } from "./load-library.ts";
+import type { LibraryCatalog } from "./types.ts";
 
 function card(numero: string): Card {
   return {

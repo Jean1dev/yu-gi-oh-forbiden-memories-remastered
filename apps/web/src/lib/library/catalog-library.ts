@@ -11,15 +11,16 @@ import {
   type Result,
 } from "@yugioh/shared";
 
-export type LibraryCatalog = Readonly<{
-  listing: LibraryCatalogListing;
-  artLookup: CardArtLookup;
-}>;
+import { generatedDataDir } from "../server/repo-root.ts";
+import type { LibraryCatalog } from "./types.ts";
 
 let memoized: Promise<Result<LibraryCatalog, DomainError>> | undefined;
 
 async function loadOnce(): Promise<Result<LibraryCatalog, DomainError>> {
-  const result = await loadCatalogFromDisk();
+  // `generatedDir` is passed explicitly: the loader's own default is derived
+  // from `import.meta.url`, which Next may rewrite to a path inside `.next/`
+  // when it bundles the module (see `lib/server/repo-root.ts`).
+  const result = await loadCatalogFromDisk({ generatedDir: generatedDataDir() });
   if (!result.ok) {
     memoized = undefined;
     return err(
@@ -48,10 +49,16 @@ async function loadOnce(): Promise<Result<LibraryCatalog, DomainError>> {
     },
   };
 
+  // The manifest stores `cards-data/001.jpg` — a path relative to the
+  // repository root, the coordinate system the ingestion pipeline works in. The
+  // browser needs a URL, and a *relative* one would resolve differently on
+  // `/library` than on `/library/001`, so it is anchored here, at the web layer's
+  // edge, rather than changing what the dataset means. `/cards-data/[file]`
+  // serves it (the URL `collection-card-item.tsx` already hard-codes).
   const artLookup: CardArtLookup = (cardNumber) => {
     const resolved = artResolver.resolve(cardNumber);
     return resolved.tipo === "arte"
-      ? { kind: "art", path: resolved.caminho }
+      ? { kind: "art", path: `/${resolved.caminho}` }
       : { kind: "placeholder" };
   };
 

@@ -1,3 +1,9 @@
+// The Supabase-gated suite below exercises the offline cache fallback, and this
+// file runs in the Node environment. Same first line as
+// `collection.integration.test.ts` and `reward.integration.test.ts`, which use
+// the cache for the same reason.
+import "fake-indexeddb/auto";
+
 import { randomUUID } from "node:crypto";
 
 import { buildLibraryIndex } from "@yugioh/rules";

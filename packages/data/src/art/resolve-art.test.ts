@@ -73,6 +73,14 @@ describe("resolveArt", () => {
     expect(unknownAltogether.tipo).toBe("placeholder");
     expect(knownButMissing.caminho).toBe(unknownAltogether.caminho);
   });
+
+  it("ignores inherited object properties when checking the manifest", () => {
+    expect(resolveArt("toString" as CardNumber, Object.freeze({}))).toEqual({
+      numero: "toString",
+      tipo: "placeholder",
+      caminho: DEFAULT_ART_PLACEHOLDER_PATH,
+    });
+  });
 });
 
 describe("resolveArt (property-based)", () => {
