@@ -1,0 +1,62 @@
+.cell {
+  list-style: none;
+  /* Fluidity budget for the full 722-card catalog (Decision 2, §7): off-screen
+     cells skip layout/style/paint; the estimate keeps the scrollbar honest. */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 220px;
+  /* Own containment context so the cell compacts by the space *it* received,
+     not by the viewport (Decision 3). */
+  container-type: inline-size;
+  container-name: card-cell;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  outline-offset: 2px;
+}
+
+.link:hover,
+.link:focus-visible {
+  outline: 2px solid currentColor;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.number {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.typeClass {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Compact form by container query, not media query (Decision 3): the type and
+   class label is the first thing to go when the cell itself is narrow. */
+@container card-cell (max-width: 140px) {
+  .typeClass {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}

@@ -89,6 +89,16 @@ export {
 } from "./collection/schema.ts";
 export type { CardPoolLookup } from "./initial-deck/catalog.ts";
 export type { InitialPoolConfig } from "./initial-deck/types.ts";
+export type {
+  ArtReference,
+  CollectionProgress,
+  LibraryEntry,
+  LibraryIndex,
+  LoadedLibrary,
+  ObtainedArtReference,
+} from "./library/types.ts";
+export type { CardArtLookup, LibraryCatalogListing } from "./library/catalog.ts";
+export { ArtReferenceSchema, LibraryEntrySchema, LibraryIndexSchema } from "./library/schema.ts";
 export {
   ActiveDeckRowSchema,
   InitialPoolConfigSchema,
