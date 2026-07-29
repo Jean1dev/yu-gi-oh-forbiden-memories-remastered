@@ -32,6 +32,7 @@ export {
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
   INITIAL_LP,
+  MAX_CPU_ACTIONS_PER_ADVANCE,
   TOTAL_MONSTER_ZONES,
   TOTAL_SPELL_ZONES,
 } from "./duel/constants.ts";
@@ -43,8 +44,26 @@ export type {
   PlayerField,
   PlayerId,
   PlayerState,
+  PublicCard,
+  PublicDuelEvent,
+  PublicDuelState,
+  PublicHand,
+  PublicMonsterZone,
+  PublicPlayerField,
+  PublicPlayerState,
+  PublicReactionWindow,
+  PublicSpellZone,
   SpellZone,
 } from "./duel/types.ts";
+export {
+  ORCHESTRATION_ERROR_CODES,
+  type AiAgent,
+  type DuelAction,
+  type DuelSession,
+  type GetPublicDuelState,
+  type MatchOrchestrationInput,
+  type OrchestrationFailureReason,
+} from "./duel/orchestration.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
 export type { Snapshot } from "./duel/snapshot.ts";
 export type {
@@ -153,6 +172,15 @@ export {
   PlayerFieldSchema,
   PlayerIdSchema,
   PlayerStateSchema,
+  PublicCardSchema,
+  PublicDuelEventSchema,
+  PublicDuelStateSchema,
+  PublicHandSchema,
+  PublicMonsterZoneSchema,
+  PublicPlayerFieldSchema,
+  PublicPlayerStateSchema,
+  PublicReactionWindowSchema,
+  PublicSpellZoneSchema,
   ReactionWindowSchema,
   SpellZoneSchema,
   ZoneIndexSchema,

@@ -3,7 +3,22 @@ import { z } from "zod";
 import { CardSchema } from "../card/schema.ts";
 import { EVENT_TYPES } from "./constants.ts";
 import type { DuelEvent, EventType, JsonValue, ReactionWindow, ZoneReference } from "./events.ts";
-import type { DuelState, MonsterZone, PlayerField, PlayerState, SpellZone } from "./types.ts";
+import type {
+  DuelState,
+  MonsterZone,
+  PlayerField,
+  PlayerState,
+  PublicCard,
+  PublicDuelEvent,
+  PublicDuelState,
+  PublicHand,
+  PublicMonsterZone,
+  PublicPlayerField,
+  PublicPlayerState,
+  PublicReactionWindow,
+  PublicSpellZone,
+  SpellZone,
+} from "./types.ts";
 
 export const PlayerIdSchema = z.enum(["P1", "P2"]);
 
@@ -122,6 +137,86 @@ export const DuelStateSchema = z.strictObject({
   seed: z.number().int().min(0).max(0xffffffff),
 });
 
+export const PublicCardSchema = z.discriminatedUnion("visible", [
+  z.strictObject({ visible: z.literal(true), card: CardSchema }),
+  z.strictObject({ visible: z.literal(false) }),
+]);
+
+export const PublicHandSchema = z.discriminatedUnion("visible", [
+  z.strictObject({ visible: z.literal(true), cards: z.array(CardSchema) }),
+  z.strictObject({ visible: z.literal(false), count: z.number().int().nonnegative() }),
+]);
+
+export const PublicMonsterZoneSchema = z.discriminatedUnion("occupied", [
+  z.strictObject({ occupied: z.literal(false) }),
+  z.strictObject({
+    occupied: z.literal(true),
+    card: PublicCardSchema,
+    position: MonsterPositionSchema,
+    hasAttacked: z.boolean(),
+    hasChangedPosition: z.boolean(),
+  }),
+]);
+
+export const PublicSpellZoneSchema = z.discriminatedUnion("occupied", [
+  z.strictObject({ occupied: z.literal(false) }),
+  z.strictObject({
+    occupied: z.literal(true),
+    card: PublicCardSchema,
+    faceUp: z.boolean(),
+  }),
+]);
+
+export const PublicPlayerFieldSchema = z.strictObject({
+  monsters: z.tuple([
+    PublicMonsterZoneSchema,
+    PublicMonsterZoneSchema,
+    PublicMonsterZoneSchema,
+    PublicMonsterZoneSchema,
+    PublicMonsterZoneSchema,
+  ]),
+  spells: z.tuple([
+    PublicSpellZoneSchema,
+    PublicSpellZoneSchema,
+    PublicSpellZoneSchema,
+    PublicSpellZoneSchema,
+    PublicSpellZoneSchema,
+  ]),
+});
+
+export const PublicPlayerStateSchema = z.strictObject({
+  lp: z.number().int().min(0),
+  hand: PublicHandSchema,
+  remainingDeck: z.number().int().nonnegative(),
+  field: PublicPlayerFieldSchema,
+});
+
+export const PublicDuelEventSchema = z.strictObject({
+  type: EventTypeSchema,
+  originPlayer: PlayerIdSchema,
+  involvedCards: z.array(PublicCardSchema),
+  involvedZones: z.array(ZoneReferenceSchema),
+  context: z.record(z.string(), JsonValueSchema),
+});
+
+export const PublicReactionWindowSchema = z.strictObject({
+  type: z.literal("reaction_window"),
+  event: PublicDuelEventSchema,
+  reactingPlayer: PlayerIdSchema,
+});
+
+export const PublicDuelStateSchema = z.strictObject({
+  players: z.strictObject({
+    P1: PublicPlayerStateSchema,
+    P2: PublicPlayerStateSchema,
+  }),
+  activeField: CardSchema.nullable(),
+  activePlayer: PlayerIdSchema,
+  turn: z.number().int().min(1),
+  phase: PhaseSchema,
+  pending: PublicReactionWindowSchema.optional(),
+});
+
 /**
  * Locks the schema and the declared type together: if one changes without
  * the other, the typecheck breaks here instead of silently drifting (same
@@ -147,3 +242,35 @@ const _reactionWindowMatchesDeclaredType: ReactionWindow = {} as z.infer<
   typeof ReactionWindowSchema
 >;
 void _reactionWindowMatchesDeclaredType;
+const _publicCardMatchesDeclaredType: PublicCard = {} as z.infer<typeof PublicCardSchema>;
+void _publicCardMatchesDeclaredType;
+const _publicHandMatchesDeclaredType: PublicHand = {} as z.infer<typeof PublicHandSchema>;
+void _publicHandMatchesDeclaredType;
+const _publicMonsterZoneMatchesDeclaredType: PublicMonsterZone = {} as z.infer<
+  typeof PublicMonsterZoneSchema
+>;
+void _publicMonsterZoneMatchesDeclaredType;
+const _publicSpellZoneMatchesDeclaredType: PublicSpellZone = {} as z.infer<
+  typeof PublicSpellZoneSchema
+>;
+void _publicSpellZoneMatchesDeclaredType;
+const _publicFieldMatchesDeclaredType: PublicPlayerField = {} as z.infer<
+  typeof PublicPlayerFieldSchema
+>;
+void _publicFieldMatchesDeclaredType;
+const _publicPlayerMatchesDeclaredType: PublicPlayerState = {} as z.infer<
+  typeof PublicPlayerStateSchema
+>;
+void _publicPlayerMatchesDeclaredType;
+const _publicEventMatchesDeclaredType: PublicDuelEvent = {} as z.infer<
+  typeof PublicDuelEventSchema
+>;
+void _publicEventMatchesDeclaredType;
+const _publicReactionMatchesDeclaredType: PublicReactionWindow = {} as z.infer<
+  typeof PublicReactionWindowSchema
+>;
+void _publicReactionMatchesDeclaredType;
+const _publicStateMatchesDeclaredType: PublicDuelState = {} as z.infer<
+  typeof PublicDuelStateSchema
+>;
+void _publicStateMatchesDeclaredType;

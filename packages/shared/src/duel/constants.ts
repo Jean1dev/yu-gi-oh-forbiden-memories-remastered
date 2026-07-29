@@ -10,6 +10,9 @@ export const INITIAL_LP = 8000;
 /** Number of cards dealt to each player's opening hand (motor-duelo-1x1 F03). */
 export const INITIAL_HAND_SIZE = 5;
 
+/** Maximum number of consecutive CPU decisions before the orchestrator stops a stalled match. */
+export const MAX_CPU_ACTIONS_PER_ADVANCE = 100;
+
 /**
  * The closed vocabulary of duel trigger events (PRD motor-duelo-1x1 F02
  * Capabilities; `docs/arquitetura.md` §3.3). Single source of truth: `EventType`
