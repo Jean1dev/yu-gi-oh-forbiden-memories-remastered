@@ -8,6 +8,8 @@ export type CollectionGridProps = Readonly<{
   entries: readonly LibraryEntry[];
   /** Shown instead of an empty list; not exercised by F02's own flow (`LibraryClient` renders `EmptyState` first), reserved for F04. */
   emptyLabel: string;
+  /** Active Library query params carried into detail links so F05 can reconstruct the visible sequence. */
+  detailQueryString?: string;
 }>;
 
 /**
@@ -16,7 +18,7 @@ export type CollectionGridProps = Readonly<{
  * §3, §4). Column count follows the available space, not a breakpoint list
  * (see `collection-grid.module.css`).
  */
-export function CollectionGrid({ entries, emptyLabel }: CollectionGridProps) {
+export function CollectionGrid({ entries, emptyLabel, detailQueryString }: CollectionGridProps) {
   if (entries.length === 0) {
     return <p role="status">{emptyLabel}</p>;
   }
@@ -24,7 +26,11 @@ export function CollectionGrid({ entries, emptyLabel }: CollectionGridProps) {
   return (
     <ul className={styles.grid} aria-label="Cartas">
       {entries.map((entry) => (
-        <CardCell key={entry.cardNumber} entry={entry} />
+        <CardCell
+          key={entry.cardNumber}
+          entry={entry}
+          {...(detailQueryString === undefined ? {} : { detailQueryString })}
+        />
       ))}
     </ul>
   );
