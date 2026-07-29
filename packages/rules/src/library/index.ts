@@ -10,4 +10,13 @@ export {
   type LibrarySearchIndex,
   type NormalizedLibrarySearchTerm,
 } from "./search.ts";
+export {
+  hasNonDefaultLibraryFilters,
+  queryLibraryEntries,
+  type LibraryQueryInput,
+  type LibrarySearchPredicate,
+} from "./query.ts";
+export { filterByCollectionStatus } from "./status.ts";
+export { filterByCardType } from "./type-filter.ts";
+export { sortLibraryEntries } from "./sort.ts";
 export { onlyObtained } from "./visibility.ts";
