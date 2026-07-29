@@ -14,11 +14,12 @@ import { log } from "../logging.ts";
  * already added.
  */
 export const DATABASE_NAME = "yugioh-build-deck";
-export const DATABASE_VERSION = 3;
+export const DATABASE_VERSION = 4;
 export const STORE_NAME = "collection";
 export const PENDING_REWARDS_STORE_NAME = "pendingRewards";
 export const ACTIVE_DECK_CACHE_STORE_NAME = "activeDeckCache";
 export const ACTIVE_DECK_PENDING_SAVE_STORE_NAME = "activeDeckPendingSave";
+export const ROSTER_CACHE_STORE_NAME = "rosterCache";
 
 /** The collection's local-cache port (spec build-deck/F01 §4 `lerSnapshot`/`gravarSnapshot`). */
 export type CollectionCache = Readonly<{
@@ -42,6 +43,9 @@ export function openDatabase(): Promise<IDBDatabase> {
       }
       if (!database.objectStoreNames.contains(ACTIVE_DECK_PENDING_SAVE_STORE_NAME)) {
         database.createObjectStore(ACTIVE_DECK_PENDING_SAVE_STORE_NAME, { keyPath: "playerId" });
+      }
+      if (!database.objectStoreNames.contains(ROSTER_CACHE_STORE_NAME)) {
+        database.createObjectStore(ROSTER_CACHE_STORE_NAME);
       }
     };
     request.onsuccess = () => {
