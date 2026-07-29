@@ -1,0 +1,106 @@
+.detail {
+  box-sizing: border-box;
+  width: min(100%, 60rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+.detail > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-block-end: 1rem;
+  border-radius: 0.25rem;
+}
+
+.detail > a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr);
+  gap: clamp(1rem, 4vw, 2.5rem);
+  align-items: start;
+}
+
+.art {
+  width: 100%;
+  max-width: 20rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, CanvasText 10%, Canvas);
+}
+
+.content {
+  min-width: 0;
+}
+
+.content h1 {
+  margin-block: 0.25rem 1rem;
+}
+
+.content h2 {
+  margin-block: 1.25rem 0.5rem;
+  font-size: 1rem;
+}
+
+.content dl {
+  margin: 0;
+}
+
+.content dl > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) minmax(0, 2fr);
+  gap: 0.75rem;
+  padding-block: 0.375rem;
+}
+
+.content dt {
+  font-weight: 700;
+}
+
+.content dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.number {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.blocked {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.blocked h1 {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .art {
+    width: min(100%, 16rem);
+    margin-inline: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail *,
+  .detail *::before,
+  .detail *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

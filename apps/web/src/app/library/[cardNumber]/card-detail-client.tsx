@@ -4,6 +4,8 @@ import { findEntry } from "@yugioh/rules";
 import { CardNumberSchema } from "@yugioh/shared";
 import { useMemo } from "react";
 
+import { BlockedCardDetail } from "../../../components/library/blocked-card-detail.tsx";
+import { CardDetail } from "../../../components/library/card-detail.tsx";
 import { LibraryBackAction } from "../../../components/library/library-back-action.tsx";
 import { LibraryFailure } from "../../../components/library/library-failure.tsx";
 import { LIBRARY_MESSAGES } from "../../../components/library/messages.ts";
@@ -57,10 +59,13 @@ export function CardDetailClient({
     );
   }
 
-  return (
-    <section aria-label={`Detalhe da carta ${entry.cardNumber}`}>
-      <p>{entry.obtained ? entry.card.nome : LIBRARY_MESSAGES.cardNotObtained}</p>
-      <LibraryBackAction returnDestination={returnDestination} />
-    </section>
+  return entry.obtained ? (
+    <CardDetail entry={entry} returnDestination={returnDestination} />
+  ) : (
+    <BlockedCardDetail
+      cardNumber={entry.cardNumber}
+      art={entry.art}
+      returnDestination={returnDestination}
+    />
   );
 }
