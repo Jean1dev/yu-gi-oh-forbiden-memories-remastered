@@ -18,8 +18,9 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
-    "lint": "eslint . && pnpm run lint:boundaries",
+    "lint": "eslint . && pnpm run lint:boundaries && pnpm run lint:build-deck-f04",
     "lint:boundaries": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "lint:build-deck-f04": "node scripts/check-build-deck-f04-boundaries.mjs",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
