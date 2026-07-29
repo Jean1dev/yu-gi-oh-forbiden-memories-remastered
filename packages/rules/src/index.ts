@@ -7,8 +7,10 @@ export {
   ownedEntries,
   ownedQuantity,
   owns,
+  searchByName,
   serializeCollection,
   validateRewardCardNumber,
+  withDeckQuantity,
 } from "./collection/index.ts";
 export {
   drawInitialDeck,
@@ -18,6 +20,14 @@ export {
   type RandomSource,
   type ResolvedInitialPool,
 } from "./initial-deck/index.ts";
+export {
+  addCardToDraft,
+  createActiveDeckLookupFromDraft,
+  draftDivergesFromActiveDeck,
+  removeCardFromDraft,
+  totalCardsInDraft,
+  validateDeckDraft,
+} from "./deck/index.ts";
 export {
   buildLibraryIndex,
   calculateProgress,

@@ -3,18 +3,22 @@ import { CollectionSnapshotSchema, type CollectionSnapshot } from "@yugioh/share
 import { log } from "../logging.ts";
 
 /**
- * Shared with `../reward/offline-queue.ts`: the reward's offline path writes
- * the collection point-increment and the queue entry in the same IndexedDB
- * transaction (spec build-deck/F03 §5, "as duas nunca divergem entre si"),
- * which requires opening this same database and listing both store names in
- * one `transaction()` call — IndexedDB has no cross-connection transactions.
- * `DATABASE_VERSION` is 2 as of build-deck/F03 (spec §5): the upgrade adds
- * `PENDING_REWARDS_STORE_NAME` alongside the collection store opened here.
+ * Shared with `../reward/offline-queue.ts` and `../active-deck/cache.ts`: the
+ * reward's offline path and the active deck's offline save both write a
+ * point-in-time record and a pending-queue entry in the same IndexedDB
+ * transaction, which requires opening this same database and listing every
+ * involved store name in one `transaction()` call — IndexedDB has no
+ * cross-connection transactions. `DATABASE_VERSION` is 3 as of build-deck/F07
+ * (spec §5): the upgrade adds `ACTIVE_DECK_CACHE_STORE_NAME` and
+ * `ACTIVE_DECK_PENDING_SAVE_STORE_NAME` alongside the two stores build-deck/F03
+ * already added.
  */
 export const DATABASE_NAME = "yugioh-build-deck";
-export const DATABASE_VERSION = 2;
+export const DATABASE_VERSION = 3;
 export const STORE_NAME = "collection";
 export const PENDING_REWARDS_STORE_NAME = "pendingRewards";
+export const ACTIVE_DECK_CACHE_STORE_NAME = "activeDeckCache";
+export const ACTIVE_DECK_PENDING_SAVE_STORE_NAME = "activeDeckPendingSave";
 
 /** The collection's local-cache port (spec build-deck/F01 §4 `lerSnapshot`/`gravarSnapshot`). */
 export type CollectionCache = Readonly<{
@@ -32,6 +36,12 @@ export function openDatabase(): Promise<IDBDatabase> {
       }
       if (!database.objectStoreNames.contains(PENDING_REWARDS_STORE_NAME)) {
         database.createObjectStore(PENDING_REWARDS_STORE_NAME, { keyPath: "duelId" });
+      }
+      if (!database.objectStoreNames.contains(ACTIVE_DECK_CACHE_STORE_NAME)) {
+        database.createObjectStore(ACTIVE_DECK_CACHE_STORE_NAME, { keyPath: "playerId" });
+      }
+      if (!database.objectStoreNames.contains(ACTIVE_DECK_PENDING_SAVE_STORE_NAME)) {
+        database.createObjectStore(ACTIVE_DECK_PENDING_SAVE_STORE_NAME, { keyPath: "playerId" });
       }
     };
     request.onsuccess = () => {

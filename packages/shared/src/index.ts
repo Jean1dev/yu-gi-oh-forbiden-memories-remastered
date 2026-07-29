@@ -55,6 +55,25 @@ export type {
 } from "./duel/combat-modifiers.ts";
 export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
 export type {
+  DeckDraft,
+  DeckDraftValidationResult,
+  DeckDraftViolation,
+  DeckEditBlockReason,
+} from "./deck/draft.ts";
+export type {
+  CachedActiveDeckRecord,
+  LoadedActiveDeck,
+  PendingActiveDeckSave,
+  SaveActiveDeckResult,
+  SyncActiveDeckSummary,
+} from "./deck/persistence.ts";
+export {
+  CachedActiveDeckRecordSchema,
+  PendingActiveDeckSaveSchema,
+  SaveActiveDeckResponseSchema,
+  type SaveActiveDeckResponse,
+} from "./deck/schema.ts";
+export type {
   DuelEvent,
   EventType,
   JsonValue,
@@ -77,6 +96,7 @@ export type {
   RewardResult,
   SerializedCollection,
 } from "./collection/types.ts";
+export type { ActiveDeckLookup, CollectionItemWithDeck } from "./collection/active-deck.ts";
 export {
   ApplyCardRewardResponseSchema,
   CardRewardEventSchema,

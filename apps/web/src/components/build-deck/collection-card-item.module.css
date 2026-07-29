@@ -1,0 +1,36 @@
+.item {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.5rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  content-visibility: auto;
+  contain-intrinsic-size: 48px;
+}
+
+.selected {
+  border-color: #3b82f6;
+}
+
+.art {
+  width: 48px;
+  height: 48px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.limit {
+  font-size: 0.75rem;
+  color: #b91c1c;
+}
