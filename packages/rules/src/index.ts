@@ -31,11 +31,18 @@ export {
 export {
   buildLibraryIndex,
   calculateProgress,
+  filterLibrarySearch,
   findEntry,
   isObtained,
+  LIBRARY_SEARCH_TERM_MAX_LENGTH,
+  normalizeLibrarySearchTerm,
   onlyObtained,
+  prepareLibrarySearch,
   resolveArtReference,
   type LibraryCrossReferenceInput,
+  type LibrarySearchEntry,
+  type LibrarySearchIndex,
+  type NormalizedLibrarySearchTerm,
 } from "./library/index.ts";
 export { neutralGuardianModifier } from "./guardian-star/index.ts";
 export { neutralTerrainModifier } from "./terrain/index.ts";
