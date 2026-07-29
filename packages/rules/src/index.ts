@@ -27,6 +27,11 @@ export {
   removeCardFromDraft,
   totalCardsInDraft,
   validateDeckDraft,
+  buildReadyDeck,
+  expandComposition,
+  totalCards,
+  validateDeckComposition,
+  validateDeckForDuel,
 } from "./deck/index.ts";
 export {
   buildLibraryIndex,
