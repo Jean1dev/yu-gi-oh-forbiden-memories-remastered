@@ -34,6 +34,7 @@ export default async function InterceptedCardDetailPage({
         cardNumber={cardNumber}
         returnDestination={libraryReturnDestination(await searchParams)}
         catalogResult={await loadCatalogPayload()}
+        returnMode="history"
       />
     </DetailModal>
   );

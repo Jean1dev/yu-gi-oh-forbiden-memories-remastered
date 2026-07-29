@@ -17,6 +17,7 @@ export type CardDetailClientProps = Readonly<{
   cardNumber: string;
   returnDestination: string;
   catalogResult: LibraryCatalogPayload;
+  returnMode?: "link" | "history";
 }>;
 
 function failureMessage(code: string): string {
@@ -33,6 +34,7 @@ export function CardDetailClient({
   cardNumber,
   returnDestination,
   catalogResult,
+  returnMode = "link",
 }: CardDetailClientProps) {
   const catalog = useMemo(() => fromCatalogPayload(catalogResult), [catalogResult]);
   const state = useLibrary(catalog);
@@ -54,18 +56,19 @@ export function CardDetailClient({
     return (
       <section aria-labelledby="card-not-found-title">
         <h1 id="card-not-found-title">{LIBRARY_MESSAGES.cardNotFound}</h1>
-        <LibraryBackAction returnDestination={returnDestination} />
+        <LibraryBackAction returnDestination={returnDestination} mode={returnMode} />
       </section>
     );
   }
 
   return entry.obtained ? (
-    <CardDetail entry={entry} returnDestination={returnDestination} />
+    <CardDetail entry={entry} returnDestination={returnDestination} returnMode={returnMode} />
   ) : (
     <BlockedCardDetail
       cardNumber={entry.cardNumber}
       art={entry.art}
       returnDestination={returnDestination}
+      returnMode={returnMode}
     />
   );
 }

@@ -10,6 +10,7 @@ export type ObtainedLibraryEntry = Extract<LibraryEntry, Readonly<{ obtained: tr
 export type CardDetailProps = Readonly<{
   entry: ObtainedLibraryEntry;
   returnDestination: string;
+  returnMode?: "link" | "history";
 }>;
 
 function optionalField(label: string, value: string | number | null): CardDetailField | undefined {
@@ -20,7 +21,7 @@ function presentFields(fields: readonly (CardDetailField | undefined)[]): CardDe
   return fields.filter((field): field is CardDetailField => field !== undefined);
 }
 
-export function CardDetail({ entry, returnDestination }: CardDetailProps) {
+export function CardDetail({ entry, returnDestination, returnMode = "link" }: CardDetailProps) {
   const { card } = entry;
   const combatFields = presentFields([
     optionalField("ATK", card.atk),
@@ -33,7 +34,7 @@ export function CardDetail({ entry, returnDestination }: CardDetailProps) {
 
   return (
     <article className={styles.detail} aria-labelledby="card-detail-title">
-      <LibraryBackAction returnDestination={returnDestination} />
+      <LibraryBackAction returnDestination={returnDestination} mode={returnMode} />
       <div className={styles.layout}>
         <CardDetailArt art={entry.art} label={card.nome} />
         <div className={styles.content}>

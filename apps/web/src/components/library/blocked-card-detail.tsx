@@ -9,16 +9,18 @@ export type BlockedCardDetailProps = Readonly<{
   cardNumber: CardNumber;
   art: Readonly<{ kind: "silhouette" }>;
   returnDestination: string;
+  returnMode?: "link" | "history";
 }>;
 
 export function BlockedCardDetail({
   cardNumber,
   art,
   returnDestination,
+  returnMode = "link",
 }: BlockedCardDetailProps) {
   return (
     <article className={styles.detail} aria-labelledby="blocked-card-title">
-      <LibraryBackAction returnDestination={returnDestination} />
+      <LibraryBackAction returnDestination={returnDestination} mode={returnMode} />
       <div className={styles.blocked}>
         <CardDetailArt art={art} label="" />
         <p className={styles.number}>#{cardNumber}</p>
