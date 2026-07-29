@@ -32,7 +32,7 @@ export async function GET(
 
   let bytes: Buffer;
   try {
-    bytes = await readFile(join(cardsDataDir(), file));
+    bytes = await readFile(join(cardsDataDir(), /* turbopackIgnore: true */ file));
   } catch {
     // A card with no art on disk is a known dataset state (`placeholder.jpg` is
     // still a pending asset): 404 lets `CardArt`'s `onError` fall back to the
