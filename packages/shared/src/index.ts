@@ -53,7 +53,17 @@ export type {
   GuardianModifierProvider,
   TerrainModifierProvider,
 } from "./duel/combat-modifiers.ts";
-export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
+export type {
+  ActiveDeckOrigin,
+  ActiveDeckVerification,
+  DeckBlockReason,
+  DeckComposition,
+  DeckVerdict,
+  DeckViolation,
+  LoadedDuelDeck,
+  ReadyDeck,
+} from "./deck/types.ts";
+export { DECK_ERROR_CODES, type DeckErrorCode } from "./deck/error-codes.ts";
 export { MAX_COPIES_PER_CARD, REQUIRED_DECK_SIZE } from "./deck/constants.ts";
 export type {
   DeckDraft,
@@ -69,6 +79,9 @@ export type {
   SyncActiveDeckSummary,
 } from "./deck/persistence.ts";
 export {
+  ActiveDeckLineSchema,
+  ActiveDeckSnapshotSchema,
+  DeckCompositionSchema,
   CachedActiveDeckRecordSchema,
   PendingActiveDeckSaveSchema,
   SaveActiveDeckResponseSchema,

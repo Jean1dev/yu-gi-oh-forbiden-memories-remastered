@@ -1,6 +1,19 @@
 import { z } from "zod";
 
 import { SerializedCollectionSchema } from "../collection/schema.ts";
+import { CardNumberSchema } from "../card/schema.ts";
+
+export const DeckCompositionSchema = z.record(CardNumberSchema, z.number().finite());
+export const ActiveDeckLineSchema = z.strictObject({
+  player_id: z.string().uuid(),
+  cards: DeckCompositionSchema,
+  updated_at: z.string().datetime(),
+});
+export const ActiveDeckSnapshotSchema = z.strictObject({
+  playerId: z.string().min(1),
+  cards: DeckCompositionSchema,
+  updatedAt: z.string().datetime(),
+});
 
 /**
  * Shape returned by the `save_active_deck` RPC (spec build-deck/F07 §4).
