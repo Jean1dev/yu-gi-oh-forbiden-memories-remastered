@@ -29,10 +29,12 @@ export {
   validateDeckDraft,
   buildReadyDeck,
   expandComposition,
+  groupIntoComposition,
   totalCards,
   validateDeckComposition,
   validateDeckForDuel,
 } from "./deck/index.ts";
+export { getPublicDuelState } from "./visibility/index.ts";
 export {
   buildLibraryIndex,
   calculateProgress,

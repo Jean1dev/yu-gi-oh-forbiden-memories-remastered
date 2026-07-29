@@ -11,3 +11,10 @@ export function expandComposition(composition: DeckComposition): readonly CardNu
       Array.from({ length: composition[cardNumber] ?? 0 }, () => cardNumber),
     );
 }
+
+export function groupIntoComposition(cardNumbers: readonly CardNumber[]): DeckComposition {
+  return cardNumbers.reduce<Record<CardNumber, number>>((composition, cardNumber) => {
+    composition[cardNumber] = (composition[cardNumber] ?? 0) + 1;
+    return composition;
+  }, {});
+}
