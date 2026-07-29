@@ -54,6 +54,7 @@ export type {
   TerrainModifierProvider,
 } from "./duel/combat-modifiers.ts";
 export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
+export { MAX_COPIES_PER_CARD, REQUIRED_DECK_SIZE } from "./deck/constants.ts";
 export type {
   DeckDraft,
   DeckDraftValidationResult,
@@ -143,3 +144,26 @@ export {
   ZoneReferenceSchema,
   ZoneTypeSchema,
 } from "./duel/schema.ts";
+export { DIFFICULTY_LEVELS, ROSTER_ERROR_CODES, type RosterErrorCode } from "./duelist/constants.ts";
+export type {
+  DifficultyLevel,
+  DifficultyParameter,
+  DifficultyProfile,
+  DropPool,
+  DropTier,
+  DropTierId,
+  Duelist,
+  DuelistId,
+  NpcDeck,
+  Roster,
+} from "./duelist/types.ts";
+export {
+  DifficultyLevelSchema,
+  DifficultyProfileSchema,
+  DropPoolSchema,
+  DropTierSchema,
+  DuelistIdSchema,
+  DuelistSchema,
+  NpcDeckSchema,
+  RosterSchema,
+} from "./duelist/schema.ts";
