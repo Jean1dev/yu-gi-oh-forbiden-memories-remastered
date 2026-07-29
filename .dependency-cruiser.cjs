@@ -109,6 +109,20 @@ module.exports = {
       to: { path: "^(node:|react|react-dom|next|@supabase/|apps/)" },
     },
     {
+      name: "free-duel-visibility-rules-are-pure",
+      comment: "Public duel projections are pure rules and depend only on shared contracts.",
+      severity: "error",
+      from: { path: "^packages/rules/src/visibility/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^(node:|react|react-dom|next|@supabase/|apps/|packages/(?!rules|shared))" },
+    },
+    {
+      name: "free-duel-session-store-stays-in-web",
+      comment: "The Zustand runtime adapter belongs to the web application only.",
+      severity: "error",
+      from: { path: "^packages/" },
+      to: { path: "^apps/web/src/stores/free-duel/" },
+    },
+    {
       name: "no-circular",
       severity: "error",
       from: {},

@@ -9,6 +9,7 @@ import {
   MISSING_DECK_MESSAGE,
 } from "../../../../lib/free-duel/deck-messages.ts";
 import { useSession } from "../../../../hooks/use-session.ts";
+import { setDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 
 export function DuelPreparation({ duelistId }: { duelistId: string }) {
   const router = useRouter();
@@ -32,7 +33,13 @@ export function DuelPreparation({ duelistId }: { duelistId: string }) {
   return (
     <main>
       <h1>Deck ready</h1>
-      <button type="button" onClick={() => router.push(`/free-duel/${duelistId}/duel`)}>
+      <button
+        type="button"
+        onClick={() => {
+          setDuelHandoff(duelistId, verification.readyDeck);
+          router.push(`/free-duel/${duelistId}/duel`);
+        }}
+      >
         Start duel
       </button>
     </main>
