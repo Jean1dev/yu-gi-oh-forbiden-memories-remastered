@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
+import { PostDuelActions } from "../../../../components/free-duel/post-duel-actions.tsx";
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
@@ -182,12 +183,15 @@ export function DuelScreen({
         onCancel={surrenderFlow.cancel}
       />
       {session.status === "ended" ? (
-        <EndedDuelResult
-          session={session}
-          resolveResult={resolveResult}
-          dropPool={context?.duelist.dropPool ?? []}
-          grantVictoryReward={grantVictoryReward}
-        />
+        <>
+          <EndedDuelResult
+            session={session}
+            resolveResult={resolveResult}
+            dropPool={context?.duelist.dropPool ?? []}
+            grantVictoryReward={grantVictoryReward}
+          />
+          <PostDuelActions duelistId={duelistId} />
+        </>
       ) : null}
     </main>
   );

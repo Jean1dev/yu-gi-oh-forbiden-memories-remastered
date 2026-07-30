@@ -147,6 +147,49 @@ describe("DuelScreen", () => {
     expect(await screen.findByRole("heading", { name: "Derrota" })).toBeTruthy();
     expect(screen.getByText("Você se rendeu.")).toBeTruthy();
     expect(screen.queryByText(/estrelas/)).toBeNull();
+    expect(screen.getByRole("link", { name: "Revanche" }).getAttribute("href")).toBe(
+      "/free-duel/seto/prepare",
+    );
+    expect(screen.getByRole("link", { name: "Trocar oponente" }).getAttribute("href")).toBe(
+      "/free-duel",
+    );
+    expect(screen.getByRole("link", { name: "Voltar ao menu" }).getAttribute("href")).toBe("/");
+  });
+
+  it("does not render post-duel actions while the session is in progress", async () => {
+    render(
+      <DuelScreen
+        duelistId="seto"
+        loadContext={loadContext}
+        startMatch={() => ({
+          status: "in_progress",
+          duelSessionId: "session-1",
+          duelistId: "seto",
+          state,
+          currentDecider: "P1",
+        })}
+      />,
+    );
+    await screen.findByRole("heading", { name: "Duel" });
+    expect(screen.queryByRole("link", { name: "Revanche" })).toBeNull();
+  });
+
+  it("does not render post-duel actions when orchestration failed", async () => {
+    render(
+      <DuelScreen
+        duelistId="seto"
+        loadContext={loadContext}
+        startMatch={() => ({
+          status: "failed",
+          duelSessionId: "session-1",
+          duelistId: "seto",
+          reason: "ai_unavailable",
+        })}
+      />,
+    );
+    await screen.findByRole("alert");
+    expect(screen.queryByRole("link", { name: "Revanche" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Trocar oponente" })).toBeNull();
   });
 
   it("fails safely when result contracts are not composed", async () => {
