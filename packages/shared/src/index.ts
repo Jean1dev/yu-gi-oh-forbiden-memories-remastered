@@ -246,3 +246,17 @@ export type {
   DropRewardSource,
 } from "./duelist/drop-reward.ts";
 export { DefaultCommonDropPoolSchema } from "./duelist/drop-reward-schema.ts";
+export type {
+  LoadedWalletBalance,
+  PendingVictoryReward,
+  VictoryRewardEvent,
+  VictoryRewardResult,
+  WalletBalance,
+} from "./economy/wallet.ts";
+export {
+  ApplyVictoryRewardResponseSchema,
+  PendingVictoryRewardSchema,
+  VictoryRewardEventSchema,
+  WalletBalanceSchema,
+  type ApplyVictoryRewardResponse,
+} from "./economy/wallet-schema.ts";
