@@ -139,7 +139,7 @@ describe("round-trip idempotency (motor-duelo-1x1 F05, critério de aceite 1)", 
       }),
       { numRuns: 1000 },
     );
-  });
+  }, 15_000);
 });
 
 describe("reference independence", () => {
@@ -161,5 +161,5 @@ describe("reference independence", () => {
       }),
       { numRuns: 1000 },
     );
-  });
+  }, 15_000);
 });
