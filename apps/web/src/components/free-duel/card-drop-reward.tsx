@@ -1,5 +1,5 @@
 import { cardArtUrl } from "../../lib/card-art-url.ts";
-import type { CardDropRewardViewState } from "../../hooks/use-card-drop-reward.ts";
+import type { VictoryRewardViewState } from "../../hooks/use-victory-reward.ts";
 
 export const CARD_DROP_ADDED_MESSAGE = "Adicionada à sua coleção.";
 export const CARD_DROP_OFFLINE_MESSAGE = "Carta conquistada salva localmente; sincronizando…";
@@ -14,7 +14,7 @@ export const CARD_DROP_PENDING_MESSAGE =
  * `RewardResult` status. `already_applied` shows only the message — the card
  * was already granted in an earlier attempt, so its art is not repeated.
  */
-export function CardDropReward({ state }: { readonly state: CardDropRewardViewState }) {
+export function CardDropReward({ state }: { readonly state: VictoryRewardViewState }) {
   if (state.status === "not_applicable") return null;
   if (state.status === "loading") return <p aria-busy="true">Selecionando recompensa…</p>;
   if (state.status === "unavailable") return <p role="alert">{CARD_DROP_PENDING_MESSAGE}</p>;

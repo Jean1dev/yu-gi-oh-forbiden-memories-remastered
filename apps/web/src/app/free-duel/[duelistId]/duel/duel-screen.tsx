@@ -18,9 +18,9 @@ import { SurrenderButton } from "../../../../components/free-duel/surrender-butt
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import {
-  useCardDropReward,
-  type GrantedCardDropView,
-} from "../../../../hooks/use-card-drop-reward.ts";
+  useVictoryReward,
+} from "../../../../hooks/use-victory-reward.ts";
+import type { GrantedVictoryReward } from "../../../../lib/free-duel/grant-victory-reward.ts";
 import {
   useDuelResult,
   type ResolveEndedDuelResult,
@@ -35,10 +35,10 @@ import { generateDuelSessionId } from "../../../../lib/free-duel/seed-generator.
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 
 /** Bound with the duelist's `dropPool` at composition time; see `ResolvedDuelResult`. */
-export type GrantCardDropForVictory = (
+export type GrantVictoryRewardForVictory = (
   result: Extract<ConsolidatedDuelResult, { status: "victory" }>,
   dropPool: DropPool,
-) => Promise<Result<GrantedCardDropView, DomainError>>;
+) => Promise<Result<GrantedVictoryReward, DomainError>>;
 
 async function loadDefaultContext(duelistId: string): Promise<DuelScreenContext | null> {
   const handoff = takeDuelHandoff(duelistId);
@@ -65,31 +65,31 @@ const unavailableApply: ApplyAction = () => {
 function ResolvedDuelResult({
   result,
   dropPool,
-  grantCardDropReward,
+  grantVictoryReward,
 }: {
   readonly result: ConsolidatedDuelResult;
   readonly dropPool: DropPool;
-  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
+  readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
 }) {
   const boundGrantReward = useMemo(() => {
-    if (!grantCardDropReward) return undefined;
+    if (!grantVictoryReward) return undefined;
     return (victory: Extract<ConsolidatedDuelResult, { status: "victory" }>) =>
-      grantCardDropReward(victory, dropPool);
-  }, [grantCardDropReward, dropPool]);
-  const cardDropState = useCardDropReward(result, boundGrantReward);
-  return <DuelResult result={result} cardDropState={cardDropState} />;
+      grantVictoryReward(victory, dropPool);
+  }, [grantVictoryReward, dropPool]);
+  const victoryRewardState = useVictoryReward(result, boundGrantReward);
+  return <DuelResult result={result} victoryRewardState={victoryRewardState} />;
 }
 
 function EndedDuelResult({
   session,
   resolveResult,
   dropPool,
-  grantCardDropReward,
+  grantVictoryReward,
 }: {
   readonly session: Extract<DuelSession, { status: "ended" }>;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
   readonly dropPool: DropPool;
-  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
+  readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
 }) {
   const viewState = useDuelResult(session, resolveResult);
   return viewState.status === "loading" ? (
@@ -98,7 +98,7 @@ function EndedDuelResult({
     <ResolvedDuelResult
       result={viewState.result}
       dropPool={dropPool}
-      grantCardDropReward={grantCardDropReward}
+      grantVictoryReward={grantVictoryReward}
     />
   );
 }
@@ -109,7 +109,7 @@ export function DuelScreen({
   startMatch = unavailableExternalModules,
   applyAction = unavailableApply,
   resolveResult,
-  grantCardDropReward,
+  grantVictoryReward,
 }: {
   readonly duelistId: string;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
@@ -119,7 +119,7 @@ export function DuelScreen({
   ) => DuelSession | Promise<DuelSession>;
   readonly applyAction?: ApplyAction;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
-  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
+  readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<DuelSession>({ status: "not_started" });
@@ -186,7 +186,7 @@ export function DuelScreen({
           session={session}
           resolveResult={resolveResult}
           dropPool={context?.duelist.dropPool ?? []}
-          grantCardDropReward={grantCardDropReward}
+          grantVictoryReward={grantVictoryReward}
         />
       ) : null}
     </main>

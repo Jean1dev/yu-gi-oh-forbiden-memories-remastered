@@ -5,15 +5,15 @@ import {
   getDuelResultTitle,
   RATING_FALLBACK_MESSAGE,
 } from "../../lib/free-duel/duel-result-messages.ts";
-import type { CardDropRewardViewState } from "../../hooks/use-card-drop-reward.ts";
+import type { VictoryRewardViewState } from "../../hooks/use-victory-reward.ts";
 import { CardDropReward } from "./card-drop-reward.tsx";
 
 export function DuelResult({
   result,
-  cardDropState = { status: "not_applicable" },
+  victoryRewardState = { status: "not_applicable" },
 }: {
   readonly result: ConsolidatedDuelResult;
-  readonly cardDropState?: CardDropRewardViewState;
+  readonly victoryRewardState?: VictoryRewardViewState;
 }) {
   return (
     <section aria-labelledby="duel-result-title" role="status">
@@ -27,10 +27,9 @@ export function DuelResult({
             <p>Nota {result.rating.grade}</p>
           )}
           <p>+{result.rating.reward.stars} estrelas</p>
-          <CardDropReward state={cardDropState} />
+          <CardDropReward state={victoryRewardState} />
         </>
       ) : null}
     </section>
   );
 }
-

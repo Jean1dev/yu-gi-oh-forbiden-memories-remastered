@@ -161,7 +161,7 @@ describe("DuelScreen", () => {
     expect(screen.queryByText(/estrelas/)).toBeNull();
   });
 
-  it("passes the loaded duelist's dropPool to grantCardDropReward on a victory result", async () => {
+  it("passes the loaded duelist's dropPool to grantVictoryReward on a victory result", async () => {
     const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
     const contextWithDropPool: DuelScreenContext = {
       duelist: { ...duelist, dropPool },
@@ -173,10 +173,10 @@ describe("DuelScreen", () => {
       duelistId: "seto",
       finalState: { ...state, phase: "end" },
     };
-    const grantCardDropReward = vi.fn(async () =>
+    const grantVictoryReward = vi.fn(async () =>
       ok({
         outcome: { cardNumber: "001" as const, source: "duelist_pool" as const, tier: "common" },
-        reward: { status: "applied" as const, currentQuantity: 1 },
+        reward: { status: "applied" as const, cardQuantity: 1, walletStars: 10 },
       }),
     );
 
@@ -191,11 +191,11 @@ describe("DuelScreen", () => {
           reason: "lp_zerado",
           rating: { source: "rating_engine", grade: "A", reward: { stars: 10, dropTier: "common" } },
         })}
-        grantCardDropReward={grantCardDropReward}
+        grantVictoryReward={grantVictoryReward}
       />,
     );
 
-    await waitFor(() => expect(grantCardDropReward).toHaveBeenCalledTimes(1));
-    expect(grantCardDropReward).toHaveBeenCalledWith(expect.anything(), dropPool);
+    await waitFor(() => expect(grantVictoryReward).toHaveBeenCalledTimes(1));
+    expect(grantVictoryReward).toHaveBeenCalledWith(expect.anything(), dropPool);
   });
 });

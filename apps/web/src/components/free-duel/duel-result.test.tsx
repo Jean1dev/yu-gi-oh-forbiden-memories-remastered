@@ -97,11 +97,11 @@ describe("DuelResult", () => {
             reward: { stars: 10, dropTier: "common" },
           },
         }}
-        cardDropState={{
+        victoryRewardState={{
           status: "granted",
           granted: {
             outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
-            reward: { status: "applied", currentQuantity: 1 },
+            reward: { status: "applied", cardQuantity: 1, walletStars: 10 },
           },
         }}
       />,
@@ -113,11 +113,11 @@ describe("DuelResult", () => {
     const { rerender } = render(
       <DuelResult
         result={{ status: "defeat", duelSessionId: "duel-1", reason: "lp_zerado" }}
-        cardDropState={{
+        victoryRewardState={{
           status: "granted",
           granted: {
             outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
-            reward: { status: "applied", currentQuantity: 1 },
+            reward: { status: "applied", cardQuantity: 1, walletStars: 10 },
           },
         }}
       />,
@@ -127,11 +127,11 @@ describe("DuelResult", () => {
     rerender(
       <DuelResult
         result={{ status: "draw", duelSessionId: "duel-1", reason: "empate" }}
-        cardDropState={{
+        victoryRewardState={{
           status: "granted",
           granted: {
             outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
-            reward: { status: "applied", currentQuantity: 1 },
+            reward: { status: "applied", cardQuantity: 1, walletStars: 10 },
           },
         }}
       />,
