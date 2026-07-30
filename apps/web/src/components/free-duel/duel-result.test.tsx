@@ -83,5 +83,60 @@ describe("DuelResult", () => {
     expect(screen.getByText("+9 estrelas")).toBeTruthy();
     expect(screen.queryByText(/^Nota /)).toBeNull();
   });
+
+  it("renders CardDropReward only in the victory branch", () => {
+    render(
+      <DuelResult
+        result={{
+          status: "victory",
+          duelSessionId: "duel-1",
+          reason: "deck_out",
+          rating: {
+            source: "rating_engine",
+            grade: "A",
+            reward: { stars: 10, dropTier: "common" },
+          },
+        }}
+        cardDropState={{
+          status: "granted",
+          granted: {
+            outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
+            reward: { status: "applied", currentQuantity: 1 },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByRole("img", { name: "Carta 001" })).toBeTruthy();
+  });
+
+  it("does not render CardDropReward in the defeat or draw branch", () => {
+    const { rerender } = render(
+      <DuelResult
+        result={{ status: "defeat", duelSessionId: "duel-1", reason: "lp_zerado" }}
+        cardDropState={{
+          status: "granted",
+          granted: {
+            outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
+            reward: { status: "applied", currentQuantity: 1 },
+          },
+        }}
+      />,
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+
+    rerender(
+      <DuelResult
+        result={{ status: "draw", duelSessionId: "duel-1", reason: "empate" }}
+        cardDropState={{
+          status: "granted",
+          granted: {
+            outcome: { cardNumber: "001", source: "duelist_pool", tier: "common" },
+            reward: { status: "applied", currentQuantity: 1 },
+          },
+        }}
+      />,
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+  });
 });
 

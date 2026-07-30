@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { render, screen, waitFor } from "@testing-library/react";
-import type { Card, DuelSession, DuelState, Duelist, ReadyDeck } from "@yugioh/shared";
+import { ok, type Card, type DropPool, type DuelSession, type DuelState, type Duelist, type ReadyDeck } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import { DuelScreen, type DuelScreenContext } from "./duel-screen.tsx";
 
@@ -159,5 +159,43 @@ describe("DuelScreen", () => {
     render(<DuelScreen duelistId="seto" loadContext={loadContext} startMatch={() => session} />);
     expect(await screen.findByRole("heading", { name: "Resultado indisponível" })).toBeTruthy();
     expect(screen.queryByText(/estrelas/)).toBeNull();
+  });
+
+  it("passes the loaded duelist's dropPool to grantCardDropReward on a victory result", async () => {
+    const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
+    const contextWithDropPool: DuelScreenContext = {
+      duelist: { ...duelist, dropPool },
+      playerDeck,
+    };
+    const session: DuelSession = {
+      status: "ended",
+      duelSessionId: "session-1",
+      duelistId: "seto",
+      finalState: { ...state, phase: "end" },
+    };
+    const grantCardDropReward = vi.fn(async () =>
+      ok({
+        outcome: { cardNumber: "001" as const, source: "duelist_pool" as const, tier: "common" },
+        reward: { status: "applied" as const, currentQuantity: 1 },
+      }),
+    );
+
+    render(
+      <DuelScreen
+        duelistId="seto"
+        loadContext={async () => contextWithDropPool}
+        startMatch={() => session}
+        resolveResult={async () => ({
+          status: "victory",
+          duelSessionId: "session-1",
+          reason: "lp_zerado",
+          rating: { source: "rating_engine", grade: "A", reward: { stars: 10, dropTier: "common" } },
+        })}
+        grantCardDropReward={grantCardDropReward}
+      />,
+    );
+
+    await waitFor(() => expect(grantCardDropReward).toHaveBeenCalledTimes(1));
+    expect(grantCardDropReward).toHaveBeenCalledWith(expect.anything(), dropPool);
   });
 });

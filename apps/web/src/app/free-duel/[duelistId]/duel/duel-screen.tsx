@@ -1,14 +1,26 @@
 "use client";
 
-import type { DuelSession, Duelist, ReadyDeck } from "@yugioh/shared";
+import type {
+  ConsolidatedDuelResult,
+  DomainError,
+  DropPool,
+  DuelSession,
+  Duelist,
+  ReadyDeck,
+  Result,
+} from "@yugioh/shared";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
+import {
+  useCardDropReward,
+  type GrantedCardDropView,
+} from "../../../../hooks/use-card-drop-reward.ts";
 import {
   useDuelResult,
   type ResolveEndedDuelResult,
@@ -21,6 +33,12 @@ import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.t
 import { generateDuelSessionId } from "../../../../lib/free-duel/seed-generator.ts";
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
+
+/** Bound with the duelist's `dropPool` at composition time; see `ResolvedDuelResult`. */
+export type GrantCardDropForVictory = (
+  result: Extract<ConsolidatedDuelResult, { status: "victory" }>,
+  dropPool: DropPool,
+) => Promise<Result<GrantedCardDropView, DomainError>>;
 
 async function loadDefaultContext(duelistId: string): Promise<DuelScreenContext | null> {
   const handoff = takeDuelHandoff(duelistId);
@@ -43,18 +61,45 @@ const unavailableApply: ApplyAction = () => {
   throw new Error("The duel engine apply contract is unavailable.");
 };
 
+/** Mounted only once the result is resolved, so its hooks never run against a placeholder result. */
+function ResolvedDuelResult({
+  result,
+  dropPool,
+  grantCardDropReward,
+}: {
+  readonly result: ConsolidatedDuelResult;
+  readonly dropPool: DropPool;
+  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
+}) {
+  const boundGrantReward = useMemo(() => {
+    if (!grantCardDropReward) return undefined;
+    return (victory: Extract<ConsolidatedDuelResult, { status: "victory" }>) =>
+      grantCardDropReward(victory, dropPool);
+  }, [grantCardDropReward, dropPool]);
+  const cardDropState = useCardDropReward(result, boundGrantReward);
+  return <DuelResult result={result} cardDropState={cardDropState} />;
+}
+
 function EndedDuelResult({
   session,
   resolveResult,
+  dropPool,
+  grantCardDropReward,
 }: {
   readonly session: Extract<DuelSession, { status: "ended" }>;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
+  readonly dropPool: DropPool;
+  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
 }) {
   const viewState = useDuelResult(session, resolveResult);
   return viewState.status === "loading" ? (
     <p aria-busy="true">Apurando resultado…</p>
   ) : (
-    <DuelResult result={viewState.result} />
+    <ResolvedDuelResult
+      result={viewState.result}
+      dropPool={dropPool}
+      grantCardDropReward={grantCardDropReward}
+    />
   );
 }
 
@@ -64,6 +109,7 @@ export function DuelScreen({
   startMatch = unavailableExternalModules,
   applyAction = unavailableApply,
   resolveResult,
+  grantCardDropReward,
 }: {
   readonly duelistId: string;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
@@ -73,9 +119,11 @@ export function DuelScreen({
   ) => DuelSession | Promise<DuelSession>;
   readonly applyAction?: ApplyAction;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
+  readonly grantCardDropReward?: GrantCardDropForVictory | undefined;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<DuelSession>({ status: "not_started" });
+  const [context, setContext] = useState<DuelScreenContext | null>(null);
   const matchStarted = useRef(false);
   const surrenderFlow = useSurrender({
     session,
@@ -87,18 +135,19 @@ export function DuelScreen({
     if (matchStarted.current) return;
     matchStarted.current = true;
     let active = true;
-    void loadContext(duelistId).then(async (context) => {
+    void loadContext(duelistId).then(async (loaded) => {
       if (!active) return;
-      if (!context) {
+      if (!loaded) {
         router.replace("/free-duel");
         return;
       }
+      setContext(loaded);
       const input = buildMatchInput({
         duelistId,
-        playerDeck: context.playerDeck,
-        duelist: context.duelist,
+        playerDeck: loaded.playerDeck,
+        duelist: loaded.duelist,
       });
-      const next = await startMatch(context, input);
+      const next = await startMatch(loaded, input);
       if (active) setSession(next);
     });
     return () => {
@@ -133,7 +182,12 @@ export function DuelScreen({
         onCancel={surrenderFlow.cancel}
       />
       {session.status === "ended" ? (
-        <EndedDuelResult session={session} resolveResult={resolveResult} />
+        <EndedDuelResult
+          session={session}
+          resolveResult={resolveResult}
+          dropPool={context?.duelist.dropPool ?? []}
+          grantCardDropReward={grantCardDropReward}
+        />
       ) : null}
     </main>
   );
