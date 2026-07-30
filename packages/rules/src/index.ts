@@ -31,11 +31,25 @@ export {
 export {
   buildLibraryIndex,
   calculateProgress,
+  filterLibrarySearch,
+  filterByCardType,
+  filterByCollectionStatus,
   findEntry,
   isObtained,
+  LIBRARY_SEARCH_TERM_MAX_LENGTH,
+  normalizeLibrarySearchTerm,
   onlyObtained,
+  prepareLibrarySearch,
+  queryLibraryEntries,
   resolveArtReference,
+  sortLibraryEntries,
+  hasNonDefaultLibraryFilters,
   type LibraryCrossReferenceInput,
+  type LibraryQueryInput,
+  type LibrarySearchEntry,
+  type LibrarySearchIndex,
+  type LibrarySearchPredicate,
+  type NormalizedLibrarySearchTerm,
 } from "./library/index.ts";
 export { neutralGuardianModifier } from "./guardian-star/index.ts";
 export { neutralTerrainModifier } from "./terrain/index.ts";

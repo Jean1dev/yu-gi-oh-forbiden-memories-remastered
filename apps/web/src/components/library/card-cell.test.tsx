@@ -85,6 +85,16 @@ describe("CardCell", () => {
     expect(screen.getByRole("link").getAttribute("href")).toBe("/library/042");
   });
 
+  it("preserves search and future filter parameters in the detail link", () => {
+    render(
+      <CardCell entry={OBTAINED_ENTRY} detailQueryString="q=dragon&status=all&type=monster" />,
+    );
+
+    expect(screen.getByRole("link").getAttribute("href")).toBe(
+      "/library/001?q=dragon&status=all&type=monster",
+    );
+  });
+
   it("uses the placeholder when the art reference is placeholder", () => {
     const entry: LibraryEntry = {
       ...OBTAINED_ENTRY,

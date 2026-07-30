@@ -1,6 +1,7 @@
 import { getLibraryCatalog } from "../../lib/library/catalog-library.ts";
 import { toCatalogPayload } from "../../lib/library/catalog-payload.ts";
 import type { LibraryCatalogPayload } from "../../lib/library/types.ts";
+import { Suspense } from "react";
 import { LibraryClient } from "./library-client.tsx";
 
 /**
@@ -20,5 +21,9 @@ async function loadCatalogPayload(): Promise<LibraryCatalogPayload> {
 }
 
 export default async function LibraryPage() {
-  return <LibraryClient catalogResult={await loadCatalogPayload()} />;
+  return (
+    <Suspense fallback={null}>
+      <LibraryClient catalogResult={await loadCatalogPayload()} />
+    </Suspense>
+  );
 }
