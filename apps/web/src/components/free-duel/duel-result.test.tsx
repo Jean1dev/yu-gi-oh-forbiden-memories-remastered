@@ -57,6 +57,13 @@ describe("DuelResult", () => {
             reward: { stars: 31, dropTier: "opaque-tier" },
           },
         }}
+        victoryRewardState={{
+          status: "granted",
+          granted: {
+            outcome: { cardNumber: "001", source: "duelist_pool", tier: "opaque-tier" },
+            reward: { status: "applied", cardQuantity: 1, walletStars: 31 },
+          },
+        }}
       />,
     );
     expect(screen.getByRole("heading", { name: "Vitória!" })).toBeTruthy();
@@ -75,6 +82,13 @@ describe("DuelResult", () => {
             source: "minimum_fallback",
             grade: null,
             reward: { stars: 9, dropTier: "configured-tier" },
+          },
+        }}
+        victoryRewardState={{
+          status: "granted",
+          granted: {
+            outcome: { cardNumber: "001", source: "duelist_pool", tier: "configured-tier" },
+            reward: { status: "applied", cardQuantity: 1, walletStars: 9 },
           },
         }}
       />,
@@ -139,4 +153,3 @@ describe("DuelResult", () => {
     expect(screen.queryByRole("img")).toBeNull();
   });
 });
-

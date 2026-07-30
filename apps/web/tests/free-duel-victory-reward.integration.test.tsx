@@ -20,12 +20,13 @@ import {
 } from "../src/app/free-duel/[duelistId]/duel/duel-screen.tsx";
 import type { CollectionCache } from "../src/lib/collection/indexeddb-cache.ts";
 import type { Clock } from "../src/lib/collection/load-collection.ts";
-import { createGrantCardDropCache, grantCardDrop } from "../src/lib/free-duel/grant-card-drop.ts";
+import { createGrantVictoryRewardCache, grantVictoryReward } from "../src/lib/free-duel/grant-victory-reward.ts";
 import {
   createDuelResultCache,
   resolveDuelResult,
 } from "../src/lib/free-duel/resolve-duel-result.ts";
-import type { RewardQueue } from "../src/lib/reward/offline-queue.ts";
+import type { VictoryRewardQueue } from "../src/lib/reward/victory-reward-queue.ts";
+import type { WalletCache } from "../src/lib/wallet/indexeddb-cache.ts";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn() }) }));
 
@@ -69,7 +70,7 @@ function fakeCatalog(knownNumbers: readonly string[]): CardCatalogLookup {
     knownNumbers.includes(cardNumber) ? ({ numero: cardNumber } as never) : undefined;
 }
 
-function fakeRewardQueue(): RewardQueue {
+function fakeVictoryRewardQueue(): VictoryRewardQueue {
   return {
     async enqueueReward() {},
     async listPendingRewards() {
@@ -86,6 +87,14 @@ function fakeCollectionCache(): CollectionCache {
     },
     async saveSnapshot() {},
   };
+}
+
+function fakeWalletCache(): WalletCache {
+  return { loadSnapshot: async () => undefined, saveSnapshot: async () => undefined };
+}
+
+async function unusedOfflineReward() {
+  return { collection: new Map(), wallet: { playerId: "player-1", stars: 0 } };
 }
 
 const fixedClock: Clock = { now: () => new Date("2026-07-30T12:00:00.000Z") };
@@ -108,11 +117,11 @@ function resolveResultFor(outcome: DuelOutcome, reward: { stars: number; dropTie
     });
 }
 
-describe("free duel F03 to F06 card drop integration", () => {
+describe("free duel F03 to F07 victory reward integration", () => {
   it("victory flow grants exactly one card and displays it in the result screen", async () => {
     const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001", "002"] }];
     const context: DuelScreenContext = { duelist: duelistWithDropPool(dropPool), playerDeck };
-    const apply = vi.fn(async () => ok({ applied: true, currentQuantity: 1 }));
+    const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
 
     render(
       <DuelScreen
@@ -123,16 +132,17 @@ describe("free duel F03 to F06 card drop integration", () => {
           { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
           { stars: 10, dropTier: "common" },
         )}
-        grantCardDropReward={(result, resolvedDropPool) =>
-          grantCardDrop(
+        grantVictoryReward={(result, resolvedDropPool) =>
+          grantVictoryReward(
             result,
             { playerId: "player-1", dropPool: resolvedDropPool },
             {
               catalog: fakeCatalog(["001", "002"]),
-              rewardRepository: { apply },
-              rewardQueue: fakeRewardQueue(),
+              victoryRewardRepository: { apply },
+              victoryRewardQueue: fakeVictoryRewardQueue(),
               collectionCache: fakeCollectionCache(),
-              applyOfflineReward: vi.fn(),
+              walletCache: fakeWalletCache(),
+              applyOfflineVictoryReward: unusedOfflineReward,
               clock: fixedClock,
               defaultCommonDropPool: ["099"],
             },
@@ -143,26 +153,35 @@ describe("free duel F03 to F06 card drop integration", () => {
 
     expect(await screen.findByRole("heading", { name: "Vitória!" })).toBeTruthy();
     await waitFor(() => expect(apply).toHaveBeenCalledTimes(1));
-    const [, , grantedCardNumber] = apply.mock.calls[0] as [string, string, string];
+    const [, , grantedCardNumber, grantedStars] = apply.mock.calls[0] as [
+      string,
+      string,
+      string,
+      number,
+    ];
     expect(["001", "002"]).toContain(grantedCardNumber);
+    expect(grantedStars).toBe(10);
     expect(screen.getByRole("img", { name: `Carta ${grantedCardNumber}` })).toBeTruthy();
     expect(screen.getByText("Adicionada à sua coleção.")).toBeTruthy();
+    expect(screen.getByText("+10 estrelas")).toBeTruthy();
+    expect(screen.getByText("Saldo: 10 estrelas")).toBeTruthy();
   });
 
-  it("defeat flow never calls grantCardDrop or registerCardReward", async () => {
+  it("defeat flow never calls grantVictoryReward or registerCardReward", async () => {
     const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
     const context: DuelScreenContext = { duelist: duelistWithDropPool(dropPool), playerDeck };
-    const apply = vi.fn(async () => ok({ applied: true, currentQuantity: 1 }));
-    const grantCardDropReward = vi.fn((result: never, resolvedDropPool: DropPool) =>
-      grantCardDrop(
+    const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
+    const grantReward = vi.fn((result: never, resolvedDropPool: DropPool) =>
+      grantVictoryReward(
         result,
         { playerId: "player-1", dropPool: resolvedDropPool },
         {
           catalog: fakeCatalog(["001"]),
-          rewardRepository: { apply },
-          rewardQueue: fakeRewardQueue(),
+          victoryRewardRepository: { apply },
+          victoryRewardQueue: fakeVictoryRewardQueue(),
           collectionCache: fakeCollectionCache(),
-          applyOfflineReward: vi.fn(),
+          walletCache: fakeWalletCache(),
+          applyOfflineVictoryReward: unusedOfflineReward,
           clock: fixedClock,
           defaultCommonDropPool: ["099"],
         },
@@ -178,30 +197,31 @@ describe("free duel F03 to F06 card drop integration", () => {
           { status: "decisive", winner: "P2", loser: "P1", reason: "lp_zerado" },
           { stars: 10, dropTier: "common" },
         )}
-        grantCardDropReward={grantCardDropReward}
+        grantVictoryReward={grantReward}
       />,
     );
 
     expect(await screen.findByRole("heading", { name: "Derrota" })).toBeTruthy();
     expect(screen.queryByText(/estrelas/)).toBeNull();
-    expect(grantCardDropReward).not.toHaveBeenCalled();
+    expect(grantReward).not.toHaveBeenCalled();
     expect(apply).not.toHaveBeenCalled();
   });
 
-  it("draw flow never calls grantCardDrop or registerCardReward", async () => {
+  it("draw flow never calls grantVictoryReward or registerCardReward", async () => {
     const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
     const context: DuelScreenContext = { duelist: duelistWithDropPool(dropPool), playerDeck };
-    const apply = vi.fn(async () => ok({ applied: true, currentQuantity: 1 }));
-    const grantCardDropReward = vi.fn((result: never, resolvedDropPool: DropPool) =>
-      grantCardDrop(
+    const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
+    const grantReward = vi.fn((result: never, resolvedDropPool: DropPool) =>
+      grantVictoryReward(
         result,
         { playerId: "player-1", dropPool: resolvedDropPool },
         {
           catalog: fakeCatalog(["001"]),
-          rewardRepository: { apply },
-          rewardQueue: fakeRewardQueue(),
+          victoryRewardRepository: { apply },
+          victoryRewardQueue: fakeVictoryRewardQueue(),
           collectionCache: fakeCollectionCache(),
-          applyOfflineReward: vi.fn(),
+          walletCache: fakeWalletCache(),
+          applyOfflineVictoryReward: unusedOfflineReward,
           clock: fixedClock,
           defaultCommonDropPool: ["099"],
         },
@@ -217,19 +237,19 @@ describe("free duel F03 to F06 card drop integration", () => {
           { status: "draw", winner: null, loser: null, reason: "empate" },
           { stars: 10, dropTier: "common" },
         )}
-        grantCardDropReward={grantCardDropReward}
+        grantVictoryReward={grantReward}
       />,
     );
 
     expect(await screen.findByRole("heading", { name: "Empate" })).toBeTruthy();
-    expect(grantCardDropReward).not.toHaveBeenCalled();
+    expect(grantReward).not.toHaveBeenCalled();
     expect(apply).not.toHaveBeenCalled();
   });
 
   it("empty duelist drop pool falls back to the default common pool and still grants a card", async () => {
     const emptyDropPool: DropPool = [];
     const context: DuelScreenContext = { duelist: duelistWithDropPool(emptyDropPool), playerDeck };
-    const apply = vi.fn(async () => ok({ applied: true, currentQuantity: 1 }));
+    const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
 
     render(
       <DuelScreen
@@ -240,16 +260,17 @@ describe("free duel F03 to F06 card drop integration", () => {
           { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
           { stars: 10, dropTier: "common" },
         )}
-        grantCardDropReward={(result, resolvedDropPool) =>
-          grantCardDrop(
+        grantVictoryReward={(result, resolvedDropPool) =>
+          grantVictoryReward(
             result,
             { playerId: "player-1", dropPool: resolvedDropPool },
             {
               catalog: fakeCatalog(["099"]),
-              rewardRepository: { apply },
-              rewardQueue: fakeRewardQueue(),
+              victoryRewardRepository: { apply },
+              victoryRewardQueue: fakeVictoryRewardQueue(),
               collectionCache: fakeCollectionCache(),
-              applyOfflineReward: vi.fn(),
+              walletCache: fakeWalletCache(),
+              applyOfflineVictoryReward: unusedOfflineReward,
               clock: fixedClock,
               defaultCommonDropPool: ["099"],
             },
@@ -259,32 +280,33 @@ describe("free duel F03 to F06 card drop integration", () => {
     );
 
     await waitFor(() => expect(apply).toHaveBeenCalledTimes(1));
-    expect(apply).toHaveBeenCalledWith("player-1", "session-fallback", "099");
+    expect(apply).toHaveBeenCalledWith("player-1", "session-fallback", "099", 10);
     expect(screen.getByRole("img", { name: "Carta 099" })).toBeTruthy();
   });
 
   it("reopening the result screen for the same session does not duplicate the reward call", async () => {
     const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
     const context: DuelScreenContext = { duelist: duelistWithDropPool(dropPool), playerDeck };
-    const apply = vi.fn(async () => ok({ applied: true, currentQuantity: 1 }));
-    const sharedGrantCache = createGrantCardDropCache();
+    const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
+    const sharedGrantCache = createGrantVictoryRewardCache();
     const resolveResult = resolveResultFor(
       { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
       { stars: 10, dropTier: "common" },
     );
-    const grantCardDropReward = (
-      result: Parameters<typeof grantCardDrop>[0],
+    const grantReward = (
+      result: Parameters<typeof grantVictoryReward>[0],
       resolvedDropPool: DropPool,
     ) =>
-      grantCardDrop(
+      grantVictoryReward(
         result,
         { playerId: "player-1", dropPool: resolvedDropPool },
         {
           catalog: fakeCatalog(["001"]),
-          rewardRepository: { apply },
-          rewardQueue: fakeRewardQueue(),
+          victoryRewardRepository: { apply },
+          victoryRewardQueue: fakeVictoryRewardQueue(),
           collectionCache: fakeCollectionCache(),
-          applyOfflineReward: vi.fn(),
+          walletCache: fakeWalletCache(),
+          applyOfflineVictoryReward: unusedOfflineReward,
           clock: fixedClock,
           defaultCommonDropPool: ["099"],
           cache: sharedGrantCache,
@@ -297,7 +319,7 @@ describe("free duel F03 to F06 card drop integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-reopen")}
         resolveResult={resolveResult}
-        grantCardDropReward={grantCardDropReward}
+        grantVictoryReward={grantReward}
       />,
     );
     await waitFor(() => expect(apply).toHaveBeenCalledTimes(1));
@@ -309,7 +331,7 @@ describe("free duel F03 to F06 card drop integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-reopen")}
         resolveResult={resolveResult}
-        grantCardDropReward={grantCardDropReward}
+        grantVictoryReward={grantReward}
       />,
     );
     expect(await screen.findByText("Adicionada à sua coleção.")).toBeTruthy();

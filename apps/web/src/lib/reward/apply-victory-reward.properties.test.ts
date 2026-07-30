@@ -36,6 +36,7 @@ describe("applyVictoryReward properties", () => {
           value: { status: "applied", cardQuantity: 1, walletStars: stars },
         });
       }),
+      { numRuns: 1_000 },
     );
   });
 });

@@ -7,6 +7,7 @@ import {
 } from "../../lib/free-duel/duel-result-messages.ts";
 import type { VictoryRewardViewState } from "../../hooks/use-victory-reward.ts";
 import { CardDropReward } from "./card-drop-reward.tsx";
+import { StarsRewardBadge } from "./stars-reward-badge.tsx";
 
 export function DuelResult({
   result,
@@ -26,8 +27,14 @@ export function DuelResult({
           ) : (
             <p>Nota {result.rating.grade}</p>
           )}
-          <p>+{result.rating.reward.stars} estrelas</p>
+          {victoryRewardState.status === "not_applicable" ? (
+            <p>+{result.rating.reward.stars} estrelas</p>
+          ) : null}
           <CardDropReward state={victoryRewardState} />
+          <StarsRewardBadge
+            state={victoryRewardState}
+            stars={result.rating.reward.stars}
+          />
         </>
       ) : null}
     </section>
