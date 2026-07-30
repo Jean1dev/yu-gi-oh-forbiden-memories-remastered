@@ -39,7 +39,7 @@ environment and these values:
 
 - Environment secret `SUPABASE_ACCESS_TOKEN`
 - Environment secret `SUPABASE_DB_PASSWORD`
-- Environment variable `SUPABASE_PROJECT_ID`
+- Environment secret `SUPABASE_PROJECT_ID`
 
 The job links the project, previews pending migrations with `db push --dry-run`,
 and then runs `db push`. Deployments are serialized and seeds are never pushed
