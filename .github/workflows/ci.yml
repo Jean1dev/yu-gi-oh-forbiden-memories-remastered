@@ -91,7 +91,9 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Run Supabase integration tests
-        run: pnpm --filter @yugioh/web test:integration
+        # Turbo materializes the validated card catalog required by several
+        # web integration suites before Vitest starts.
+        run: pnpm turbo run test:integration --filter=@yugioh/web
 
   deploy-database:
     name: Deploy Supabase migrations
