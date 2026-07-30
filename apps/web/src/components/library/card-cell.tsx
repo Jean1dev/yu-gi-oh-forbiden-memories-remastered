@@ -4,7 +4,10 @@ import Link from "next/link";
 import { CardArt } from "./card-art.tsx";
 import styles from "./card-cell.module.css";
 
-export type CardCellProps = Readonly<{ entry: LibraryEntry }>;
+export type CardCellProps = Readonly<{
+  entry: LibraryEntry;
+  detailQueryString?: string;
+}>;
 
 /**
  * The single fluid cell for both variants of `LibraryEntry` (spec
@@ -15,8 +18,10 @@ export type CardCellProps = Readonly<{ entry: LibraryEntry }>;
  * discipline (library/F01, Decision 2). The whole cell is the link to the
  * detail route in both cases (Decision 6).
  */
-export function CardCell({ entry }: CardCellProps) {
-  const href = `/library/${entry.cardNumber}`;
+export function CardCell({ entry, detailQueryString }: CardCellProps) {
+  const query =
+    detailQueryString === undefined || detailQueryString === "" ? "" : `?${detailQueryString}`;
+  const href = `/library/${entry.cardNumber}${query}`;
 
   if (!entry.obtained) {
     return (

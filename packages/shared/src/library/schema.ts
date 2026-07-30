@@ -1,6 +1,12 @@
 import { z } from "zod";
 
 import { CardNumberSchema, CardSchema } from "../card/schema.ts";
+import {
+  COLLECTION_STATUS_FILTERS,
+  LIBRARY_FILTER_TYPES,
+  LIBRARY_SORT_DIRECTIONS,
+  LIBRARY_SORT_FIELDS,
+} from "./filters.ts";
 
 export const ArtReferenceSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("art"), path: z.string().min(1) }),
@@ -51,3 +57,29 @@ export const LibraryIndexSchema = z
     message: "obtained must never exceed total",
     path: ["obtained"],
   });
+
+export const LibraryFilterTypeSchema = z.enum(LIBRARY_FILTER_TYPES);
+export const CollectionStatusFilterSchema = z.enum(COLLECTION_STATUS_FILTERS);
+export const LibrarySortFieldSchema = z.enum(LIBRARY_SORT_FIELDS);
+export const LibrarySortDirectionSchema = z.enum(LIBRARY_SORT_DIRECTIONS);
+
+export const LibrarySortSchema = z.strictObject({
+  field: LibrarySortFieldSchema,
+  direction: LibrarySortDirectionSchema,
+});
+
+export const LibraryFiltersSchema = z.strictObject({
+  types: z.array(LibraryFilterTypeSchema).refine((types) => new Set(types).size === types.length, {
+    message: "filter types must not contain duplicates",
+  }),
+  status: CollectionStatusFilterSchema,
+  sort: LibrarySortSchema,
+});
+
+export const LibraryQueryResultSchema = z.strictObject({
+  entries: z.array(LibraryEntrySchema),
+  totalBefore: z.number().int().min(0),
+  totalAfter: z.number().int().min(0),
+  activeFilters: LibraryFiltersSchema,
+  hasNonDefaultFilters: z.boolean(),
+});

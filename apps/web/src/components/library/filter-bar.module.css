@@ -1,0 +1,62 @@
+.filters {
+  margin-block: 1rem;
+}
+
+.filters > summary {
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  padding-block: 0.75rem;
+}
+
+.panel fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  border: 0;
+  padding: 0;
+}
+
+.panel label,
+.panel button,
+.panel select {
+  min-height: 44px;
+}
+
+.panel label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.panel :focus-visible,
+.filters > summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+  .filters > summary {
+    display: none;
+  }
+
+  .panel {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, auto));
+    align-items: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filters *,
+  .filters *::before,
+  .filters *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

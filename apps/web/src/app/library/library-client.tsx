@@ -1,18 +1,37 @@
 "use client";
 
-import { calculateProgress, onlyObtained } from "@yugioh/rules";
+import {
+  calculateProgress,
+  filterLibrarySearch,
+  hasNonDefaultLibraryFilters,
+  normalizeLibrarySearchTerm,
+  prepareLibrarySearch,
+  queryLibraryEntries,
+} from "@yugioh/rules";
+import type { LoadedLibrary } from "@yugioh/shared";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { CacheNotice } from "../../components/library/cache-notice.tsx";
 import { CollectionGrid } from "../../components/library/collection-grid.tsx";
 import { EmptyState } from "../../components/library/empty-state.tsx";
+import { FilterBar } from "../../components/library/filter-bar.tsx";
+import { FilterNoResults } from "../../components/library/filter-no-results.tsx";
 import { GridSkeleton } from "../../components/library/grid-skeleton.tsx";
 import { LibraryFailure } from "../../components/library/library-failure.tsx";
 import { LIBRARY_MESSAGES } from "../../components/library/messages.ts";
 import { ProgressIndicator } from "../../components/library/progress-indicator.tsx";
+import { LibrarySearchField } from "../../components/library/search-field.tsx";
+import { LibrarySearchNoResults } from "../../components/library/search-no-results.tsx";
 import { useLibrary } from "../../hooks/use-library.ts";
+import { useLibraryFilters } from "../../hooks/use-library-filters.ts";
 import { fromCatalogPayload } from "../../lib/library/catalog-payload.ts";
 import type { LibraryCatalogPayload } from "../../lib/library/types.ts";
+import {
+  applySearchToUrl,
+  readSearchFromUrl,
+  removeSearchFromUrl,
+} from "../../lib/library/search-url.ts";
 
 export type LibraryClientProps = Readonly<{
   /** Resolved server-side in `page.tsx` via `loadCatalogFromDisk` (fs access is server-only). */
@@ -27,6 +46,83 @@ function failureMessage(code: string): string {
     return LIBRARY_MESSAGES.sessionMissing;
   }
   return LIBRARY_MESSAGES.collectionUnavailable;
+}
+
+function ReadyLibrary({
+  loaded,
+  pathname,
+  queryString,
+  replace,
+}: Readonly<{
+  loaded: LoadedLibrary;
+  pathname: string;
+  queryString: string;
+  replace: ReturnType<typeof useRouter>["replace"];
+}>) {
+  const term = useMemo(() => readSearchFromUrl(new URLSearchParams(queryString)), [queryString]);
+  const { index, collectionOrigin, syncedAt } = loaded;
+  const { filters, setFilters, clearFilters } = useLibraryFilters();
+  const progress = calculateProgress(index);
+  const searchMatches = useMemo(
+    () =>
+      new Set(
+        filterLibrarySearch(prepareLibrarySearch(index.entries), normalizeLibrarySearchTerm(term)),
+      ),
+    [index.entries, term],
+  );
+  const result = useMemo(
+    () =>
+      queryLibraryEntries({
+        entries: index.entries,
+        filters,
+        ...(term.length === 0 ? {} : { search: (entry) => searchMatches.has(entry) }),
+      }),
+    [filters, index.entries, searchMatches, term.length],
+  );
+
+  function replaceSearch(nextParams: URLSearchParams): void {
+    const nextQuery = nextParams.toString();
+    replace(nextQuery.length === 0 ? pathname : `${pathname}?${nextQuery}`, {
+      scroll: false,
+    });
+  }
+
+  return (
+    <>
+      {collectionOrigin === "cache" ? <CacheNotice syncedAt={syncedAt} /> : null}
+      <ProgressIndicator progress={progress} />
+      {progress.obtained === 0 && filters.status === "obtidas" ? (
+        <EmptyState />
+      ) : (
+        <>
+          <FilterBar
+            filters={filters}
+            hasNonDefaultFilters={hasNonDefaultLibraryFilters(filters)}
+            onChange={setFilters}
+            onClear={clearFilters}
+          />
+          <LibrarySearchField
+            term={term}
+            onChange={(nextTerm) =>
+              replaceSearch(applySearchToUrl(new URLSearchParams(queryString), nextTerm))
+            }
+            onClear={() => replaceSearch(removeSearchFromUrl(new URLSearchParams(queryString)))}
+          />
+          {result.entries.length === 0 && term.length > 0 ? (
+            <LibrarySearchNoResults term={term} />
+          ) : result.entries.length === 0 ? (
+            <FilterNoResults />
+          ) : (
+            <CollectionGrid
+              entries={result.entries}
+              emptyLabel={LIBRARY_MESSAGES.emptyCollection}
+              detailQueryString={queryString}
+            />
+          )}
+        </>
+      )}
+    </>
+  );
 }
 
 /**
@@ -49,6 +145,10 @@ function failureMessage(code: string): string {
 export function LibraryClient({ catalogResult }: LibraryClientProps) {
   const catalog = useMemo(() => fromCatalogPayload(catalogResult), [catalogResult]);
   const state = useLibrary(catalog);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
 
   if (state.status === "loading") {
     return <GridSkeleton />;
@@ -58,19 +158,12 @@ export function LibraryClient({ catalogResult }: LibraryClientProps) {
     return <LibraryFailure message={failureMessage(state.error.code)} onReload={state.reload} />;
   }
 
-  const { index, collectionOrigin, syncedAt } = state.loaded;
-  const progress = calculateProgress(index);
-  const entries = onlyObtained(index.entries);
-
   return (
-    <>
-      {collectionOrigin === "cache" ? <CacheNotice syncedAt={syncedAt} /> : null}
-      <ProgressIndicator progress={progress} />
-      {progress.obtained === 0 ? (
-        <EmptyState />
-      ) : (
-        <CollectionGrid entries={entries} emptyLabel={LIBRARY_MESSAGES.emptyCollection} />
-      )}
-    </>
+    <ReadyLibrary
+      loaded={state.loaded}
+      pathname={pathname}
+      queryString={queryString}
+      replace={router.replace}
+    />
   );
 }

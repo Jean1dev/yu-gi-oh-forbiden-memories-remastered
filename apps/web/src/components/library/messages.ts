@@ -10,4 +10,6 @@ export const LIBRARY_MESSAGES = {
   cacheNotice: "Coleção carregada do cache; algumas cartas podem estar desatualizadas.",
   emptyCollection:
     "Você ainda não obteve nenhuma carta. Vença duelos ou use senhas para começar sua coleção.",
+  cardNotFound: "Carta não encontrada.",
+  cardNotObtained: "Carta ainda não obtida",
 } as const;
