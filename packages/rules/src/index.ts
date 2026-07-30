@@ -27,7 +27,14 @@ export {
   removeCardFromDraft,
   totalCardsInDraft,
   validateDeckDraft,
+  buildReadyDeck,
+  expandComposition,
+  groupIntoComposition,
+  totalCards,
+  validateDeckComposition,
+  validateDeckForDuel,
 } from "./deck/index.ts";
+export { getPublicDuelState } from "./visibility/index.ts";
 export {
   buildLibraryIndex,
   calculateProgress,
@@ -55,3 +62,9 @@ export { neutralGuardianModifier } from "./guardian-star/index.ts";
 export { neutralTerrainModifier } from "./terrain/index.ts";
 export { neutralEquipmentModifier } from "./effect-system/index.ts";
 export { neutralModifierProviders } from "./combat/index.ts";
+export {
+  deriveDeterministicIndex,
+  deriveWeightedSelection,
+  selectDropCardNumber,
+} from "./drop-reward/index.ts";
+export { validateVictoryRewardStars } from "./economy/index.ts";

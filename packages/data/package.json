@@ -13,6 +13,7 @@
     "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",
     "./guardian-stars": "./src/guardian-stars/index.ts",
     "./ingestion": "./src/ingestion/index.ts",
+    "./roster": "./src/roster/index.ts",
     "./terrain": "./src/terrain/index.ts",
     "./terrain/disk": "./scripts/load-terrain-table-from-disk.ts",
     "./validation": "./src/validation/index.ts"
@@ -22,6 +23,7 @@
     "data:ingest": "node scripts/ingest-cards.ts",
     "data:validate": "node scripts/validate-cards.ts",
     "data:validate-fusions": "node scripts/validate-fusions.ts",
+    "roster:validate": "node scripts/validate-roster.ts",
     "data:validate-terrain": "node scripts/validate-terrain-matrix.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --dir src",

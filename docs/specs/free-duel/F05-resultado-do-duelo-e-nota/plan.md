@@ -4,89 +4,59 @@
 
 ## Pré-requisitos
 
-- **F03 (interna, spec já publicada)** — `SessaoDuelo` com o desfecho `encerrada` expondo
-  `estadoFinal: EstadoDuelo` na fase `fim` e um identificador de sessão estável (`idSessaoDuelo`,
-  spec Decisão 10) que este plano repassa a F06/F07 para idempotência de recompensa.
-- **`MotorDuelo/F12` (cross-PRD, sem spec)** — encerramento do duelo com vencedor/perdedor/motivo.
-  Assumido inteiramente como contrato externo, consumido por meio da porta injetada
-  `ExtrairDesfechoMotor` (spec, Decisão 2). Nenhuma implementação real existe ainda.
-- **`MotorDuelo/F05` (cross-PRD, spec já publicada)** — `serializar(estado): Snapshot` em
-  `packages/engine/src/serializacao/`. Pré-requisito de código: essa função precisa existir em
-  `packages/engine` antes de F05 poder ser integrada de ponta a ponta (os testes unitários e de
-  propriedade desta feature não dependem disso, mas o teste de integração sim).
-- **Rating Engine (cross-PRD, sem PRD, sem spec)** — assumido inteiramente como contrato externo
-  via a porta injetada `PortaRatingEngine`. Enquanto não existir, a implementação usa o adaptador
-  placeholder que sempre sinaliza indisponibilidade, exercitando o caminho de recompensa mínima
-  garantida como comportamento padrão observável.
-- **Pendência de dado externo:** escala de notas e tabela nota→recompensa do Rating Engine.
-  Fallback adotado enquanto não chega: recompensa mínima garantida não-nula (piso estrutural
-  `ESTRELAS_MINIMAS_GARANTIDAS = 1`, `FAIXA_MINIMA_GARANTIDA = 'comum'`) em vez do fallback neutro
-  padrão de outras tabelas pendentes — ver spec, Decisão 6.
+- F03 e F04 estão implementadas e fornecem `DuelSession`, `duelSessionId`, `finalState` e o fluxo
+  de rendição.
+- `MotorDuelo/F12` ainda não existe; o override “assuma os contratos externos” autoriza criar
+  somente `ReadDuelOutcome` e seus tipos/schemas em `packages/shared`.
+- O Rating Engine ainda não possui PRD/spec/implementação; o mesmo override autoriza criar somente
+  sua porta e schemas compartilhados.
+- Escala de notas e tabela nota→recompensa permanecem pendentes. A implementação recebe uma
+  política mínima externa validada e não hard-code valores.
+- A integração de produção completa ficará bloqueada até F12 e o Rating Engine fornecerem
+  adaptadores reais; fakes existem apenas em testes.
 
-## Fase 1: Vocabulário e contratos compartilhados
+## Fase 1: Contratos compartilhados
 
-**1. Vocabulário de desfecho** — Declarar em `packages/shared` o vocabulário fechado do motivo de
-encerramento e do desfecho do jogador, reaproveitando `JogadorId` já existente do motor de duelo.
+**1. Vocabulário do resultado** — Declarar o desfecho externo do motor, a avaliação do Rating
+Engine, a política mínima e o resultado consolidado como uniões e tipos imutáveis.
 
-**2. Forma do desfecho do motor e seu invariante** — Declarar o tipo e o schema que representam o
-que `MotorDuelo/F12` vai produzir (vencedor, perdedor, motivo), incluindo a regra estrutural que
-liga `motivo` a `vencedor`/`perdedor`, para que entradas inconsistentes sejam rejeitadas antes de
-qualquer interpretação.
+**2. Validação das fronteiras** — Criar schemas zod para todos os payloads externos e invariantes
+estruturais, exportando os contratos pela API pública de `packages/shared`.
 
-**3. Contratos da avaliação e do resultado consolidado** — Declarar a nota opaca, a recompensa por
-nota (reaproveitando a faixa de raridade já definida por F01), a avaliação consolidada com suas
-duas origens possíveis, e a união discriminada do resultado final que F06/F07/F08 vão consumir.
+**3. Núcleo puro de consolidação** — Implementar a tradução do resultado para o ponto de vista de
+P1 e garantir por tipo que derrota/empate não carregam recompensa, com testes unitários e
+property-based conforme a Seção 7.
 
-**4. Portas injetadas e constantes** — Declarar os tipos das duas portas externas (extração do
-desfecho do motor e avaliação do Rating Engine), o lado fixo do jogador humano, o piso de
-recompensa mínima garantida e o timeout da chamada ao Rating Engine.
+## Fase 2: Resolução e fallback
 
-## Fase 2: Núcleo puro de interpretação e consolidação
+**4. Orquestrador de resultado** — Implementar a borda que lê o desfecho, chama o Rating Engine
+somente na vitória, valida sua resposta e delega a consolidação ao núcleo puro.
 
-**5. Validação estrutural do desfecho do motor** — Implementar a checagem pura que aceita ou
-rejeita um desfecho do motor conforme o invariante declarado na Fase 1.
+**5. Fallback e observabilidade** — Aplicar a política mínima injetada quando o Rating Engine
+falhar, registrar incidentes estruturados e produzir o estado seguro quando o motor for
+inconsistente.
 
-**6. Mapeamento para o desfecho do jogador** — Implementar a função pura que traduz
-vencedor/perdedor/motivo para vitória, derrota ou empate do ponto de vista do lado humano.
+**6. Idempotência em memória** — Memoizar o resultado por sessão para impedir avaliações repetidas
+durante remontagens, cobrindo sucesso e falhas com testes.
 
-**7. Montagem do resultado consolidado** — Implementar a função pura que monta a união
-discriminada final, incluindo o ramo de recompensa mínima garantida quando nenhuma avaliação do
-Rating Engine é fornecida, mantendo o campo de avaliação ausente em derrota e empate.
+## Fase 3: Apresentação e integração com F03
 
-**8. Testes do núcleo puro** — Cobrir a validação estrutural, o mapeamento e a montagem com casos
-tabulares e com as propriedades de bicondicional, correção do mapeamento, exclusividade da
-avaliação e não-ausência da recompensa mínima descritas na spec.
+**7. Hook de resultado** — Expor o ciclo carregando/resolvido para sessões encerradas sem mover
+regra de domínio para React.
 
-## Fase 3: Orquestração com o motor e o Rating Engine
+**8. Painel acessível** — Renderizar desfecho, motivo e o ramo de vitória, incluindo a mensagem
+exata de fallback, e cobrir os estados visuais.
 
-**9. Adaptador placeholder do Rating Engine** — Criar o adaptador que satisfaz a porta do Rating
-Engine sinalizando indisponibilidade, para que o restante do fluxo seja exercitável e testável
-antes de o Rating Engine real existir.
+**9. Tela de duelo** — Substituir o placeholder de duelo encerrado pelo painel F05 quando as portas
+externas forem compostas, preservando um estado seguro quando ainda não estiverem disponíveis.
 
-**10. Cache em memória por sessão** — Implementar o armazenamento efêmero que evita reprocessar
-ou rechamar o Rating Engine quando a tela de resultado é remontada para a mesma sessão.
+## Fase 4: Integração e aceite
 
-**11. Orquestrador de apuração do resultado** — Implementar a função de borda que observa a
-sessão encerrada de F03, extrai o desfecho do motor pela porta injetada, serializa o estado final
-usando a função já especificada por `MotorDuelo/F05` apenas na vitória, chama a porta do Rating
-Engine sob timeout, aplica o fallback de recompensa mínima quando necessário, e delega ao núcleo
-puro da Fase 2 para montar o resultado final.
+**10. Fluxo F03→F05** — Adicionar teste de integração com uma sessão encerrada, portas externas
+controladas e verificação de que apenas a vitória é avaliada.
 
-**12. Registro estruturado de incidentes** — Adicionar o log de borda para indisponibilidade do
-Rating Engine, resposta fora do schema, e inconsistência do resultado do motor, sempre incluindo
-o identificador de sessão e o código do problema.
+**11. Critérios de aceite** — Reexecutar os testes mapeados na Seção 7, incluindo derrota, empate,
+rendição, fallback mínimo, cache por sessão e preservação opaca da avaliação oficial.
 
-**13. Testes do orquestrador** — Cobrir timeout, falha, resposta inválida, indisponibilidade do
-motor, sessão não encerrada, idempotência por sessão e não-reaproveitamento de cache entre
-sessões diferentes.
-
-## Fase 4: Apresentação do resultado
-
-**14. Hook de leitura do resultado** — Criar o hook fino que dispara a apuração quando a sessão de
-F03 encerra e expõe o estado (carregando/resolvido) à interface.
-
-**15. Painel de resultado e mensagens** — Criar o componente que exibe desfecho e motivo em todo
-caso, e — somente na vitória — a nota (ou o aviso de indisponibilidade quando a origem é a
-recompensa mínima) e as estrelas, com o mapa de mensagens exatas do PRD; integrar o painel à tela
-de duelo já montada por F03 quando a sessão atinge o desfecho encerrado, e cobrir os estados com
-testes de tela.
+**12. Portões finais** — Rodar lint, fronteiras arquiteturais, typecheck, suítes unitária e de
+integração, além do build web como smoke check.

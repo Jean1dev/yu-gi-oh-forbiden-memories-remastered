@@ -1,0 +1,14 @@
+{
+  "rosterVersion": "1.0.0",
+  "duelists": [
+    {
+      "id": "unknown-card",
+      "name": "Unknown",
+      "portrait": "duelists/unknown.webp",
+      "difficulty": "easy",
+      "profile": { "strategy": "fixture", "parameters": {} },
+      "deck": ["999"],
+      "dropPool": []
+    }
+  ]
+}
