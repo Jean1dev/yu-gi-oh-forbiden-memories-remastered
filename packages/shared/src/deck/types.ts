@@ -32,3 +32,33 @@ export type ReadyDeck = Readonly<{
   cardNumbers: readonly CardNumber[];
   total: number;
 }>;
+
+export type DeckVerdict =
+  | Readonly<{ valid: true; total: number }>
+  | Readonly<{ valid: false; total: number; violations: readonly DeckViolation[] }>;
+export type ActiveDeckOrigin = "server" | "cache";
+export type LoadedDuelDeck = Readonly<{
+  origin: ActiveDeckOrigin;
+  composition: DeckComposition;
+  updatedAt: string;
+}>;
+export type DeckBlockReason = "missing_deck" | "invalid_deck";
+export type ActiveDeckVerification =
+  | Readonly<{
+      status: "ready";
+      hasValidDeck: true;
+      readyDeck: ReadyDeck;
+      origin: ActiveDeckOrigin;
+    }>
+  | Readonly<{
+      status: "blocked";
+      hasValidDeck: false;
+      reason: DeckBlockReason;
+      violations: readonly DeckViolation[];
+      origin: ActiveDeckOrigin | null;
+    }>
+  | Readonly<{
+      status: "unavailable";
+      hasValidDeck: false;
+      reason: "load_failed" | "missing_session" | "catalog_unavailable";
+    }>;

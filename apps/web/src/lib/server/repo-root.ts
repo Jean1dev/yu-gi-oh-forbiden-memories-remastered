@@ -49,3 +49,7 @@ export function generatedDataDir(): string {
 export function cardsDataDir(): string {
   return join(repoRoot(), "cards-data");
 }
+
+export function dataPackageDir(): string {
+  return join(repoRoot(), "packages", "data");
+}

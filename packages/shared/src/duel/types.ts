@@ -1,6 +1,7 @@
 import type { Card } from "../card/types.ts";
 import type { ReactionWindow } from "./events.ts";
 import type { PlayerId } from "./player.ts";
+import type { DuelEvent, EventType, JsonValue, ZoneReference } from "./events.ts";
 
 export type { PlayerId } from "./player.ts";
 
@@ -9,10 +10,7 @@ export type Phase = "draw" | "main" | "battle" | "end";
 
 /** The four combinations of attack/defense x face-up/face-down. */
 export type MonsterPosition =
-  | "attack_face_up"
-  | "attack_face_down"
-  | "defense_face_up"
-  | "defense_face_down";
+  "attack_face_up" | "attack_face_down" | "defense_face_up" | "defense_face_down";
 
 /**
  * A monster zone on the field. Discriminated union on `occupied`: the empty
@@ -34,8 +32,7 @@ export type MonsterZone =
  * position and no turn flags, which do not apply to these cards.
  */
 export type SpellZone =
-  | Readonly<{ occupied: false }>
-  | Readonly<{ occupied: true; card: Card; faceUp: boolean }>;
+  Readonly<{ occupied: false }> | Readonly<{ occupied: true; card: Card; faceUp: boolean }>;
 
 /** The ten zones of a player's field, with fixed identity by index. */
 export type PlayerField = Readonly<{
@@ -69,3 +66,74 @@ export type DuelState = Readonly<{
   /** The seed this duel was shuffled with (F03); enables deterministic replay. */
   seed: number;
 }>;
+
+export type PublicCard = Readonly<{ visible: true; card: Card }> | Readonly<{ visible: false }>;
+
+export type PublicHand =
+  Readonly<{ visible: true; cards: readonly Card[] }> | Readonly<{ visible: false; count: number }>;
+
+export type PublicMonsterZone =
+  | Readonly<{ occupied: false }>
+  | Readonly<{
+      occupied: true;
+      card: PublicCard;
+      position: MonsterPosition;
+      hasAttacked: boolean;
+      hasChangedPosition: boolean;
+    }>;
+
+export type PublicSpellZone =
+  Readonly<{ occupied: false }> | Readonly<{ occupied: true; card: PublicCard; faceUp: boolean }>;
+
+export type PublicPlayerField = Readonly<{
+  monsters: readonly [
+    PublicMonsterZone,
+    PublicMonsterZone,
+    PublicMonsterZone,
+    PublicMonsterZone,
+    PublicMonsterZone,
+  ];
+  spells: readonly [
+    PublicSpellZone,
+    PublicSpellZone,
+    PublicSpellZone,
+    PublicSpellZone,
+    PublicSpellZone,
+  ];
+}>;
+
+export type PublicPlayerState = Readonly<{
+  lp: number;
+  hand: PublicHand;
+  remainingDeck: number;
+  field: PublicPlayerField;
+}>;
+
+export type PublicDuelEvent = Readonly<{
+  type: EventType;
+  originPlayer: PlayerId;
+  involvedCards: readonly PublicCard[];
+  involvedZones: readonly ZoneReference[];
+  context: Record<string, JsonValue>;
+}>;
+
+export type PublicReactionWindow = Readonly<{
+  type: "reaction_window";
+  event: PublicDuelEvent;
+  reactingPlayer: PlayerId;
+}>;
+
+export type PublicDuelState = Readonly<{
+  players: Readonly<Record<PlayerId, PublicPlayerState>>;
+  activeField: Card | null;
+  activePlayer: PlayerId;
+  turn: number;
+  phase: Phase;
+  pending?: PublicReactionWindow | undefined;
+}>;
+
+const _publicEventShape: Omit<PublicDuelEvent, "involvedCards"> = {} as Omit<
+  DuelEvent,
+  "involvedCards"
+>;
+void _publicEventShape;

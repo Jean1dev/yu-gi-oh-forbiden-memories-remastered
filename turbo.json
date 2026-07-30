@@ -35,6 +35,18 @@
       ],
       "outputs": ["generated/fusion-validation-report.json"]
     },
+    "roster:validate": {
+      "dependsOn": ["data:validate"],
+      "inputs": [
+        "data/roster.json",
+        "src/roster/**",
+        "scripts/validate-roster.ts",
+        "scripts/load-catalog-from-disk.ts",
+        "generated/cards.json",
+        "generated/arts-manifest.json",
+        "generated/dataset-seal.json"
+      ]
+    },
     "data:guardian-matrix": {
       "dependsOn": ["data:ingest", "data:validate"],
       "inputs": [

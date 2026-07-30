@@ -1,6 +1,42 @@
 import { z } from "zod";
 
 import { SerializedCollectionSchema } from "../collection/schema.ts";
+import { CardNumberSchema } from "../card/schema.ts";
+
+export const DeckCompositionSchema = z.record(CardNumberSchema, z.number().finite());
+export const ActiveDeckLineSchema = z.strictObject({
+  player_id: z.string().uuid(),
+  cards: DeckCompositionSchema,
+  updated_at: z.string().datetime(),
+});
+export const ActiveDeckSnapshotSchema = z.strictObject({
+  playerId: z.string().min(1),
+  cards: DeckCompositionSchema,
+  updatedAt: z.string().datetime(),
+});
+export const DeckViolationSchema = z.discriminatedUnion("type", [
+  z.strictObject({ type: z.literal("insufficient_size"), total: z.number(), missing: z.number() }),
+  z.strictObject({ type: z.literal("excessive_size"), total: z.number(), excess: z.number() }),
+  z.strictObject({
+    type: z.literal("copies_exceeded"),
+    cardNumber: CardNumberSchema,
+    quantity: z.number(),
+  }),
+  z.strictObject({
+    type: z.literal("invalid_quantity"),
+    cardNumber: CardNumberSchema,
+    quantity: z.number(),
+  }),
+  z.strictObject({ type: z.literal("unknown_card"), cardNumber: CardNumberSchema }),
+]);
+export const DeckVerdictSchema = z.discriminatedUnion("valid", [
+  z.strictObject({ valid: z.literal(true), total: z.number() }),
+  z.strictObject({
+    valid: z.literal(false),
+    total: z.number(),
+    violations: z.array(DeckViolationSchema).min(1),
+  }),
+]);
 
 /**
  * Shape returned by the `save_active_deck` RPC (spec build-deck/F07 §4).

@@ -32,6 +32,7 @@ export {
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
   INITIAL_LP,
+  MAX_CPU_ACTIONS_PER_ADVANCE,
   TOTAL_MONSTER_ZONES,
   TOTAL_SPELL_ZONES,
 } from "./duel/constants.ts";
@@ -43,17 +44,71 @@ export type {
   PlayerField,
   PlayerId,
   PlayerState,
+  PublicCard,
+  PublicDuelEvent,
+  PublicDuelState,
+  PublicHand,
+  PublicMonsterZone,
+  PublicPlayerField,
+  PublicPlayerState,
+  PublicReactionWindow,
+  PublicSpellZone,
   SpellZone,
 } from "./duel/types.ts";
+export {
+  ORCHESTRATION_ERROR_CODES,
+  type AiAgent,
+  type DuelAction,
+  type DuelSession,
+  type GetPublicDuelState,
+  type MatchOrchestrationInput,
+  type OrchestrationFailureReason,
+} from "./duel/orchestration.ts";
 export type { InitializationInput, InitializationPlayerInput } from "./duel/initialization.ts";
 export type { Snapshot } from "./duel/snapshot.ts";
+export type {
+  ConsolidatedDuelResult,
+  ConsolidatedRating,
+  CreateDuelSnapshot,
+  DecisiveDuelEndReason,
+  DuelEndReason,
+  DuelGrade,
+  DuelOutcome,
+  DuelResultUnavailableReason,
+  EndedDuelSession,
+  MinimumRatingReward,
+  RatingEngine,
+  RatingEvaluation,
+  RatingReward,
+  ReadDuelOutcome,
+} from "./duel/result.ts";
+export {
+  ConsolidatedDuelResultSchema,
+  DecisiveDuelEndReasonSchema,
+  DuelEndReasonSchema,
+  DuelOutcomeSchema,
+  MinimumRatingRewardSchema,
+  RatingEvaluationSchema,
+  RatingRewardSchema,
+} from "./duel/result-schema.ts";
 export type {
   EffectiveAtkDef,
   EquipmentModifierProvider,
   GuardianModifierProvider,
   TerrainModifierProvider,
 } from "./duel/combat-modifiers.ts";
-export type { DeckComposition, DeckViolation, ReadyDeck } from "./deck/types.ts";
+export type {
+  ActiveDeckOrigin,
+  ActiveDeckVerification,
+  DeckBlockReason,
+  DeckComposition,
+  DeckVerdict,
+  DeckViolation,
+  LoadedDuelDeck,
+  ReadyDeck,
+} from "./deck/types.ts";
+export { DECK_ERROR_CODES, type DeckErrorCode } from "./deck/error-codes.ts";
+export { MAX_COPIES_PER_CARD, REQUIRED_DECK_SIZE } from "./deck/constants.ts";
 export type {
   DeckDraft,
   DeckDraftValidationResult,
@@ -68,6 +123,11 @@ export type {
   SyncActiveDeckSummary,
 } from "./deck/persistence.ts";
 export {
+  ActiveDeckLineSchema,
+  ActiveDeckSnapshotSchema,
+  DeckCompositionSchema,
+  DeckVerdictSchema,
+  DeckViolationSchema,
   CachedActiveDeckRecordSchema,
   PendingActiveDeckSaveSchema,
   SaveActiveDeckResponseSchema,
@@ -128,9 +188,66 @@ export {
   PlayerFieldSchema,
   PlayerIdSchema,
   PlayerStateSchema,
+  PublicCardSchema,
+  PublicDuelEventSchema,
+  PublicDuelStateSchema,
+  PublicHandSchema,
+  PublicMonsterZoneSchema,
+  PublicPlayerFieldSchema,
+  PublicPlayerStateSchema,
+  PublicReactionWindowSchema,
+  PublicSpellZoneSchema,
   ReactionWindowSchema,
   SpellZoneSchema,
   ZoneIndexSchema,
   ZoneReferenceSchema,
   ZoneTypeSchema,
 } from "./duel/schema.ts";
+export {
+  DIFFICULTY_LEVELS,
+  ROSTER_ERROR_CODES,
+  type RosterErrorCode,
+} from "./duelist/constants.ts";
+export type {
+  DifficultyLevel,
+  DifficultyParameter,
+  DifficultyProfile,
+  DropPool,
+  DropTier,
+  DropTierId,
+  Duelist,
+  DuelistId,
+  NpcDeck,
+  Roster,
+} from "./duelist/types.ts";
+export {
+  DifficultyLevelSchema,
+  DifficultyProfileSchema,
+  DropPoolSchema,
+  DropTierSchema,
+  DuelistIdSchema,
+  DuelistSchema,
+  NpcDeckSchema,
+  RosterSchema,
+} from "./duelist/schema.ts";
+export type {
+  CardWeightLookup,
+  DefaultCommonDropPool,
+  DropRewardOutcome,
+  DropRewardSource,
+} from "./duelist/drop-reward.ts";
+export { DefaultCommonDropPoolSchema } from "./duelist/drop-reward-schema.ts";
+export type {
+  LoadedWalletBalance,
+  PendingVictoryReward,
+  VictoryRewardEvent,
+  VictoryRewardResult,
+  WalletBalance,
+} from "./economy/wallet.ts";
+export {
+  ApplyVictoryRewardResponseSchema,
+  PendingVictoryRewardSchema,
+  VictoryRewardEventSchema,
+  WalletBalanceSchema,
+  type ApplyVictoryRewardResponse,
+} from "./economy/wallet-schema.ts";
