@@ -48,3 +48,8 @@ export { neutralGuardianModifier } from "./guardian-star/index.ts";
 export { neutralTerrainModifier } from "./terrain/index.ts";
 export { neutralEquipmentModifier } from "./effect-system/index.ts";
 export { neutralModifierProviders } from "./combat/index.ts";
+export {
+  deriveDeterministicIndex,
+  deriveWeightedSelection,
+  selectDropCardNumber,
+} from "./drop-reward/index.ts";

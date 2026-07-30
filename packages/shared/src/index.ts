@@ -239,3 +239,10 @@ export {
   NpcDeckSchema,
   RosterSchema,
 } from "./duelist/schema.ts";
+export type {
+  CardWeightLookup,
+  DefaultCommonDropPool,
+  DropRewardOutcome,
+  DropRewardSource,
+} from "./duelist/drop-reward.ts";
+export { DefaultCommonDropPoolSchema } from "./duelist/drop-reward-schema.ts";
