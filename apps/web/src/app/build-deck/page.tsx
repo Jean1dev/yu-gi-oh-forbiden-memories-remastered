@@ -14,12 +14,12 @@ async function loadCatalogResult(): Promise<CatalogResult> {
 
 export default async function BuildDeckPage() {
   const catalogResult = await loadCatalogResult();
-  // The page frame lives here rather than in `BuildDeckClient`, whose every
-  // branch (failure, skeleton, empty collection, editor) returns a fragment —
-  // wrapping once at the route keeps all of them inside the same container.
+  // The page frame lives here rather than in `BuildDeckClient`; `BuildDeckClient`
+  // owns its own `<h1>` (paired with the live "N / 40" count in its header row)
+  // since every one of its branches — failure, skeleton, empty collection,
+  // editor — needs the same title above it.
   return (
     <main className="page">
-      <h1>Build Deck</h1>
       <BuildDeckClient catalogResult={catalogResult} />
     </main>
   );

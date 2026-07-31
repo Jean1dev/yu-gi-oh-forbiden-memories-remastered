@@ -1,3 +1,5 @@
+import type { CardType } from "@yugioh/shared";
+
 /**
  * Single map from state/error code to the text shown to the player, reusing
  * the wording build-deck/F01 and library/F02 already settled on for the same
@@ -28,7 +30,23 @@ export const BUILD_DECK_MESSAGES = {
   deckSaving: "Salvando…",
   deckConflictNotice: "Seu deck foi atualizado em outro dispositivo; a versão mais recente foi mantida.",
   saveDeckButton: "Salvar deck",
+  tabAllCards: "Todas as Cartas",
+  viewList: "Lista",
+  viewGrid: "Grade",
+  allCardTypes: "Todos",
+  allMonsterClasses: "Todos",
+  emptyFilterResult: "Nenhuma carta desse tipo na sua coleção.",
+  emptyDeckTab: 'Nenhuma carta no deck ainda — vá em "Todas as Cartas" para adicionar.',
 } as const;
+
+/** Card-type filter labels — covers all five `CardType` values plus the "todos" filter. */
+export const CARD_TYPE_LABELS: Readonly<Record<CardType, string>> = {
+  monstro: "Monstro",
+  magica: "Mágica",
+  armadilha: "Armadilha",
+  equipamento: "Equipamento",
+  ritual: "Ritual",
+};
 
 export function noSearchResultsMessage(term: string): string {
   return `Nenhuma carta encontrada para "${term}".`;
@@ -37,4 +55,8 @@ export function noSearchResultsMessage(term: string): string {
 /** build-deck/F05 §6: the one dynamic block message — needs how many copies the player owns. */
 export function ownedQuantityLimitMessage(quantityOwned: number): string {
   return `Você possui apenas ${quantityOwned} cópia(s) desta carta.`;
+}
+
+export function tabMyDeckLabel(total: number): string {
+  return `Meu Deck (${total})`;
 }

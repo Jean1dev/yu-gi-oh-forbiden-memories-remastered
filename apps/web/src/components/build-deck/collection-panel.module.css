@@ -1,29 +1,93 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
   width: 100%;
   max-width: 100%;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  padding: var(--space-3);
+  max-height: 60vh;
+  overflow: auto;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   list-style: none;
   margin: 0;
   padding: 0;
   max-width: 100%;
 }
 
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+  gap: var(--space-3);
+}
+
+.gridItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  position: relative;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-bevel-raised);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.gridItem.selected {
+  box-shadow: var(--shadow-bevel-pressed);
+}
+
+.gridArt {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.gridName {
+  font-size: var(--text-body-md);
+  color: var(--text-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gridStats {
+  font-size: var(--text-body-sm);
+  color: var(--text-muted);
+}
+
+.gridCount {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: var(--color-gold);
+  color: var(--color-black);
+  font-family: var(--font-display);
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.limit {
+  font-size: var(--text-body-xs);
+  color: var(--text-danger);
+}
+
 .skeletonList {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .skeletonItem {
   min-height: 44px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb);
+  background: linear-gradient(90deg, var(--surface-raised), var(--surface-frame), var(--surface-raised));
 }

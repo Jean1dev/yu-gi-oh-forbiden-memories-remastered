@@ -1,30 +1,74 @@
 /**
  * App shell styling: the reset plus the design tokens every screen reads.
  *
- * The palette and typography follow `docs/estetica-visual.md` §2.2 — Egyptian /
- * millennium (gold and amber, stone and sand, deep night blue, black), a
- * decorative serif for titles and a legible sans for dense data such as the
- * 722-card library. Nothing here is a component style: those stay in the CSS
- * Modules next to the components they belong to.
+ * Palette and typography follow the "forbidden-memories-remastered" design
+ * system imported from Claude Design: a hard-edged PS1-CRT console look
+ * (Egyptian gold/purple/black, 4-color inset bevels, no rounded corners,
+ * pixel typefaces) rather than the earlier soft/rounded gold-on-night pass.
+ * Component-level styles stay in the CSS Modules next to the components they
+ * belong to; this file only owns tokens and the bare-tag reset.
  */
 
 :root {
-  --color-night: #0b1020;
-  --color-night-raised: #141a30;
-  --color-night-sunken: #070a16;
-  --color-gold: #d4a63c;
-  --color-gold-bright: #f0cd70;
-  --color-sand: #e8ddc4;
-  --color-stone: #9aa0b4;
-  --color-danger: #e2686b;
-  --color-success: #6fbf8b;
+  --color-night: #0a0a1e;
+  --color-night-raised: #1a1440;
+  --color-night-sunken: #050510;
+  --color-panel: #2b1d54;
+  --color-gold: #ffd23f;
+  --color-gold-bright: #ffd23f;
+  --color-gold-dark: #8a5a12;
+  --color-gold-shadow: #5c3a0a;
+  --color-sand: #f4e8c1;
+  --color-stone: #8f88c2;
+  --color-danger: #ff4d4d;
+  --color-danger-dark: #7a1f1f;
+  --color-success: #4dff88;
+  --color-success-dark: #1f7a45;
+  --color-black: #000000;
+  --color-white: #ffffff;
 
-  --font-display: "Trajan Pro", "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
-  --font-body:
-    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Surface/text roles built on the palette above. */
+  --surface-page: var(--color-night);
+  --surface-raised: var(--color-night-raised);
+  --surface-sunken: var(--color-night-sunken);
+  --surface-frame: var(--color-panel);
+  --border-item: var(--color-gold-dark);
+  --text-primary: var(--color-sand);
+  --text-heading: var(--color-gold);
+  --text-muted: var(--color-stone);
+  --text-danger: var(--color-danger);
+  --text-success: var(--color-success);
+  --link-color: var(--color-gold);
+  --hover-tint: var(--color-gold-dark);
 
-  --radius: 6px;
+  /* The 4-color inset bevel that stands in for shadow/radius everywhere. */
+  --bevel-light: var(--color-gold);
+  --bevel-dark: var(--color-gold-shadow);
+  --shadow-bevel-raised: inset -4px -4px 0 var(--bevel-dark), inset 4px 4px 0 var(--bevel-light);
+  --shadow-bevel-pressed: inset 4px 4px 0 var(--bevel-dark), inset -4px -4px 0 var(--bevel-light);
+
+  --font-display: var(--font-press-start-2p), "Courier New", monospace;
+  --font-body: var(--font-vt323), "Courier New", monospace;
+
+  --text-body-lg: 1.5rem;
+  --text-body-md: 1.25rem;
+  --text-body-sm: 1.125rem;
+  --text-body-xs: 1rem;
+  --tracking-display: 0.05em;
+  --leading-body: 1.35;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* No rounding, ever — PS1 menu chrome is rectangular; depth comes from the
+     bevel above, not from radius or blur. */
+  --radius: 0;
   --touch-target: 44px;
+  --container-page: 1200px;
 
   color-scheme: dark;
 }
@@ -39,29 +83,33 @@ html {
   /* Wide content (the card grid, the collection panel) scrolls inside its own
      container; the page itself never scrolls sideways, 320px to 1920px. */
   overflow-x: hidden;
+  image-rendering: pixelated;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse at 50% -10%, #1b2444 0%, transparent 60%),
-    var(--color-night);
-  color: var(--color-sand);
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 35%) 0px, rgb(0 0 0 / 35%) 1px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse at 50% -10%, var(--color-night-raised) 0%, transparent 60%),
+    var(--surface-page);
+  color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: none;
 }
 
 h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--color-gold-bright);
-  margin: 0 0 0.5em;
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
+  color: var(--text-heading);
+  margin: 0 0 0.6em;
+  line-height: 1.5;
+  text-shadow: 2px 2px 0 var(--color-black);
 }
 
 p {
@@ -69,7 +117,11 @@ p {
 }
 
 a {
-  color: var(--color-gold-bright);
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--color-sand);
 }
 
 img {
@@ -80,46 +132,56 @@ button {
   font: inherit;
   min-height: var(--touch-target);
   padding: 0 1rem;
-  border: 1px solid var(--color-gold);
+  border: none;
   border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-gold-bright);
+  background: var(--surface-frame);
+  color: var(--text-heading);
   cursor: pointer;
+  box-shadow: var(--shadow-bevel-raised);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 button:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-gold) 18%, transparent);
+  background: var(--hover-tint);
+  color: var(--color-black);
+}
+
+button:active:not(:disabled) {
+  box-shadow: var(--shadow-bevel-pressed);
 }
 
 button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-input {
+input,
+select {
   font: inherit;
   min-height: var(--touch-target);
   padding: 0 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--color-stone) 45%, transparent);
+  border: none;
   border-radius: var(--radius);
-  background: var(--color-night-sunken);
-  color: var(--color-sand);
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-bevel-pressed);
 }
 
 /* Accessibility floor from `docs/estetica-visual.md` §2.2: focus is always
    visible, and never removed without a replacement. */
 :focus-visible {
-  outline: 2px solid var(--color-gold-bright);
+  outline: 3px solid var(--color-white);
   outline-offset: 2px;
 }
 
 [role="alert"] {
-  color: var(--color-danger);
+  color: var(--text-danger);
 }
 
-/** The gold frame the main screens share (`estetica-visual.md` §2.3). */
+/** The beveled console frame the main screens share. */
 .page {
-  max-width: 1200px;
+  max-width: var(--container-page);
   margin: 0 auto;
   padding: 2rem 1rem 3rem;
 }
