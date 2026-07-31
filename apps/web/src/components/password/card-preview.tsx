@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { ObtainedArtReference, PasswordResolution } from "@yugioh/shared";
 
 import { CardArt } from "../library/card-art.tsx";
@@ -7,9 +8,10 @@ import styles from "./password.module.css";
 export type CardPreviewProps = Readonly<{
   resolution: Extract<PasswordResolution, { status: "resolved" }>;
   art: ObtainedArtReference;
+  action?: ReactNode;
 }>;
 
-export function CardPreview({ resolution, art }: CardPreviewProps) {
+export function CardPreview({ resolution, art, action }: CardPreviewProps) {
   const { card, price, affordability } = resolution;
   return (
     <section className={styles.preview} aria-label={`Preview de ${card.nome}`}>
@@ -35,9 +37,7 @@ export function CardPreview({ resolution, art }: CardPreviewProps) {
           <p className={styles.warning}>Faltam {affordability.missingStars.toLocaleString("pt-BR")}⭐ para liberar esta carta.</p>
         ) : null}
         {affordability.status === "unknown" ? <p>{PASSWORD_MESSAGES.walletUnavailable}</p> : null}
-        <button type="button" disabled title={PASSWORD_MESSAGES.releaseUnavailable}>
-          Liberar (custa {price.stars.toLocaleString("pt-BR")}⭐)
-        </button>
+        {action ?? <button type="button" disabled title={PASSWORD_MESSAGES.releaseUnavailable}>Liberar (custa {price.stars.toLocaleString("pt-BR")}⭐)</button>}
       </div>
     </section>
   );

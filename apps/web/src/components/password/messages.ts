@@ -6,5 +6,9 @@ export const PASSWORD_MESSAGES = {
   cacheNotice: "Saldo carregado do cache; sincronizando…",
   notFound: "Senha inválida. Verifique o código.",
   malformed: "Senha inválida. Use apenas os números do código.",
-  releaseUnavailable: "Liberação disponível na próxima etapa.",
+  releaseUnavailable: "A liberação está indisponível.",
+  insufficientStars: (price: number, balance: number) => `Estrelas insuficientes: esta carta custa ${price.toLocaleString("pt-BR")}⭐, você tem ${balance.toLocaleString("pt-BR")}⭐.`,
+  releaseFailed: "Não foi possível concluir a liberação. Seu saldo não foi alterado. Tente novamente.",
+  sessionExpired: "Faça login novamente para liberar cartas.",
+  queuedOffline: "Liberação pendente: será concluída quando você voltar a ficar online.",
 } as const;

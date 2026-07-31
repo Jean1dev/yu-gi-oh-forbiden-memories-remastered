@@ -74,6 +74,9 @@ export {
 } from "./economy/index.ts";
 export {
   evaluateAffordability,
+  evaluateRedemptionEligibility,
+  applyRedemptionDebit,
+  applyRedemptionToLedger,
   normalizePasswordInput,
   resolveCardPrice,
   resolvePasswordEntry,

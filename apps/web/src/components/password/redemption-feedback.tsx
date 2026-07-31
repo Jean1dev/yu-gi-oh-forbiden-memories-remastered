@@ -1,0 +1,5 @@
+import type { CardRedemptionOutcome } from "@yugioh/shared";
+import { PASSWORD_MESSAGES } from "./messages.ts";
+export function RedemptionFeedback({outcome,cardName}:{outcome:CardRedemptionOutcome|undefined;cardName:string}) { if(!outcome)return null; let message:string;
+  switch(outcome.status){case"applied":message=`${cardName} adicionada à coleção. Saldo: ${outcome.walletStars.toLocaleString("pt-BR")}⭐.`;break;case"already_applied":message=`Esta liberação já havia sido concluída. Saldo: ${outcome.walletStars.toLocaleString("pt-BR")}⭐.`;break;case"insufficient_stars":message=PASSWORD_MESSAGES.insufficientStars(outcome.priceStars,outcome.balanceStars);break;case"queued_offline":message=PASSWORD_MESSAGES.queuedOffline;break;case"preview_mismatch":message=`O preço desta carta mudou. Agora custa ${outcome.authoritativeStars.toLocaleString("pt-BR")}⭐. Confira e tente novamente.`;break;default:message=`Carta indisponível para liberação (numero ${outcome.expectedCardNumber}).`;}
+  return <p role="status">{message}</p>; }

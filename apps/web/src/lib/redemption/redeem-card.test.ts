@@ -1,0 +1,2 @@
+import { describe,expect,it,vi } from "vitest";import { redeemCardByPassword } from "./redeem-card.ts";
+describe("redeem card",()=>{it("rejects malformed input before io",async()=>{const redeem=vi.fn();expect(await redeemCardByPassword({}, {repository:{redeem},queue:{enqueue:vi.fn(),listPending:vi.fn(),remove:vi.fn()},clock:{now:()=>new Date()},ids:{newId:()=>"id"}})).toMatchObject({ok:false,error:{code:"invalid_redemption_intent"}});expect(redeem).not.toHaveBeenCalled();});});
