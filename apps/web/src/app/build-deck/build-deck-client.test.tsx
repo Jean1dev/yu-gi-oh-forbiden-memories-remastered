@@ -16,6 +16,7 @@ import { useActiveDeckSync } from "../../hooks/use-active-deck-sync.ts";
 import type { UseDeckDraftResult } from "../../hooks/use-deck-draft.ts";
 import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
 import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
+import { useVictoryRewardSync } from "../../hooks/use-victory-reward-sync.ts";
 import { BuildDeckClient } from "./build-deck-client.tsx";
 
 vi.mock("../../hooks/use-collection-panel.ts", () => ({
@@ -36,6 +37,9 @@ vi.mock("../../hooks/use-deck-draft.ts", () => ({
 vi.mock("../../hooks/use-unsaved-changes-warning.ts", () => ({
   useUnsavedChangesWarning: vi.fn(),
 }));
+vi.mock("../../hooks/use-victory-reward-sync.ts", () => ({
+  useVictoryRewardSync: vi.fn(),
+}));
 
 const mockedPanelHook = vi.mocked(useCollectionPanel);
 const mockedCollectionHook = vi.mocked(useCollection);
@@ -43,6 +47,7 @@ const mockedActiveDeckHook = vi.mocked(useActiveDeckPersistence);
 const mockedActiveDeckSyncHook = vi.mocked(useActiveDeckSync);
 const mockedDeckDraftHook = vi.mocked(useDeckDraft);
 const mockedUnsavedChangesHook = vi.mocked(useUnsavedChangesWarning);
+const mockedVictoryRewardSyncHook = vi.mocked(useVictoryRewardSync);
 
 const NOOP_ACTIONS: CollectionPanelActions = { setTerm: vi.fn(), select: vi.fn() };
 
@@ -85,6 +90,22 @@ function mockReadyActiveDeckAndDraft(): void {
 }
 
 describe("BuildDeckClient", () => {
+  it("mounts victory reward sync with the resolved catalog", () => {
+    mockReadyActiveDeckAndDraft();
+    mockPanel({ status: "loading" });
+    const card = { numero: "001" } as never;
+    render(<BuildDeckClient catalogResult={{ status: "ok", cards: [card] }} />);
+    const catalog = mockedVictoryRewardSyncHook.mock.calls.at(-1)?.[0];
+    expect(catalog?.("001")).toBe(card);
+  });
+
+  it("disables victory reward sync when the catalog failed to load", () => {
+    mockReadyActiveDeckAndDraft();
+    mockPanel({ status: "loading" });
+    render(<BuildDeckClient catalogResult={{ status: "error" }} />);
+    expect(mockedVictoryRewardSyncHook).toHaveBeenLastCalledWith(undefined);
+  });
+
   it("shows the skeleton while the load has not resolved", () => {
     mockReadyActiveDeckAndDraft();
     mockPanel({ status: "loading" });
