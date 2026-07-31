@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 50%);
+  background: rgb(0 0 0 / 70%);
 }
 
 .dialog {
@@ -13,10 +13,10 @@
   max-width: 640px;
   max-height: 90vh;
   overflow: auto;
-  border-radius: 8px;
-  padding: 1.5rem;
-  background: Canvas;
-  color: CanvasText;
+  padding: var(--space-5);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+  color: var(--text-primary);
 }
 
 /* Small viewports get the full page, not a floating dialog (spec library/F02 §3, Fluxo step 6). */
@@ -29,6 +29,5 @@
     max-width: none;
     height: 100%;
     max-height: none;
-    border-radius: 0;
   }
 }

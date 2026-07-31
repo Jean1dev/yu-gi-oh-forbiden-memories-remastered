@@ -4,15 +4,16 @@
      320px, as many as fit at 1920px, no breakpoint list to keep in sync and
      no fixed pixel track width — the usual cause of horizontal scroll
      (spec library/F02 §3, Grade responsiva). */
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+  gap: var(--space-3);
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
 }
 
 .skeletonItem {
   aspect-ratio: 3 / 4;
-  border-radius: 4px;
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: linear-gradient(90deg, var(--surface-raised), var(--surface-frame), var(--surface-raised));
 }

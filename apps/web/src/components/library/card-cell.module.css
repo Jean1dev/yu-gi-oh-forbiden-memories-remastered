@@ -13,18 +13,18 @@
 .link {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   min-width: 44px;
   min-height: 44px;
-  padding: 0.5rem;
+  padding: var(--space-2);
   text-decoration: none;
-  color: inherit;
-  outline-offset: 2px;
+  color: var(--text-primary);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-bevel-raised);
 }
 
-.link:hover,
-.link:focus-visible {
-  outline: 2px solid currentColor;
+.link:hover {
+  box-shadow: var(--shadow-bevel-pressed);
 }
 
 .name {
@@ -32,16 +32,17 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
+  color: var(--text-heading);
 }
 
 .number {
-  font-size: 0.75rem;
-  opacity: 0.75;
+  font-size: var(--text-body-xs);
+  color: var(--text-muted);
 }
 
 .typeClass {
-  font-size: 0.75rem;
-  opacity: 0.75;
+  font-size: var(--text-body-xs);
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

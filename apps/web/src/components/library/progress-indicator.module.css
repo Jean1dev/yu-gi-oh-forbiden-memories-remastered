@@ -1,0 +1,25 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-body-lg);
+  color: var(--text-muted);
+}
+
+.track {
+  height: 16px;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--color-gold);
+  background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgb(0 0 0 / 25%) 6px 8px);
+}

@@ -1,25 +1,44 @@
 .filters {
-  margin-block: 1rem;
+  margin-block: var(--space-3);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+  padding: 0 var(--space-3);
 }
 
 .filters > summary {
   min-height: 44px;
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: var(--text-body-sm);
+  color: var(--text-heading);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
 }
 
 .panel {
   display: grid;
-  gap: 1rem;
-  padding-block: 0.75rem;
+  gap: var(--space-4);
+  padding-block: var(--space-3);
 }
 
 .panel fieldset {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: var(--space-2) var(--space-4);
   border: 0;
   padding: 0;
+}
+
+.panel legend {
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-body-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
 }
 
 .panel label,
@@ -32,12 +51,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-}
-
-.panel :focus-visible,
-.filters > summary:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 3px;
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  color: var(--text-primary);
 }
 
 @media (min-width: 48rem) {
