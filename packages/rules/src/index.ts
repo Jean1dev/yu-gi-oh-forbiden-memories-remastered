@@ -72,3 +72,10 @@ export {
   validateVictoryRewardStars,
   type ReconcileWalletBalanceInput,
 } from "./economy/index.ts";
+export {
+  evaluateAffordability,
+  normalizePasswordInput,
+  resolveCardPrice,
+  resolvePasswordEntry,
+  type ResolvePasswordEntryInput,
+} from "./password/index.ts";

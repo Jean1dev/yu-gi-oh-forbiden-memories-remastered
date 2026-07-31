@@ -237,7 +237,19 @@ export type {
   DropRewardSource,
 } from "./duelist/drop-reward.ts";
 export { DefaultCommonDropPoolSchema } from "./duelist/drop-reward-schema.ts";
-export { INITIAL_WALLET_STARS } from "./economy/constants.ts";
+export {
+  INITIAL_WALLET_STARS,
+  PASSWORD_DIGIT_COUNT,
+  PASSWORD_MAX_INPUT_LENGTH,
+  UNPRICED_CARD_STARS,
+} from "./economy/constants.ts";
+export type {
+  CardPrice,
+  NormalizedPasswordInput,
+  PasswordAffordability,
+  PasswordCardLookup,
+  PasswordResolution,
+} from "./economy/password.ts";
 export type {
   LoadedWalletBalance,
   PendingVictoryReward,
