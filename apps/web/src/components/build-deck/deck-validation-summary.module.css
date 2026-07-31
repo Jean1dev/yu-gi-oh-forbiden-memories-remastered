@@ -1,21 +1,24 @@
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .counter {
-  font-weight: bold;
+  font-family: var(--font-display);
+  font-size: var(--text-body-md);
 }
 
 .valid {
-  font-weight: bold;
-  color: #1a7f37;
+  font-family: var(--font-display);
+  font-size: var(--text-body-md);
+  color: var(--text-success);
 }
 
 .invalid {
-  font-weight: bold;
-  color: #cf222e;
+  font-family: var(--font-display);
+  font-size: var(--text-body-md);
+  color: var(--text-danger);
 }
 
 .violations {
@@ -24,5 +27,6 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
+  color: var(--text-danger);
 }
