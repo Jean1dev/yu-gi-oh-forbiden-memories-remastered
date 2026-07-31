@@ -67,4 +67,8 @@ export {
   deriveWeightedSelection,
   selectDropCardNumber,
 } from "./drop-reward/index.ts";
-export { validateVictoryRewardStars } from "./economy/index.ts";
+export {
+  reconcileWalletBalance,
+  validateVictoryRewardStars,
+  type ReconcileWalletBalanceInput,
+} from "./economy/index.ts";

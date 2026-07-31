@@ -29,3 +29,10 @@ export const ApplyVictoryRewardResponseSchema = z.strictObject({
 });
 
 export type ApplyVictoryRewardResponse = z.infer<typeof ApplyVictoryRewardResponseSchema>;
+
+export const EnsureWalletResponseSchema = z.strictObject({
+  stars: z.number().int().min(0),
+  created_now: z.boolean(),
+});
+
+export type EnsureWalletResponse = z.infer<typeof EnsureWalletResponseSchema>;
