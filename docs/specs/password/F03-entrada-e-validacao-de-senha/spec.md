@@ -106,8 +106,8 @@ Nenhum contrato inexistente. As três dependências de F03 já estão materializ
 | `apps/web/src/lib/password/catalog-payload.ts` | web | novo | `toPasswordPayload` (servidor) / `fromPasswordPayload` (cliente) |
 | `apps/web/src/lib/password/catalog-password.ts` | web | novo | Leitura do catálogo selado + composição do `artLookup`, server-only |
 | `apps/web/src/lib/password/catalog-payload.test.ts` | web | novo | Round-trip do payload |
-| `apps/web/src/hooks/use-wallet-balance.ts` | web | novo | Adaptador React sobre `loadWalletBalance` (F01) |
-| `apps/web/src/hooks/use-wallet-balance.test.ts` | web | novo | Estados `loading` / `ready` / `unavailable` |
+| `apps/web/src/hooks/use-wallet-balance.ts` | web | existente (F01) | Adaptador React sobre a store reativa da carteira; F03 consome `effectiveStars` |
+| `apps/web/src/hooks/use-wallet-balance.test.tsx` | web | existente (F01) | Carga única compartilhada entre consumidores |
 | `apps/web/src/hooks/use-password-lookup.ts` | web | novo | Estado da busca: entrada, submissão, resolução corrente |
 | `apps/web/src/hooks/use-password-lookup.test.ts` | web | novo | Submissão, limpeza, resolução repetida |
 | `apps/web/src/app/password/page.tsx` | web | novo | Server Component: carrega o catálogo selado e monta o payload |
