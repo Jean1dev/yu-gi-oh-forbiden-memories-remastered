@@ -1,4 +1,7 @@
 export { err, ok, type Result } from "./result.ts";
+export { EXPENSIVE_REDEMPTION_THRESHOLD_STARS } from "./economy/constants.ts";
+export type { CardRedemptionIntent, CardRedemptionOutcome, PendingCardRedemption, RedemptionEligibility, RedemptionLedgerState } from "./economy/redemption.ts";
+export { CardRedemptionIntentSchema, PendingCardRedemptionSchema, RedeemCardResponseSchema, type RedeemCardResponse } from "./economy/redemption-schema.ts";
 export { DomainError } from "./errors.ts";
 export {
   CANONICAL_CARD_TOTAL,
