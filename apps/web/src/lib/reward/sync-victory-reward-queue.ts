@@ -27,6 +27,7 @@ export async function syncVictoryRewardQueue(
     log("info", "victory_reward_queue_synced", { playerId: deps.playerId, ...summary });
     return summary;
   }
+  const pendingCount = pending.length;
   let applied = 0;
   let removed = 0;
   for (const item of pending) {
@@ -53,7 +54,7 @@ export async function syncVictoryRewardQueue(
     removed += 1;
     if (result.value.applied) applied += 1;
   }
-  const summary = { applied, removed, remaining: pending.length - removed };
+  const summary = { applied, removed, remaining: pendingCount - removed };
   log("info", "victory_reward_queue_synced", { playerId: deps.playerId, ...summary });
   return summary;
 }
