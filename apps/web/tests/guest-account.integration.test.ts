@@ -66,8 +66,8 @@ describe.skipIf(!hasSupabaseEnv)("guest entry + e-mail linking against a real Su
       const result = await onAccountCreated(playerId);
       expect(result.ok).toBe(true);
       if (!result.ok) return;
-      expect(result.value.createdNow).toBe(true);
-      const total = [...result.value.deck.values()].reduce((sum, quantity) => sum + quantity, 0);
+      expect(result.value.initialDeck.createdNow).toBe(true);
+      const total = [...result.value.initialDeck.deck.values()].reduce((sum, quantity) => sum + quantity, 0);
       expect(total).toBe(40);
     } finally {
       await cleanupPlayer(admin, playerId);

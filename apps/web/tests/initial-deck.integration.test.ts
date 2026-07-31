@@ -266,9 +266,11 @@ describe.skipIf(!hasSupabaseEnv)("build-deck/F02 initial deck against a real Sup
 
       expect(first.ok && second.ok).toBe(true);
       if (!first.ok || !second.ok) return;
-      expect(first.value.createdNow).toBe(true);
-      expect(second.value.createdNow).toBe(false);
-      expect([...second.value.deck.entries()].sort()).toEqual([...first.value.deck.entries()].sort());
+      expect(first.value.initialDeck.createdNow).toBe(true);
+      expect(second.value.initialDeck.createdNow).toBe(false);
+      expect([...second.value.initialDeck.deck.entries()].sort()).toEqual(
+        [...first.value.initialDeck.deck.entries()].sort(),
+      );
     } finally {
       await cleanupPlayer(admin, fresh.playerId);
     }
