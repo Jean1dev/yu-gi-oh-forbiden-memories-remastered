@@ -27,10 +27,13 @@ function mockSession(state: SessionState): void {
   mockedUseSession.mockReturnValue(state);
 }
 
-function fakeClient(updateUserResult: { data: { user: unknown }; error: unknown }): SupabaseClient {
+function fakeClient(updateUserResult: {
+  data: { user: unknown };
+  error: unknown;
+}): SupabaseClient & { auth: { updateUser: ReturnType<typeof vi.fn> } } {
   return {
     auth: { updateUser: vi.fn().mockResolvedValue(updateUserResult) },
-  } as unknown as SupabaseClient;
+  } as unknown as SupabaseClient & { auth: { updateUser: ReturnType<typeof vi.fn> } };
 }
 
 async function fillAndSubmit(): Promise<void> {
@@ -84,9 +87,8 @@ describe("LinkEmailForm", () => {
 
   it("shows a pending-confirmation message when the account is still anonymous after the call", async () => {
     mockSession({ status: "guest", playerId: "guest-1" });
-    mockedCreateSupabaseClient.mockReturnValue(
-      fakeClient({ data: { user: { id: "guest-1", is_anonymous: true } }, error: null }),
-    );
+    const client = fakeClient({ data: { user: { id: "guest-1", is_anonymous: true } }, error: null });
+    mockedCreateSupabaseClient.mockReturnValue(client);
 
     render(<LinkEmailForm />);
     await fillAndSubmit();
@@ -99,6 +101,10 @@ describe("LinkEmailForm", () => {
       ).toBeTruthy(),
     );
     expect(push).not.toHaveBeenCalled();
+    expect(client.auth.updateUser).toHaveBeenCalledWith(
+      { email: "player@example.com", password: "s3nha123" },
+      { emailRedirectTo: `${window.location.origin}/login/link-email` },
+    );
   });
 
   it("maps a duplicate e-mail error to its own message", async () => {
