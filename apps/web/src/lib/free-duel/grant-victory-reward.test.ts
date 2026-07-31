@@ -7,6 +7,9 @@ import {
   type GrantVictoryRewardDeps,
 } from "./grant-victory-reward.ts";
 
+vi.mock("../logging.ts", () => ({ log: vi.fn() }));
+import { log } from "../logging.ts";
+
 const result: Extract<ConsolidatedDuelResult, { status: "victory" }> = {
   status: "victory",
   duelSessionId: "session",
@@ -58,5 +61,17 @@ describe("grantVictoryReward", () => {
       await grantVictoryReward(result, { playerId: "player", dropPool }, configured),
     ).toEqual(await grantVictoryReward(result, { playerId: "player", dropPool }, configured));
     expect(apply).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns a malformed event error without writing when rating stars are invalid", async () => {
+    const apply = vi.fn();
+    const malformed = {
+      ...result,
+      rating: { ...result.rating, reward: { ...result.rating.reward, stars: -1 } },
+    } as Extract<ConsolidatedDuelResult, { status: "victory" }>;
+    const granted = await grantVictoryReward(malformed, { playerId: "player", dropPool }, deps(apply));
+    expect(granted).toMatchObject({ ok: false, error: { code: "malformed_victory_reward_event" } });
+    expect(apply).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith("warn", "victory_reward_event_malformed", expect.any(Object));
   });
 });

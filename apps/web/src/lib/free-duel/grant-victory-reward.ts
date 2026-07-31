@@ -1,10 +1,11 @@
 import { selectDropCardNumber } from "@yugioh/rules";
 import {
   VictoryRewardEventSchema,
+  DomainError,
+  err,
   ok,
   type ConsolidatedDuelResult,
   type DefaultCommonDropPool,
-  type DomainError,
   type DropPool,
   type DropRewardOutcome,
   type Result,
@@ -15,6 +16,7 @@ import {
   applyVictoryReward,
   type ApplyVictoryRewardDeps,
 } from "../reward/apply-victory-reward.ts";
+import { log } from "../logging.ts";
 
 export type GrantVictoryRewardContext = Readonly<{ playerId: string; dropPool: DropPool }>;
 export type GrantedVictoryReward = Readonly<{
@@ -57,13 +59,21 @@ export async function grantVictoryReward(
     result.duelSessionId,
   );
   if (!selection.ok) return selection;
-  const event = VictoryRewardEventSchema.parse({
+  const event = VictoryRewardEventSchema.safeParse({
     playerId: context.playerId,
     duelId: result.duelSessionId,
     cardNumber: selection.value.cardNumber,
     stars: result.rating.reward.stars,
   });
-  const applied = await applyVictoryReward(event, deps);
+  if (!event.success) {
+    log("warn", "victory_reward_event_malformed", { issues: event.error.issues });
+    return err(
+      new DomainError("Victory reward event failed validation.", "malformed_victory_reward_event", {
+        issues: event.error.issues,
+      }),
+    );
+  }
+  const applied = await applyVictoryReward(event.data, deps);
   if (!applied.ok) return applied;
   const granted = { outcome: selection.value, reward: applied.value };
   cache.set(result.duelSessionId, granted);
