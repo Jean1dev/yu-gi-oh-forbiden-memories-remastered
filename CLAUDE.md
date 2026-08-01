@@ -151,12 +151,17 @@ generic and long — consult it for a specific question rather than reading it e
 
 ## Current state
 
-Implemented: `banco-de-cartas` F01–F08, `motor-duelo-1x1` F01–F05, `build-deck` F01–F07,
-`library` F01–F02, plus the integration shell (main menu, `/login`,
-`POST /api/account/bootstrap`, the `/cards-data/[file]` art route).
+Implemented: `banco-de-cartas` F01–F08, `build-deck` F01–F07, `library` F01–F05 (complete),
+`free-duel` F01–F08 (complete), `password` F01–F04, `motor-duelo-1x1` F01–F11, plus the
+integration shell (main menu, `/login`, `POST /api/account/bootstrap`, the `/cards-data/[file]`
+art route).
 
-Not implemented: Campanha, Free Duel (specs exist, zero code), Online Duel, Password, Save.
-There is **no playable duel** — the engine has state, events, init, effective ATK/DEF and
-snapshots, but no turn machine, draw, summon or attack. `library/[cardNumber]` is a declared
-stub awaiting library/F05, and `DeckValidator`/`montarDeckPronto` are forward-declared contracts
-with no implementation.
+The duel engine now has a full turn cycle: `apply(state, action)` dispatches `advance_phase`
+(with draw built in), `summon_monster`, `play_spell_or_trap`/`play_field_spell`,
+`change_position`, and `declare_attack`/`resolve_attack` (complete FM combat table, no
+piercing). A duel can be played end to end except for declaring a winner.
+
+Not implemented: Campanha, Online Duel, Save. `motor-duelo-1x1/F12` (end-of-duel conditions) —
+LP can reach 0 and a deck can run out (`deckOutPlayer` is set), but nothing declares a
+winner or freezes the state yet. `password/F05` (redemption history). `DeckValidator`/
+`montarDeckPronto` are still a forward-declared contract with no real implementation.
