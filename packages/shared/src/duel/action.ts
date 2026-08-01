@@ -1,3 +1,4 @@
+import type { ZoneIndex } from "./events.ts";
 import type { SummonMonsterAction } from "./summon-monster-action.ts";
 
 /**
@@ -9,4 +10,27 @@ import type { SummonMonsterAction } from "./summon-monster-action.ts";
  */
 export type AdvancePhaseAction = Readonly<{ type: "advance_phase" }>;
 
-export type Action = AdvancePhaseAction | SummonMonsterAction;
+/**
+ * Places a magic/trap/equipment card from the active player's hand into a
+ * free spell/trap zone (motor-duelo-1x1 F09). The engine does not
+ * distinguish a field-spell card from an effect-spell card by schema (both
+ * are `tipo: "magica"`) — whoever builds the action picks this variant or
+ * `PlayFieldSpellAction` from knowledge outside the engine.
+ */
+export type PlaySpellOrTrapAction = Readonly<{
+  type: "play_spell_or_trap";
+  handIndex: number;
+  zoneIndex: ZoneIndex;
+}>;
+
+/** Plays a field-spell card from hand, replacing the single `activeField` slot (motor-duelo-1x1 F09). */
+export type PlayFieldSpellAction = Readonly<{
+  type: "play_field_spell";
+  handIndex: number;
+}>;
+
+export type Action =
+  | AdvancePhaseAction
+  | SummonMonsterAction
+  | PlaySpellOrTrapAction
+  | PlayFieldSpellAction;

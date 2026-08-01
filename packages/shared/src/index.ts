@@ -146,10 +146,17 @@ export type {
   ZoneType,
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
-export type { Action, AdvancePhaseAction } from "./duel/action.ts";
+export type {
+  Action,
+  AdvancePhaseAction,
+  PlayFieldSpellAction,
+  PlaySpellOrTrapAction,
+} from "./duel/action.ts";
 export {
   ActionSchema,
   AdvancePhaseActionSchema,
+  PlayFieldSpellActionSchema,
+  PlaySpellOrTrapActionSchema,
   SummonMonsterActionSchema,
 } from "./duel/action.schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";

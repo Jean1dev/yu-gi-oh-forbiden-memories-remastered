@@ -18,9 +18,22 @@ export const SummonMonsterActionSchema = z.strictObject({
   position: MonsterPositionSchema,
 });
 
+export const PlaySpellOrTrapActionSchema = z.strictObject({
+  type: z.literal("play_spell_or_trap"),
+  handIndex: z.number().int().min(0),
+  zoneIndex: ZoneIndexSchema,
+});
+
+export const PlayFieldSpellActionSchema = z.strictObject({
+  type: z.literal("play_field_spell"),
+  handIndex: z.number().int().min(0),
+});
+
 export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
+  PlaySpellOrTrapActionSchema,
+  PlayFieldSpellActionSchema,
 ]);
 
 const _schemaMatchesDeclaredType: Action = {} as z.infer<typeof ActionSchema>;
