@@ -1,5 +1,6 @@
 import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Result } from "@yugioh/shared";
 
+import { declareAttack, resolveAttack } from "../combat/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
 import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
@@ -11,8 +12,22 @@ import { advancePhase } from "./advance-phase.ts";
  * current state and a player/system action, and returns the new state plus
  * the events it emitted. An exhaustive `switch` on `action.type` — F07-F12
  * each add a `case` to this same function, never a separate dispatcher.
+ *
+ * `resolve_attack` is handled before the generic reaction-window guard
+ * below: unlike every other action, its precondition is that a window IS
+ * open — specifically one over `onAttackDeclared` (motor-duelo-1x1 F11 spec
+ * Decision 3), not that one is absent.
  */
 export function apply(state: DuelState, action: Action): Result<ApplyResult, DomainError> {
+  if (action.type === "resolve_attack") {
+    if (state.pending?.event.type !== "onAttackDeclared") {
+      return err(
+        new DomainError("There is no pending attack to resolve.", "no_pending_attack_to_resolve", {}),
+      );
+    }
+    return resolveAttack(state);
+  }
+
   if (hasOpenReactionWindow(state)) {
     return err(
       new DomainError(
@@ -68,6 +83,16 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
     }
     case "change_position":
       return changePosition(state, action.zone);
+    case "declare_attack": {
+      if (state.phase !== "battle") {
+        return err(
+          new DomainError("An attack can only be declared during the Battle phase.", "wrong_phase", {
+            phase: state.phase,
+          }),
+        );
+      }
+      return declareAttack(state, action);
+    }
     default: {
       // Assigning `action` (not `action.type`) to `never` here works around a
       // TypeScript 6.0.3 narrowing bug where `const x: never = action.type`
