@@ -18,8 +18,8 @@ const emptyField = {
 };
 const activeState: DuelState = {
   players: {
-    P1: { lp: 8000, hand: [], deck: [], field: emptyField },
-    P2: { lp: 8000, hand: [], deck: [], field: emptyField },
+    P1: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
+    P2: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P2",

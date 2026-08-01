@@ -13,8 +13,8 @@ function duelState(activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"
   };
   return {
     players: {
-      P1: { lp: 8000, hand: [], deck: [], field: emptyField },
-      P2: { lp: 8000, hand: [], deck: [], field: emptyField },
+      P1: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
+      P2: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
     },
     activeField: null,
     activePlayer,

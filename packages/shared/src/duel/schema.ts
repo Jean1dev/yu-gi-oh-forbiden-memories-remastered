@@ -73,6 +73,7 @@ export const PlayerStateSchema = z.strictObject({
   hand: z.array(CardSchema),
   deck: z.array(CardSchema),
   field: PlayerFieldSchema,
+  handPlayUsed: z.boolean(),
 });
 
 export const EventTypeSchema = z.enum(EVENT_TYPES);

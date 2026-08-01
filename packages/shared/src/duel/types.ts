@@ -47,6 +47,8 @@ export type PlayerState = Readonly<{
   /** Ordered; index 0 = top of the deck. */
   deck: readonly Card[];
   field: PlayerField;
+  /** Whether this player has already used their one hand play this turn (motor-duelo-1x1 F06). */
+  handPlayUsed: boolean;
 }>;
 
 /**

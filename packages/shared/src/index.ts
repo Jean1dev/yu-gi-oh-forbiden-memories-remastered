@@ -146,6 +146,8 @@ export type {
   ZoneType,
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
+export type { Action, AdvancePhaseAction } from "./duel/action.ts";
+export { ActionSchema, AdvancePhaseActionSchema } from "./duel/action.schema.ts";
 export type {
   CardRewardEvent,
   Collection,

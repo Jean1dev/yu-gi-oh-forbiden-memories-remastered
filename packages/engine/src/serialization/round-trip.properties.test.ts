@@ -78,6 +78,7 @@ const playerStateArbitrary = fc.record({
   hand: fc.array(cardArbitrary, { maxLength: 5 }),
   deck: fc.array(cardArbitrary, { maxLength: 40 }),
   field: playerFieldArbitrary,
+  handPlayUsed: fc.boolean(),
 });
 
 const zoneReferenceArbitrary = fc.record({

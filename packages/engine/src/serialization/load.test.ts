@@ -13,7 +13,7 @@ function emptyField(): PlayerField {
 }
 
 function validPlayer(overrides: Partial<PlayerState> = {}): PlayerState {
-  return { lp: INITIAL_LP, hand: [], deck: [], field: emptyField(), ...overrides };
+  return { lp: INITIAL_LP, hand: [], deck: [], field: emptyField(), handPlayUsed: false, ...overrides };
 }
 
 function validState(overrides: Partial<DuelState> = {}): DuelState {

@@ -37,8 +37,8 @@ const field = {
 } as const;
 const state: DuelState = {
   players: {
-    P1: { lp: 1, hand: [], deck: [], field },
-    P2: { lp: 0, hand: [], deck: [], field },
+    P1: { lp: 1, hand: [], deck: [], field, handPlayUsed: false },
+    P2: { lp: 0, hand: [], deck: [], field, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",

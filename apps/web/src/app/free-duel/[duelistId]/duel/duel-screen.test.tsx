@@ -40,8 +40,8 @@ const card: Card = {
 };
 const state: DuelState = {
   players: {
-    P1: { lp: 8000, hand: [card], deck: [], field },
-    P2: { lp: 7500, hand: [], deck: [], field },
+    P1: { lp: 8000, hand: [card], deck: [], field, handPlayUsed: false },
+    P2: { lp: 7500, hand: [], deck: [], field, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",

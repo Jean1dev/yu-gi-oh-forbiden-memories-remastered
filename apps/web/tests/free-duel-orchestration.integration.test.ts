@@ -86,6 +86,7 @@ describe("free duel F01 -> F02 -> F03", () => {
               { occupied: false },
             ],
           },
+          handPlayUsed: false,
         },
         P2: {
           lp: 8000,
@@ -107,6 +108,7 @@ describe("free duel F01 -> F02 -> F03", () => {
               { occupied: false },
             ],
           },
+          handPlayUsed: false,
         },
       },
       activeField: null,

@@ -58,8 +58,8 @@ export function initDuel(input: InitializationInput): DuelState {
 
   return {
     players: {
-      P1: { lp: INITIAL_LP, hand: handP1, deck: deckP1, field: emptyField() },
-      P2: { lp: INITIAL_LP, hand: handP2, deck: deckP2, field: emptyField() },
+      P1: { lp: INITIAL_LP, hand: handP1, deck: deckP1, field: emptyField(), handPlayUsed: false },
+      P2: { lp: INITIAL_LP, hand: handP2, deck: deckP2, field: emptyField(), handPlayUsed: false },
     },
     activeField: null,
     activePlayer,
