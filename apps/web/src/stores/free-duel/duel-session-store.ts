@@ -46,11 +46,12 @@ export function createDuelSessionStore(
     async submitAction(action) {
       const session = get().session;
       if (session.status !== "in_progress") return;
+      const outcome = await submitPlayerAction(session, action, {
+        ...dependencies.advance,
+        cpuProfile,
+      });
       set({
-        session: await submitPlayerAction(session, action, {
-          ...dependencies.advance,
-          cpuProfile,
-        }),
+        session: outcome.session,
       });
     },
   }));

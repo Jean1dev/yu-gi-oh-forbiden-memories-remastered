@@ -1,7 +1,14 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import type { ApplyResult, DuelSession, DuelState, Duelist, ReadyDeck } from "@yugioh/shared";
+import {
+  ok,
+  type ApplyResult,
+  type DuelSession,
+  type DuelState,
+  type Duelist,
+  type ReadyDeck,
+} from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import {
   DuelScreen,
@@ -55,7 +62,7 @@ const session: DuelSession = {
 describe("surrender integration", () => {
   it("confirms a defeat-producing engine intent outside the player's turn", async () => {
     const apply = vi.fn(
-      (): ApplyResult => ({ state: endedState, events: [] }),
+      () => ok({ state: endedState, events: [] } satisfies ApplyResult),
     );
     const resolveResult = vi.fn(async (ended: Extract<DuelSession, { status: "ended" }>) => ({
       status: "defeat" as const,

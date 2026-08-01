@@ -42,7 +42,7 @@ describe("free duel rematch independence integration", () => {
         return seedSequence;
       },
       catalog: (): Card | undefined => undefined,
-      validateDeck: {},
+      validateDeck: () => ok({ composition: {}, cardNumbers: [], total: 40 }),
       generateSessionId: () => {
         sessionSequence += 1;
         return `session-${sessionSequence}`;

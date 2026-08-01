@@ -1,4 +1,4 @@
-import type { ApplyResult, DuelSession, DuelState } from "@yugioh/shared";
+import { ok, type ApplyResult, type DuelSession, type DuelState } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import {
   canSurrender,
@@ -72,9 +72,7 @@ describe("surrender", () => {
         ...duelState(currentDecider),
         outcome: { status: "decisive", winner: "P2", loser: "P1", reason: "surrender" },
       };
-      const apply = vi.fn(
-        (): ApplyResult => ({ state: endedState, events: [] }),
-      );
+      const apply = vi.fn(() => ok({ state: endedState, events: [] } satisfies ApplyResult));
 
       expect(surrender(session, "P1", { apply })).toEqual({
         status: "ended",
