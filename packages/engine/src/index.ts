@@ -23,3 +23,4 @@ export { load, serialize } from "./serialization/index.ts";
 export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
 export { drawUpToHandSize, getDeckOutPlayer, hasDeckedOut, resolveDrawPhase } from "./draw/index.ts";
 export { summonMonster } from "./summon/index.ts";
+export { getOpponent, playFieldSpell, playSpellOrTrap } from "./spells/index.ts";

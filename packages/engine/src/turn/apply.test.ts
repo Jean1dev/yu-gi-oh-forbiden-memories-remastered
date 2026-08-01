@@ -1,8 +1,26 @@
-import type { DuelState, PlayerField, PlayerState, ReactionWindow } from "@yugioh/shared";
+import type { Card, DuelState, PlayerField, PlayerState, ReactionWindow } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { createEvent } from "../events/index.ts";
 import { apply } from "./apply.ts";
+
+function makeCard(overrides: Partial<Card> = {}): Card {
+  return {
+    id: 1,
+    numero: "030",
+    nome: "Test Spell",
+    img: null,
+    classe: "Magic",
+    atk: null,
+    def: null,
+    guardiao1: null,
+    guardiao2: null,
+    password: null,
+    estrelas: null,
+    tipo: "magica",
+    ...overrides,
+  };
+}
 
 function emptyField(): PlayerField {
   const zone = { occupied: false } as const;
@@ -64,5 +82,53 @@ describe("apply", () => {
     if (result.ok) {
       expect(result.value.state.phase).toBe("main");
     }
+  });
+
+  it("roteia play_spell_or_trap para playSpellOrTrap", () => {
+    const card = makeCard({ tipo: "magica" });
+    const state = makeState({
+      phase: "main",
+      players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() },
+    });
+
+    const result = apply(state, { type: "play_spell_or_trap", handIndex: 0, zoneIndex: 0 });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.players.P1.field.spells[0]).toMatchObject({ occupied: true, card });
+    }
+  });
+
+  it("roteia play_field_spell para playFieldSpell", () => {
+    const card = makeCard({ tipo: "magica" });
+    const state = makeState({
+      phase: "main",
+      players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() },
+    });
+
+    const result = apply(state, { type: "play_field_spell", handIndex: 0 });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.activeField).toEqual(card);
+    }
+  });
+
+  it("recusa play_spell_or_trap quando state.pending está definido, devolvendo reaction_window_open", () => {
+    const state = makeState({ phase: "main", pending: openWindow });
+
+    const result = apply(state, { type: "play_spell_or_trap", handIndex: 0, zoneIndex: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("reaction_window_open");
+  });
+
+  it("recusa play_field_spell quando state.pending está definido, devolvendo reaction_window_open", () => {
+    const state = makeState({ phase: "main", pending: openWindow });
+
+    const result = apply(state, { type: "play_field_spell", handIndex: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("reaction_window_open");
   });
 });

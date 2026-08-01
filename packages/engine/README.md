@@ -45,6 +45,13 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   reaction window with the opponent as `reactingPlayer`. Wired into `apply` (`turn`) as the
   `"summon_monster"` case, which checks the `"main"` phase and active-player ownership before
   delegating — `summonMonster` itself only validates what is specific to summoning.
+- `spells` (`./src/spells`, motor-duelo-1x1 F09): `playSpellOrTrap` — places a magic/trap/equipment
+  card from the active player's hand into a free spell/trap zone, face-down only for `armadilha`.
+  `playFieldSpell` — plays a field-spell card, replacing the single `activeField` slot (always
+  substitutable, never rejected as "occupied"). Both mark `handPlayUsed`, emit `onSet` (with
+  `context.target` distinguishing `"spell_trap_zone"` from `"field"`), and open a reaction window
+  with `getOpponent(state.activePlayer)` as `reactingPlayer`. The engine does not know which
+  `tipo: "magica"` cards are field-spells vs. effect-spells — the caller picks the action variant.
 
 ## Dependency direction
 
