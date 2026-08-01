@@ -33,6 +33,16 @@ const state = (activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"): D
   phase,
   seed: 1,
 });
+/** A state the engine has frozen (motor-duelo-1x1/F12) — what actually ends a session. */
+const surrenderedState = (loser: "P1" | "P2"): DuelState => ({
+  ...state(loser),
+  outcome: {
+    status: "decisive",
+    winner: loser === "P1" ? "P2" : "P1",
+    loser,
+    reason: "surrender",
+  },
+});
 const input: MatchOrchestrationInput = {
   duelistId: "seto",
   playerComposition: {},
@@ -53,7 +63,7 @@ function createDependencies(initialState: DuelState, reject = false) {
   };
 }
 
-const ai: AiAgent = { decide: async () => ({ type: "pass" }) };
+const ai: AiAgent = { decide: async () => ({ type: "advance_phase" }) };
 const profile = { strategy: "test", parameters: {} };
 
 describe("duel session", () => {
@@ -105,11 +115,11 @@ describe("duel session", () => {
     expect(result).toMatchObject({ status: "in_progress", currentDecider: "P1" });
   });
 
-  it("ends on the engine terminal phase and preserves the id", async () => {
+  it("ends when the engine freezes the duel and preserves the id", async () => {
     const active = createDuelSession(input, createDependencies(state("P2")));
     if (active.status !== "in_progress") return;
     const result = await advanceCpuDecisions(active, {
-      apply: () => ({ state: state("P2", "end"), events: [] }),
+      apply: () => ({ state: surrenderedState("P2"), events: [] }),
       aiAgent: ai,
       getPublicDuelState,
       cpuProfile: profile,
@@ -148,8 +158,8 @@ describe("duel session", () => {
       getPublicDuelState,
       cpuProfile: profile,
     };
-    await expect(submitPlayerAction(cpu, {}, dependencies)).resolves.toBe(cpu);
-    await expect(submitPlayerAction(player, {}, dependencies)).resolves.toMatchObject({
+    await expect(submitPlayerAction(cpu, { type: "advance_phase" }, dependencies)).resolves.toBe(cpu);
+    await expect(submitPlayerAction(player, { type: "advance_phase" }, dependencies)).resolves.toMatchObject({
       status: "in_progress",
       currentDecider: "P1",
     });
@@ -161,11 +171,25 @@ describe("duel session", () => {
     expect(
       interruptDuelSession(
         active,
-        { type: "surrender" },
+        { type: "surrender", player: "P1" },
+        {
+          apply: () => ({ state: surrenderedState("P1"), events: [] }),
+        },
+      ),
+    ).toMatchObject({ status: "ended" });
+  });
+
+  it("keeps the session in progress through the end phase of a turn", () => {
+    const active = createDuelSession(input, createDependencies(state("P2")));
+    if (active.status !== "in_progress") return;
+    expect(
+      interruptDuelSession(
+        active,
+        { type: "advance_phase" },
         {
           apply: () => ({ state: state("P2", "end"), events: [] }),
         },
       ),
-    ).toMatchObject({ status: "ended" });
+    ).toMatchObject({ status: "in_progress" });
   });
 });

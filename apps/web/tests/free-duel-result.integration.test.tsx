@@ -82,7 +82,7 @@ describe("free duel F03 to F05 result integration", () => {
       status: "decisive",
       winner: "P1",
       loser: "P2",
-      reason: "lp_zerado",
+      reason: "lp_depleted",
     });
     render(<DuelResult result={result} />);
     expect(screen.getByRole("heading", { name: "Vitória!" })).toBeTruthy();
@@ -96,7 +96,7 @@ describe("free duel F03 to F05 result integration", () => {
       status: "decisive",
       winner: "P2",
       loser: "P1",
-      reason: "rendicao",
+      reason: "surrender",
     });
     render(<DuelResult result={result} />);
     expect(screen.getByRole("heading", { name: "Derrota" })).toBeTruthy();

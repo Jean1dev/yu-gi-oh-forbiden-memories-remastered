@@ -65,7 +65,7 @@ describe("duel session store", () => {
       },
       advance: {
         apply: (current) => ({ state: current, events: [] }),
-        aiAgent: { decide: async () => ({}) },
+        aiAgent: { decide: async () => ({ type: "advance_phase" }) },
         getPublicDuelState,
       },
     });
@@ -75,7 +75,7 @@ describe("duel session store", () => {
       status: "in_progress",
       duelSessionId: "session-1",
     });
-    await store.getState().submitAction({});
+    await store.getState().submitAction({ type: "advance_phase" });
     expect(store.getState().session.status).toBe("in_progress");
   });
 });

@@ -140,7 +140,7 @@ describe("DuelScreen", () => {
         resolveResult={async () => ({
           status: "defeat",
           duelSessionId: "session-1",
-          reason: "rendicao",
+          reason: "surrender",
         })}
       />,
     );
@@ -231,7 +231,7 @@ describe("DuelScreen", () => {
         resolveResult={async () => ({
           status: "victory",
           duelSessionId: "session-1",
-          reason: "lp_zerado",
+          reason: "lp_depleted",
           rating: { source: "rating_engine", grade: "A", reward: { stars: 10, dropTier: "common" } },
         })}
         grantVictoryReward={grantVictoryReward}

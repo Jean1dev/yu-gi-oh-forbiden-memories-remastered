@@ -132,7 +132,7 @@ describe("free duel F01 -> F02 -> F03", () => {
         state: { ...current, activePlayer: "P1" },
         events: [],
       }),
-      aiAgent: { decide: async () => ({ type: "pass" }) },
+      aiAgent: { decide: async () => ({ type: "advance_phase" }) },
       getPublicDuelState,
       cpuProfile: duelist.profile,
     });

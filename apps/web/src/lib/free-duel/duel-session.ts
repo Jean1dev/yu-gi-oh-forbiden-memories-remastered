@@ -59,8 +59,14 @@ export function nextDecider(state: DuelState): PlayerId {
   return state.pending?.reactingPlayer ?? state.activePlayer;
 }
 
+/**
+ * A duel is over when the engine says so — `state.outcome` is what
+ * motor-duelo-1x1/F12 stamps and freezes on. This deliberately does not look
+ * at `state.phase`: `"end"` is the last phase of *every* turn, so testing it
+ * would end the session at the close of turn 1.
+ */
 function finishOrContinue(session: ActiveDuelSession, state: DuelState): DuelSession {
-  if (state.phase === "end") {
+  if (state.outcome !== undefined) {
     return {
       status: "ended",
       duelSessionId: session.duelSessionId,
@@ -113,7 +119,7 @@ export async function advanceCpuDecisions(
   let current: ActiveDuelSession = session;
   try {
     for (let actionCount = 0; actionCount < MAX_CPU_ACTIONS_PER_ADVANCE; actionCount += 1) {
-      if (current.state.phase === "end") return finishOrContinue(current, current.state);
+      if (current.state.outcome !== undefined) return finishOrContinue(current, current.state);
       if (nextDecider(current.state) === "P1") {
         return { ...current, currentDecider: "P1" };
       }

@@ -56,7 +56,7 @@ const victory: DuelOutcome = {
   status: "decisive",
   winner: "P1",
   loser: "P2",
-  reason: "lp_zerado",
+  reason: "lp_depleted",
 };
 const evaluation: RatingEvaluation = {
   grade: "official-opaque-grade",
@@ -92,7 +92,7 @@ describe("resolveDuelResult", () => {
     await expect(resolveDuelResult(session, deps)).resolves.toEqual({
       status: "victory",
       duelSessionId: "duel-1",
-      reason: "lp_zerado",
+      reason: "lp_depleted",
       rating: {
         source: "rating_engine",
         grade: evaluation.grade,
@@ -109,9 +109,9 @@ describe("resolveDuelResult", () => {
         status: "decisive",
         winner: "P2",
         loser: "P1",
-        reason: "rendicao",
+        reason: "surrender",
       } satisfies DuelOutcome,
-      expected: { status: "defeat", duelSessionId: "duel-1", reason: "rendicao" },
+      expected: { status: "defeat", duelSessionId: "duel-1", reason: "surrender" },
     },
     {
       name: "draw",
@@ -119,9 +119,9 @@ describe("resolveDuelResult", () => {
         status: "draw",
         winner: null,
         loser: null,
-        reason: "empate",
+        reason: "draw",
       } satisfies DuelOutcome,
-      expected: { status: "draw", duelSessionId: "duel-1", reason: "empate" },
+      expected: { status: "draw", duelSessionId: "duel-1", reason: "draw" },
     },
   ])("does not call the Rating Engine for $name", async ({ outcome, expected }) => {
     const deps = dependencies(outcome);
@@ -138,7 +138,7 @@ describe("resolveDuelResult", () => {
     expect(result).toEqual({
       status: "victory",
       duelSessionId: "duel-1",
-      reason: "lp_zerado",
+      reason: "lp_depleted",
       rating: {
         source: "minimum_fallback",
         grade: null,

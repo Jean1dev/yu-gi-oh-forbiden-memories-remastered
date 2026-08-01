@@ -61,14 +61,17 @@ describe("surrender", () => {
   });
 
   it("creates the local player's surrender intent", () => {
-    expect(createSurrenderAction("P1")).toEqual({ type: "surrender", playerId: "P1" });
+    expect(createSurrenderAction("P1")).toEqual({ type: "surrender", player: "P1" });
   });
 
   it.each(["P1", "P2"] as const)(
     "interrupts an active session when the current decider is %s",
     (currentDecider) => {
       const session = activeSession(currentDecider);
-      const endedState = duelState(currentDecider, "end");
+      const endedState: DuelState = {
+        ...duelState(currentDecider),
+        outcome: { status: "decisive", winner: "P2", loser: "P1", reason: "surrender" },
+      };
       const apply = vi.fn(
         (): ApplyResult => ({ state: endedState, events: [] }),
       );
@@ -81,7 +84,7 @@ describe("surrender", () => {
       });
       expect(apply).toHaveBeenCalledWith(session.state, {
         type: "surrender",
-        playerId: "P1",
+        player: "P1",
       });
     },
   );

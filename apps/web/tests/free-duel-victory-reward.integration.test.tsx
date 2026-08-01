@@ -129,7 +129,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-victory")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={(result, resolvedDropPool) =>
@@ -194,7 +194,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-defeat")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P2", loser: "P1", reason: "lp_zerado" },
+          { status: "decisive", winner: "P2", loser: "P1", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={grantReward}
@@ -234,7 +234,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-draw")}
         resolveResult={resolveResultFor(
-          { status: "draw", winner: null, loser: null, reason: "empate" },
+          { status: "draw", winner: null, loser: null, reason: "draw" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={grantReward}
@@ -257,7 +257,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-fallback")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={(result, resolvedDropPool) =>
@@ -290,7 +290,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
     const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
     const sharedGrantCache = createGrantVictoryRewardCache();
     const resolveResult = resolveResultFor(
-      { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+      { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
       { stars: 10, dropTier: "common" },
     );
     const grantReward = (

@@ -13,7 +13,7 @@ describe("DuelResult", () => {
       result: {
         status: "defeat",
         duelSessionId: "duel-1",
-        reason: "lp_zerado",
+        reason: "lp_depleted",
       } satisfies ConsolidatedDuelResult,
       title: "Derrota",
       reason: "Seus LP chegaram a 0.",
@@ -22,7 +22,7 @@ describe("DuelResult", () => {
       result: {
         status: "draw",
         duelSessionId: "duel-1",
-        reason: "empate",
+        reason: "draw",
       } satisfies ConsolidatedDuelResult,
       title: "Empate",
       reason: "O duelo terminou empatado.",
@@ -77,7 +77,7 @@ describe("DuelResult", () => {
         result={{
           status: "victory",
           duelSessionId: "duel-1",
-          reason: "lp_zerado",
+          reason: "lp_depleted",
           rating: {
             source: "minimum_fallback",
             grade: null,
@@ -126,7 +126,7 @@ describe("DuelResult", () => {
   it("does not render CardDropReward in the defeat or draw branch", () => {
     const { rerender } = render(
       <DuelResult
-        result={{ status: "defeat", duelSessionId: "duel-1", reason: "lp_zerado" }}
+        result={{ status: "defeat", duelSessionId: "duel-1", reason: "lp_depleted" }}
         victoryRewardState={{
           status: "granted",
           granted: {
@@ -140,7 +140,7 @@ describe("DuelResult", () => {
 
     rerender(
       <DuelResult
-        result={{ status: "draw", duelSessionId: "duel-1", reason: "empate" }}
+        result={{ status: "draw", duelSessionId: "duel-1", reason: "draw" }}
         victoryRewardState={{
           status: "granted",
           granted: {
