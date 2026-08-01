@@ -4,7 +4,6 @@ import {
   ok,
   INITIAL_HAND_SIZE,
   type ApplyResult,
-  type Card,
   type DuelState,
   type Result,
 } from "@yugioh/shared";
@@ -24,19 +23,9 @@ export function drawUpToHandSize(state: DuelState): ApplyResult {
   const current = state.players[player];
   const needed = Math.max(0, INITIAL_HAND_SIZE - current.hand.length);
 
-  const drawnCards: Card[] = [];
-  let remainingDeck = current.deck;
-  let deckedOut = false;
-
-  for (let i = 0; i < needed; i++) {
-    const [top, ...rest] = remainingDeck;
-    if (top === undefined) {
-      deckedOut = true;
-      break;
-    }
-    drawnCards.push(top);
-    remainingDeck = rest;
-  }
+  const drawnCards = current.deck.slice(0, needed);
+  const remainingDeck = current.deck.slice(drawnCards.length);
+  const deckedOut = drawnCards.length < needed;
 
   const nextState: DuelState = {
     ...state,

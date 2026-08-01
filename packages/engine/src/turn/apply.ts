@@ -1,4 +1,4 @@
-import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Result } from "@yugioh/shared";
+import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Phase, type Result } from "@yugioh/shared";
 
 import { declareAttack, resolveAttack } from "../combat/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
@@ -6,6 +6,11 @@ import { changePosition } from "../position/index.ts";
 import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
+
+/** `undefined` when `state.phase === phase`; otherwise the `wrong_phase` error to return. */
+function requirePhase(state: DuelState, phase: Phase, message: string): DomainError | undefined {
+  return state.phase === phase ? undefined : new DomainError(message, "wrong_phase", { phase: state.phase });
+}
 
 /**
  * The engine's single entry point (`docs/arquitetura.md` §3.1): receives the
@@ -42,13 +47,8 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
     case "advance_phase":
       return ok(advancePhase(state));
     case "summon_monster": {
-      if (state.phase !== "main") {
-        return err(
-          new DomainError("A monster can only be summoned during the Main phase.", "wrong_phase", {
-            phase: state.phase,
-          }),
-        );
-      }
+      const phaseError = requirePhase(state, "main", "A monster can only be summoned during the Main phase.");
+      if (phaseError) return err(phaseError);
       if (state.activePlayer !== action.player) {
         return err(
           new DomainError("Only the active player can act.", "not_active_player", {
@@ -60,37 +60,20 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
       return summonMonster(state, action);
     }
     case "play_spell_or_trap": {
-      if (state.phase !== "main") {
-        return err(
-          new DomainError(
-            "A spell/trap card can only be played during the Main phase.",
-            "wrong_phase",
-            { phase: state.phase },
-          ),
-        );
-      }
+      const phaseError = requirePhase(state, "main", "A spell/trap card can only be played during the Main phase.");
+      if (phaseError) return err(phaseError);
       return playSpellOrTrap(state, action);
     }
     case "play_field_spell": {
-      if (state.phase !== "main") {
-        return err(
-          new DomainError("A field-spell card can only be played during the Main phase.", "wrong_phase", {
-            phase: state.phase,
-          }),
-        );
-      }
+      const phaseError = requirePhase(state, "main", "A field-spell card can only be played during the Main phase.");
+      if (phaseError) return err(phaseError);
       return playFieldSpell(state, action);
     }
     case "change_position":
       return changePosition(state, action.zone);
     case "declare_attack": {
-      if (state.phase !== "battle") {
-        return err(
-          new DomainError("An attack can only be declared during the Battle phase.", "wrong_phase", {
-            phase: state.phase,
-          }),
-        );
-      }
+      const phaseError = requirePhase(state, "battle", "An attack can only be declared during the Battle phase.");
+      if (phaseError) return err(phaseError);
       return declareAttack(state, action);
     }
     default: {

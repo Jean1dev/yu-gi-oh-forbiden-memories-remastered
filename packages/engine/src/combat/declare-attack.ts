@@ -67,9 +67,10 @@ export function declareAttack(
   }
 
   const targetZoneIndex = action.targetZoneIndex;
+  const targetZone =
+    targetZoneIndex !== undefined ? state.players[opponent].field.monsters[targetZoneIndex] : undefined;
 
-  if (targetZoneIndex !== undefined) {
-    const targetZone = state.players[opponent].field.monsters[targetZoneIndex];
+  if (targetZone !== undefined) {
     if (!targetZone.occupied) {
       return err(
         new DomainError("The target zone is empty.", "target_zone_empty", { zoneIndex: targetZoneIndex }),
@@ -92,11 +93,8 @@ export function declareAttack(
   const involvedCards: Card[] = [attackerZone.card];
   const involvedZones: ZoneReference[] = [attackerZoneRef];
 
-  if (targetZoneIndex !== undefined) {
-    const targetZone = state.players[opponent].field.monsters[targetZoneIndex];
-    if (targetZone.occupied) {
-      involvedCards.push(targetZone.card);
-    }
+  if (targetZoneIndex !== undefined && targetZone?.occupied) {
+    involvedCards.push(targetZone.card);
     involvedZones.push({ player: opponent, zoneType: "monster", index: targetZoneIndex });
   }
 

@@ -5,19 +5,16 @@ import {
   TOTAL_MONSTER_ZONES,
   type ApplyResult,
   type DuelState,
-  type PlayerId,
   type Result,
   type SummonMonsterAction,
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
+import { replaceZone } from "../field/replace-zone.ts";
+import { getOpponent } from "../spells/opponent.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
 
 const SUMMONABLE_TYPES = new Set(["monstro", "ritual"]);
-
-function opponentOf(player: PlayerId): PlayerId {
-  return player === "P1" ? "P2" : "P1";
-}
 
 /**
  * Summons a monster from `action.player`'s hand into a free monster zone
@@ -85,15 +82,7 @@ export function summonMonster(
     hasAttacked: false,
     hasChangedPosition: false,
   };
-  const [z0, z1, z2, z3, z4] = player.field.monsters;
-  const withZone = (index: number, zone: typeof z0) => (index === action.zoneIndex ? summonedZone : zone);
-  const nextMonsters: typeof player.field.monsters = [
-    withZone(0, z0),
-    withZone(1, z1),
-    withZone(2, z2),
-    withZone(3, z3),
-    withZone(4, z4),
-  ];
+  const nextMonsters = replaceZone(player.field.monsters, action.zoneIndex, summonedZone);
 
   const summonedState: DuelState = {
     ...state,
@@ -118,7 +107,7 @@ export function summonMonster(
     context: { position: action.position },
   });
 
-  const opened = openReactionWindow(stateAfterHandPlay, event, opponentOf(action.player));
+  const opened = openReactionWindow(stateAfterHandPlay, event, getOpponent(action.player));
   if (!opened.ok) {
     throw new Error("Unreachable: apply already guaranteed no reaction window is open.");
   }

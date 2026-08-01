@@ -13,6 +13,7 @@ import {
 } from "@yugioh/shared";
 
 import { closeReactionWindow, createEvent } from "../events/index.ts";
+import { replaceZone } from "../field/replace-zone.ts";
 import { isFaceDown } from "../position/next-position.ts";
 import { getOpponent } from "../spells/opponent.ts";
 import { calculateEffectiveAtkDef } from "./calculate-effective-atk-def.ts";
@@ -23,14 +24,6 @@ function postureOf(position: MonsterPosition): "attack" | "defense" {
   return position === "attack_face_up" || position === "attack_face_down" ? "attack" : "defense";
 }
 
-type MonsterZoneTuple = readonly [MonsterZone, MonsterZone, MonsterZone, MonsterZone, MonsterZone];
-
-function replaceMonsterZone(monsters: MonsterZoneTuple, index: ZoneIndex, zone: MonsterZone): MonsterZoneTuple {
-  const [z0, z1, z2, z3, z4] = monsters;
-  const pick = (i: number, current: MonsterZone) => (i === index ? zone : current);
-  return [pick(0, z0), pick(1, z1), pick(2, z2), pick(3, z3), pick(4, z4)];
-}
-
 function withMonsterZone(state: DuelState, player: PlayerId, index: ZoneIndex, zone: MonsterZone): DuelState {
   const player_ = state.players[player];
   return {
@@ -39,7 +32,7 @@ function withMonsterZone(state: DuelState, player: PlayerId, index: ZoneIndex, z
       ...state.players,
       [player]: {
         ...player_,
-        field: { ...player_.field, monsters: replaceMonsterZone(player_.field.monsters, index, zone) },
+        field: { ...player_.field, monsters: replaceZone(player_.field.monsters, index, zone) },
       },
     },
   };
@@ -139,40 +132,23 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
     workingState = withMonsterZone(workingState, opponentPlayer, targetZoneRef.index, { occupied: false });
   }
 
-  if (combatResult.damage.toAttackerOwner > 0) {
-    const owner = workingState.players[attackerPlayer];
-    workingState = {
-      ...workingState,
-      players: {
-        ...workingState.players,
-        [attackerPlayer]: { ...owner, lp: Math.max(0, owner.lp - combatResult.damage.toAttackerOwner) },
-      },
-    };
-  } else if (combatResult.damage.toDefenderOwner > 0) {
-    const owner = workingState.players[opponentPlayer];
-    workingState = {
-      ...workingState,
-      players: {
-        ...workingState.players,
-        [opponentPlayer]: { ...owner, lp: Math.max(0, owner.lp - combatResult.damage.toDefenderOwner) },
-      },
-    };
-  }
+  const damagedPlayer = combatResult.damage.toAttackerOwner > 0 ? attackerPlayer : opponentPlayer;
+  const damageAmount = Math.max(combatResult.damage.toAttackerOwner, combatResult.damage.toDefenderOwner);
 
-  if (combatResult.damage.toAttackerOwner > 0) {
+  if (damageAmount > 0) {
+    const owner = workingState.players[damagedPlayer];
+    workingState = {
+      ...workingState,
+      players: {
+        ...workingState.players,
+        [damagedPlayer]: { ...owner, lp: Math.max(0, owner.lp - damageAmount) },
+      },
+    };
     events.push(
       createEvent({
         type: "onDamage",
         originPlayer: attackerPlayer,
-        context: { toPlayer: attackerPlayer, amount: combatResult.damage.toAttackerOwner },
-      }),
-    );
-  } else if (combatResult.damage.toDefenderOwner > 0) {
-    events.push(
-      createEvent({
-        type: "onDamage",
-        originPlayer: attackerPlayer,
-        context: { toPlayer: opponentPlayer, amount: combatResult.damage.toDefenderOwner },
+        context: { toPlayer: damagedPlayer, amount: damageAmount },
       }),
     );
   }

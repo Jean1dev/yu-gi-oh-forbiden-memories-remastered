@@ -11,6 +11,7 @@ import {
 } from "@yugioh/shared";
 
 import { createEvent, hasOpenReactionWindow } from "../events/index.ts";
+import { replaceZone } from "../field/replace-zone.ts";
 import { isFaceDown, nextPosition } from "./next-position.ts";
 
 /**
@@ -79,15 +80,7 @@ export function changePosition(
     hasChangedPosition: true,
   };
 
-  const [z0, z1, z2, z3, z4] = state.players[zone.player].field.monsters;
-  const withZone = (index: number, current: typeof z0) => (index === zone.index ? updatedZone : current);
-  const nextMonsters: typeof state.players.P1.field.monsters = [
-    withZone(0, z0),
-    withZone(1, z1),
-    withZone(2, z2),
-    withZone(3, z3),
-    withZone(4, z4),
-  ];
+  const nextMonsters = replaceZone(state.players[zone.player].field.monsters, zone.index, updatedZone);
 
   const nextState: DuelState = {
     ...state,

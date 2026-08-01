@@ -10,6 +10,7 @@ import {
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
+import { replaceZone } from "../field/replace-zone.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
 import { getOpponent } from "./opponent.ts";
 
@@ -74,16 +75,8 @@ export function playSpellOrTrap(
 
   const faceUp = card.tipo !== "armadilha";
   const nextHand = player.hand.filter((_, index) => index !== action.handIndex);
-  const [s0, s1, s2, s3, s4] = player.field.spells;
   const placedZone = { occupied: true as const, card, faceUp };
-  const withZone = (index: number, zone: typeof s0) => (index === action.zoneIndex ? placedZone : zone);
-  const nextSpells: typeof player.field.spells = [
-    withZone(0, s0),
-    withZone(1, s1),
-    withZone(2, s2),
-    withZone(3, s3),
-    withZone(4, s4),
-  ];
+  const nextSpells = replaceZone(player.field.spells, action.zoneIndex, placedZone);
 
   const placedState: DuelState = {
     ...state,

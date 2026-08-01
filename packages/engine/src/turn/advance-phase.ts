@@ -1,7 +1,8 @@
-import type { ApplyResult, DuelState, MonsterZone, Phase, PlayerId, PlayerState } from "@yugioh/shared";
+import type { ApplyResult, DuelState, MonsterZone, Phase, PlayerState } from "@yugioh/shared";
 
 import { drawUpToHandSize } from "../draw/index.ts";
 import { createEvent } from "../events/index.ts";
+import { getOpponent } from "../spells/opponent.ts";
 
 const NEXT_PHASE: Readonly<Record<Phase, Phase>> = {
   draw: "main",
@@ -9,10 +10,6 @@ const NEXT_PHASE: Readonly<Record<Phase, Phase>> = {
   battle: "end",
   end: "draw",
 };
-
-function otherPlayer(player: PlayerId): PlayerId {
-  return player === "P1" ? "P2" : "P1";
-}
 
 function resetTurnFlags(zone: MonsterZone): MonsterZone {
   return zone.occupied ? { ...zone, hasAttacked: false, hasChangedPosition: false } : zone;
@@ -52,7 +49,7 @@ export function advancePhase(state: DuelState): ApplyResult {
   }
 
   const endingPlayer = state.activePlayer;
-  const nextPlayer = otherPlayer(endingPlayer);
+  const nextPlayer = getOpponent(endingPlayer);
 
   const nextState: DuelState = {
     ...state,
