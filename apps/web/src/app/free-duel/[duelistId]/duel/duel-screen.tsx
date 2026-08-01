@@ -4,6 +4,7 @@ import type {
   ConsolidatedDuelResult,
   DomainError,
   DropPool,
+  Card,
   DuelSession,
   Duelist,
   ReadyDeck,
@@ -12,6 +13,7 @@ import type {
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
+import { DuelUnavailableNotice } from "../../../../components/free-duel/duel-unavailable-notice.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
 import { PostDuelActions } from "../../../../components/free-duel/post-duel-actions.tsx";
@@ -34,6 +36,9 @@ import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.t
 import { generateDuelSessionId } from "../../../../lib/free-duel/seed-generator.ts";
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
+export type DuelScreenCatalogResult =
+  | Readonly<{ status: "ready"; cards: readonly Card[] }>
+  | Readonly<{ status: "error" }>;
 
 /** Bound with the duelist's `dropPool` at composition time; see `ResolvedDuelResult`. */
 export type GrantVictoryRewardForVictory = (
@@ -106,6 +111,7 @@ function EndedDuelResult({
 
 export function DuelScreen({
   duelistId,
+  catalogResult = { status: "ready", cards: [] },
   loadContext = loadDefaultContext,
   startMatch = unavailableExternalModules,
   applyAction = unavailableApply,
@@ -113,6 +119,7 @@ export function DuelScreen({
   grantVictoryReward,
 }: {
   readonly duelistId: string;
+  readonly catalogResult?: DuelScreenCatalogResult;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
   readonly startMatch?: (
     context: DuelScreenContext,
@@ -133,6 +140,7 @@ export function DuelScreen({
     onSessionChange: setSession,
   });
   useEffect(() => {
+    if (catalogResult.status === "error") return;
     if (matchStarted.current) return;
     matchStarted.current = true;
     let active = true;
@@ -154,8 +162,9 @@ export function DuelScreen({
     return () => {
       active = false;
     };
-  }, [duelistId, loadContext, router, startMatch]);
+  }, [catalogResult.status, duelistId, loadContext, router, startMatch]);
 
+  if (catalogResult.status === "error") return <DuelUnavailableNotice />;
   if (session.status === "not_started") return <main aria-busy="true">Starting duel…</main>;
   if (session.status === "failed") {
     return (

@@ -24,7 +24,7 @@ export type BuildInitializationInput = (
   input: {
     readonly compositionP1: MatchOrchestrationInput["playerComposition"];
     readonly compositionP2: MatchOrchestrationInput["cpuComposition"];
-    readonly seed?: number | undefined;
+    readonly seed?: number;
   },
   dependencies: {
     readonly catalog: CardCatalogLookup;
