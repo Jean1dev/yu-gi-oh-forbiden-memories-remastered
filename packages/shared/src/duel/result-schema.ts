@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { DecisiveDuelEndReasonSchema, DuelOutcomeSchema } from "./schema.ts";
+import { DecisiveDuelEndReasonSchema } from "./schema.ts";
+import type { DuelOutcomeSchema } from "./schema.ts";
 import type {
   ConsolidatedDuelResult,
   DuelOutcome,
@@ -85,4 +86,3 @@ const _resultSchemaMatchesType: ConsolidatedDuelResult = {} as z.infer<
   typeof ConsolidatedDuelResultSchema
 >;
 void _resultSchemaMatchesType;
-
