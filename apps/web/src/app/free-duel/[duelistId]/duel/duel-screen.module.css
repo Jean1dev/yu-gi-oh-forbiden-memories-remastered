@@ -1,0 +1,44 @@
+.screen {
+  position: relative;
+  display: flex;
+  width: min(100%, 1100px);
+  height: 100dvh;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: var(--space-4) var(--space-5);
+}
+
+.title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.loading,
+.failed {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+.result {
+  flex-shrink: 0;
+  max-height: 35vh;
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+@media (max-width: 640px) {
+  .screen {
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+}

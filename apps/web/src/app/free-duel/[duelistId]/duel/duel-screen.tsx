@@ -4,22 +4,31 @@ import type {
   Card,
   ConsolidatedDuelResult,
   DomainError,
+  DuelState,
   DropPool,
   DuelSession,
   Duelist,
   ReadyDeck,
   Result,
 } from "@yugioh/shared";
+import { getPublicDuelState } from "@yugioh/rules";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { DuelActions } from "../../../../components/free-duel/duel-actions.tsx";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
+import { DuelCardPreview } from "../../../../components/free-duel/duel-card-preview.tsx";
+import { DuelHandBar } from "../../../../components/free-duel/duel-hand-bar.tsx";
+import { DuelMessage } from "../../../../components/free-duel/duel-message.tsx";
+import { DuelPrompt } from "../../../../components/free-duel/duel-prompt.tsx";
 import { DuelUnavailableNotice } from "../../../../components/free-duel/duel-unavailable-notice.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
 import { PostDuelActions } from "../../../../components/free-duel/post-duel-actions.tsx";
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
+import { DuelTopBar } from "../../../../components/free-duel/duel-top-bar.tsx";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
+import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
 import {
   useVictoryReward,
 } from "../../../../hooks/use-victory-reward.ts";
@@ -37,10 +46,12 @@ import type {
   CreateDuelRuntimeInput,
   DuelRuntime,
 } from "../../../../lib/free-duel/duel-runtime.ts";
-import { getPublicDuelState } from "@yugioh/rules";
+import { getRefusalMessage } from "../../../../lib/free-duel/duel-action-messages.ts";
+import { DUEL_SCREEN_MESSAGES } from "../../../../lib/free-duel/duel-screen-messages.ts";
 import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
 import { takeDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.ts";
+import styles from "./duel-screen.module.css";
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 export type DuelScreenCatalogResult =
@@ -64,6 +75,22 @@ async function loadDefaultContext(duelistId: string): Promise<DuelScreenContext 
 const unavailableApply: ApplyAction = () => {
   throw new Error("The duel engine apply contract is unavailable.");
 };
+
+function selectedHandIndex(intent: ReturnType<typeof useDuelInteraction>["intent"]): number | null {
+  switch (intent.kind) {
+    case "card_selected":
+    case "choosing_zone":
+    case "choosing_position":
+      return intent.handIndex;
+    default:
+      return null;
+  }
+}
+
+function selectedCard(state: DuelState | null, intent: ReturnType<typeof useDuelInteraction>["intent"]): Card | null {
+  const handIndex = selectedHandIndex(intent);
+  return state && handIndex !== null ? (state.players.P1.hand[handIndex] ?? null) : null;
+}
 
 /** Mounted only once the result is resolved, so its hooks never run against a placeholder result. */
 function ResolvedDuelResult({
@@ -146,47 +173,83 @@ export function DuelScreen({
     onSessionChange: duel.replaceSession,
     onInterrupt: duel.applyAction ? duel.interrupt : undefined,
   });
+  const activeState =
+    session.status === "in_progress" ? session.state : session.status === "ended" ? session.finalState : null;
+  const interactionState = session.status === "in_progress" ? session.state : null;
+  const isPlayerTurn = session.status === "in_progress" && session.currentDecider === "P1";
+  const interaction = useDuelInteraction({
+    state: interactionState,
+    isPlayerTurn,
+    busy: duel.busy,
+    dispatch: (action) => void duel.submitAction(action),
+  });
+  const selectedIndex = selectedHandIndex(interaction.intent);
+  const previewCard = selectedCard(activeState, interaction.intent);
+  const messageText = duel.lastRefusal
+    ? getRefusalMessage(duel.lastRefusal)
+    : session.status === "in_progress" && !isPlayerTurn
+      ? DUEL_SCREEN_MESSAGES.opponentTurn
+      : null;
 
   if (catalogResult.status === "error") return <DuelUnavailableNotice />;
-  if (session.status === "not_started") return <main aria-busy="true">Starting duel…</main>;
+  if (session.status === "not_started") return <main className={styles.loading} aria-busy="true">Iniciando duelo...</main>;
   if (session.status === "failed") {
     return (
-      <main>
+      <main className={styles.failed}>
         <OrchestrationFailureNotice reason={session.reason} />
       </main>
     );
   }
-  const state = session.status === "ended" ? session.finalState : session.state;
+  if (activeState === null) return <main className={styles.loading} aria-busy="true">Iniciando duelo...</main>;
+  const state = activeState;
   const view = getPublicDuelState(state, "P1");
   return (
-    <main>
-      <h1>Duel</h1>
-      <DuelBoard view={view} />
-      <PlayerHand
-        cards={state.players.P1.hand}
-        disabled={session.status === "ended" || session.currentDecider !== "P1" || duel.busy}
+    <main className={styles.screen}>
+      <h1 className={styles.title}>Duelo</h1>
+      <DuelTopBar
+        terrainName={state.activeField?.nome ?? null}
+        phase={state.phase}
+        turn={state.turn}
+        onExit={surrenderFlow.requestConfirmation}
+      >
+        <SurrenderButton
+          available={surrenderFlow.available}
+          onClick={surrenderFlow.requestConfirmation}
+        />
+      </DuelTopBar>
+      <DuelBoard
+        view={view}
+        interactive={session.status === "in_progress" && isPlayerTurn && !duel.busy}
+        zoneAffordance={interaction.affordanceFor}
+        onZoneActivate={interaction.onZoneActivate}
       />
+      <DuelMessage text={messageText} tone={duel.lastRefusal ? "refusal" : "info"} />
       {session.status === "in_progress" ? (
-        <button
-          type="button"
-          disabled={session.currentDecider !== "P1" || duel.busy}
-          onClick={() => void duel.submitAction({ type: "advance_phase" })}
-        >
-          Passar Fase
-        </button>
+        <>
+          <DuelPrompt
+            intent={interaction.intent}
+            onChoosePosition={interaction.onChoosePosition}
+            onCancel={interaction.reset}
+          />
+          <DuelHandBar>
+            <PlayerHand
+              cards={state.players.P1.hand}
+              disabled={!isPlayerTurn || duel.busy}
+              selectedIndex={selectedIndex}
+              onSelect={interaction.onSelectHandCard}
+            />
+            <DuelActions slots={interaction.slots} onInvoke={interaction.onInvokeSlot} />
+          </DuelHandBar>
+          <DuelCardPreview card={previewCard} />
+        </>
       ) : null}
-      {duel.lastRefusal ? <p role="status">{duel.lastRefusal.code}</p> : null}
-      <SurrenderButton
-        available={surrenderFlow.available}
-        onClick={surrenderFlow.requestConfirmation}
-      />
       <SurrenderConfirmationDialog
         open={surrenderFlow.confirmationOpen}
         onConfirm={surrenderFlow.confirm}
         onCancel={surrenderFlow.cancel}
       />
       {session.status === "ended" ? (
-        <>
+        <section className={styles.result}>
           <EndedDuelResult
             session={session}
             resolveResult={effectiveResolveResult}
@@ -194,7 +257,7 @@ export function DuelScreen({
             grantVictoryReward={grantVictoryReward}
           />
           <PostDuelActions duelistId={duelistId} />
-        </>
+        </section>
       ) : null}
     </main>
   );
