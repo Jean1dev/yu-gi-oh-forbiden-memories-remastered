@@ -1,6 +1,7 @@
 import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Result } from "@yugioh/shared";
 
 import { hasOpenReactionWindow } from "../events/index.ts";
+import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
 
@@ -41,6 +42,28 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
         );
       }
       return summonMonster(state, action);
+    }
+    case "play_spell_or_trap": {
+      if (state.phase !== "main") {
+        return err(
+          new DomainError(
+            "A spell/trap card can only be played during the Main phase.",
+            "wrong_phase",
+            { phase: state.phase },
+          ),
+        );
+      }
+      return playSpellOrTrap(state, action);
+    }
+    case "play_field_spell": {
+      if (state.phase !== "main") {
+        return err(
+          new DomainError("A field-spell card can only be played during the Main phase.", "wrong_phase", {
+            phase: state.phase,
+          }),
+        );
+      }
+      return playFieldSpell(state, action);
     }
     default: {
       // Assigning `action` (not `action.type`) to `never` here works around a
