@@ -106,6 +106,17 @@ Usa o Free Duel como campo de treino offline antes do ranqueado online: testa co
 ### F08. Revanche e Navegação Pós-Duelo
 - Como jogador, eu quero, ao fim do duelo, poder pedir revanche contra o mesmo oponente, escolher outro oponente ou voltar ao menu para continuar jogando sem fricção.
 
+### F09. Integração do Motor no Duelo Offline
+- Como jogador, eu quero que o duelo que eu inicio seja de verdade — cartas compradas, jogadas aplicadas e vitória apurada pelo motor — e não uma tela de demonstração.
+- Como jogador, eu quero que uma jogada ilegal apenas me avise o motivo, sem encerrar a partida, para eu poder tentar outra coisa.
+- Como sistema, eu quero um único ponto de composição que instancie o motor real com o catálogo, o deck do jogador e o deck do NPC, para que a fronteira "app não conhece regra" continue verificável.
+
+### F10. Tela de Duelo Jogável
+- Como jogador, eu quero ver o campo dos dois lados, minha mão e os pontos de vida em uma tela que se pareça com o console original, para me sentir jogando Forbidden Memories.
+- Como jogador, eu quero invocar um monstro escolhendo a zona e a posição (ataque ou defesa, virado para cima ou para baixo) para jogar com intenção.
+- Como jogador, eu quero declarar ataque escolhendo o atacante e o alvo, ou atacar diretamente quando o campo do oponente estiver vazio.
+- Como jogador, eu quero ver o que aconteceu — a carta comprada, a carta entrando no campo, o ataque e o dano — por meio de animações curtas que não me atrapalhem.
+
 ## 6. Funcionalidades
 
 ### F01. Seleção de Oponente (Roster de Duelistas)
@@ -288,6 +299,63 @@ Usa o Free Duel como campo de treino offline antes do ranqueado online: testa co
 
 **Nota de fidelidade:** modernização de qualidade de vida (revanche imediata e navegação rápida).
 
+### F09. Integração do Motor no Duelo Offline
+
+**Consumes:**
+- F01: duelista escolhido (deck do NPC, perfil de dificuldade, pool de drops)
+- F02: deck ativo do jogador já validado
+- F03: contratos de sessão (`DuelSession`, `MatchOrchestrationInput`) e o laço de decisão da CPU
+- F05: apuração do resultado a partir do desfecho do motor
+- MotorDuelo/F03, F06–F12 (cross-PRD): inicialização, `apply`, janela de reação e desfecho
+- Banco de Cartas/F03 (cross-PRD): catálogo completo, necessário para resolver os 80 números de carta em cartas reais
+
+**Provides:**
+- Uma sessão de duelo conduzida pelo motor real, do primeiro turno ao desfecho, para F10 renderizar
+
+**Capabilities:**
+- Um único módulo de composição instancia o motor (inicialização, `apply`, fechamento de janela de reação, snapshot) e é o **único ponto do app autorizado a importar o motor**; a fronteira é verificada por um portão de lint dedicado
+- Uma ação recusada pelo motor é um **valor**, não uma falha de sessão: o estado não muda, a sessão continua em andamento e o motivo (`DomainError.code`) fica disponível para a UI traduzir. Só falha de agente encerra a partida
+- A **janela de reação** aberta por invocação, magia/armadilha e declaração de ataque é liquidada pelo orquestrador no mesmo despacho, porque o Effect System ainda não existe e ninguém pode reagir; a declaração de ataque encadeia sua resolução, de forma que uma intenção do jogador é sempre um despacho
+- O lado da CPU é conduzido por um **agente passivo**: ao receber a vez, apenas avança as fases até devolvê-la. Cada ação da CPU é publicada individualmente, com ritmo perceptível, para que o turno do oponente seja legível
+- O roster passa a conter um **duelista de teste** com deck de 40 cartas válido, cumprindo a pendência de dado de balanceamento de F01 no nível mínimo necessário para jogar
+
+**Experience:** O jogador escolhe o duelista de teste, confirma o deck e cai em uma partida real: compra cartas, faz jogadas, vê o oponente passar o turno e chega a um desfecho. Uma jogada impossível responde com uma linha explicando o porquê, e a partida segue.
+
+**Error Handling:**
+- Catálogo indisponível na rota do duelo → aviso próprio com opção de recarregar, sem tentar iniciar a partida
+- Motor recusa a inicialização (deck inválido) → falha de orquestração de F03, mensagem específica
+- Motor recusa uma ação do jogador → mensagem, estado intacto, partida em andamento
+- Agente da CPU indisponível ou sem progresso → encerra a sessão com segurança (`ai_unavailable` / `no_progress_loop`), conforme F03
+
+**Nota de fidelidade:** infraestrutura; sem contraparte no jogo original. A IA passiva é um andaime declarado, não o comportamento final do NPC (a estratégia pertence à IA de NPCs, cross-PRD).
+
+### F10. Tela de Duelo Jogável
+
+**Consumes:**
+- F09: a sessão conduzida pelo motor real e o fluxo de eventos de cada jogada
+- F04: rendição e confirmação de abandono
+- F05/F08: resultado consolidado e navegação pós-duelo
+- MotorDuelo/F01 (cross-PRD): projeção pública do estado, que esconde do jogador as cartas viradas do oponente
+
+**Capabilities:**
+- Renderiza o duelo no visual do console: barra superior (terreno, fase, turno e saída), campo do oponente e do jogador com 5 zonas de monstro e 5 de magia/armadilha cada, indicadores de pontos de vida e a barra da mão
+- O que o jogador vê do oponente é a **projeção pública** do estado: monstros e armadilhas virados para baixo aparecem como carta oculta, a mão como contagem
+- **Invocação**: seleciona a carta, escolhe a zona livre e escolhe a posição entre ataque/defesa × virada para cima/para baixo; um atalho põe direto em defesa virada para baixo
+- **Magia/armadilha**: pode ser colocada em uma zona livre da fileira de trás (sem efeito nesta versão), consumindo a jogada da mão do turno
+- **Ataque**: seleciona o atacante, depois o alvo; com o campo do oponente vazio, ataca diretamente
+- **Mudança de posição** de um monstro já em campo, na fase de batalha
+- Cada afordância é habilitada pela fase, pela vez e pela legalidade da jogada, de modo que a recusa do motor seja exceção e não o caminho comum
+- **Animações curtas** derivadas dos eventos do motor — compra, entrada no campo, ataque, dano e destruição — que respeitam a preferência de movimento reduzido do sistema
+
+**Experience:** O jogador vê o tabuleiro inteiro sem rolar a página. Toca uma carta da mão para ampliá-la, escolhe onde e como jogá-la, passa a fase, assiste o oponente jogar e ataca quando é hora. Ao fim, o resultado cobre a tela com as opções de revanche.
+
+**Error Handling:**
+- Jogada recusada pelo motor → linha de aviso em região assertiva, tabuleiro inalterado
+- Enquanto uma animação corre ou é a vez do oponente, os controles do jogador ficam desabilitados
+- Preferência por movimento reduzido → nenhuma animação, o estado aparece imediatamente
+
+**Nota de fidelidade:** alta — o layout, a paleta e o chrome seguem o protótipo derivado do PS1. Divergências deliberadas: sem fase separada de "posição inicial" e sem cemitério visível (o motor não modela um).
+
 ## 7. Fora de Escopo
 
 **Regras de duelo e subsistemas de regra (outros PRDs):**
@@ -315,7 +383,8 @@ Usa o Free Duel como campo de treino offline antes do ranqueado online: testa co
 - **Composição do roster** (quais duelistas, decks, dificuldades), **composição dos pools de drop por oponente** e **pesos de raridade por nota** — dados tunáveis a definir; não são tabelas protegidas da Fase 0.
 
 **Interface e apresentação:**
-- Renderização, animações, sons e layout responsivo concreto — camada de UI; este PRD descreve fluxos, validações e mensagens em nível lógico, não sua aparência.
+- Som e trilha — ver `docs/efeitos-sonoros.md` e `docs/trilha-sonora.md`; nenhuma feature deste módulo emite áudio.
+- **(Revisado por F10)** A renderização concreta da **tela de duelo** deixou de ser fora de escopo: F10 a especifica, incluindo animações curtas derivadas dos eventos do motor. As demais telas do módulo (seleção de oponente, preparação, resultado) seguem descritas em nível lógico, não de aparência.
 
 ## 8. Grafo de Dependências
 
@@ -331,6 +400,8 @@ Usa o Free Duel como campo de treino offline antes do ranqueado online: testa co
 | F06 | Concessão de Carta (Drop) | 1 | F05, F01 |
 | F07 | Carteira de Estrelas | 2 | F05 |
 | F08 | Revanche e Navegação Pós-Duelo | 2 | F03, F05 |
+| F09 | Integração do Motor no Duelo Offline | 1 | F01, F02, F03, F05, MotorDuelo/F06–F12 (cross-PRD), BancoDeCartas/F03 (cross-PRD) |
+| F10 | Tela de Duelo Jogável | 1 | F09, F04, F08, MotorDuelo/F01 (cross-PRD) |
 
 ### Parte 2: Foundation Features
 
@@ -347,6 +418,9 @@ Recomenda-se implementar F01 (dados) e, na sequência, F03 (orquestração) ante
 - **Wave 2:** F03
 - **Wave 3:** F05, F04
 - **Wave 4:** F06, F07, F08
+- **Wave 5:** F09, F10
+
+*(Wave 5 é a wave de realização: F01–F08 foram implementadas contra os contratos do motor, que na época ainda não existia — a orquestração de F03 rodou inteira contra fakes. F09 troca os fakes pelo motor real e F10 substitui a casca da tela pelo tabuleiro jogável. Por isso F09 depende de features de waves anteriores em vez de precedê-las.)*
 
 *(Dependências cross-PRD — Build Deck, Motor de Duelo, IA de NPCs, Rating Engine, banco de cartas — são tratadas como externas/disponíveis e não deslocam as waves internas. Dentro de cada wave, a ordem segue prioridade ascendente e depois o ID.)*
 
@@ -367,6 +441,9 @@ graph TD
   MOT03[MotorDuelo/F03 cross-PRD]
   MOT12[MotorDuelo/F12 cross-PRD]
   MOT05[MotorDuelo/F05 cross-PRD]
+  MOT01[MotorDuelo/F01 cross-PRD]
+  MOT0612[MotorDuelo/F06-F12 cross-PRD]
+  CAT03[BancoDeCartas/F03 cross-PRD]
   IA[IA de NPCs cross-PRD]
   RATE[Rating Engine cross-PRD]
 
@@ -378,6 +455,8 @@ graph TD
   F06[F06 Concessão de Carta]
   F07[F07 Carteira de Estrelas]
   F08[F08 Revanche/Navegação]
+  F09[F09 Integração do Motor]
+  F10[F10 Tela de Duelo Jogável]
 
   CARDS --> F01
   BUILD07 --> F02
@@ -397,6 +476,17 @@ graph TD
   F05 --> F07
   F03 --> F08
   F05 --> F08
+
+  F01 --> F09
+  F02 --> F09
+  F03 --> F09
+  F05 --> F09
+  MOT0612 --> F09
+  CAT03 --> F09
+  F09 --> F10
+  F04 --> F10
+  F08 --> F10
+  MOT01 --> F10
 ```
 
 ## 9. Critérios de Aceite
@@ -448,6 +538,29 @@ graph TD
 - [ ] Revanche reexecuta a verificação do deck (F02) e a orquestração (F03) com o deck ativo mais recente.
 - [ ] A navegação não concede nem revoga recompensas.
 
+### F09. Integração do Motor no Duelo Offline
+- [ ] Um duelo iniciado pela tela roda contra o motor real: compra, invocação, colocação de magia/armadilha, mudança de posição, ataque e desfecho são todos aplicados por `apply`, não simulados.
+- [ ] Exatamente **um** módulo do app importa o motor; um portão de lint dedicado falha se qualquer componente ou rota o importar direto (o dependency-cruiser não cobre imports de workspace, então o portão é próprio).
+- [ ] Uma ação recusada pelo motor devolve o motivo e **não** altera o estado nem o status da sessão; a partida continua jogável.
+- [ ] A janela de reação aberta por invocação, magia/armadilha e declaração de ataque é fechada no mesmo despacho; nenhuma sequência de jogadas legais consegue travar o duelo.
+- [ ] O turno da CPU avança as fases e devolve a vez ao jogador, publicando cada ação individualmente para que o turno seja visível.
+- [ ] O catálogo é lido no servidor e entregue à tela como dado serializável; nenhum módulo cliente alcança o sistema de arquivos.
+- [ ] Catálogo indisponível na rota do duelo mostra aviso próprio com recarregar, sem iniciar a partida.
+- [ ] O roster expõe um duelista de teste com deck de 40 cartas válido (≤ 3 cópias, todas existentes no banco) e pool de drops não vazio.
+- [ ] **(Lacuna declarada)** A concessão de carta por vitória (F06) e o crédito de estrelas (F07) permanecem desligados nesta feature; a tela de resultado informa a recompensa como pendente.
+
+### F10. Tela de Duelo Jogável
+- [ ] A tela mostra, sem rolagem, a barra superior (terreno, fase, turno, sair), os dois campos com 5 zonas de monstro e 5 de magia/armadilha cada, os pontos de vida dos dois lados e a mão do jogador.
+- [ ] Cartas viradas para baixo do oponente **não** têm nome, ataque nem defesa acessíveis na tela — o lado do oponente é renderizado a partir da projeção pública do estado.
+- [ ] O jogador consegue invocar um monstro escolhendo a zona e cada uma das quatro posições (ataque/defesa × virada para cima/para baixo).
+- [ ] O jogador consegue colocar uma magia/armadilha em uma zona livre da fileira de trás; a carta aparece virada e a jogada da mão do turno é consumida.
+- [ ] O jogador consegue declarar ataque escolhendo atacante e alvo, e atacar diretamente quando o oponente não tem monstros; os pontos de vida refletem o resultado.
+- [ ] O jogador consegue mudar a posição de um monstro em campo na fase de batalha.
+- [ ] Os controles indisponíveis pela fase, pela vez ou pela legalidade da jogada aparecem desabilitados, e não somem — o chrome não muda de tamanho entre estados.
+- [ ] Compra, entrada no campo, ataque, dano e destruição têm animação curta; com movimento reduzido preferido pelo sistema, nenhuma animação roda e o estado aparece imediatamente.
+- [ ] Encerrado o duelo, o resultado cobre a tela com as opções de F08 e o tabuleiro congela.
+- [ ] Os textos da tela de duelo estão em português.
+
 ### Cross-Feature Integration
 - [ ] Fluxo completo de vitória: F01 escolhe oponente → F02 valida deck → F03 conduz o duelo → F05 apura resultado + nota → F06 concede a carta e F07 credita estrelas → F08 oferece revanche/navegação, sem estado inconsistente.
 - [ ] Em derrota/empate (inclusive por rendição/abandono de F04), F06 e F07 não disparam e a tela de resultado não exibe recompensa.
@@ -458,5 +571,6 @@ graph TD
 - [ ] **Build Deck (recompensa):** a carta concedida por F06 é somada à coleção via `BuildDeck/F03` exatamente uma vez por vitória (cross-PRD).
 - [ ] **Motor de Duelo 1x1:** todo o desfecho e o snapshot vêm de `MotorDuelo/F12`/`F05`; o Free Duel não reimplementa regras (cross-PRD).
 - [ ] **IA de NPCs:** o lado CPU (P2) é conduzido pelo agente conforme o perfil de dificuldade do oponente do roster (cross-PRD).
+- [ ] **IA de NPCs (andaime de F09):** o agente passivo introduzido por F09 satisfaz o mesmo contrato e é substituível pelo agente real sem tocar na sessão nem na tela; ele não decide jogadas, apenas devolve a vez (cross-PRD).
 - [ ] **Rating Engine:** a nota e a tabela nota→recompensa consumidas por F05 refletem as definições oficiais assim que fornecidas — pendência registrada até a definição (cross-PRD).
 - [ ] **(Pendente)** Quando o módulo de loja/gasto de estrelas existir, ele consumirá o saldo da carteira definida em F07 — critério a validar após a definição desse módulo (cross-PRD).
