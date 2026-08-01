@@ -1,13 +1,19 @@
 "use client";
 
-import { enrichCollection, searchByName, withDeckQuantity } from "@yugioh/rules";
+import { enrichCollection, queryCollectionItems, withDeckQuantity } from "@yugioh/rules";
 import type {
   ActiveDeckLookup,
+  BuildDeckCollectionFilters,
+  BuildDeckCollectionSort,
   Card,
   CardNumber,
   CollectionItemWithDeck,
   CollectionOrigin,
   DomainError,
+} from "@yugioh/shared";
+import {
+  DEFAULT_BUILD_DECK_COLLECTION_FILTERS,
+  DEFAULT_BUILD_DECK_COLLECTION_SORT,
 } from "@yugioh/shared";
 import { useMemo, useState } from "react";
 
@@ -22,14 +28,20 @@ export type CollectionPanelState =
       origin: CollectionOrigin;
       /** Whether the collection has zero owned cards, independent of the search term. */
       isEmpty: boolean;
-      /** `allItems` filtered by `term` (spec build-deck/F04 §3, Decision 4: no debounce). */
+      /** Every owned item, composed with the active deck quantity before query controls are applied. */
+      allItems: readonly CollectionItemWithDeck[];
+      /** `allItems` after name search, class/type/guardian filters and the selected sort. */
       items: readonly CollectionItemWithDeck[];
       term: string;
+      filters: BuildDeckCollectionFilters;
+      sort: BuildDeckCollectionSort;
       selectedCardNumber: CardNumber | undefined;
     }>;
 
 export type CollectionPanelActions = Readonly<{
   setTerm: (term: string) => void;
+  setFilters: (filters: BuildDeckCollectionFilters) => void;
+  setSort: (sort: BuildDeckCollectionSort) => void;
   select: (cardNumber: CardNumber | undefined) => void;
 }>;
 
@@ -50,6 +62,10 @@ export function useCollectionPanel(
 ): CollectionPanelState & CollectionPanelActions {
   const collectionState = useCollection();
   const [term, setTerm] = useState("");
+  const [filters, setFilters] = useState<BuildDeckCollectionFilters>(
+    DEFAULT_BUILD_DECK_COLLECTION_FILTERS,
+  );
+  const [sort, setSort] = useState<BuildDeckCollectionSort>(DEFAULT_BUILD_DECK_COLLECTION_SORT);
   const [selectedCardNumber, setSelectedCardNumber] = useState<CardNumber | undefined>(undefined);
 
   const catalog = useMemo(() => buildCatalogLookup(catalogCards), [catalogCards]);
@@ -67,11 +83,14 @@ export function useCollectionPanel(
       status: "ready",
       origin: collectionState.loaded.origin,
       isEmpty: allItems.length === 0,
-      items: searchByName(allItems, term),
+      allItems,
+      items: queryCollectionItems(allItems, { term, filters, sort }),
       term,
+      filters,
+      sort,
       selectedCardNumber,
     };
-  }, [collectionState, catalog, activeDeckLookup, term, selectedCardNumber]);
+  }, [collectionState, catalog, activeDeckLookup, term, filters, sort, selectedCardNumber]);
 
-  return { ...state, setTerm, select: setSelectedCardNumber };
+  return { ...state, setTerm, setFilters, setSort, select: setSelectedCardNumber };
 }

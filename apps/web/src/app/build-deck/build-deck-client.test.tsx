@@ -1,9 +1,16 @@
 // @vitest-environment jsdom
-import { DomainError } from "@yugioh/shared";
+import {
+  DEFAULT_BUILD_DECK_COLLECTION_FILTERS,
+  DEFAULT_BUILD_DECK_COLLECTION_SORT,
+  DomainError,
+} from "@yugioh/shared";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { CollectionPanelActions, CollectionPanelState } from "../../hooks/use-collection-panel.ts";
+import type {
+  CollectionPanelActions,
+  CollectionPanelState,
+} from "../../hooks/use-collection-panel.ts";
 import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
 import type { CollectionState } from "../../hooks/use-collection.ts";
 import { useCollection } from "../../hooks/use-collection.ts";
@@ -49,7 +56,23 @@ const mockedDeckDraftHook = vi.mocked(useDeckDraft);
 const mockedUnsavedChangesHook = vi.mocked(useUnsavedChangesWarning);
 const mockedVictoryRewardSyncHook = vi.mocked(useVictoryRewardSync);
 
-const NOOP_ACTIONS: CollectionPanelActions = { setTerm: vi.fn(), select: vi.fn() };
+const NOOP_ACTIONS: CollectionPanelActions = {
+  setTerm: vi.fn(),
+  setFilters: vi.fn(),
+  setSort: vi.fn(),
+  select: vi.fn(),
+};
+
+const READY_PANEL_DEFAULTS = {
+  origin: "server" as const,
+  isEmpty: false,
+  allItems: [],
+  items: [],
+  term: "",
+  filters: DEFAULT_BUILD_DECK_COLLECTION_FILTERS,
+  sort: DEFAULT_BUILD_DECK_COLLECTION_SORT,
+  selectedCardNumber: undefined,
+};
 
 const DEFAULT_DRAFT_RESULT: UseDeckDraftResult = {
   draft: new Map(),
@@ -67,7 +90,11 @@ function mockPanel(state: CollectionPanelState): void {
 }
 
 function mockActiveDeck(state: ActiveDeckPersistenceState): void {
-  const result: UseActiveDeckPersistenceResult = { state, saveStatus: { kind: "idle" }, save: vi.fn() };
+  const result: UseActiveDeckPersistenceResult = {
+    state,
+    saveStatus: { kind: "idle" },
+    save: vi.fn(),
+  };
   mockedActiveDeckHook.mockReturnValue(result);
 }
 
@@ -121,7 +148,9 @@ describe("BuildDeckClient", () => {
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
 
-    expect(screen.getByText("Não foi possível carregar sua coleção. Tente novamente.")).toBeTruthy();
+    expect(
+      screen.getByText("Não foi possível carregar sua coleção. Tente novamente."),
+    ).toBeTruthy();
     expect(screen.queryByRole("list")).toBeNull();
   });
 
@@ -138,17 +167,16 @@ describe("BuildDeckClient", () => {
     mockReadyActiveDeckAndDraft();
     mockPanel({
       status: "ready",
-      origin: "server",
+      ...READY_PANEL_DEFAULTS,
       isEmpty: true,
-      items: [],
-      term: "",
-      selectedCardNumber: undefined,
     });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
 
     expect(
-      screen.getByText("Você ainda não possui cartas. Vença duelos ou use senhas para começar sua coleção."),
+      screen.getByText(
+        "Você ainda não possui cartas. Vença duelos ou use senhas para começar sua coleção.",
+      ),
     ).toBeTruthy();
   });
 
@@ -156,11 +184,8 @@ describe("BuildDeckClient", () => {
     mockReadyActiveDeckAndDraft();
     mockPanel({
       status: "ready",
+      ...READY_PANEL_DEFAULTS,
       origin: "cache",
-      isEmpty: false,
-      items: [],
-      term: "",
-      selectedCardNumber: undefined,
     });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
@@ -199,11 +224,7 @@ describe("BuildDeckClient", () => {
     mockDeckDraft({ lastBlock: new DomainError("boom", "card_not_owned", { cardNumber: "001" }) });
     mockPanel({
       status: "ready",
-      origin: "server",
-      isEmpty: false,
-      items: [],
-      term: "",
-      selectedCardNumber: undefined,
+      ...READY_PANEL_DEFAULTS,
     });
 
     render(<BuildDeckClient catalogResult={{ status: "ok", cards: [] }} />);
