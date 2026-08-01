@@ -6,6 +6,7 @@ import {
   err,
   ok,
   type Card,
+  type DuelEvent,
   type DropPool,
   type DuelSession,
   type DuelState,
@@ -133,6 +134,16 @@ function createRuntimeHarness(initialState: DuelState, applyImpl?: DuelRuntime["
     resolveResult: vi.fn(),
   } as unknown as DuelRuntime;
   return { apply, runtime };
+}
+
+function summonEvent(): DuelEvent {
+  return {
+    type: "onSummon",
+    originPlayer: "P1",
+    involvedCards: [card],
+    involvedZones: [{ player: "P1", zoneType: "monster", index: 0 }],
+    context: {},
+  };
 }
 
 describe("DuelScreen", () => {
@@ -282,6 +293,29 @@ describe("DuelScreen", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Passar Fase" }));
 
     await waitFor(() => expect(apply).toHaveBeenCalledWith(state, { type: "advance_phase" }));
+  });
+
+  it("feeds runtime events into visual cues", async () => {
+    const { runtime } = createRuntimeHarness(state, () =>
+      ok({ state, events: [summonEvent()] }),
+    );
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Passar Fase" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }).getAttribute("data-cue"),
+      ).toBe("place"),
+    );
+    expect(screen.getByRole("button", { name: "Blue Dragon" }).hasAttribute("disabled")).toBe(true);
   });
 
   it("dispatches summon_monster after choosing card, zone and position", async () => {

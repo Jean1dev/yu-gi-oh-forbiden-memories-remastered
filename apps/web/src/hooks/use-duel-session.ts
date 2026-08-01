@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type {
   DuelAction,
+  DuelEvent,
   DuelSession,
   Duelist,
   MatchOrchestrationInput,
@@ -30,6 +31,7 @@ export type UseDuelSessionOptions = Readonly<{
   enabled?: boolean | undefined;
   startMatch?: StartDuelMatch | undefined;
   createRuntime?: ((input: CreateDuelRuntimeInput) => DuelRuntime) | undefined;
+  onEvents?: ((events: readonly DuelEvent[]) => void) | undefined;
 }>;
 
 export type DuelSessionView = Readonly<{
@@ -52,6 +54,7 @@ export function useDuelSession({
   enabled = true,
   startMatch,
   createRuntime = createDuelRuntime,
+  onEvents,
 }: UseDuelSessionOptions): DuelSessionView {
   const [legacySession, setLegacySession] = useState<DuelSession>({ status: "not_started" });
   const [context, setContext] = useState<DuelSessionContext | null>(null);
@@ -64,6 +67,7 @@ export function useDuelSession({
       : createDuelSessionStore({
           start: runtime.start,
           advance: runtime.advanceDependencies,
+          onEvents,
         }),
   );
   const [storeSnapshot, setStoreSnapshot] = useState(() => store?.getState());

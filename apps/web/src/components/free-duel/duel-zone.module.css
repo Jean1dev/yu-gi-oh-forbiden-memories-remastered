@@ -94,3 +94,49 @@
     font-size: var(--text-body-xs);
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .button[data-cue="place"] {
+    animation: zone-place 300ms ease-out;
+  }
+
+  .button[data-cue="attack"] {
+    animation: zone-attack 450ms steps(3, end);
+  }
+
+  .button[data-cue="destroy"] {
+    animation: zone-destroy 300ms steps(2, end);
+  }
+}
+
+@keyframes zone-place {
+  from {
+    transform: scale(0.92);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes zone-attack {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes zone-destroy {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}

@@ -27,6 +27,7 @@ import { PostDuelActions } from "../../../../components/free-duel/post-duel-acti
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
 import { DuelTopBar } from "../../../../components/free-duel/duel-top-bar.tsx";
+import { useDuelCues } from "../../../../hooks/use-duel-cues.ts";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
 import {
@@ -154,6 +155,7 @@ export function DuelScreen({
   readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
 }) {
   const router = useRouter();
+  const cues = useDuelCues();
   const duel = useDuelSession({
     duelistId,
     catalogCards: catalogResult.status === "ready" ? catalogResult.cards : [],
@@ -162,6 +164,7 @@ export function DuelScreen({
     enabled: catalogResult.status === "ready",
     startMatch,
     createRuntime,
+    onEvents: cues.enqueue,
   });
   const session = duel.session;
   const effectiveApply = duel.applyAction ?? applyAction ?? unavailableApply;
@@ -180,7 +183,7 @@ export function DuelScreen({
   const interaction = useDuelInteraction({
     state: interactionState,
     isPlayerTurn,
-    busy: duel.busy,
+    busy: duel.busy || cues.busy,
     dispatch: (action) => void duel.submitAction(action),
   });
   const selectedIndex = selectedHandIndex(interaction.intent);
@@ -219,8 +222,10 @@ export function DuelScreen({
       </DuelTopBar>
       <DuelBoard
         view={view}
-        interactive={session.status === "in_progress" && isPlayerTurn && !duel.busy}
+        interactive={session.status === "in_progress" && isPlayerTurn && !duel.busy && !cues.busy}
         zoneAffordance={interaction.affordanceFor}
+        cueFor={cues.cueFor}
+        cueForPlayer={cues.cueForPlayer}
         onZoneActivate={interaction.onZoneActivate}
       />
       <DuelMessage text={messageText} tone={duel.lastRefusal ? "refusal" : "info"} />
@@ -234,8 +239,9 @@ export function DuelScreen({
           <DuelHandBar>
             <PlayerHand
               cards={state.players.P1.hand}
-              disabled={!isPlayerTurn || duel.busy}
+              disabled={!isPlayerTurn || duel.busy || cues.busy}
               selectedIndex={selectedIndex}
+              drawnCount={cues.cueForPlayer("P1")?.kind === "draw" ? 1 : 0}
               onSelect={interaction.onSelectHandCard}
             />
             <DuelActions slots={interaction.slots} onInvoke={interaction.onInvokeSlot} />

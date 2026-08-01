@@ -14,6 +14,7 @@ export type DuelSideProps = Readonly<{
   interactive: boolean;
   zoneAffordance: (reference: ZoneReference) => ZoneAffordance;
   cueFor: (reference: ZoneReference) => DuelCue["kind"] | undefined;
+  cueForPlayer: (player: PlayerId) => DuelCue | undefined;
   onZoneActivate: (reference: ZoneReference) => void;
 }>;
 
@@ -75,11 +76,12 @@ export function DuelSide({
   interactive,
   zoneAffordance,
   cueFor,
+  cueForPlayer,
   onZoneActivate,
 }: DuelSideProps) {
   const meta = (
     <div className={styles.meta}>
-      <LpIndicator label={label} lp={state.lp} />
+      <LpIndicator label={label} lp={state.lp} cue={cueForPlayer(player)?.kind === "damage" ? "damage" : undefined} />
       <span className={styles.counts}>
         <span>Mao: {handCount(state)}</span>
         <span>Deck: {state.remainingDeck}</span>

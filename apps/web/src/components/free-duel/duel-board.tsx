@@ -6,12 +6,14 @@ import styles from "./duel-board.module.css";
 
 const idleZoneAffordance = () => "idle" as const;
 const noCue = () => undefined;
+const noPlayerCue = () => undefined;
 const noop = () => undefined;
 
 export type DuelBoardProps = Readonly<{
   view: PublicDuelState;
   zoneAffordance?: ((reference: ZoneReference) => ZoneAffordance) | undefined;
   cueFor?: ((reference: ZoneReference) => DuelCue["kind"] | undefined) | undefined;
+  cueForPlayer?: ((player: "P1" | "P2") => DuelCue | undefined) | undefined;
   onZoneActivate?: ((reference: ZoneReference) => void) | undefined;
   interactive?: boolean | undefined;
 }>;
@@ -20,6 +22,7 @@ export function DuelBoard({
   view,
   zoneAffordance = idleZoneAffordance,
   cueFor = noCue,
+  cueForPlayer = noPlayerCue,
   onZoneActivate = noop,
   interactive = false,
 }: DuelBoardProps) {
@@ -32,6 +35,7 @@ export function DuelBoard({
         interactive={interactive}
         zoneAffordance={zoneAffordance}
         cueFor={cueFor}
+        cueForPlayer={cueForPlayer}
         onZoneActivate={onZoneActivate}
       />
       <DuelSide
@@ -42,6 +46,7 @@ export function DuelBoard({
         interactive={interactive}
         zoneAffordance={zoneAffordance}
         cueFor={cueFor}
+        cueForPlayer={cueForPlayer}
         onZoneActivate={onZoneActivate}
       />
     </section>

@@ -55,3 +55,21 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .card[data-drawn="true"] {
+    animation: hand-draw 250ms ease-out;
+  }
+}
+
+@keyframes hand-draw {
+  from {
+    transform: translateY(10px);
+    opacity: 0.4;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
