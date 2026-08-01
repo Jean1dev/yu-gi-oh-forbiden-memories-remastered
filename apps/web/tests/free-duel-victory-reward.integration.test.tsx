@@ -161,7 +161,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
     ];
     expect(["001", "002"]).toContain(grantedCardNumber);
     expect(grantedStars).toBe(10);
-    expect(screen.getByRole("img", { name: `Carta ${grantedCardNumber}` })).toBeTruthy();
+    expect(await screen.findByRole("img", { name: `Carta ${grantedCardNumber}` })).toBeTruthy();
     expect(screen.getByText("Adicionada à sua coleção.")).toBeTruthy();
     expect(screen.getByText("+10 estrelas")).toBeTruthy();
     expect(screen.getByText("Saldo: 10 estrelas")).toBeTruthy();
@@ -281,7 +281,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
 
     await waitFor(() => expect(apply).toHaveBeenCalledTimes(1));
     expect(apply).toHaveBeenCalledWith("player-1", "session-fallback", "099", 10);
-    expect(screen.getByRole("img", { name: "Carta 099" })).toBeTruthy();
+    expect(await screen.findByRole("img", { name: "Carta 099" })).toBeTruthy();
   });
 
   it("reopening the result screen for the same session does not duplicate the reward call", async () => {
