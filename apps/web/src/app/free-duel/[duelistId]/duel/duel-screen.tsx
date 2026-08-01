@@ -1,17 +1,17 @@
 "use client";
 
 import type {
+  Card,
   ConsolidatedDuelResult,
   DomainError,
   DropPool,
-  Card,
   DuelSession,
   Duelist,
   ReadyDeck,
   Result,
 } from "@yugioh/shared";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { DuelUnavailableNotice } from "../../../../components/free-duel/duel-unavailable-notice.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
@@ -28,12 +28,18 @@ import {
   useDuelResult,
   type ResolveEndedDuelResult,
 } from "../../../../hooks/use-duel-result.ts";
+import {
+  useDuelSession,
+  type StartDuelMatch,
+} from "../../../../hooks/use-duel-session.ts";
 import { useSurrender } from "../../../../hooks/use-surrender.ts";
-import { buildMatchInput } from "../../../../lib/free-duel/build-match-input.ts";
+import type {
+  CreateDuelRuntimeInput,
+  DuelRuntime,
+} from "../../../../lib/free-duel/duel-runtime.ts";
 import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
 import { takeDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.ts";
-import { generateDuelSessionId } from "../../../../lib/free-duel/seed-generator.ts";
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 export type DuelScreenCatalogResult =
@@ -52,15 +58,6 @@ async function loadDefaultContext(duelistId: string): Promise<DuelScreenContext 
   const loaded = await loadClientRoster();
   const duelist = loaded.roster?.duelists.find(({ id }) => id === duelistId);
   return duelist ? { duelist, playerDeck: handoff.playerDeck } : null;
-}
-
-function unavailableExternalModules(context: DuelScreenContext): DuelSession {
-  return {
-    status: "failed",
-    duelSessionId: generateDuelSessionId(),
-    duelistId: context.duelist.id,
-    reason: "ai_unavailable",
-  };
 }
 
 const unavailableApply: ApplyAction = () => {
@@ -113,56 +110,41 @@ export function DuelScreen({
   duelistId,
   catalogResult = { status: "ready", cards: [] },
   loadContext = loadDefaultContext,
-  startMatch = unavailableExternalModules,
-  applyAction = unavailableApply,
+  startMatch,
+  applyAction,
+  createRuntime,
   resolveResult,
   grantVictoryReward,
 }: {
   readonly duelistId: string;
   readonly catalogResult?: DuelScreenCatalogResult;
   readonly loadContext?: (duelistId: string) => Promise<DuelScreenContext | null>;
-  readonly startMatch?: (
-    context: DuelScreenContext,
-    input: ReturnType<typeof buildMatchInput>,
-  ) => DuelSession | Promise<DuelSession>;
+  readonly startMatch?: StartDuelMatch | undefined;
   readonly applyAction?: ApplyAction;
+  readonly createRuntime?: ((input: CreateDuelRuntimeInput) => DuelRuntime) | undefined;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
   readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
 }) {
   const router = useRouter();
-  const [session, setSession] = useState<DuelSession>({ status: "not_started" });
-  const [context, setContext] = useState<DuelScreenContext | null>(null);
-  const matchStarted = useRef(false);
+  const duel = useDuelSession({
+    duelistId,
+    catalogCards: catalogResult.status === "ready" ? catalogResult.cards : [],
+    loadContext,
+    onMissingContext: () => router.replace("/free-duel"),
+    enabled: catalogResult.status === "ready",
+    startMatch,
+    createRuntime,
+  });
+  const session = duel.session;
+  const effectiveApply = duel.applyAction ?? applyAction ?? unavailableApply;
+  const effectiveResolveResult = resolveResult ?? duel.resolveResult;
   const surrenderFlow = useSurrender({
     session,
     playerId: "P1",
-    apply: applyAction,
-    onSessionChange: setSession,
+    apply: effectiveApply,
+    onSessionChange: duel.replaceSession,
+    onInterrupt: duel.applyAction ? duel.interrupt : undefined,
   });
-  useEffect(() => {
-    if (catalogResult.status === "error") return;
-    if (matchStarted.current) return;
-    matchStarted.current = true;
-    let active = true;
-    void loadContext(duelistId).then(async (loaded) => {
-      if (!active) return;
-      if (!loaded) {
-        router.replace("/free-duel");
-        return;
-      }
-      setContext(loaded);
-      const input = buildMatchInput({
-        duelistId,
-        playerDeck: loaded.playerDeck,
-        duelist: loaded.duelist,
-      });
-      const next = await startMatch(loaded, input);
-      if (active) setSession(next);
-    });
-    return () => {
-      active = false;
-    };
-  }, [catalogResult.status, duelistId, loadContext, router, startMatch]);
 
   if (catalogResult.status === "error") return <DuelUnavailableNotice />;
   if (session.status === "not_started") return <main aria-busy="true">Starting duel…</main>;
@@ -180,8 +162,18 @@ export function DuelScreen({
       <DuelBoard state={state} />
       <PlayerHand
         cards={state.players.P1.hand}
-        disabled={session.status === "ended" || session.currentDecider !== "P1"}
+        disabled={session.status === "ended" || session.currentDecider !== "P1" || duel.busy}
       />
+      {session.status === "in_progress" ? (
+        <button
+          type="button"
+          disabled={session.currentDecider !== "P1" || duel.busy}
+          onClick={() => void duel.submitAction({ type: "advance_phase" })}
+        >
+          Passar Fase
+        </button>
+      ) : null}
+      {duel.lastRefusal ? <p role="status">{duel.lastRefusal.code}</p> : null}
       <SurrenderButton
         available={surrenderFlow.available}
         onClick={surrenderFlow.requestConfirmation}
@@ -195,8 +187,8 @@ export function DuelScreen({
         <>
           <EndedDuelResult
             session={session}
-            resolveResult={resolveResult}
-            dropPool={context?.duelist.dropPool ?? []}
+            resolveResult={effectiveResolveResult}
+            dropPool={duel.context?.duelist.dropPool ?? []}
             grantVictoryReward={grantVictoryReward}
           />
           <PostDuelActions duelistId={duelistId} />

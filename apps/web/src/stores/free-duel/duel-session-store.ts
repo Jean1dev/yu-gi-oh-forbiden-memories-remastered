@@ -10,15 +10,13 @@ import type {
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import {
   advanceCpuDecisions,
-  createDuelSession,
   interruptDuelSession,
   submitPlayerAction,
   type AdvanceCpuDependencies,
-  type CreateDuelSessionDependencies,
 } from "../../lib/free-duel/duel-session.ts";
 
 export type DuelSessionStoreDependencies = Readonly<{
-  create: CreateDuelSessionDependencies;
+  start: (input: MatchOrchestrationInput, duelist: Duelist) => DuelSession;
   advance: Omit<AdvanceCpuDependencies, "cpuProfile" | "onStep">;
   onEvents?: ((events: readonly DuelEvent[]) => void) | undefined;
 }>;
@@ -50,7 +48,7 @@ export function createDuelSessionStore(
       const runToken = get().runToken + 1;
       cpuProfile = duelist.profile;
       set({ busy: true, lastRefusal: undefined, runToken });
-      let session = createDuelSession(input, dependencies.create);
+      let session = dependencies.start(input, duelist);
       set({ session });
       if (session.status === "in_progress" && session.currentDecider === "P2") {
         session = await advanceCpuDecisions(session, {

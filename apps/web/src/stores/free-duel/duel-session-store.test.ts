@@ -4,7 +4,6 @@ import {
   err,
   ok,
   type ApplyResult,
-  type Card,
   type DuelAction,
   type DuelEvent,
   type DuelState,
@@ -84,15 +83,13 @@ function createDependencies({
   readonly onEvents?: ((events: readonly DuelEvent[]) => void) | undefined;
 } = {}) {
   return {
-    create: {
-      buildInitializationInput: () =>
-        ok({ players: { P1: { cards: [] }, P2: { cards: [] } }, seed: 1 }),
-      initDuel: () => initialState,
-      seedGenerator: () => 1,
-      catalog: (): Card | undefined => undefined,
-      validateDeck: () => ok({ composition: {}, cardNumbers: [], total: 40 }),
-      generateSessionId: () => "session-1",
-    },
+    start: () => ({
+      status: "in_progress" as const,
+      duelSessionId: "session-1",
+      duelistId: "seto",
+      state: initialState,
+      currentDecider: initialState.activePlayer,
+    }),
     advance: {
       apply,
       closeReactionWindow: (current: DuelState) => ok(current),

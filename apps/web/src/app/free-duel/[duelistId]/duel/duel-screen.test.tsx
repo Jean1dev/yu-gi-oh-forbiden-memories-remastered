@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ok, type Card, type DropPool, type DuelSession, type DuelState, type Duelist, type ReadyDeck } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
+import type { DuelRuntime } from "../../../../lib/free-duel/duel-runtime.ts";
 import { DuelScreen, type DuelScreenContext } from "./duel-screen.tsx";
 
 const replace = vi.fn();
@@ -172,6 +173,59 @@ describe("DuelScreen", () => {
     );
     await screen.findByRole("heading", { name: "Duel" });
     expect(screen.queryByRole("link", { name: "Revanche" })).toBeNull();
+  });
+
+  it("shows a catalog-unavailable notice without starting the match", () => {
+    const loadContext = vi.fn(async () => context);
+    const startMatch = vi.fn();
+
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "error" }}
+        loadContext={loadContext}
+        startMatch={startMatch}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Duelo indisponível" })).toBeTruthy();
+    expect(loadContext).not.toHaveBeenCalled();
+    expect(startMatch).not.toHaveBeenCalled();
+  });
+
+  it("dispatches advance_phase from the temporary Passar Fase action", async () => {
+    const session: DuelSession = {
+      status: "in_progress",
+      duelSessionId: "session-1",
+      duelistId: "seto",
+      state,
+      currentDecider: "P1",
+    };
+    const apply = vi.fn(() => ok({ state: { ...state, phase: "battle" }, events: [] }));
+    const runtime = {
+      start: vi.fn(() => session),
+      applyAction: apply,
+      advanceDependencies: {
+        apply,
+        closeReactionWindow: vi.fn((current: DuelState) => ok(current)),
+        aiAgent: { decide: vi.fn() },
+        getPublicDuelState: vi.fn(),
+      },
+      resolveResult: vi.fn(),
+    } as unknown as DuelRuntime;
+
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Passar Fase" }));
+
+    await waitFor(() => expect(apply).toHaveBeenCalledWith(state, { type: "advance_phase" }));
   });
 
   it("does not render post-duel actions when orchestration failed", async () => {
