@@ -1,6 +1,7 @@
 import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Result } from "@yugioh/shared";
 
 import { hasOpenReactionWindow } from "../events/index.ts";
+import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
 
 /**
@@ -23,9 +24,30 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
   switch (action.type) {
     case "advance_phase":
       return ok(advancePhase(state));
+    case "summon_monster": {
+      if (state.phase !== "main") {
+        return err(
+          new DomainError("A monster can only be summoned during the Main phase.", "wrong_phase", {
+            phase: state.phase,
+          }),
+        );
+      }
+      if (state.activePlayer !== action.player) {
+        return err(
+          new DomainError("Only the active player can act.", "not_active_player", {
+            activePlayer: state.activePlayer,
+            actionPlayer: action.player,
+          }),
+        );
+      }
+      return summonMonster(state, action);
+    }
     default: {
-      const exhaustive: never = action.type;
-      throw new Error(`Unhandled action type: ${String(exhaustive)}`);
+      // Assigning `action` (not `action.type`) to `never` here works around a
+      // TypeScript 6.0.3 narrowing bug where `const x: never = action.type`
+      // reports `action.type` as `any` instead of the exhausted literal union.
+      const exhaustive: never = action;
+      throw new Error(`Unhandled action type: ${JSON.stringify(exhaustive)}`);
     }
   }
 }
