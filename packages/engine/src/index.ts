@@ -21,3 +21,4 @@ export {
 } from "./combat/index.ts";
 export { load, serialize } from "./serialization/index.ts";
 export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
+export { drawUpToHandSize, getDeckOutPlayer, hasDeckedOut, resolveDrawPhase } from "./draw/index.ts";
