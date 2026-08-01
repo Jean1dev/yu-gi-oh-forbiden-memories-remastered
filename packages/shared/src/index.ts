@@ -147,7 +147,12 @@ export type {
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type { Action, AdvancePhaseAction } from "./duel/action.ts";
-export { ActionSchema, AdvancePhaseActionSchema } from "./duel/action.schema.ts";
+export {
+  ActionSchema,
+  AdvancePhaseActionSchema,
+  SummonMonsterActionSchema,
+} from "./duel/action.schema.ts";
+export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
 export type {
   CardRewardEvent,
   Collection,

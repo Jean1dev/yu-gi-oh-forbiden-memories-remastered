@@ -1,3 +1,5 @@
+import type { SummonMonsterAction } from "./summon-monster-action.ts";
+
 /**
  * The union of every action a player (or the system) can submit to the
  * engine's `apply` dispatcher (`docs/arquitetura.md` §3.1). Starts with a
@@ -7,4 +9,4 @@
  */
 export type AdvancePhaseAction = Readonly<{ type: "advance_phase" }>;
 
-export type Action = AdvancePhaseAction;
+export type Action = AdvancePhaseAction | SummonMonsterAction;
