@@ -1,4 +1,4 @@
-import type { ZoneIndex } from "./events.ts";
+import type { ZoneIndex, ZoneReference } from "./events.ts";
 import type { SummonMonsterAction } from "./summon-monster-action.ts";
 
 /**
@@ -29,8 +29,16 @@ export type PlayFieldSpellAction = Readonly<{
   handIndex: number;
 }>;
 
+/**
+ * Changes the position of a monster already on the field (motor-duelo-1x1
+ * F10). Carries no target position — the engine computes the deterministic
+ * transition from the monster's current position (`nextPosition`).
+ */
+export type ChangePositionAction = Readonly<{ type: "change_position"; zone: ZoneReference }>;
+
 export type Action =
   | AdvancePhaseAction
   | SummonMonsterAction
   | PlaySpellOrTrapAction
-  | PlayFieldSpellAction;
+  | PlayFieldSpellAction
+  | ChangePositionAction;

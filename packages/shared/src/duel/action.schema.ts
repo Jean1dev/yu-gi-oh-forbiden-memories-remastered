@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import type { Action } from "./action.ts";
-import { MonsterPositionSchema, PlayerIdSchema, ZoneIndexSchema } from "./schema.ts";
+import { MonsterPositionSchema, PlayerIdSchema, ZoneIndexSchema, ZoneReferenceSchema } from "./schema.ts";
 
 export const AdvancePhaseActionSchema = z.strictObject({ type: z.literal("advance_phase") });
 
@@ -29,11 +29,17 @@ export const PlayFieldSpellActionSchema = z.strictObject({
   handIndex: z.number().int().min(0),
 });
 
+export const ChangePositionActionSchema = z.strictObject({
+  type: z.literal("change_position"),
+  zone: ZoneReferenceSchema,
+});
+
 export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
   PlaySpellOrTrapActionSchema,
   PlayFieldSpellActionSchema,
+  ChangePositionActionSchema,
 ]);
 
 const _schemaMatchesDeclaredType: Action = {} as z.infer<typeof ActionSchema>;

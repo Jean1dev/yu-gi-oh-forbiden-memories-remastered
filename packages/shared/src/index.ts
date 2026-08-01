@@ -149,12 +149,14 @@ export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
   Action,
   AdvancePhaseAction,
+  ChangePositionAction,
   PlayFieldSpellAction,
   PlaySpellOrTrapAction,
 } from "./duel/action.ts";
 export {
   ActionSchema,
   AdvancePhaseActionSchema,
+  ChangePositionActionSchema,
   PlayFieldSpellActionSchema,
   PlaySpellOrTrapActionSchema,
   SummonMonsterActionSchema,
