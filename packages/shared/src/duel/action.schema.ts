@@ -42,6 +42,17 @@ export const DeclareAttackActionSchema = z.strictObject({
 
 export const ResolveAttackActionSchema = z.strictObject({ type: z.literal("resolve_attack") });
 
+/**
+ * `player` is what enforces the PRD's "Rendição inválida" case: a non-player
+ * can only ever arrive through an untyped boundary (an Online Duel payload),
+ * and `PlayerIdSchema` rejects it there. The engine itself takes the field as
+ * already valid and never re-checks it.
+ */
+export const SurrenderActionSchema = z.strictObject({
+  type: z.literal("surrender"),
+  player: PlayerIdSchema,
+});
+
 export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
@@ -50,6 +61,7 @@ export const ActionSchema = z.discriminatedUnion("type", [
   ChangePositionActionSchema,
   DeclareAttackActionSchema,
   ResolveAttackActionSchema,
+  SurrenderActionSchema,
 ]);
 
 const _schemaMatchesDeclaredType: Action = {} as z.infer<typeof ActionSchema>;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PlayerIdSchema } from "./schema.ts";
+import { DecisiveDuelEndReasonSchema, DuelOutcomeSchema } from "./schema.ts";
 import type {
   ConsolidatedDuelResult,
   DuelOutcome,
@@ -9,28 +9,16 @@ import type {
   RatingReward,
 } from "./result.ts";
 
-export const DecisiveDuelEndReasonSchema = z.enum(["lp_zerado", "deck_out", "rendicao"]);
-export const DuelEndReasonSchema = z.enum(["lp_zerado", "deck_out", "rendicao", "empate"]);
-
-const DecisiveDuelOutcomeSchema = z
-  .strictObject({
-    status: z.literal("decisive"),
-    winner: PlayerIdSchema,
-    loser: PlayerIdSchema,
-    reason: DecisiveDuelEndReasonSchema,
-  })
-  .refine(({ winner, loser }) => winner !== loser, {
-    message: "winner and loser must be different players",
-  });
-
-const DrawDuelOutcomeSchema = z.strictObject({
-  status: z.literal("draw"),
-  winner: z.null(),
-  loser: z.null(),
-  reason: z.literal("empate"),
-});
-
-export const DuelOutcomeSchema = z.union([DecisiveDuelOutcomeSchema, DrawDuelOutcomeSchema]);
+/**
+ * Re-exported from `./schema.ts`, where they had to move so that
+ * `DuelStateSchema` can validate `DuelState.outcome` (F12) without the two
+ * modules importing each other. Consumers keep their import path unchanged.
+ */
+export {
+  DecisiveDuelEndReasonSchema,
+  DuelEndReasonSchema,
+  DuelOutcomeSchema,
+} from "./schema.ts";
 
 export const RatingRewardSchema = z.strictObject({
   stars: z.number().int().nonnegative(),
@@ -72,7 +60,7 @@ export const ConsolidatedDuelResultSchema = z.discriminatedUnion("status", [
   z.strictObject({
     status: z.literal("draw"),
     duelSessionId: z.string().min(1),
-    reason: z.literal("empate"),
+    reason: z.literal("draw"),
   }),
   z.strictObject({
     status: z.literal("unavailable"),

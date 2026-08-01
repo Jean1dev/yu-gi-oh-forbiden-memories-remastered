@@ -154,6 +154,7 @@ export type {
   PlayFieldSpellAction,
   PlaySpellOrTrapAction,
   ResolveAttackAction,
+  SurrenderAction,
 } from "./duel/action.ts";
 export {
   ActionSchema,
@@ -164,6 +165,7 @@ export {
   PlaySpellOrTrapActionSchema,
   ResolveAttackActionSchema,
   SummonMonsterActionSchema,
+  SurrenderActionSchema,
 } from "./duel/action.schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
 export type {

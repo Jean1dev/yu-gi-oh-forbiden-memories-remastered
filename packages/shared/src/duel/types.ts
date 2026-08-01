@@ -1,4 +1,5 @@
 import type { Card } from "../card/types.ts";
+import type { DuelOutcome } from "./outcome.ts";
 import type { ReactionWindow } from "./events.ts";
 import type { PlayerId } from "./player.ts";
 import type { DuelEvent, EventType, JsonValue, ZoneReference } from "./events.ts";
@@ -69,6 +70,12 @@ export type DuelState = Readonly<{
   seed: number;
   /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */
   deckOutPlayer?: PlayerId | undefined;
+  /**
+   * Absent while the duel is running; present once it has ended (F12). Setting
+   * it freezes the state: `apply` refuses every action from then on, and no
+   * transition ever overwrites or clears it.
+   */
+  outcome?: DuelOutcome | undefined;
 }>;
 
 export type PublicCard = Readonly<{ visible: true; card: Card }> | Readonly<{ visible: false }>;

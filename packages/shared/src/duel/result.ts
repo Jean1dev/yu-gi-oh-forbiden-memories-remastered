@@ -4,24 +4,14 @@ import type { DropTierId } from "../duelist/types.ts";
 import type { DuelSession } from "./orchestration.ts";
 import type { Snapshot } from "./snapshot.ts";
 import type { DuelState } from "./types.ts";
-import type { PlayerId } from "./player.ts";
+import type { DecisiveDuelEndReason } from "./outcome.ts";
 
-export type DecisiveDuelEndReason = "lp_zerado" | "deck_out" | "rendicao";
-export type DuelEndReason = DecisiveDuelEndReason | "empate";
-
-export type DuelOutcome =
-  | Readonly<{
-      status: "decisive";
-      winner: PlayerId;
-      loser: PlayerId;
-      reason: DecisiveDuelEndReason;
-    }>
-  | Readonly<{
-      status: "draw";
-      winner: null;
-      loser: null;
-      reason: "empate";
-    }>;
+/**
+ * Re-exported from `./outcome.ts`, where they live so that `DuelState` can
+ * carry a `DuelOutcome` without this module and `./types.ts` importing each
+ * other. Consumers keep importing them from `@yugioh/shared` either way.
+ */
+export type { DecisiveDuelEndReason, DuelEndReason, DuelOutcome } from "./outcome.ts";
 
 export type DuelGrade = string;
 
@@ -66,7 +56,7 @@ export type ConsolidatedDuelResult =
   | Readonly<{
       status: "draw";
       duelSessionId: string;
-      reason: "empate";
+      reason: "draw";
     }>
   | Readonly<{
       status: "unavailable";

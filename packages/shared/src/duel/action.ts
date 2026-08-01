@@ -1,4 +1,5 @@
 import type { ZoneIndex, ZoneReference } from "./events.ts";
+import type { PlayerId } from "./player.ts";
 import type { SummonMonsterAction } from "./summon-monster-action.ts";
 
 /**
@@ -56,6 +57,14 @@ export type DeclareAttackAction = Readonly<{
  */
 export type ResolveAttackAction = Readonly<{ type: "resolve_attack" }>;
 
+/**
+ * Concedes the duel on behalf of `player` (motor-duelo-1x1 F12). Unlike every
+ * other action it is accepted at any moment — from either player, active or
+ * not, and even while a reaction window is open — because the PRD requires a
+ * player to always be able to walk away from a duel.
+ */
+export type SurrenderAction = Readonly<{ type: "surrender"; player: PlayerId }>;
+
 export type Action =
   | AdvancePhaseAction
   | SummonMonsterAction
@@ -63,4 +72,5 @@ export type Action =
   | PlayFieldSpellAction
   | ChangePositionAction
   | DeclareAttackAction
-  | ResolveAttackAction;
+  | ResolveAttackAction
+  | SurrenderAction;
