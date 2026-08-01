@@ -64,11 +64,59 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
 }
 
 describe("advancePhase", () => {
-  it("de draw vai para main sem emitir evento", () => {
-    const result = advancePhase(makeState({ phase: "draw" }));
+  it("de draw completa a mão até 5 e emite onDraw antes de ir para main", () => {
+    const deck = [makeCard({ numero: "010" }), makeCard({ numero: "011" })];
+    const state = makeState({
+      phase: "draw",
+      players: {
+        P1: makePlayer({ hand: [makeCard({ numero: "001" })], deck }),
+        P2: makePlayer(),
+      },
+    });
+
+    const result = advancePhase(state);
 
     expect(result.state.phase).toBe("main");
+    expect(result.state.players.P1.hand).toHaveLength(3);
+    expect(result.state.players.P1.deck).toEqual([]);
+    expect(result.events).toEqual([
+      expect.objectContaining({ type: "onDraw", originPlayer: "P1" }),
+      expect.objectContaining({ type: "onDraw", originPlayer: "P1" }),
+    ]);
+  });
+
+  it("de draw não compra quando a mão já tem 5, e ainda assim avança para main", () => {
+    const fullHand = [1, 2, 3, 4, 5].map((n) => makeCard({ numero: String(n).padStart(3, "0") }));
+    const state = makeState({
+      phase: "draw",
+      players: {
+        P1: makePlayer({ hand: fullHand, deck: [makeCard({ numero: "099" })] }),
+        P2: makePlayer(),
+      },
+    });
+
+    const result = advancePhase(state);
+
+    expect(result.state.phase).toBe("main");
+    expect(result.state.players.P1.hand).toEqual(fullHand);
+    expect(result.state.players.P1.deck).toEqual([makeCard({ numero: "099" })]);
     expect(result.events).toEqual([]);
+  });
+
+  it("de draw marca deckOutPlayer quando o deck esgota no meio da compra, e ainda assim avança para main", () => {
+    const state = makeState({
+      phase: "draw",
+      players: {
+        P1: makePlayer({ hand: [], deck: [makeCard({ numero: "020" })] }),
+        P2: makePlayer(),
+      },
+    });
+
+    const result = advancePhase(state);
+
+    expect(result.state.phase).toBe("main");
+    expect(result.state.deckOutPlayer).toBe("P1");
+    expect(result.state.players.P1.hand).toHaveLength(1);
   });
 
   it("de main vai para battle sem emitir evento", () => {

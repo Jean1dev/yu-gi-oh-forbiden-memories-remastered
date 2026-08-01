@@ -1,5 +1,6 @@
 import type { ApplyResult, DuelState, MonsterZone, Phase, PlayerId, PlayerState } from "@yugioh/shared";
 
+import { drawUpToHandSize } from "../draw/index.ts";
 import { createEvent } from "../events/index.ts";
 
 const NEXT_PHASE: Readonly<Record<Phase, Phase>> = {
@@ -41,6 +42,11 @@ function endTurnFor(player: PlayerState): PlayerState {
  * `hasOpenReactionWindow` (spec Decision 7).
  */
 export function advancePhase(state: DuelState): ApplyResult {
+  if (state.phase === "draw") {
+    const drawn = drawUpToHandSize(state);
+    return { state: { ...drawn.state, phase: NEXT_PHASE.draw }, events: drawn.events };
+  }
+
   if (state.phase !== "end") {
     return { state: { ...state, phase: NEXT_PHASE[state.phase] }, events: [] };
   }

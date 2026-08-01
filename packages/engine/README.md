@@ -32,7 +32,13 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   draw → main → battle → end, and, from `end`, the turn transition (reset per-monster turn flags,
   reset the new active player's hand play, alternate `activePlayer`, increment `turn`, emit
   `onTurnEnd`/`onTurnStart`). Also exports `isFirstDuelTurn` and `hasUsedHandPlay`/
-  `markHandPlayUsed`, ready for F08-F11 to consume.
+  `markHandPlayUsed`, ready for F08-F11 to consume. The `"draw"` case delegates to `draw`
+  (below) before completing the transition to `"main"`.
+- `draw` (`./src/draw`, motor-duelo-1x1 F07): `drawUpToHandSize` — completes the active player's
+  hand up to `INITIAL_HAND_SIZE`, drawing from the top of the deck and emitting one `onDraw` per
+  card; marks `deckOutPlayer` on `DuelState` if the deck runs out mid-draw (consumed later by
+  F12). `resolveDrawPhase` is the boundary entry point for callers outside the normal turn cycle
+  (refuses outside `"draw"` phase). `hasDeckedOut`/`getDeckOutPlayer` read the deck-out signal.
 
 ## Dependency direction
 

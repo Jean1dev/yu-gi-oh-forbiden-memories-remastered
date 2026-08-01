@@ -132,20 +132,23 @@ describe("advancePhase properties", () => {
     );
   });
 
-  it("preserva lp, hand, deck, activeField e seed em transições que não fecham o turno", () => {
+  it("preserva lp, hand, deck, activeField e seed em transições que não fecham o turno nem compram (main→battle, battle→end)", () => {
     fc.assert(
-      fc.property(duelStateArbitrary.filter((state) => state.phase !== "end"), (initial) => {
-        const result = advancePhase(initial);
+      fc.property(
+        duelStateArbitrary.filter((state) => state.phase !== "end" && state.phase !== "draw"),
+        (initial) => {
+          const result = advancePhase(initial);
 
-        expect(result.state.players.P1.lp).toBe(initial.players.P1.lp);
-        expect(result.state.players.P2.lp).toBe(initial.players.P2.lp);
-        expect(result.state.players.P1.hand).toEqual(initial.players.P1.hand);
-        expect(result.state.players.P2.hand).toEqual(initial.players.P2.hand);
-        expect(result.state.players.P1.deck).toEqual(initial.players.P1.deck);
-        expect(result.state.players.P2.deck).toEqual(initial.players.P2.deck);
-        expect(result.state.activeField).toEqual(initial.activeField);
-        expect(result.state.seed).toBe(initial.seed);
-      }),
+          expect(result.state.players.P1.lp).toBe(initial.players.P1.lp);
+          expect(result.state.players.P2.lp).toBe(initial.players.P2.lp);
+          expect(result.state.players.P1.hand).toEqual(initial.players.P1.hand);
+          expect(result.state.players.P2.hand).toEqual(initial.players.P2.hand);
+          expect(result.state.players.P1.deck).toEqual(initial.players.P1.deck);
+          expect(result.state.players.P2.deck).toEqual(initial.players.P2.deck);
+          expect(result.state.activeField).toEqual(initial.activeField);
+          expect(result.state.seed).toBe(initial.seed);
+        },
+      ),
       { numRuns: 1000 },
     );
   });
