@@ -1,6 +1,7 @@
 import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Result } from "@yugioh/shared";
 
 import { hasOpenReactionWindow } from "../events/index.ts";
+import { changePosition } from "../position/index.ts";
 import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
@@ -65,6 +66,8 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
       }
       return playFieldSpell(state, action);
     }
+    case "change_position":
+      return changePosition(state, action.zone);
     default: {
       // Assigning `action` (not `action.type`) to `never` here works around a
       // TypeScript 6.0.3 narrowing bug where `const x: never = action.type`

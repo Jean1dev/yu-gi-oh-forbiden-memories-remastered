@@ -24,3 +24,4 @@ export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./tur
 export { drawUpToHandSize, getDeckOutPlayer, hasDeckedOut, resolveDrawPhase } from "./draw/index.ts";
 export { summonMonster } from "./summon/index.ts";
 export { getOpponent, playFieldSpell, playSpellOrTrap } from "./spells/index.ts";
+export { changePosition, isFaceDown, nextPosition } from "./position/index.ts";

@@ -52,6 +52,11 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   `context.target` distinguishing `"spell_trap_zone"` from `"field"`), and open a reaction window
   with `getOpponent(state.activePlayer)` as `reactingPlayer`. The engine does not know which
   `tipo: "magica"` cards are field-spells vs. effect-spells — the caller picks the action variant.
+- `position` (`./src/position`, motor-duelo-1x1 F10): `changePosition` — alternates a monster
+  already on the field between attack/defense and, if it was face-down, reveals it, restricted to
+  the Battle phase. Does not consume the hand play and never touches `hasAttacked`. Emits `onFlip`
+  (only when revealing) followed by `onPositionChange` (always); opens no reaction window.
+  `nextPosition`/`isFaceDown` are the pure transition matrix it delegates to.
 
 ## Dependency direction
 

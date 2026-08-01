@@ -131,4 +131,42 @@ describe("apply", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("reaction_window_open");
   });
+
+  it("roteia change_position para changePosition e devolve o resultado de sucesso inalterado", () => {
+    const monster = makeCard({ tipo: "monstro", classe: "Dragon" });
+    const occupiedZone = {
+      occupied: true as const,
+      card: monster,
+      position: "attack_face_up" as const,
+      hasAttacked: false,
+      hasChangedPosition: false,
+    };
+    const [, e1, e2, e3, e4] = emptyField().monsters;
+    const state = makeState({
+      phase: "battle",
+      players: {
+        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone, e1, e2, e3, e4] } }),
+        P2: makePlayer(),
+      },
+    });
+
+    const result = apply(state, { type: "change_position", zone: { player: "P1", zoneType: "monster", index: 0 } });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({
+        position: "defense_face_up",
+        hasChangedPosition: true,
+      });
+    }
+  });
+
+  it("devolve o erro de changePosition sem processamento adicional quando a mudança de posição é recusada", () => {
+    const state = makeState({ phase: "battle" });
+
+    const result = apply(state, { type: "change_position", zone: { player: "P1", zoneType: "monster", index: 0 } });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("zone_empty");
+  });
 });
