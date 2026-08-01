@@ -26,6 +26,13 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   `DuelStateSchema` and returns a cloned `DuelState`, or a `Result` error). `Snapshot` is a plain
   type alias for `DuelState` (`packages/shared`), not a new wrapper — this is the contract the
   future Online Duel server (cross-PRD) will use to persist and resync sessions.
+- `turn` (`./src/turn`, motor-duelo-1x1 F06): `apply` — the engine's single dispatcher
+  (`docs/arquitetura.md` §3.1), an exhaustive `switch` over `Action.type` (`packages/shared`) that
+  F07-F12 each extend with their own case. Today handles only `advance_phase`: the four-phase cycle
+  draw → main → battle → end, and, from `end`, the turn transition (reset per-monster turn flags,
+  reset the new active player's hand play, alternate `activePlayer`, increment `turn`, emit
+  `onTurnEnd`/`onTurnStart`). Also exports `isFirstDuelTurn` and `hasUsedHandPlay`/
+  `markHandPlayUsed`, ready for F08-F11 to consume.
 
 ## Dependency direction
 
