@@ -13,13 +13,14 @@ import type {
 } from "@yugioh/shared";
 import { getPublicDuelState } from "@yugioh/rules";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { DuelActions } from "../../../../components/free-duel/duel-actions.tsx";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { DuelCardPreview } from "../../../../components/free-duel/duel-card-preview.tsx";
 import { DuelHandBar } from "../../../../components/free-duel/duel-hand-bar.tsx";
 import { DuelMessage } from "../../../../components/free-duel/duel-message.tsx";
 import { DuelPrompt } from "../../../../components/free-duel/duel-prompt.tsx";
+import { DuelResultOverlay } from "../../../../components/free-duel/duel-result-overlay.tsx";
 import { DuelUnavailableNotice } from "../../../../components/free-duel/duel-unavailable-notice.tsx";
 import { OrchestrationFailureNotice } from "../../../../components/free-duel/orchestration-failure-notice.tsx";
 import { PlayerHand } from "../../../../components/free-duel/player-hand.tsx";
@@ -194,6 +195,10 @@ export function DuelScreen({
       ? DUEL_SCREEN_MESSAGES.opponentTurn
       : null;
 
+  useEffect(() => {
+    if (session.status === "ended") cues.clear();
+  }, [cues, session.status]);
+
   if (catalogResult.status === "error") return <DuelUnavailableNotice />;
   if (session.status === "not_started") return <main className={styles.loading} aria-busy="true">Iniciando duelo...</main>;
   if (session.status === "failed") {
@@ -255,7 +260,7 @@ export function DuelScreen({
         onCancel={surrenderFlow.cancel}
       />
       {session.status === "ended" ? (
-        <section className={styles.result}>
+        <DuelResultOverlay>
           <EndedDuelResult
             session={session}
             resolveResult={effectiveResolveResult}
@@ -263,7 +268,7 @@ export function DuelScreen({
             grantVictoryReward={grantVictoryReward}
           />
           <PostDuelActions duelistId={duelistId} />
-        </section>
+        </DuelResultOverlay>
       ) : null}
     </main>
   );

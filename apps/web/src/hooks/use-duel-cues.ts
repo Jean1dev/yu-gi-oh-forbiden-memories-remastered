@@ -47,6 +47,10 @@ export function useDuelCues() {
     if (cues.length === 0 || prefersReducedMotion()) return;
     setQueue((current) => [...current, ...cues].slice(0, MAX_CUE_QUEUE));
   }, []);
+  const clear = useCallback(() => {
+    setActive(null);
+    setQueue([]);
+  }, []);
 
   useEffect(() => {
     if (active !== null || queue.length === 0 || reducedMotion) return;
@@ -64,11 +68,12 @@ export function useDuelCues() {
   return useMemo(
     () => ({
       enqueue,
+      clear,
       cueFor: (reference: ZoneReference) =>
         active && cueMatchesZone(active, reference) ? active.kind : undefined,
       cueForPlayer: (player: PlayerId) => (active && cueMatchesPlayer(active, player) ? active : undefined),
       busy: !reducedMotion && (active !== null || queue.length > 0),
     }),
-    [active, enqueue, queue.length, reducedMotion],
+    [active, clear, enqueue, queue.length, reducedMotion],
   );
 }

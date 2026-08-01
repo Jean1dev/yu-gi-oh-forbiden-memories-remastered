@@ -68,4 +68,14 @@ describe("useDuelCues", () => {
     const { result } = renderHook(() => useDuelCues());
     expect(() => result.current.enqueue([event])).not.toThrow();
   });
+
+  it("clears active and queued cues", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useDuelCues());
+    act(() => result.current.enqueue([event]));
+    expect(result.current.busy).toBe(true);
+    act(() => result.current.clear());
+    expect(result.current.busy).toBe(false);
+    expect(result.current.cueFor(zone)).toBeUndefined();
+  });
 });

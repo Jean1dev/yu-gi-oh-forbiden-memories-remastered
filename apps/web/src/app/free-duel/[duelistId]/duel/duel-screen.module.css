@@ -27,15 +27,6 @@
   padding: var(--space-6);
 }
 
-.result {
-  flex-shrink: 0;
-  max-height: 35vh;
-  overflow: auto;
-  padding: var(--space-3);
-  background: var(--surface-frame);
-  box-shadow: var(--shadow-bevel-raised);
-}
-
 @media (max-width: 640px) {
   .screen {
     gap: var(--space-2);
