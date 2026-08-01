@@ -1,0 +1,57 @@
+.section {
+  min-width: 0;
+  flex: 1;
+}
+
+.list {
+  display: flex;
+  min-width: 0;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.item {
+  flex: 0 0 64px;
+}
+
+.card {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 64px;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.card[aria-pressed="true"] {
+  box-shadow:
+    var(--shadow-bevel-raised),
+    0 0 0 3px var(--color-success);
+}
+
+.name {
+  display: block;
+  overflow: hidden;
+  padding: 2px var(--space-1);
+  color: var(--text-heading);
+  font-size: var(--text-body-xs);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
