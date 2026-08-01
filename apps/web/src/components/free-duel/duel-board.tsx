@@ -1,38 +1,49 @@
-import type { DuelState, PlayerId } from "@yugioh/shared";
-import { LpIndicator } from "./lp-indicator.tsx";
+import type { PublicDuelState, ZoneReference } from "@yugioh/shared";
+import type { DuelCue } from "../../lib/free-duel/duel-cues.ts";
+import type { ZoneAffordance } from "../../lib/free-duel/duel-interaction.ts";
+import { DuelSide } from "./duel-side.tsx";
+import styles from "./duel-board.module.css";
 
-function Side({ state, player }: { readonly state: DuelState; readonly player: PlayerId }) {
-  const field = state.players[player].field;
-  return (
-    <section aria-label={`${player} field`}>
-      <LpIndicator label={player === "P1" ? "Player" : "Opponent"} lp={state.players[player].lp} />
-      <div aria-label={`${player} spell zones`}>
-        {field.spells.map((zone, index) => (
-          <div key={index} aria-label={`Spell zone ${index + 1}`}>
-            {zone.occupied && zone.faceUp ? zone.card.nome : zone.occupied ? "Set card" : "Empty"}
-          </div>
-        ))}
-      </div>
-      <div aria-label={`${player} monster zones`}>
-        {field.monsters.map((zone, index) => (
-          <div key={index} aria-label={`Monster zone ${index + 1}`}>
-            {zone.occupied && zone.position.endsWith("_face_up")
-              ? zone.card.nome
-              : zone.occupied
-                ? "Set monster"
-                : "Empty"}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+const idleZoneAffordance = () => "idle" as const;
+const noCue = () => undefined;
+const noop = () => undefined;
 
-export function DuelBoard({ state }: { readonly state: DuelState }) {
+export type DuelBoardProps = Readonly<{
+  view: PublicDuelState;
+  zoneAffordance?: ((reference: ZoneReference) => ZoneAffordance) | undefined;
+  cueFor?: ((reference: ZoneReference) => DuelCue["kind"] | undefined) | undefined;
+  onZoneActivate?: ((reference: ZoneReference) => void) | undefined;
+  interactive?: boolean | undefined;
+}>;
+
+export function DuelBoard({
+  view,
+  zoneAffordance = idleZoneAffordance,
+  cueFor = noCue,
+  onZoneActivate = noop,
+  interactive = false,
+}: DuelBoardProps) {
   return (
-    <section aria-label="Duel board">
-      <Side state={state} player="P2" />
-      <Side state={state} player="P1" />
+    <section className={styles.board} aria-label="Tabuleiro de duelo">
+      <DuelSide
+        player="P2"
+        state={view.players.P2}
+        label="Oponente"
+        interactive={interactive}
+        zoneAffordance={zoneAffordance}
+        cueFor={cueFor}
+        onZoneActivate={onZoneActivate}
+      />
+      <DuelSide
+        player="P1"
+        state={view.players.P1}
+        label="Jogador"
+        mirrored
+        interactive={interactive}
+        zoneAffordance={zoneAffordance}
+        cueFor={cueFor}
+        onZoneActivate={onZoneActivate}
+      />
     </section>
   );
 }

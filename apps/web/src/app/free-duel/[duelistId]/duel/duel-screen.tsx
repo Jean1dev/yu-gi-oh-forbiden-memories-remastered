@@ -37,6 +37,7 @@ import type {
   CreateDuelRuntimeInput,
   DuelRuntime,
 } from "../../../../lib/free-duel/duel-runtime.ts";
+import { getPublicDuelState } from "@yugioh/rules";
 import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
 import { takeDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.ts";
@@ -156,10 +157,11 @@ export function DuelScreen({
     );
   }
   const state = session.status === "ended" ? session.finalState : session.state;
+  const view = getPublicDuelState(state, "P1");
   return (
     <main>
       <h1>Duel</h1>
-      <DuelBoard state={state} />
+      <DuelBoard view={view} />
       <PlayerHand
         cards={state.players.P1.hand}
         disabled={session.status === "ended" || session.currentDecider !== "P1" || duel.busy}

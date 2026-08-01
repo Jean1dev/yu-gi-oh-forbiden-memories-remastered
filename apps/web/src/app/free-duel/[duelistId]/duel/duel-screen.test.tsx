@@ -74,8 +74,8 @@ describe("DuelScreen", () => {
     };
     render(<DuelScreen duelistId="seto" loadContext={loadContext} startMatch={() => session} />);
     expect(await screen.findByRole("heading", { name: "Duel" })).toBeTruthy();
-    expect(screen.getAllByLabelText(/Monster zone/)).toHaveLength(10);
-    expect(screen.getAllByLabelText(/Spell zone/)).toHaveLength(10);
+    expect(screen.getAllByRole("button", { name: /Zona de monstro/ })).toHaveLength(10);
+    expect(screen.getAllByRole("button", { name: /Zona de magia\/armadilha/ })).toHaveLength(10);
     expect(screen.getByRole("button", { name: "Blue Dragon" }).hasAttribute("disabled")).toBe(
       false,
     );

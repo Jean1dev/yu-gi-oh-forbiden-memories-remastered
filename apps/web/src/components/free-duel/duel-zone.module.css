@@ -1,0 +1,96 @@
+.item {
+  list-style: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+.button {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 52px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.button[data-affordance="selectable"],
+.button[data-affordance="target"] {
+  color: var(--text-heading);
+  box-shadow:
+    var(--shadow-bevel-pressed),
+    0 0 0 3px var(--color-success);
+}
+
+.button[data-affordance="target"] {
+  box-shadow:
+    var(--shadow-bevel-pressed),
+    0 0 0 3px var(--color-danger);
+}
+
+.button[data-affordance="selected"] {
+  box-shadow:
+    var(--shadow-bevel-pressed),
+    0 0 0 3px var(--color-gold);
+}
+
+.empty {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--text-muted);
+}
+
+.name {
+  position: absolute;
+  right: 0;
+  bottom: 1.65rem;
+  left: 0;
+  overflow: hidden;
+  padding: 0 var(--space-1);
+  background: rgb(5 5 16 / 82%);
+  color: var(--text-heading);
+  font-size: var(--text-body-xs);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 2px 0;
+  background: var(--color-night-sunken);
+  color: var(--text-heading);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .stats,
+  .name,
+  .empty {
+    font-size: var(--text-body-xs);
+  }
+}

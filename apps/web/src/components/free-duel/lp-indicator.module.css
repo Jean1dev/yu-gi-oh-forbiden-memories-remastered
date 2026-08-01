@@ -1,0 +1,11 @@
+.indicator {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-shadow: 2px 2px 0 var(--color-black);
+}
+
+.value {
+  color: var(--text-heading);
+}
