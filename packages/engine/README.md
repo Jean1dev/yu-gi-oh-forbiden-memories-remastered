@@ -33,8 +33,10 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   type alias for `DuelState` (`packages/shared`), not a new wrapper — this is the contract the
   future Online Duel server (cross-PRD) will use to persist and resync sessions.
 - `turn` (`./src/turn`, motor-duelo-1x1 F06): `apply` — the engine's single dispatcher
-  (`docs/arquitetura.md` §3.1), an exhaustive `switch` over `Action.type` (`packages/shared`) that
-  F07-F12 each extend with their own case. Today handles only `advance_phase`: the four-phase cycle
+  (`docs/arquitetura.md` §3.1), an exhaustive `switch` over `Action.type` (`packages/shared`), now
+  complete: F07-F12 each added their case. `apply` also owns both halves of the end-of-duel rule
+  (F12) — it refuses every action once `state.outcome` is set, and passes every successful
+  transition through `stampOutcome`. The base `advance_phase` case runs the four-phase cycle
   draw → main → battle → end, and, from `end`, the turn transition (reset per-monster turn flags,
   reset the new active player's hand play, alternate `activePlayer`, increment `turn`, emit
   `onTurnEnd`/`onTurnStart`). Also exports `isFirstDuelTurn` and `hasUsedHandPlay`/
@@ -63,6 +65,16 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   the Battle phase. Does not consume the hand play and never touches `hasAttacked`. Emits `onFlip`
   (only when revealing) followed by `onPositionChange` (always); opens no reaction window.
   `nextPosition`/`isFaceDown` are the pure transition matrix it delegates to.
+- `end` (`./src/end`, motor-duelo-1x1 F12): closes the duel cycle. `checkDuelEnd` derives the
+  `DuelOutcome` from what the state shows — both players at 0 LP (`draw`), one player at 0 LP
+  (`lp_depleted`), or the `deckOutPlayer` flag F07 raises (`deck_out`) — in that fixed precedence,
+  and returns `undefined` while the duel runs. `surrender` handles the one ending that cannot be
+  derived from the state, stamping a `surrender` outcome without touching anything else; it is
+  accepted at any moment, from either player, even with a reaction window open. `stampOutcome` is
+  the `apply` post-step that ties the two together: it never overwrites an outcome already present,
+  which is what lets `surrender` speak for itself while keeping a single freeze point. No new
+  trigger event is emitted — the vocabulary stays closed at ten, and the ending is observable as
+  `state.outcome`, which travels in the F05 snapshot. `isDuelOver` is the read for UI and AI.
 
 ## Dependency direction
 

@@ -24,6 +24,7 @@ export {
   type ResolveCombatTableInput,
   type ResolveCombatTableResult,
 } from "./combat/index.ts";
+export { checkDuelEnd, isDuelOver, stampOutcome, surrender } from "./end/index.ts";
 export { load, serialize } from "./serialization/index.ts";
 export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
 export { drawUpToHandSize, getDeckOutPlayer, hasDeckedOut, resolveDrawPhase } from "./draw/index.ts";

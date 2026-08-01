@@ -236,4 +236,99 @@ describe("apply", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("no_pending_attack_to_resolve");
   });
+
+  it("routes surrender to the surrender handler", () => {
+    const result = apply(makeState({ phase: "main" }), { type: "surrender", player: "P1" });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.outcome).toEqual({
+      status: "decisive",
+      winner: "P2",
+      loser: "P1",
+      reason: "surrender",
+    });
+  });
+
+  it("accepts surrender from the inactive player even with an open reaction window", () => {
+    const state = makeState({ phase: "battle", pending: openWindow });
+
+    const result = apply(state, { type: "surrender", player: "P2" });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.state.outcome).toMatchObject({ reason: "surrender" });
+  });
+
+  it.each([
+    { type: "advance_phase" },
+    { type: "change_position", zone: { player: "P1", zoneType: "monster", index: 0 } },
+    { type: "declare_attack", attackerZoneIndex: 0 },
+    { type: "resolve_attack" },
+    { type: "surrender", player: "P1" },
+  ] as const)("refuses $type with duel_already_ended after the duel ends", (action) => {
+    const state = makeState({
+      outcome: { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
+    });
+
+    const result = apply(state, action);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("duel_already_ended");
+  });
+
+  it("stamps lp_depleted on the state returned by a lethal resolve_attack", () => {
+    const monster = makeCard({ tipo: "monstro", classe: "Dragon", atk: 1500, def: 1200 });
+    const occupiedZone = {
+      occupied: true as const,
+      card: monster,
+      position: "attack_face_up" as const,
+      hasAttacked: false,
+      hasChangedPosition: false,
+    };
+    const [, e1, e2, e3, e4] = emptyField().monsters;
+    const state = makeState({
+      turn: 3,
+      phase: "battle",
+      players: {
+        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone, e1, e2, e3, e4] } }),
+        P2: makePlayer({ lp: 1500 }),
+      },
+    });
+    const declared = apply(state, { type: "declare_attack", attackerZoneIndex: 0 });
+    if (!declared.ok) throw new Error("Expected declare_attack to succeed");
+
+    const result = apply(declared.value.state, { type: "resolve_attack" });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.players.P2.lp).toBe(0);
+    expect(result.value.state.outcome).toEqual({
+      status: "decisive",
+      winner: "P1",
+      loser: "P2",
+      reason: "lp_depleted",
+    });
+  });
+
+  it("stamps deck_out on the advance_phase that cannot complete the draw", () => {
+    const state = makeState({ phase: "draw", players: { P1: makePlayer(), P2: makePlayer() } });
+
+    const result = apply(state, { type: "advance_phase" });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.outcome).toEqual({
+      status: "decisive",
+      winner: "P2",
+      loser: "P1",
+      reason: "deck_out",
+    });
+  });
+
+  it("does not stamp an outcome while no ending condition holds", () => {
+    const result = apply(makeState({ phase: "main" }), { type: "advance_phase" });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.state.outcome).toBeUndefined();
+  });
 });
