@@ -67,6 +67,8 @@ export type DuelState = Readonly<{
   pending?: ReactionWindow | undefined;
   /** The seed this duel was shuffled with (F03); enables deterministic replay. */
   seed: number;
+  /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */
+  deckOutPlayer?: PlayerId | undefined;
 }>;
 
 export type PublicCard = Readonly<{ visible: true; card: Card }> | Readonly<{ visible: false }>;

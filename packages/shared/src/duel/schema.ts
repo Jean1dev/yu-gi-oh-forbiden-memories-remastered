@@ -136,6 +136,7 @@ export const DuelStateSchema = z.strictObject({
   phase: PhaseSchema,
   pending: ReactionWindowSchema.optional(),
   seed: z.number().int().min(0).max(0xffffffff),
+  deckOutPlayer: PlayerIdSchema.optional(),
 });
 
 export const PublicCardSchema = z.discriminatedUnion("visible", [
