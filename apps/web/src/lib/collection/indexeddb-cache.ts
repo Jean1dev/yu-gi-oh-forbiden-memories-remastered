@@ -14,7 +14,7 @@ import { log } from "../logging.ts";
  * already added.
  */
 export const DATABASE_NAME = "yugioh-build-deck";
-export const DATABASE_VERSION = 5;
+export const DATABASE_VERSION = 6;
 export const STORE_NAME = "collection";
 export const PENDING_REWARDS_STORE_NAME = "pendingRewards";
 export const ACTIVE_DECK_CACHE_STORE_NAME = "activeDeckCache";
@@ -22,6 +22,7 @@ export const ACTIVE_DECK_PENDING_SAVE_STORE_NAME = "activeDeckPendingSave";
 export const ROSTER_CACHE_STORE_NAME = "rosterCache";
 export const WALLET_BALANCE_STORE_NAME = "walletBalance";
 export const PENDING_VICTORY_REWARDS_STORE_NAME = "pendingVictoryRewards";
+export const PENDING_PASSWORD_REDEMPTIONS_STORE_NAME = "pendingPasswordRedemptions";
 
 /** The collection's local-cache port (spec build-deck/F01 §4 `lerSnapshot`/`gravarSnapshot`). */
 export type CollectionCache = Readonly<{
@@ -54,6 +55,9 @@ export function openDatabase(): Promise<IDBDatabase> {
       }
       if (!database.objectStoreNames.contains(PENDING_VICTORY_REWARDS_STORE_NAME)) {
         database.createObjectStore(PENDING_VICTORY_REWARDS_STORE_NAME, { keyPath: "duelId" });
+      }
+      if (!database.objectStoreNames.contains(PENDING_PASSWORD_REDEMPTIONS_STORE_NAME)) {
+        database.createObjectStore(PENDING_PASSWORD_REDEMPTIONS_STORE_NAME, { keyPath: "redemptionId" });
       }
     };
     request.onsuccess = () => {

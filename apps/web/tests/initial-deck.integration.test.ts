@@ -266,9 +266,20 @@ describe.skipIf(!hasSupabaseEnv)("build-deck/F02 initial deck against a real Sup
 
       expect(first.ok && second.ok).toBe(true);
       if (!first.ok || !second.ok) return;
-      expect(first.value.createdNow).toBe(true);
-      expect(second.value.createdNow).toBe(false);
-      expect([...second.value.deck.entries()].sort()).toEqual([...first.value.deck.entries()].sort());
+      expect(first.value.initialDeck.createdNow).toBe(true);
+      expect(second.value.initialDeck.createdNow).toBe(false);
+      expect(first.value.wallet).toEqual({ stars: 0, createdNow: true });
+      expect(second.value.wallet).toEqual({ stars: 0, createdNow: false });
+      expect([...second.value.initialDeck.deck.entries()].sort()).toEqual(
+        [...first.value.initialDeck.deck.entries()].sort(),
+      );
+      const { data: wallet, error } = await fresh.client
+        .from("wallets")
+        .select("player_id,stars")
+        .eq("player_id", fresh.playerId)
+        .single();
+      expect(error).toBeNull();
+      expect(wallet).toEqual({ player_id: fresh.playerId, stars: 0 });
     } finally {
       await cleanupPlayer(admin, fresh.playerId);
     }

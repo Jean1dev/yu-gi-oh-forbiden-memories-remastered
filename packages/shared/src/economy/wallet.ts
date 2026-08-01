@@ -5,9 +5,31 @@ export type WalletBalance = Readonly<{
   stars: number;
 }>;
 
+/** Output of `reconcileWalletBalance` (`@yugioh/rules`): persisted balance plus queued credits not yet confirmed in `reward_ledger`. */
+export type ReconciledWalletBalance = Readonly<{
+  persistedStars: number;
+  pendingStars: number;
+  effectiveStars: number;
+  pendingDuelIds: readonly string[];
+}>;
+
 export type LoadedWalletBalance =
-  | Readonly<{ origin: "server"; stars: number; syncedAt: string }>
-  | Readonly<{ origin: "cache"; stars: number; syncedAt: string }>;
+  | Readonly<{
+      origin: "server";
+      stars: number;
+      effectiveStars: number;
+      pendingStars: number;
+      pendingDuelIds: readonly string[];
+      syncedAt: string;
+    }>
+  | Readonly<{
+      origin: "cache";
+      stars: number;
+      effectiveStars: number;
+      pendingStars: number;
+      pendingDuelIds: readonly string[];
+      syncedAt: string;
+    }>;
 
 export type VictoryRewardEvent = Readonly<{
   playerId: string;
