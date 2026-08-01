@@ -39,6 +39,12 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
   card; marks `deckOutPlayer` on `DuelState` if the deck runs out mid-draw (consumed later by
   F12). `resolveDrawPhase` is the boundary entry point for callers outside the normal turn cycle
   (refuses outside `"draw"` phase). `hasDeckedOut`/`getDeckOutPlayer` read the deck-out signal.
+- `summon` (`./src/summon`, motor-duelo-1x1 F08): `summonMonster` — moves a monster/ritual card
+  from the active player's hand into a free monster zone in one of the four positions, with no
+  tribute. Marks `handPlayUsed`, emits `onSummon` (face-up) or `onSet` (face-down), and opens a
+  reaction window with the opponent as `reactingPlayer`. Wired into `apply` (`turn`) as the
+  `"summon_monster"` case, which checks the `"main"` phase and active-player ownership before
+  delegating — `summonMonster` itself only validates what is specific to summoning.
 
 ## Dependency direction
 
