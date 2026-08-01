@@ -1,6 +1,7 @@
 import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Phase, type Result } from "@yugioh/shared";
 
 import { declareAttack, resolveAttack } from "../combat/index.ts";
+import { stampOutcome, surrender } from "../end/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
 import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
@@ -15,15 +16,42 @@ function requirePhase(state: DuelState, phase: Phase, message: string): DomainEr
 /**
  * The engine's single entry point (`docs/arquitetura.md` §3.1): receives the
  * current state and a player/system action, and returns the new state plus
- * the events it emitted. An exhaustive `switch` on `action.type` — F07-F12
- * each add a `case` to this same function, never a separate dispatcher.
+ * the events it emitted.
  *
- * `resolve_attack` is handled before the generic reaction-window guard
- * below: unlike every other action, its precondition is that a window IS
- * open — specifically one over `onAttackDeclared` (motor-duelo-1x1 F11 spec
- * Decision 3), not that one is absent.
+ * Wraps the dispatch in the two halves of the end-of-duel rule
+ * (motor-duelo-1x1 F12): nothing is accepted once the duel is over, and every
+ * successful transition is checked for having just ended it. Keeping both
+ * here rather than inside each action means no action can forget either one.
  */
 export function apply(state: DuelState, action: Action): Result<ApplyResult, DomainError> {
+  if (state.outcome !== undefined) {
+    return err(
+      new DomainError("O duelo já terminou.", "duel_already_ended", {
+        reason: state.outcome.reason,
+        winner: state.outcome.winner,
+      }),
+    );
+  }
+
+  const result = dispatch(state, action);
+  return result.ok ? ok(stampOutcome(result.value)) : result;
+}
+
+/**
+ * The action dispatch itself: an exhaustive `switch` on `action.type`, with
+ * the two actions whose preconditions invert the generic reaction-window
+ * guard handled ahead of it.
+ *
+ * `resolve_attack` requires a window to BE open — specifically one over
+ * `onAttackDeclared` (F11 spec Decision 3). `surrender` ignores the window
+ * entirely, and does not require its player to be the active one, because the
+ * PRD requires it to work at any moment (F12 spec Decision 10).
+ */
+function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainError> {
+  if (action.type === "surrender") {
+    return surrender(state, action);
+  }
+
   if (action.type === "resolve_attack") {
     if (state.pending?.event.type !== "onAttackDeclared") {
       return err(
