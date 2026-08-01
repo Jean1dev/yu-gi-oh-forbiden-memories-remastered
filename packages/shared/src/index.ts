@@ -150,15 +150,19 @@ export type {
   Action,
   AdvancePhaseAction,
   ChangePositionAction,
+  DeclareAttackAction,
   PlayFieldSpellAction,
   PlaySpellOrTrapAction,
+  ResolveAttackAction,
 } from "./duel/action.ts";
 export {
   ActionSchema,
   AdvancePhaseActionSchema,
   ChangePositionActionSchema,
+  DeclareAttackActionSchema,
   PlayFieldSpellActionSchema,
   PlaySpellOrTrapActionSchema,
+  ResolveAttackActionSchema,
   SummonMonsterActionSchema,
 } from "./duel/action.schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";

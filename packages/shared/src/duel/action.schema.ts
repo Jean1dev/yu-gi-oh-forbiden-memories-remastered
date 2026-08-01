@@ -34,12 +34,22 @@ export const ChangePositionActionSchema = z.strictObject({
   zone: ZoneReferenceSchema,
 });
 
+export const DeclareAttackActionSchema = z.strictObject({
+  type: z.literal("declare_attack"),
+  attackerZoneIndex: ZoneIndexSchema,
+  targetZoneIndex: ZoneIndexSchema.optional(),
+});
+
+export const ResolveAttackActionSchema = z.strictObject({ type: z.literal("resolve_attack") });
+
 export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
   PlaySpellOrTrapActionSchema,
   PlayFieldSpellActionSchema,
   ChangePositionActionSchema,
+  DeclareAttackActionSchema,
+  ResolveAttackActionSchema,
 ]);
 
 const _schemaMatchesDeclaredType: Action = {} as z.infer<typeof ActionSchema>;

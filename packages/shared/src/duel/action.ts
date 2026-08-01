@@ -36,9 +36,31 @@ export type PlayFieldSpellAction = Readonly<{
  */
 export type ChangePositionAction = Readonly<{ type: "change_position"; zone: ZoneReference }>;
 
+/**
+ * Declares an attack from the monster in `attackerZoneIndex` against the
+ * monster in `targetZoneIndex`, or directly at the opponent when
+ * `targetZoneIndex` is absent (motor-duelo-1x1 F11). Opens a reaction window
+ * on `onAttackDeclared`; resolution is a separate action (`resolve_attack`,
+ * spec Decision 1) so the window can genuinely stay open in between.
+ */
+export type DeclareAttackAction = Readonly<{
+  type: "declare_attack";
+  attackerZoneIndex: ZoneIndex;
+  targetZoneIndex?: ZoneIndex | undefined;
+}>;
+
+/**
+ * Resolves the currently pending attack (motor-duelo-1x1 F11). Carries no
+ * parameters — the attacker/target zones are read from the pending
+ * `onAttackDeclared` event's `involvedZones` (spec Decision 2).
+ */
+export type ResolveAttackAction = Readonly<{ type: "resolve_attack" }>;
+
 export type Action =
   | AdvancePhaseAction
   | SummonMonsterAction
   | PlaySpellOrTrapAction
   | PlayFieldSpellAction
-  | ChangePositionAction;
+  | ChangePositionAction
+  | DeclareAttackAction
+  | ResolveAttackAction;
