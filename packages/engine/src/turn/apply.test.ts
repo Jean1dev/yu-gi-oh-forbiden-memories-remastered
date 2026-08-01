@@ -169,4 +169,71 @@ describe("apply", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("zone_empty");
   });
+
+  it("roteia declare_attack para declareAttack", () => {
+    const monster = makeCard({ tipo: "monstro", classe: "Dragon", atk: 1500, def: 1200 });
+    const occupiedZone = {
+      occupied: true as const,
+      card: monster,
+      position: "attack_face_up" as const,
+      hasAttacked: false,
+      hasChangedPosition: false,
+    };
+    const [, e1, e2, e3, e4] = emptyField().monsters;
+    const state = makeState({
+      turn: 3,
+      phase: "battle",
+      players: {
+        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone, e1, e2, e3, e4] } }),
+        P2: makePlayer(),
+      },
+    });
+
+    const result = apply(state, { type: "declare_attack", attackerZoneIndex: 0 });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.events).toEqual([expect.objectContaining({ type: "onAttackDeclared" })]);
+      expect(result.value.state.pending).toMatchObject({ type: "reaction_window", reactingPlayer: "P2" });
+    }
+  });
+
+  it("roteia resolve_attack para resolveAttack quando há janela de onAttackDeclared pendente", () => {
+    const monster = makeCard({ tipo: "monstro", classe: "Dragon", atk: 1500, def: 1200 });
+    const occupiedZone = {
+      occupied: true as const,
+      card: monster,
+      position: "attack_face_up" as const,
+      hasAttacked: false,
+      hasChangedPosition: false,
+    };
+    const [, e1, e2, e3, e4] = emptyField().monsters;
+    const state = makeState({
+      turn: 3,
+      phase: "battle",
+      players: {
+        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone, e1, e2, e3, e4] } }),
+        P2: makePlayer(),
+      },
+    });
+    const declared = apply(state, { type: "declare_attack", attackerZoneIndex: 0 });
+    if (!declared.ok) throw new Error("Expected declare_attack to succeed");
+
+    const result = apply(declared.value.state, { type: "resolve_attack" });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.pending).toBeUndefined();
+      expect(result.value.state.players.P2.lp).toBe(8000 - 1500);
+    }
+  });
+
+  it("recusa resolve_attack com no_pending_attack_to_resolve quando não há janela de ataque pendente", () => {
+    const state = makeState({ phase: "battle" });
+
+    const result = apply(state, { type: "resolve_attack" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("no_pending_attack_to_resolve");
+  });
 });

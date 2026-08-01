@@ -16,11 +16,17 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
 - `initialization` (`./src/initialization`, motor-duelo-1x1 F03): produces the first `DuelState` of
   a duel — `buildInitializationInput` (validates and resolves the two decks + seed) and `initDuel`
   (pure, total, builds the state).
-- `combat` (`./src/combat`, motor-duelo-1x1 F04): `calculateEffectiveAtkDef` — a monster's ATK/DEF
-  base plus the Guardian Star, terrain and equipment modifiers, added term by term. The three
-  modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`, `terrain`,
-  `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since none of
-  those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
+- `combat` (`./src/combat`, motor-duelo-1x1 F04/F11): `calculateEffectiveAtkDef` — a monster's
+  ATK/DEF base plus the Guardian Star, terrain and equipment modifiers, added term by term. The
+  three modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`,
+  `terrain`, `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since
+  none of those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
+  `declareAttack`/`resolveAttack` (F11) are the two-action attack flow: `declareAttack` validates
+  the attacker/target and opens a reaction window on `onAttackDeclared` without touching LP or the
+  field; `resolveAttack` closes that window, reveals a face-down defender (`onFlip`), computes
+  effective ATK/DEF with a combat-local neutral `ModifierProviders` bundle (`packages/rules` is
+  never imported from `engine`), and applies `resolveCombatTable` — the pure, stateless FM combat
+  table (no piercing) also exported here.
 - `serialization` (`./src/serialization`, motor-duelo-1x1 F05): `serialize` (a cloned, reference-
   independent `Snapshot` of a `DuelState`) and `load` (validates an untrusted `unknown` against
   `DuelStateSchema` and returns a cloned `DuelState`, or a `Result` error). `Snapshot` is a plain

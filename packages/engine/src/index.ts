@@ -16,8 +16,13 @@ export {
 } from "./initialization/index.ts";
 export {
   calculateEffectiveAtkDef,
+  declareAttack,
+  resolveAttack,
+  resolveCombatTable,
   type CombatContext,
   type ModifierProviders,
+  type ResolveCombatTableInput,
+  type ResolveCombatTableResult,
 } from "./combat/index.ts";
 export { load, serialize } from "./serialization/index.ts";
 export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
