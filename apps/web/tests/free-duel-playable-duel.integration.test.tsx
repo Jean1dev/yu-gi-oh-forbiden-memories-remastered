@@ -92,8 +92,8 @@ describe("free duel playable screen with real engine", () => {
       const cardName = button.getAttribute("aria-label");
       if (!cardName) continue;
       fireEvent.click(button);
-      const summon = screen.getByRole("button", { name: "Invocar" });
-      if (!summon.hasAttribute("disabled")) {
+      const summon = screen.queryByRole("button", { name: "Invocar" });
+      if (summon && !summon.hasAttribute("disabled")) {
         chosenName = cardName;
         break;
       }
