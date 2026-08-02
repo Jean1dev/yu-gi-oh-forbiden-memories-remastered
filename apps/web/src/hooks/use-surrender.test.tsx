@@ -1,7 +1,14 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { ApplyResult, DuelSession, DuelState } from "@yugioh/shared";
+import {
+  ok,
+  type ApplyResult,
+  type DomainError,
+  type DuelSession,
+  type DuelState,
+  type Result,
+} from "@yugioh/shared";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useSurrender } from "./use-surrender.ts";
@@ -16,10 +23,10 @@ const active = {
 
 function Harness({
   initialSession = active,
-  apply = vi.fn(() => ({ state: { phase: "end" } as DuelState, events: [] }) as ApplyResult),
+  apply = vi.fn(() => ok({ state: { phase: "end" } as DuelState, events: [] })),
 }: {
   readonly initialSession?: DuelSession;
-  readonly apply?: (state: DuelState, action: unknown) => ApplyResult;
+  readonly apply?: Apply;
 }) {
   const [session, setSession] = useState(initialSession);
   const flow = useSurrender({ session, playerId: "P1", apply, onSessionChange: setSession });
@@ -35,6 +42,8 @@ function Harness({
     </>
   );
 }
+
+type Apply = (state: DuelState, action: unknown) => Result<ApplyResult, DomainError>;
 
 describe("useSurrender", () => {
   it("opens the same confirmation from the explicit action and an exit attempt", () => {

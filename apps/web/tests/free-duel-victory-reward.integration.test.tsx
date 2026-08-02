@@ -37,8 +37,8 @@ const emptyField = {
 
 const endedState: DuelState = {
   players: {
-    P1: { lp: 4000, hand: [], deck: [], field: emptyField },
-    P2: { lp: 0, hand: [], deck: [], field: emptyField },
+    P1: { lp: 4000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
+    P2: { lp: 0, hand: [], deck: [], field: emptyField, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",
@@ -129,7 +129,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-victory")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={(result, resolvedDropPool) =>
@@ -161,7 +161,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
     ];
     expect(["001", "002"]).toContain(grantedCardNumber);
     expect(grantedStars).toBe(10);
-    expect(screen.getByRole("img", { name: `Carta ${grantedCardNumber}` })).toBeTruthy();
+    expect(await screen.findByRole("img", { name: `Carta ${grantedCardNumber}` })).toBeTruthy();
     expect(screen.getByText("Adicionada à sua coleção.")).toBeTruthy();
     expect(screen.getByText("+10 estrelas")).toBeTruthy();
     expect(screen.getByText("Saldo: 10 estrelas")).toBeTruthy();
@@ -194,7 +194,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-defeat")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P2", loser: "P1", reason: "lp_zerado" },
+          { status: "decisive", winner: "P2", loser: "P1", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={grantReward}
@@ -234,7 +234,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-draw")}
         resolveResult={resolveResultFor(
-          { status: "draw", winner: null, loser: null, reason: "empate" },
+          { status: "draw", winner: null, loser: null, reason: "draw" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={grantReward}
@@ -257,7 +257,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
         loadContext={async () => context}
         startMatch={() => endedSession("session-fallback")}
         resolveResult={resolveResultFor(
-          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+          { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
           { stars: 10, dropTier: "common" },
         )}
         grantVictoryReward={(result, resolvedDropPool) =>
@@ -281,7 +281,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
 
     await waitFor(() => expect(apply).toHaveBeenCalledTimes(1));
     expect(apply).toHaveBeenCalledWith("player-1", "session-fallback", "099", 10);
-    expect(screen.getByRole("img", { name: "Carta 099" })).toBeTruthy();
+    expect(await screen.findByRole("img", { name: "Carta 099" })).toBeTruthy();
   });
 
   it("reopening the result screen for the same session does not duplicate the reward call", async () => {
@@ -290,7 +290,7 @@ describe("free duel F03 to F07 victory reward integration", () => {
     const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 10 }));
     const sharedGrantCache = createGrantVictoryRewardCache();
     const resolveResult = resolveResultFor(
-      { status: "decisive", winner: "P1", loser: "P2", reason: "lp_zerado" },
+      { status: "decisive", winner: "P1", loser: "P2", reason: "lp_depleted" },
       { stars: 10, dropTier: "common" },
     );
     const grantReward = (

@@ -8,7 +8,7 @@ function decisiveReasonMessage(
   reason: DecisiveDuelEndReason,
   resultStatus: "victory" | "defeat",
 ): string {
-  if (reason === "rendicao") {
+  if (reason === "surrender") {
     return resultStatus === "victory"
       ? "O oponente se rendeu."
       : "Você se rendeu.";

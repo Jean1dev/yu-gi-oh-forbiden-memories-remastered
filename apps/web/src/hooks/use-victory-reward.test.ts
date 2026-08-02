@@ -8,7 +8,7 @@ import { useVictoryReward } from "./use-victory-reward.ts";
 const victory: ConsolidatedDuelResult = {
   status: "victory",
   duelSessionId: "session",
-  reason: "lp_zerado",
+  reason: "lp_depleted",
   rating: { source: "rating_engine", grade: "A", reward: { stars: 4, dropTier: "common" } },
 };
 
@@ -18,7 +18,7 @@ describe("useVictoryReward", () => {
     const nonVictory = {
       status,
       duelSessionId: "session",
-      reason: status === "defeat" ? "rendicao" : status === "draw" ? "empate" : "missing_outcome",
+      reason: status === "defeat" ? "surrender" : status === "draw" ? "draw" : "missing_outcome",
     } as ConsolidatedDuelResult;
     renderHook(() => useVictoryReward(nonVictory, grant));
     expect(grant).not.toHaveBeenCalled();

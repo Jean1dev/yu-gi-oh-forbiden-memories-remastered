@@ -1,0 +1,32 @@
+.prompt {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.text {
+  margin: 0;
+}
+
+.positions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .prompt {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .positions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

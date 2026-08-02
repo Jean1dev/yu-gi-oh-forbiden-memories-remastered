@@ -19,14 +19,14 @@ describe("consolidateDuelResult", () => {
           status: "decisive",
           winner: "P1",
           loser: "P2",
-          reason: "lp_zerado",
+          reason: "lp_depleted",
         },
         rating,
       }),
     ).toEqual({
       status: "victory",
       duelSessionId: "duel-1",
-      reason: "lp_zerado",
+      reason: "lp_depleted",
       rating,
     });
   });
@@ -39,14 +39,14 @@ describe("consolidateDuelResult", () => {
           status: "decisive",
           winner: "P2",
           loser: "P1",
-          reason: "rendicao",
+          reason: "surrender",
         },
         rating: null,
       }),
     ).toEqual({
       status: "defeat",
       duelSessionId: "duel-1",
-      reason: "rendicao",
+      reason: "surrender",
     });
   });
 
@@ -54,13 +54,13 @@ describe("consolidateDuelResult", () => {
     expect(
       consolidateDuelResult({
         duelSessionId: "duel-1",
-        outcome: { status: "draw", winner: null, loser: null, reason: "empate" },
+        outcome: { status: "draw", winner: null, loser: null, reason: "draw" },
         rating: null,
       }),
     ).toEqual({
       status: "draw",
       duelSessionId: "duel-1",
-      reason: "empate",
+      reason: "draw",
     });
   });
 
@@ -99,7 +99,7 @@ describe("consolidateDuelResult", () => {
             status: "draw",
             winner: null,
             loser: null,
-            reason: "empate",
+            reason: "draw",
           }),
         ),
         (duelSessionId, outcome) => {

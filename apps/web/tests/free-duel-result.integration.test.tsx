@@ -34,8 +34,8 @@ const field = {
 } as const;
 const finalState: DuelState = {
   players: {
-    P1: { lp: 4000, hand: [], deck: [], field },
-    P2: { lp: 0, hand: [], deck: [], field },
+    P1: { lp: 4000, hand: [], deck: [], field, handPlayUsed: false },
+    P2: { lp: 0, hand: [], deck: [], field, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",
@@ -82,7 +82,7 @@ describe("free duel F03 to F05 result integration", () => {
       status: "decisive",
       winner: "P1",
       loser: "P2",
-      reason: "lp_zerado",
+      reason: "lp_depleted",
     });
     render(<DuelResult result={result} />);
     expect(screen.getByRole("heading", { name: "Vitória!" })).toBeTruthy();
@@ -96,7 +96,7 @@ describe("free duel F03 to F05 result integration", () => {
       status: "decisive",
       winner: "P2",
       loser: "P1",
-      reason: "rendicao",
+      reason: "surrender",
     });
     render(<DuelResult result={result} />);
     expect(screen.getByRole("heading", { name: "Derrota" })).toBeTruthy();

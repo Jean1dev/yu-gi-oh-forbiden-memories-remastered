@@ -15,8 +15,8 @@ function emptyState(): DuelState {
 
   return {
     players: {
-      P1: { lp: INITIAL_LP, hand: [], deck: [], field },
-      P2: { lp: INITIAL_LP, hand: [], deck: [], field },
+      P1: { lp: INITIAL_LP, hand: [], deck: [], field, handPlayUsed: false },
+      P2: { lp: INITIAL_LP, hand: [], deck: [], field, handPlayUsed: false },
     },
     activeField: null,
     activePlayer: "P1",

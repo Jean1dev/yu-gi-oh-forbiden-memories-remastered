@@ -1,3 +1,4 @@
+import type { Action } from "./action.ts";
 import type { DeckComposition } from "../deck/types.ts";
 import type { DifficultyProfile, DuelistId } from "../duelist/types.ts";
 import type { DuelState, PublicDuelState } from "./types.ts";
@@ -11,8 +12,11 @@ export const ORCHESTRATION_ERROR_CODES = [
 
 export type OrchestrationFailureReason = (typeof ORCHESTRATION_ERROR_CODES)[number];
 
-/** Opaque until the engine action vocabulary is delivered by motor-duelo-1x1/F06-F12. */
-export type DuelAction = unknown;
+/**
+ * The engine's action vocabulary, closed by motor-duelo-1x1/F12 — the last
+ * feature to add a variant. Was `unknown` while F06-F12 were still landing.
+ */
+export type DuelAction = Action;
 
 export type AiAgent = Readonly<{
   decide(state: PublicDuelState, profile: DifficultyProfile): Promise<DuelAction>;

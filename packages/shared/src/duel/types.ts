@@ -1,4 +1,5 @@
 import type { Card } from "../card/types.ts";
+import type { DuelOutcome } from "./outcome.ts";
 import type { ReactionWindow } from "./events.ts";
 import type { PlayerId } from "./player.ts";
 import type { DuelEvent, EventType, JsonValue, ZoneReference } from "./events.ts";
@@ -47,6 +48,8 @@ export type PlayerState = Readonly<{
   /** Ordered; index 0 = top of the deck. */
   deck: readonly Card[];
   field: PlayerField;
+  /** Whether this player has already used their one hand play this turn (motor-duelo-1x1 F06). */
+  handPlayUsed: boolean;
 }>;
 
 /**
@@ -65,6 +68,14 @@ export type DuelState = Readonly<{
   pending?: ReactionWindow | undefined;
   /** The seed this duel was shuffled with (F03); enables deterministic replay. */
   seed: number;
+  /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */
+  deckOutPlayer?: PlayerId | undefined;
+  /**
+   * Absent while the duel is running; present once it has ended (F12). Setting
+   * it freezes the state: `apply` refuses every action from then on, and no
+   * transition ever overwrites or clears it.
+   */
+  outcome?: DuelOutcome | undefined;
 }>;
 
 export type PublicCard = Readonly<{ visible: true; card: Card }> | Readonly<{ visible: false }>;

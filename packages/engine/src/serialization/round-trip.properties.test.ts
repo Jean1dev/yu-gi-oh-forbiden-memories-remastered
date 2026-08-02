@@ -78,6 +78,7 @@ const playerStateArbitrary = fc.record({
   hand: fc.array(cardArbitrary, { maxLength: 5 }),
   deck: fc.array(cardArbitrary, { maxLength: 40 }),
   field: playerFieldArbitrary,
+  handPlayUsed: fc.boolean(),
 });
 
 const zoneReferenceArbitrary = fc.record({
@@ -114,6 +115,22 @@ const reactionWindowArbitrary = fc.record({
  * (`requiredKeys` below omits it in roughly half the generated cases instead
  * of always setting it to `undefined`), turn 1 and arbitrary later turns.
  */
+/** Every way a duel can be frozen (motor-duelo-1x1 F12) — all four reasons. */
+const outcomeArbitrary = fc.oneof(
+  fc
+    .record({
+      loser: playerIdArbitrary,
+      reason: fc.constantFrom("lp_depleted" as const, "deck_out" as const, "surrender" as const),
+    })
+    .map(({ loser, reason }) => ({
+      status: "decisive" as const,
+      winner: loser === "P1" ? ("P2" as const) : ("P1" as const),
+      loser,
+      reason,
+    })),
+  fc.constant({ status: "draw" as const, winner: null, loser: null, reason: "draw" as const }),
+);
+
 const duelStateArbitrary = fc.record(
   {
     players: fc.record({ P1: playerStateArbitrary, P2: playerStateArbitrary }),
@@ -123,6 +140,8 @@ const duelStateArbitrary = fc.record(
     phase: fc.constantFrom("draw", "main", "battle", "end"),
     seed: fc.integer({ min: 0, max: 0xffffffff }),
     pending: reactionWindowArbitrary,
+    deckOutPlayer: playerIdArbitrary,
+    outcome: outcomeArbitrary,
   },
   { requiredKeys: ["players", "activeField", "activePlayer", "turn", "phase", "seed"] },
 );

@@ -1,8 +1,21 @@
 // @vitest-environment jsdom
 
-import { render, screen, waitFor } from "@testing-library/react";
-import { ok, type Card, type DropPool, type DuelSession, type DuelState, type Duelist, type ReadyDeck } from "@yugioh/shared";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  DomainError,
+  err,
+  ok,
+  type Card,
+  type DuelEvent,
+  type DropPool,
+  type DuelSession,
+  type DuelState,
+  type Duelist,
+  type ReadyDeck,
+  type ZoneReference,
+} from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
+import type { DuelRuntime } from "../../../../lib/free-duel/duel-runtime.ts";
 import { DuelScreen, type DuelScreenContext } from "./duel-screen.tsx";
 
 const replace = vi.fn();
@@ -38,10 +51,19 @@ const card: Card = {
   estrelas: null,
   tipo: "monstro",
 };
+const spell: Card = {
+  ...card,
+  id: 2,
+  numero: "002",
+  nome: "Magic Card",
+  atk: null,
+  def: null,
+  tipo: "magica",
+};
 const state: DuelState = {
   players: {
-    P1: { lp: 8000, hand: [card], deck: [], field },
-    P2: { lp: 7500, hand: [], deck: [], field },
+    P1: { lp: 8000, hand: [card], deck: [], field, handPlayUsed: false },
+    P2: { lp: 7500, hand: [], deck: [], field, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",
@@ -62,6 +84,68 @@ const playerDeck: ReadyDeck = { composition: {}, cardNumbers: [], total: 40 };
 const context: DuelScreenContext = { duelist, playerDeck };
 const loadContext = async () => context;
 
+function withHand(base: DuelState, hand: readonly Card[]): DuelState {
+  return {
+    ...base,
+    players: { ...base.players, P1: { ...base.players.P1, hand } },
+  };
+}
+
+function withMonster(base: DuelState, reference: ZoneReference): DuelState {
+  const player = base.players[reference.player];
+  const monsters = player.field.monsters.map((zone, index) =>
+    index === reference.index
+      ? {
+          occupied: true as const,
+          card,
+          position: "attack_face_up" as const,
+          hasAttacked: false,
+          hasChangedPosition: false,
+        }
+      : zone,
+  ) as unknown as typeof player.field.monsters;
+  return {
+    ...base,
+    players: {
+      ...base.players,
+      [reference.player]: { ...player, field: { ...player.field, monsters } },
+    },
+  };
+}
+
+function createRuntimeHarness(initialState: DuelState, applyImpl?: DuelRuntime["applyAction"]) {
+  const session: DuelSession = {
+    status: "in_progress",
+    duelSessionId: "session-1",
+    duelistId: "seto",
+    state: initialState,
+    currentDecider: "P1",
+  };
+  const apply = vi.fn(applyImpl ?? ((current) => ok({ state: current, events: [] })));
+  const runtime = {
+    start: vi.fn(() => session),
+    applyAction: apply,
+    advanceDependencies: {
+      apply,
+      closeReactionWindow: vi.fn((current: DuelState) => ok(current)),
+      aiAgent: { decide: vi.fn() },
+      getPublicDuelState: vi.fn(),
+    },
+    resolveResult: vi.fn(),
+  } as unknown as DuelRuntime;
+  return { apply, runtime };
+}
+
+function summonEvent(): DuelEvent {
+  return {
+    type: "onSummon",
+    originPlayer: "P1",
+    involvedCards: [card],
+    involvedZones: [{ player: "P1", zoneType: "monster", index: 0 }],
+    context: {},
+  };
+}
+
 describe("DuelScreen", () => {
   it("renders both 5+5 fields, life points and the player hand", async () => {
     const session: DuelSession = {
@@ -72,9 +156,9 @@ describe("DuelScreen", () => {
       currentDecider: "P1",
     };
     render(<DuelScreen duelistId="seto" loadContext={loadContext} startMatch={() => session} />);
-    expect(await screen.findByRole("heading", { name: "Duel" })).toBeTruthy();
-    expect(screen.getAllByLabelText(/Monster zone/)).toHaveLength(10);
-    expect(screen.getAllByLabelText(/Spell zone/)).toHaveLength(10);
+    expect(await screen.findByRole("heading", { name: "Duelo" })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /Zona de monstro/ })).toHaveLength(10);
+    expect(screen.getAllByRole("button", { name: /Zona de magia\/armadilha/ })).toHaveLength(10);
     expect(screen.getByRole("button", { name: "Blue Dragon" }).hasAttribute("disabled")).toBe(
       false,
     );
@@ -140,7 +224,7 @@ describe("DuelScreen", () => {
         resolveResult={async () => ({
           status: "defeat",
           duelSessionId: "session-1",
-          reason: "rendicao",
+          reason: "surrender",
         })}
       />,
     );
@@ -170,8 +254,205 @@ describe("DuelScreen", () => {
         })}
       />,
     );
-    await screen.findByRole("heading", { name: "Duel" });
+    await screen.findByRole("heading", { name: "Duelo" });
     expect(screen.queryByRole("link", { name: "Revanche" })).toBeNull();
+  });
+
+  it("shows a catalog-unavailable notice without starting the match", () => {
+    const loadContext = vi.fn(async () => context);
+    const startMatch = vi.fn();
+
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "error" }}
+        loadContext={loadContext}
+        startMatch={startMatch}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Duelo indisponível" })).toBeTruthy();
+    expect(loadContext).not.toHaveBeenCalled();
+    expect(startMatch).not.toHaveBeenCalled();
+  });
+
+  it("dispatches advance_phase from the fixed action slot", async () => {
+    const { apply, runtime } = createRuntimeHarness(state, () =>
+      ok({ state: { ...state, phase: "battle" }, events: [] }),
+    );
+
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Passar Fase" }));
+
+    await waitFor(() => expect(apply).toHaveBeenCalledWith(state, { type: "advance_phase" }));
+  });
+
+  it("feeds runtime events into visual cues", async () => {
+    const { runtime } = createRuntimeHarness(state, () =>
+      ok({ state, events: [summonEvent()] }),
+    );
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Passar Fase" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }).getAttribute("data-cue"),
+      ).toBe("place"),
+    );
+    expect(screen.getByRole("button", { name: "Blue Dragon" }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("dispatches summon_monster after choosing card, zone and position", async () => {
+    const { apply, runtime } = createRuntimeHarness(state);
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Blue Dragon" }));
+    fireEvent.click(screen.getByRole("button", { name: "Invocar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ataque" }));
+
+    await waitFor(() =>
+      expect(apply).toHaveBeenCalledWith(state, {
+        type: "summon_monster",
+        player: "P1",
+        handIndex: 0,
+        zoneIndex: 0,
+        position: "attack_face_up",
+      }),
+    );
+  });
+
+  it("dispatches play_spell_or_trap from a selected spell card", async () => {
+    const spellState = withHand(state, [spell]);
+    const { apply, runtime } = createRuntimeHarness(spellState);
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [spell] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Magic Card" }));
+    fireEvent.click(screen.getByRole("button", { name: "Colocar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de magia/armadilha Jogador 1, -" }));
+
+    await waitFor(() =>
+      expect(apply).toHaveBeenCalledWith(spellState, {
+        type: "play_spell_or_trap",
+        handIndex: 0,
+        zoneIndex: 0,
+      }),
+    );
+  });
+
+  it("dispatches targeted and direct attacks", async () => {
+    const battleState = withHand(
+      withMonster(
+        withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+        { player: "P2", zoneType: "monster", index: 0 },
+      ),
+      [],
+    );
+    const { apply, runtime } = createRuntimeHarness(battleState);
+    const rendered = render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Atacar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Blue Dragon" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Oponente 1, Blue Dragon" }));
+    await waitFor(() =>
+      expect(apply).toHaveBeenCalledWith(battleState, {
+        type: "declare_attack",
+        attackerZoneIndex: 0,
+        targetZoneIndex: 0,
+      }),
+    );
+    rendered.unmount();
+
+    const directState = withHand(
+      withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+      [],
+    );
+    const directHarness = createRuntimeHarness(directState);
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => directHarness.runtime}
+      />,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Atacar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Blue Dragon" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ataque Direto" }));
+    await waitFor(() =>
+      expect(directHarness.apply).toHaveBeenCalledWith(directState, {
+        type: "declare_attack",
+        attackerZoneIndex: 0,
+      }),
+    );
+  });
+
+  it("dispatches change_position and translates engine refusals", async () => {
+    const battleState = withHand(
+      withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+      [],
+    );
+    const { apply, runtime } = createRuntimeHarness(battleState, () =>
+      err(new DomainError("engine text", "hand_play_already_used")),
+    );
+    render(
+      <DuelScreen
+        duelistId="seto"
+        catalogResult={{ status: "ready", cards: [card] }}
+        loadContext={loadContext}
+        createRuntime={() => runtime}
+      />,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Mudar Posicao" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Blue Dragon" }));
+
+    await waitFor(() =>
+      expect(apply).toHaveBeenCalledWith(battleState, {
+        type: "change_position",
+        zone: { player: "P1", zoneType: "monster", index: 0 },
+      }),
+    );
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "Voce ja usou uma carta da mao neste turno.",
+    );
   });
 
   it("does not render post-duel actions when orchestration failed", async () => {
@@ -231,7 +512,7 @@ describe("DuelScreen", () => {
         resolveResult={async () => ({
           status: "victory",
           duelSessionId: "session-1",
-          reason: "lp_zerado",
+          reason: "lp_depleted",
           rating: { source: "rating_engine", grade: "A", reward: { stars: 10, dropTier: "common" } },
         })}
         grantVictoryReward={grantVictoryReward}

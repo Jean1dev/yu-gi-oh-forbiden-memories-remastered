@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { interceptDuelExit } from "../lib/free-duel/duel-exit-guard.ts";
 import {
   canSurrender,
+  createSurrenderAction,
   surrender,
 } from "../lib/free-duel/surrender.ts";
 import type { ApplyAction } from "../lib/free-duel/duel-session.ts";
@@ -14,11 +15,13 @@ export function useSurrender({
   playerId,
   apply,
   onSessionChange,
+  onInterrupt,
 }: {
   readonly session: DuelSession;
   readonly playerId: PlayerId;
   readonly apply: ApplyAction;
   readonly onSessionChange: (session: DuelSession) => void;
+  readonly onInterrupt?: ((action: ReturnType<typeof createSurrenderAction>) => void) | undefined;
 }) {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const sessionRef = useRef(session);
@@ -31,9 +34,13 @@ export function useSurrender({
   const confirm = useCallback(() => {
     const current = sessionRef.current;
     setConfirmationOpen(false);
+    if (onInterrupt && canSurrender(current)) {
+      onInterrupt(createSurrenderAction(playerId));
+      return;
+    }
     const next = surrender(current, playerId, { apply });
     if (next !== current) onSessionChange(next);
-  }, [apply, onSessionChange, playerId]);
+  }, [apply, onInterrupt, onSessionChange, playerId]);
 
   useEffect(() => {
     function onDocumentClick(event: MouseEvent) {

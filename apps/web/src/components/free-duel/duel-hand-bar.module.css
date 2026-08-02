@@ -1,0 +1,17 @@
+.bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 10px var(--space-4);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+@media (max-width: 720px) {
+  .bar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}

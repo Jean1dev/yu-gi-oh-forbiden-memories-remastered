@@ -9,8 +9,9 @@ export function createAiAgentFake(actions: readonly DuelAction[]): AiAgent & {
     receivedStates,
     async decide(state) {
       receivedStates.push(state);
-      if (queue.length === 0) throw new Error("AI fake has no action queued");
-      return queue.shift();
+      const next = queue.shift();
+      if (next === undefined) throw new Error("AI fake has no action queued");
+      return next;
     },
   };
 }

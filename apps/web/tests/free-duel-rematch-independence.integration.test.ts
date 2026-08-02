@@ -28,8 +28,8 @@ describe("free duel rematch independence integration", () => {
         }),
       initDuel: (initialization: { readonly seed: number }): DuelState => ({
         players: {
-          P1: { lp: 8000, hand: [], deck: [], field: emptyField() },
-          P2: { lp: 8000, hand: [], deck: [], field: emptyField() },
+          P1: { lp: 8000, hand: [], deck: [], field: emptyField(), handPlayUsed: false },
+          P2: { lp: 8000, hand: [], deck: [], field: emptyField(), handPlayUsed: false },
         },
         activeField: null,
         activePlayer: "P1",
@@ -42,7 +42,7 @@ describe("free duel rematch independence integration", () => {
         return seedSequence;
       },
       catalog: (): Card | undefined => undefined,
-      validateDeck: {},
+      validateDeck: () => ok({ composition: {}, cardNumbers: [], total: 40 }),
       generateSessionId: () => {
         sessionSequence += 1;
         return `session-${sessionSequence}`;

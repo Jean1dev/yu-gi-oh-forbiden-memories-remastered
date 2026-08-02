@@ -15,7 +15,7 @@ export function consolidateDuelResult(
 ): ConsolidatedDuelResult {
   const { duelSessionId, outcome, rating } = input;
   if (outcome.status === "draw") {
-    return { status: "draw", duelSessionId, reason: "empate" };
+    return { status: "draw", duelSessionId, reason: "draw" };
   }
   if (outcome.winner === "P1") {
     if (!rating) {

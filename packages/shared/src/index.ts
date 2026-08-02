@@ -158,6 +158,28 @@ export type {
 } from "./duel/events.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
+  Action,
+  AdvancePhaseAction,
+  ChangePositionAction,
+  DeclareAttackAction,
+  PlayFieldSpellAction,
+  PlaySpellOrTrapAction,
+  ResolveAttackAction,
+  SurrenderAction,
+} from "./duel/action.ts";
+export {
+  ActionSchema,
+  AdvancePhaseActionSchema,
+  ChangePositionActionSchema,
+  DeclareAttackActionSchema,
+  PlayFieldSpellActionSchema,
+  PlaySpellOrTrapActionSchema,
+  ResolveAttackActionSchema,
+  SummonMonsterActionSchema,
+  SurrenderActionSchema,
+} from "./duel/action.schema.ts";
+export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
+export type {
   CardRewardEvent,
   Collection,
   CollectionEntry,

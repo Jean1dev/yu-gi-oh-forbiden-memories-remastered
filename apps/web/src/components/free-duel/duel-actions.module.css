@@ -1,0 +1,33 @@
+.actions {
+  display: grid;
+  flex: 0 0 260px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.button {
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary {
+  background: var(--surface-frame);
+  color: var(--text-heading);
+}
+
+.primary {
+  background: var(--color-gold);
+  color: var(--color-black);
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-basis: auto;
+    grid-template-columns: repeat(3, minmax(68px, 1fr));
+    width: 100%;
+  }
+}

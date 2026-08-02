@@ -1,4 +1,4 @@
-import type { ApplyResult, DuelSession, DuelState } from "@yugioh/shared";
+import { ok, type ApplyResult, type DuelSession, type DuelState } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import {
   canSurrender,
@@ -13,8 +13,8 @@ function duelState(activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"
   };
   return {
     players: {
-      P1: { lp: 8000, hand: [], deck: [], field: emptyField },
-      P2: { lp: 8000, hand: [], deck: [], field: emptyField },
+      P1: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
+      P2: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
     },
     activeField: null,
     activePlayer,
@@ -61,17 +61,18 @@ describe("surrender", () => {
   });
 
   it("creates the local player's surrender intent", () => {
-    expect(createSurrenderAction("P1")).toEqual({ type: "surrender", playerId: "P1" });
+    expect(createSurrenderAction("P1")).toEqual({ type: "surrender", player: "P1" });
   });
 
   it.each(["P1", "P2"] as const)(
     "interrupts an active session when the current decider is %s",
     (currentDecider) => {
       const session = activeSession(currentDecider);
-      const endedState = duelState(currentDecider, "end");
-      const apply = vi.fn(
-        (): ApplyResult => ({ state: endedState, events: [] }),
-      );
+      const endedState: DuelState = {
+        ...duelState(currentDecider),
+        outcome: { status: "decisive", winner: "P2", loser: "P1", reason: "surrender" },
+      };
+      const apply = vi.fn(() => ok({ state: endedState, events: [] } satisfies ApplyResult));
 
       expect(surrender(session, "P1", { apply })).toEqual({
         status: "ended",
@@ -81,7 +82,7 @@ describe("surrender", () => {
       });
       expect(apply).toHaveBeenCalledWith(session.state, {
         type: "surrender",
-        playerId: "P1",
+        player: "P1",
       });
     },
   );

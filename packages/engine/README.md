@@ -16,16 +16,65 @@ no functions. `@yugioh/engine` is where the pure reducer lives: the code that re
 - `initialization` (`./src/initialization`, motor-duelo-1x1 F03): produces the first `DuelState` of
   a duel — `buildInitializationInput` (validates and resolves the two decks + seed) and `initDuel`
   (pure, total, builds the state).
-- `combat` (`./src/combat`, motor-duelo-1x1 F04): `calculateEffectiveAtkDef` — a monster's ATK/DEF
-  base plus the Guardian Star, terrain and equipment modifiers, added term by term. The three
-  modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`, `terrain`,
-  `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since none of
-  those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
+- `combat` (`./src/combat`, motor-duelo-1x1 F04/F11): `calculateEffectiveAtkDef` — a monster's
+  ATK/DEF base plus the Guardian Star, terrain and equipment modifiers, added term by term. The
+  three modifiers are injected as `ModifierProviders` (`packages/rules/src/guardian-star`,
+  `terrain`, `effect-system` supply the neutral `{ atk: 0, def: 0 }` implementations today, since
+  none of those cross-PRD engines exist yet); this function never imports `packages/rules` itself.
+  `declareAttack`/`resolveAttack` (F11) are the two-action attack flow: `declareAttack` validates
+  the attacker/target and opens a reaction window on `onAttackDeclared` without touching LP or the
+  field; `resolveAttack` closes that window, reveals a face-down defender (`onFlip`), computes
+  effective ATK/DEF with a combat-local neutral `ModifierProviders` bundle (`packages/rules` is
+  never imported from `engine`), and applies `resolveCombatTable` — the pure, stateless FM combat
+  table (no piercing) also exported here.
 - `serialization` (`./src/serialization`, motor-duelo-1x1 F05): `serialize` (a cloned, reference-
   independent `Snapshot` of a `DuelState`) and `load` (validates an untrusted `unknown` against
   `DuelStateSchema` and returns a cloned `DuelState`, or a `Result` error). `Snapshot` is a plain
   type alias for `DuelState` (`packages/shared`), not a new wrapper — this is the contract the
   future Online Duel server (cross-PRD) will use to persist and resync sessions.
+- `turn` (`./src/turn`, motor-duelo-1x1 F06): `apply` — the engine's single dispatcher
+  (`docs/arquitetura.md` §3.1), an exhaustive `switch` over `Action.type` (`packages/shared`), now
+  complete: F07-F12 each added their case. `apply` also owns both halves of the end-of-duel rule
+  (F12) — it refuses every action once `state.outcome` is set, and passes every successful
+  transition through `stampOutcome`. The base `advance_phase` case runs the four-phase cycle
+  draw → main → battle → end, and, from `end`, the turn transition (reset per-monster turn flags,
+  reset the new active player's hand play, alternate `activePlayer`, increment `turn`, emit
+  `onTurnEnd`/`onTurnStart`). Also exports `isFirstDuelTurn` and `hasUsedHandPlay`/
+  `markHandPlayUsed`, ready for F08-F11 to consume. The `"draw"` case delegates to `draw`
+  (below) before completing the transition to `"main"`.
+- `draw` (`./src/draw`, motor-duelo-1x1 F07): `drawUpToHandSize` — completes the active player's
+  hand up to `INITIAL_HAND_SIZE`, drawing from the top of the deck and emitting one `onDraw` per
+  card; marks `deckOutPlayer` on `DuelState` if the deck runs out mid-draw (consumed later by
+  F12). `resolveDrawPhase` is the boundary entry point for callers outside the normal turn cycle
+  (refuses outside `"draw"` phase). `hasDeckedOut`/`getDeckOutPlayer` read the deck-out signal.
+- `summon` (`./src/summon`, motor-duelo-1x1 F08): `summonMonster` — moves a monster/ritual card
+  from the active player's hand into a free monster zone in one of the four positions, with no
+  tribute. Marks `handPlayUsed`, emits `onSummon` (face-up) or `onSet` (face-down), and opens a
+  reaction window with the opponent as `reactingPlayer`. Wired into `apply` (`turn`) as the
+  `"summon_monster"` case, which checks the `"main"` phase and active-player ownership before
+  delegating — `summonMonster` itself only validates what is specific to summoning.
+- `spells` (`./src/spells`, motor-duelo-1x1 F09): `playSpellOrTrap` — places a magic/trap/equipment
+  card from the active player's hand into a free spell/trap zone, face-down only for `armadilha`.
+  `playFieldSpell` — plays a field-spell card, replacing the single `activeField` slot (always
+  substitutable, never rejected as "occupied"). Both mark `handPlayUsed`, emit `onSet` (with
+  `context.target` distinguishing `"spell_trap_zone"` from `"field"`), and open a reaction window
+  with `getOpponent(state.activePlayer)` as `reactingPlayer`. The engine does not know which
+  `tipo: "magica"` cards are field-spells vs. effect-spells — the caller picks the action variant.
+- `position` (`./src/position`, motor-duelo-1x1 F10): `changePosition` — alternates a monster
+  already on the field between attack/defense and, if it was face-down, reveals it, restricted to
+  the Battle phase. Does not consume the hand play and never touches `hasAttacked`. Emits `onFlip`
+  (only when revealing) followed by `onPositionChange` (always); opens no reaction window.
+  `nextPosition`/`isFaceDown` are the pure transition matrix it delegates to.
+- `end` (`./src/end`, motor-duelo-1x1 F12): closes the duel cycle. `checkDuelEnd` derives the
+  `DuelOutcome` from what the state shows — both players at 0 LP (`draw`), one player at 0 LP
+  (`lp_depleted`), or the `deckOutPlayer` flag F07 raises (`deck_out`) — in that fixed precedence,
+  and returns `undefined` while the duel runs. `surrender` handles the one ending that cannot be
+  derived from the state, stamping a `surrender` outcome without touching anything else; it is
+  accepted at any moment, from either player, even with a reaction window open. `stampOutcome` is
+  the `apply` post-step that ties the two together: it never overwrites an outcome already present,
+  which is what lets `surrender` speak for itself while keeping a single freeze point. No new
+  trigger event is emitted — the vocabulary stays closed at ten, and the ending is observable as
+  `state.outcome`, which travels in the F05 snapshot. `isDuelOver` is the read for UI and AI.
 
 ## Dependency direction
 

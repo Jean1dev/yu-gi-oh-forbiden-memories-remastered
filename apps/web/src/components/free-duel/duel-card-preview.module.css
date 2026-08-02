@@ -1,0 +1,24 @@
+.preview {
+  position: fixed;
+  z-index: 5;
+  bottom: 96px;
+  left: 50%;
+  display: flex;
+  width: 144px;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  transform: translateX(-50%);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+.name {
+  overflow: hidden;
+  margin: 0;
+  color: var(--text-heading);
+  font-size: var(--text-body-sm);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
