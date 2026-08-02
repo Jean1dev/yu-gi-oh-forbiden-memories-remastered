@@ -1,6 +1,13 @@
 "use client";
 
-import { CARD_TYPES, type Card, type CardType } from "@yugioh/shared";
+import {
+  CARD_TYPES,
+  GUARDIAN_STARS,
+  type BuildDeckCollectionSortField,
+  type Card,
+  type CardType,
+  type GuardianStar,
+} from "@yugioh/shared";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -10,7 +17,11 @@ import { CollectionPanel } from "../../components/build-deck/collection-panel.ts
 import { DeckEditor } from "../../components/build-deck/deck-editor.tsx";
 import { DeckValidationSummary } from "../../components/build-deck/deck-validation-summary.tsx";
 import { EmptyCollectionState } from "../../components/build-deck/empty-collection-state.tsx";
-import { BUILD_DECK_MESSAGES, CARD_TYPE_LABELS, tabMyDeckLabel } from "../../components/build-deck/messages.ts";
+import {
+  BUILD_DECK_MESSAGES,
+  CARD_TYPE_LABELS,
+  tabMyDeckLabel,
+} from "../../components/build-deck/messages.ts";
 import { PanelSkeleton } from "../../components/build-deck/panel-skeleton.tsx";
 import { SaveDeckIndicator } from "../../components/build-deck/save-deck-indicator.tsx";
 import { useActiveDeckPersistence } from "../../hooks/use-active-deck-persistence.ts";
@@ -27,8 +38,7 @@ import styles from "./build-deck-client.module.css";
 
 /** The catalog, resolved server-side in `page.tsx` via `loadCatalogFromDisk` (fs access is server-only). */
 export type CatalogResult =
-  | Readonly<{ status: "ok"; cards: readonly Card[] }>
-  | Readonly<{ status: "error" }>;
+  Readonly<{ status: "ok"; cards: readonly Card[] }> | Readonly<{ status: "error" }>;
 
 export type BuildDeckClientProps = Readonly<{
   catalogResult: CatalogResult;
@@ -38,6 +48,16 @@ const EMPTY_CARDS: readonly Card[] = [];
 
 /** "Todos" plus every `CardType`, in the fixed order the filter row renders. */
 const CARD_TYPE_FILTERS: readonly ("todos" | CardType)[] = ["todos", ...CARD_TYPES];
+const ALL_FILTER_VALUE = "";
+
+const SORT_FIELD_LABELS: Readonly<Record<BuildDeckCollectionSortField, string>> = {
+  numero: "Número",
+  nome: "Nome",
+  atk: "ATK",
+  def: "DEF",
+  estrelas: "Estrelas",
+  quantity: "Quantidade",
+};
 
 /**
  * The state machine driving `/build-deck`: skeleton, failure, empty
@@ -55,10 +75,9 @@ const CARD_TYPE_FILTERS: readonly ("todos" | CardType)[] = ["todos", ...CARD_TYP
  * build-deck/F07 Seção 2), so this is the only place that changes shape for
  * F05/F06 consumers of the active deck.
  *
- * The tab/view/filter controls added for the redesigned screen are purely
- * presentational local state layered over `panel.items` — they narrow what
- * `CollectionPanel` renders but never touch `useCollectionPanel`,
- * `useDeckDraft` or any other hook's contract.
+ * The tab/view controls are local presentation state. Collection query
+ * controls (type, class, guardian, sort) live in `useCollectionPanel`, where
+ * they stay pure and read-only before F05 consumes the selected card.
  */
 export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
   const cards = catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS;
@@ -86,8 +105,6 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
 
   const [tab, setTab] = useState<"todas" | "meu-deck">("todas");
   const [view, setView] = useState<"list" | "grid">("list");
-  const [cardType, setCardType] = useState<"todos" | CardType>("todos");
-  const [monsterClass, setMonsterClass] = useState("todos");
 
   function handleLeaveEditor(): void {
     if (!confirmInternalNavigation()) {
@@ -130,28 +147,22 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
     const selectedCard =
       panel.selectedCardNumber === undefined ? undefined : catalog(panel.selectedCardNumber);
     const selectedCardSummary =
-      selectedCard === undefined ? undefined : { numero: selectedCard.numero, nome: selectedCard.nome };
+      selectedCard === undefined
+        ? undefined
+        : { numero: selectedCard.numero, nome: selectedCard.nome };
 
-    const monsterClasses = [
-      "todos",
-      ...Array.from(
-        new Set(panel.items.filter((item) => item.card.tipo === "monstro").map((item) => item.card.classe)),
-      ).sort(),
-    ];
+    const cardClasses = Array.from(new Set(panel.allItems.map((item) => item.card.classe))).sort();
+    const availableGuardians = GUARDIAN_STARS.filter((guardian) =>
+      panel.allItems.some(
+        (item) => item.card.guardiao1 === guardian || item.card.guardiao2 === guardian,
+      ),
+    );
 
-    const scopedItems = tab === "meu-deck" ? panel.items.filter((item) => item.deckQuantity > 0) : panel.items;
-    const filteredItems = scopedItems.filter((item) => {
-      if (cardType !== "todos" && item.card.tipo !== cardType) {
-        return false;
-      }
-      if (cardType === "monstro" && monsterClass !== "todos" && item.card.classe !== monsterClass) {
-        return false;
-      }
-      return true;
-    });
-    const showEmptyDeckTab = tab === "meu-deck" && filteredItems.length === 0 && panel.term === "";
+    const scopedItems =
+      tab === "meu-deck" ? panel.items.filter((item) => item.deckQuantity > 0) : panel.items;
+    const showEmptyDeckTab = tab === "meu-deck" && scopedItems.length === 0 && panel.term === "";
     const showFilterEmptyState =
-      tab === "todas" && filteredItems.length === 0 && panel.items.length > 0 && panel.term === "";
+      tab === "todas" && scopedItems.length === 0 && panel.allItems.length > 0 && panel.term === "";
 
     content = (
       <>
@@ -201,30 +212,104 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
               <button
                 key={type}
                 type="button"
-                className={cardType === type ? styles.filterActive : styles.filter}
-                onClick={() => {
-                  setCardType(type);
-                  setMonsterClass("todos");
-                }}
+                className={
+                  (type === "todos" && panel.filters.cardType === undefined) ||
+                  panel.filters.cardType === type
+                    ? styles.filterActive
+                    : styles.filter
+                }
+                onClick={() =>
+                  panel.setFilters({
+                    ...panel.filters,
+                    cardType: type === "todos" ? undefined : type,
+                  })
+                }
               >
                 {type === "todos" ? BUILD_DECK_MESSAGES.allCardTypes : CARD_TYPE_LABELS[type]}
               </button>
             ))}
           </div>
-          {cardType === "monstro" ? (
-            <div className={styles.filterGroup} role="group" aria-label="Tipo de monstro">
-              {monsterClasses.map((monsterClassOption) => (
-                <button
-                  key={monsterClassOption}
-                  type="button"
-                  className={monsterClass === monsterClassOption ? styles.filterActive : styles.filter}
-                  onClick={() => setMonsterClass(monsterClassOption)}
-                >
-                  {monsterClassOption === "todos" ? BUILD_DECK_MESSAGES.allMonsterClasses : monsterClassOption}
-                </button>
+          <div className={styles.filterSelects}>
+            <label className={styles.selectLabel} htmlFor="build-deck-card-class">
+              Classe
+            </label>
+            <select
+              id="build-deck-card-class"
+              className={styles.selectControl}
+              value={panel.filters.cardClass ?? ALL_FILTER_VALUE}
+              onChange={(event) =>
+                panel.setFilters({
+                  ...panel.filters,
+                  cardClass: event.currentTarget.value || undefined,
+                })
+              }
+            >
+              <option value={ALL_FILTER_VALUE}>{BUILD_DECK_MESSAGES.allCardClasses}</option>
+              {cardClasses.map((cardClass) => (
+                <option key={cardClass} value={cardClass}>
+                  {cardClass}
+                </option>
               ))}
-            </div>
-          ) : null}
+            </select>
+            <label className={styles.selectLabel} htmlFor="build-deck-guardian">
+              Guardião
+            </label>
+            <select
+              id="build-deck-guardian"
+              className={styles.selectControl}
+              value={panel.filters.guardian ?? ALL_FILTER_VALUE}
+              onChange={(event) =>
+                panel.setFilters({
+                  ...panel.filters,
+                  guardian: (event.currentTarget.value || undefined) as GuardianStar | undefined,
+                })
+              }
+            >
+              <option value={ALL_FILTER_VALUE}>{BUILD_DECK_MESSAGES.allGuardians}</option>
+              {availableGuardians.map((guardian) => (
+                <option key={guardian} value={guardian}>
+                  {guardian}
+                </option>
+              ))}
+            </select>
+            <label className={styles.selectLabel} htmlFor="build-deck-sort-field">
+              Ordenar por
+            </label>
+            <select
+              id="build-deck-sort-field"
+              className={styles.selectControl}
+              value={panel.sort.field}
+              onChange={(event) =>
+                panel.setSort({
+                  ...panel.sort,
+                  field: event.currentTarget.value as BuildDeckCollectionSortField,
+                })
+              }
+            >
+              {Object.entries(SORT_FIELD_LABELS).map(([field, label]) => (
+                <option key={field} value={field}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className={styles.filter}
+              aria-label={
+                panel.sort.direction === "asc"
+                  ? BUILD_DECK_MESSAGES.sortAscending
+                  : BUILD_DECK_MESSAGES.sortDescending
+              }
+              onClick={() =>
+                panel.setSort({
+                  ...panel.sort,
+                  direction: panel.sort.direction === "asc" ? "desc" : "asc",
+                })
+              }
+            >
+              {panel.sort.direction === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
         </div>
         {showEmptyDeckTab ? (
           <p className={styles.emptyState}>{BUILD_DECK_MESSAGES.emptyDeckTab}</p>
@@ -232,7 +317,7 @@ export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
           <p className={styles.emptyState}>{BUILD_DECK_MESSAGES.emptyFilterResult}</p>
         ) : (
           <CollectionPanel
-            items={filteredItems}
+            items={scopedItems}
             term={panel.term}
             onTermChange={panel.setTerm}
             isEmpty={panel.isEmpty}
