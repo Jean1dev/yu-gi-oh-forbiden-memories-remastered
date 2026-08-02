@@ -1,7 +1,18 @@
 export { err, ok, type Result } from "./result.ts";
 export { EXPENSIVE_REDEMPTION_THRESHOLD_STARS } from "./economy/constants.ts";
-export type { CardRedemptionIntent, CardRedemptionOutcome, PendingCardRedemption, RedemptionEligibility, RedemptionLedgerState } from "./economy/redemption.ts";
-export { CardRedemptionIntentSchema, PendingCardRedemptionSchema, RedeemCardResponseSchema, type RedeemCardResponse } from "./economy/redemption-schema.ts";
+export type {
+  CardRedemptionIntent,
+  CardRedemptionOutcome,
+  PendingCardRedemption,
+  RedemptionEligibility,
+  RedemptionLedgerState,
+} from "./economy/redemption.ts";
+export {
+  CardRedemptionIntentSchema,
+  PendingCardRedemptionSchema,
+  RedeemCardResponseSchema,
+  type RedeemCardResponse,
+} from "./economy/redemption-schema.ts";
 export { DomainError } from "./errors.ts";
 export {
   CANONICAL_CARD_TOTAL,
@@ -181,6 +192,17 @@ export type {
   RewardResult,
   SerializedCollection,
 } from "./collection/types.ts";
+export {
+  BUILD_DECK_COLLECTION_SORT_DIRECTIONS,
+  BUILD_DECK_COLLECTION_SORT_FIELDS,
+  DEFAULT_BUILD_DECK_COLLECTION_FILTERS,
+  DEFAULT_BUILD_DECK_COLLECTION_SORT,
+  type BuildDeckCollectionFilters,
+  type BuildDeckCollectionQuery,
+  type BuildDeckCollectionSort,
+  type BuildDeckCollectionSortDirection,
+  type BuildDeckCollectionSortField,
+} from "./collection/filters.ts";
 export type { ActiveDeckLookup, CollectionItemWithDeck } from "./collection/active-deck.ts";
 export {
   ApplyCardRewardResponseSchema,
