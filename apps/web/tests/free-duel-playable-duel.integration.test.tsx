@@ -101,7 +101,6 @@ describe("free duel playable screen with real engine", () => {
     expect(chosenName).not.toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Invocar" }));
-    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }));
     fireEvent.click(screen.getByRole("button", { name: "Ataque" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: `Zona de monstro Jogador 1, ${chosenName}` })).toBeTruthy(),

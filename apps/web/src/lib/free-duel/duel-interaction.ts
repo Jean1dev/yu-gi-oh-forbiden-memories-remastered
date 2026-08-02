@@ -17,12 +17,7 @@ const ATTACK_POSITIONS = new Set<MonsterPosition>(["attack_face_up", "attack_fac
 export type DuelIntent =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "card_selected"; handIndex: number }>
-  | Readonly<{
-      kind: "choosing_zone";
-      handIndex: number;
-      row: "monster" | "spell";
-      shortcutPosition?: MonsterPosition | undefined;
-    }>
+  | Readonly<{ kind: "choosing_zone"; handIndex: number }>
   | Readonly<{ kind: "choosing_position"; handIndex: number; zoneIndex: ZoneIndex }>
   | Readonly<{ kind: "choosing_attacker" }>
   | Readonly<{ kind: "choosing_target"; attackerZoneIndex: ZoneIndex }>
@@ -97,6 +92,11 @@ function selectedCard(state: DuelState, intent: DuelIntent): Card | undefined {
 
 function hasFreeMonsterZone(state: DuelState): boolean {
   return state.players[PLAYER].field.monsters.some((zone) => !zone.occupied);
+}
+
+function nextFreeMonsterZoneIndex(state: DuelState): ZoneIndex | undefined {
+  const index = state.players[PLAYER].field.monsters.findIndex((zone) => !zone.occupied);
+  return isZoneIndex(index) ? index : undefined;
 }
 
 function hasFreeSpellZone(state: DuelState): boolean {
@@ -205,30 +205,12 @@ export function describeActionSlots(
   return [emptySlot(), emptySlot(), advance];
 }
 
-function activateZoneForChoice(
+function activateSpellZoneForChoice(
   intent: Extract<DuelIntent, { kind: "choosing_zone" }>,
   reference: ZoneReference,
   state: DuelState,
 ): Readonly<{ intent: DuelIntent; action?: DuelAction }> {
-  if (reference.player !== PLAYER || reference.zoneType !== intent.row) return { intent };
-  if (intent.row === "monster") {
-    const zone = state.players[PLAYER].field.monsters[reference.index];
-    if (zone.occupied) return { intent };
-    if (intent.shortcutPosition) {
-      return {
-        intent: idleIntent,
-        action: {
-          type: "summon_monster",
-          player: PLAYER,
-          handIndex: intent.handIndex,
-          zoneIndex: reference.index,
-          position: intent.shortcutPosition,
-        },
-      };
-    }
-    return { intent: { kind: "choosing_position", handIndex: intent.handIndex, zoneIndex: reference.index } };
-  }
-
+  if (reference.player !== PLAYER || reference.zoneType !== "spell") return { intent };
   const zone = state.players[PLAYER].field.spells[reference.index];
   if (zone.occupied) return { intent };
   return {
@@ -254,24 +236,32 @@ export function reduceIntent(
     switch (event.id) {
       case "advance_phase":
         return affordances.canAdvancePhase ? { intent: idleIntent, action: { type: "advance_phase" } } : { intent };
-      case "summon":
-        return intent.kind === "card_selected" && affordances.canSummon
-          ? { intent: { kind: "choosing_zone", handIndex: intent.handIndex, row: "monster" } }
-          : { intent };
-      case "set":
-        return intent.kind === "card_selected" && affordances.canSummon
-          ? {
-              intent: {
-                kind: "choosing_zone",
+      case "summon": {
+        if (intent.kind !== "card_selected" || !affordances.canSummon) return { intent };
+        const zoneIndex = nextFreeMonsterZoneIndex(state);
+        return zoneIndex === undefined
+          ? { intent }
+          : { intent: { kind: "choosing_position", handIndex: intent.handIndex, zoneIndex } };
+      }
+      case "set": {
+        if (intent.kind !== "card_selected" || !affordances.canSummon) return { intent };
+        const zoneIndex = nextFreeMonsterZoneIndex(state);
+        return zoneIndex === undefined
+          ? { intent }
+          : {
+              intent: idleIntent,
+              action: {
+                type: "summon_monster",
+                player: PLAYER,
                 handIndex: intent.handIndex,
-                row: "monster",
-                shortcutPosition: "defense_face_down",
+                zoneIndex,
+                position: "defense_face_down",
               },
-            }
-          : { intent };
+            };
+      }
       case "place":
         return intent.kind === "card_selected" && affordances.canPlaceSpell
-          ? { intent: { kind: "choosing_zone", handIndex: intent.handIndex, row: "spell" } }
+          ? { intent: { kind: "choosing_zone", handIndex: intent.handIndex } }
           : { intent };
       case "attack":
         return affordances.canAttack ? { intent: { kind: "choosing_attacker" } } : { intent };
@@ -295,7 +285,7 @@ export function reduceIntent(
     const { reference } = event;
     switch (intent.kind) {
       case "choosing_zone":
-        return activateZoneForChoice(intent, reference, state);
+        return activateSpellZoneForChoice(intent, reference, state);
       case "choosing_attacker":
         return reference.player === PLAYER &&
           reference.zoneType === "monster" &&
@@ -360,11 +350,8 @@ export function zoneAffordance(
   }
 
   if (intent.kind === "choosing_zone") {
-    if (reference.player !== PLAYER || reference.zoneType !== intent.row) return "idle";
-    const zone =
-      intent.row === "monster"
-        ? state.players[PLAYER].field.monsters[reference.index]
-        : state.players[PLAYER].field.spells[reference.index];
+    if (reference.player !== PLAYER || reference.zoneType !== "spell") return "idle";
+    const zone = state.players[PLAYER].field.spells[reference.index];
     return zone.occupied ? "idle" : "selectable";
   }
 

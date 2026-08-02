@@ -29,8 +29,9 @@ e de `docs/estetica-visual.md` §2.1.
 - **Renderização a partir da projeção pública** (`getPublicDuelState(state, "P1")`): carta virada do
   oponente não tem nome, ATK nem DEF no DOM; a mão do oponente é contagem (PRD F10 critério 2;
   MotorDuelo/F01 cross-PRD).
-- **Invocação nas quatro posições**, escolhendo carta → zona livre → posição, mais o atalho clássico
-  do FM direto para defesa virada para baixo (PRD F10 Capabilities).
+- **Invocação nas quatro posições**, escolhendo carta → posição (a zona de monstro livre de menor
+  índice é calculada automaticamente, sem etapa de escolha — correção 2026-08-02), mais o atalho
+  clássico do FM direto para defesa virada para baixo (PRD F10 Capabilities).
 - **Colocação de magia/armadilha** em zona livre da fileira de trás, sem efeito, consumindo a jogada
   da mão do turno.
 - **Ataque** por seleção atacante → alvo, e ataque direto quando o oponente não tem monstros.
@@ -181,7 +182,7 @@ alterados**.
 |---|---|---|
 | `idle` | — | Nada selecionado; slots de fase/batalha disponíveis |
 | `card_selected` | `handIndex` | Carta da mão em foco; a prévia está aberta |
-| `choosing_zone` | `handIndex`, `row: "monster" \| "spell"` | Aguarda o clique numa zona livre da fileira indicada |
+| `choosing_zone` | `handIndex` | Aguarda o clique numa zona livre de magia/armadilha (correção 2026-08-02: monstro não passa mais por aqui, vai direto a `choosing_position` com a zona já calculada) |
 | `choosing_position` | `handIndex`, `zoneIndex` | Aguarda uma das 4 posições no seletor |
 | `choosing_attacker` | — | Aguarda o clique num monstro próprio apto a atacar |
 | `choosing_target` | `attackerZoneIndex` | Aguarda o clique num monstro do oponente |
@@ -226,12 +227,17 @@ componente.
 **Invocar um monstro** (PRD F10 Capabilities)
 
 4. Clique na carta da mão → `card_selected`; a prévia abre com arte 120px e nome.
-5. Slot **Invocar** → `choosing_zone` com `row: "monster"`; as 5 zonas livres do jogador ficam
-   `selectable` e recebem foco de teclado; as demais ficam inertes.
-6. Clique numa zona livre → `choosing_position`; `duel-prompt` mostra as quatro opções.
+5. Slot **Invocar** → a máquina calcula sozinha a zona de monstro livre de **menor índice** e vai
+   direto a `choosing_position`, sem etapa de escolha de zona. **Correção (2026-08-02, pedido do
+   usuário):** a etapa `choosing_zone` para monstros foi removida — o jogador nunca escolhia nada
+   de verdade ali (a única decisão real é a posição), então o clique numa zona virou apenas um
+   passo redundante. `choosing_zone` continua existindo, só que restrita à colocação de
+   magia/armadilha (passo 10), que de fato tem 5 zonas equivalentes entre as quais escolher.
+6. `duel-prompt` mostra as quatro opções de posição.
 7. Escolha da posição → a máquina produz `{ type: "summon_monster", player: "P1", handIndex,
-   zoneIndex, position }` e volta a `idle`.
-8. O slot **Definir** encurta 5–7: escolhida a zona, dispara direto `defense_face_down`.
+   zoneIndex: <zona calculada no passo 5>, position }` e volta a `idle`.
+8. O slot **Definir** encurta 5–7: com a zona já calculada, dispara direto `defense_face_down`
+   assim que o slot é acionado, sem passar por `choosing_position`.
 
 **Colocar magia/armadilha**
 
@@ -669,11 +675,11 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
 **`duel-interaction.test.ts`** (node) — uma transição por linha da máquina:
 
 - `reduceIntent seleciona a carta da mao e abre a previa`
-- `reduceIntent leva de card_selected a choosing_zone ao invocar`
-- `reduceIntent leva de choosing_zone a choosing_position ao ativar uma zona livre`
+- `reduceIntent leva de card_selected a choosing_position ao invocar, com a zona calculada automaticamente` (correção 2026-08-02 — não passa mais por `choosing_zone`)
+- `reduceIntent pula zonas ocupadas e escolhe a proxima zona de monstro livre ao invocar`
 - `reduceIntent produz summon_monster com a posicao escolhida` — uma asserção por posição, tabela com
   as quatro (`attack_face_up`, `attack_face_down`, `defense_face_up`, `defense_face_down`)
-- `reduceIntent do atalho Definir produz summon_monster em defense_face_down sem passar por choosing_position`
+- `reduceIntent do atalho Definir produz summon_monster direto em defense_face_down, com a zona calculada automaticamente e sem passar por choosing_position`
 - `reduceIntent produz play_spell_or_trap ao ativar uma zona livre da backrow`
 - `reduceIntent produz declare_attack com alvo apos escolher atacante e alvo`
 - `reduceIntent produz declare_attack sem alvo no ataque direto`
@@ -700,7 +706,7 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
 - `describeAffordances nega canChangePosition quando o monstro ja mudou de posicao`
 - `describeActionSlots devolve sempre tres slots` — tabela cobrindo as cinco linhas do layout
 - `describeActionSlots mantem Passar Fase no slot primario em todas as situacoes`
-- `zoneAffordance marca as zonas livres como selectable em choosing_zone`
+- `zoneAffordance marca as zonas de magia/armadilha livres como selectable em choosing_zone` (correção 2026-08-02 — `choosing_zone` só existe mais para a backrow)
 - `zoneAffordance marca os monstros do oponente como target em choosing_target`
 - `zoneAffordance devolve idle para zonas do oponente em choosing_zone`
 
@@ -724,7 +730,7 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
 
 **`use-duel-interaction.test.ts`** (jsdom):
 
-- `o fluxo selecionar carta, invocar, escolher zona e escolher posicao despacha summon_monster uma unica vez`
+- `o fluxo selecionar carta, invocar e escolher posicao despacha summon_monster uma unica vez, na zona livre calculada automaticamente` (correção 2026-08-02)
 - `cancelar no meio da selecao nao despacha nada`
 
 **`use-duel-cues.test.ts`** (jsdom, `vi.useFakeTimers()`):
@@ -778,8 +784,9 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
 
 - **`apps/web/tests/free-duel-playable-duel.integration.test.tsx` (novo, jsdom, contra o motor real —
   só o `sleep` do agente é falso):** monta o catálogo selado, cria o `DuelRuntime` de F09 e conduz uma
-  partida completa pela interface — iniciar → selecionar carta → Invocar → escolher zona → escolher
-  posição → a zona mostra a carta e a mão encolhe → Passar Fase ×3 → o turno da CPU avança visivelmente
+  partida completa pela interface — iniciar → selecionar carta → Invocar → escolher posição (zona
+  calculada automaticamente, correção 2026-08-02) → a zona mostra a carta e a mão encolhe → Passar
+  Fase ×3 → o turno da CPU avança visivelmente
   → na fase de batalha do turno ≥ 2, Atacar → atacante → alvo (ou ataque direto) → o LP do oponente cai
   → render → "Derrota" + "Revanche" / "Trocar oponente" / "Voltar ao menu". **Sem fakes do motor.**
 - **`apps/web/tests/surrender.integration.test.tsx` (existente, deve seguir verde):** o botão
@@ -810,7 +817,7 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
 |---|---|
 | Barra superior, dois campos 5+5, LP dos dois lados e mão do jogador, sem rolagem | `a tela renderiza a barra superior, os dois campos, os LP e a mao sem rolagem` + `renderiza 10 zonas de monstro e 10 de magia/armadilha` |
 | Cartas viradas do oponente sem nome, ATK ou DEF acessíveis; lado do oponente vindo da projeção pública | `uma zona do oponente virada para baixo nao expoe nome, atk nem def`, `nenhum nome de carta virada do oponente aparece no DOM` e o portão de tipos (`pnpm typecheck`) |
-| Invocar escolhendo zona e cada uma das quatro posições | `reduceIntent produz summon_monster com a posicao escolhida` (tabela das 4) + o caminho completo na integração |
+| Invocar na zona livre calculada automaticamente, escolhendo cada uma das quatro posições | `reduceIntent produz summon_monster com a posicao escolhida` (tabela das 4) + o caminho completo na integração |
 | Colocar magia/armadilha na fileira de trás, carta virada e jogada da mão consumida | `reduceIntent produz play_spell_or_trap…` + integração (a segunda tentativa de jogada no mesmo turno é recusada com `hand_play_already_used`) |
 | Declarar ataque com atacante e alvo, e ataque direto; LP refletem o resultado | `reduceIntent produz declare_attack…` (×2) + integração (queda de LP contra o motor real) |
 | Mudar a posição de um monstro em campo na fase de batalha | `reduceIntent produz change_position…` + `describeAffordances nega canChangePosition…` |

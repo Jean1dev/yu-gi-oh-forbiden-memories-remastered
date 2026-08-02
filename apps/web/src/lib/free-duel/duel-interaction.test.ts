@@ -83,17 +83,11 @@ function withMonster(base: DuelState, reference: ZoneReference, card = monster, 
 }
 
 describe("duel interaction reducer", () => {
-  it("selects a hand card and opens summon flow through all four positions", () => {
+  it("selects a hand card and opens summon flow straight into the next free zone", () => {
     const selected = reduceIntent({ kind: "idle" }, { type: "select_hand_card", handIndex: 0 }, state());
     expect(selected.intent).toEqual({ kind: "card_selected", handIndex: 0 });
-    const choosingZone = reduceIntent(selected.intent, { type: "invoke_slot", id: "summon" }, state());
-    expect(choosingZone.intent).toEqual({ kind: "choosing_zone", handIndex: 0, row: "monster" });
-    const choosingPosition = reduceIntent(
-      choosingZone.intent,
-      { type: "activate_zone", reference: zoneReference("P1", "monster", 2) },
-      state(),
-    );
-    expect(choosingPosition.intent).toEqual({ kind: "choosing_position", handIndex: 0, zoneIndex: 2 });
+    const choosingPosition = reduceIntent(selected.intent, { type: "invoke_slot", id: "summon" }, state());
+    expect(choosingPosition.intent).toEqual({ kind: "choosing_position", handIndex: 0, zoneIndex: 0 });
 
     const positions: MonsterPosition[] = [
       "attack_face_up",
@@ -104,24 +98,29 @@ describe("duel interaction reducer", () => {
     for (const position of positions) {
       expect(
         reduceIntent(choosingPosition.intent, { type: "choose_position", position }, state()).action,
-      ).toEqual({ type: "summon_monster", player: "P1", handIndex: 0, zoneIndex: 2, position });
+      ).toEqual({ type: "summon_monster", player: "P1", handIndex: 0, zoneIndex: 0, position });
     }
   });
 
-  it("uses set as a shortcut to defense face down", () => {
+  it("skips occupied zones and picks the next free one when summoning", () => {
+    const occupied = withMonster(state(), zoneReference("P1", "monster", 0));
+    const choosingPosition = reduceIntent(
+      { kind: "card_selected", handIndex: 0 },
+      { type: "invoke_slot", id: "summon" },
+      occupied,
+    );
+    expect(choosingPosition.intent).toEqual({ kind: "choosing_position", handIndex: 0, zoneIndex: 1 });
+  });
+
+  it("uses set as a shortcut straight to defense face down in the next free zone", () => {
     const base: DuelIntent = { kind: "card_selected", handIndex: 0 };
-    const choosingZone = reduceIntent(base, { type: "invoke_slot", id: "set" }, state());
-    expect(
-      reduceIntent(
-        choosingZone.intent,
-        { type: "activate_zone", reference: zoneReference("P1", "monster", 1) },
-        state(),
-      ).action,
-    ).toEqual({
+    const result = reduceIntent(base, { type: "invoke_slot", id: "set" }, state());
+    expect(result.intent).toEqual({ kind: "idle" });
+    expect(result.action).toEqual({
       type: "summon_monster",
       player: "P1",
       handIndex: 0,
-      zoneIndex: 1,
+      zoneIndex: 0,
       position: "defense_face_down",
     });
   });
@@ -129,6 +128,7 @@ describe("duel interaction reducer", () => {
   it("places a spell or trap in the back row", () => {
     const selected: DuelIntent = { kind: "card_selected", handIndex: 1 };
     const choosingZone = reduceIntent(selected, { type: "invoke_slot", id: "place" }, state());
+    expect(choosingZone.intent).toEqual({ kind: "choosing_zone", handIndex: 1 });
     expect(
       reduceIntent(
         choosingZone.intent,
@@ -294,13 +294,13 @@ describe("duel affordances", () => {
 
   it("classifies zones for the current intent", () => {
     const base = withMonster(state({ phase: "battle" }), zoneReference("P2", "monster", 1));
-    expect(zoneAffordance(base, { kind: "choosing_zone", handIndex: 0, row: "monster" }, zoneReference("P1", "monster", 2))).toBe(
+    expect(zoneAffordance(base, { kind: "choosing_zone", handIndex: 0 }, zoneReference("P1", "spell", 2))).toBe(
       "selectable",
     );
     expect(zoneAffordance(base, { kind: "choosing_target", attackerZoneIndex: 0 }, zoneReference("P2", "monster", 1))).toBe(
       "target",
     );
-    expect(zoneAffordance(base, { kind: "choosing_zone", handIndex: 0, row: "monster" }, zoneReference("P2", "monster", 1))).toBe(
+    expect(zoneAffordance(base, { kind: "choosing_zone", handIndex: 0 }, zoneReference("P2", "monster", 1))).toBe(
       "idle",
     );
   });
