@@ -259,6 +259,10 @@ describe("duel affordances", () => {
         .canAttack,
     ).toBe(false);
     expect(
+      describeAffordances({ state: alreadyAttacked, isPlayerTurn: true, busy: false, intent: { kind: "idle" } })
+        .canChangePosition,
+    ).toBe(false);
+    expect(
       describeAffordances({ state: faceDownAttack, isPlayerTurn: true, busy: false, intent: { kind: "idle" } })
         .canDirectAttack,
     ).toBe(true);

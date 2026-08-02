@@ -291,7 +291,7 @@ componente.
 | `canPlaceSpell` | `canAct` ∧ `phase === "main"` ∧ `activePlayer === "P1"` ∧ `!P1.handPlayUsed` ∧ `carta.tipo ∈ {magica, armadilha, equipamento}` ∧ ∃ zona de magia livre | `wrong_phase`, `hand_play_already_used`, `invalid_spell_trap_card_type`, `no_space_for_card` |
 | `canAttack` | `canAct` ∧ `phase === "battle"` ∧ `activePlayer === "P1"` ∧ `turn > 1` ∧ ∃ monstro próprio em `attack_face_up`/`attack_face_down` com `!hasAttacked` | `wrong_phase`, `first_turn_attack_forbidden`, `attacker_not_in_attack_position`, `attacker_already_attacked` |
 | `canDirectAttack` | `canAttack` ∧ nenhuma zona de monstro do oponente ocupada | `direct_attack_blocked_by_monsters` |
-| `canChangePosition` | `canAct` ∧ `phase === "battle"` ∧ `activePlayer === "P1"` ∧ ∃ monstro próprio com `!hasChangedPosition` | `wrong_phase`, `already_changed_position`, `zone_not_owned_by_active_player` |
+| `canChangePosition` | `canAct` ∧ `phase === "battle"` ∧ `activePlayer === "P1"` ∧ ∃ monstro próprio com `!hasChangedPosition` ∧ `!hasAttacked` (correção 2026-08-02 — motor-duelo-1x1/F10 Decisão 6, revisada) | `wrong_phase`, `already_changed_position`, `already_attacked`, `zone_not_owned_by_active_player` |
 | `canAdvancePhase` | `canAct` | `duel_already_ended` |
 
 > `attack_face_down` **conta como posição de ataque** no motor (`ATTACK_POSITIONS` inclui as duas

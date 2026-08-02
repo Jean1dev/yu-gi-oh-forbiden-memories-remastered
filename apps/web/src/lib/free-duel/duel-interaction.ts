@@ -123,7 +123,9 @@ function canAnyMonsterAttack(state: DuelState): boolean {
 }
 
 function canAnyMonsterChangePosition(state: DuelState): boolean {
-  return state.players[PLAYER].field.monsters.some((zone) => zone.occupied && !zone.hasChangedPosition);
+  return state.players[PLAYER].field.monsters.some(
+    (zone) => zone.occupied && !zone.hasChangedPosition && !zone.hasAttacked,
+  );
 }
 
 function describeAsPlayerTurn(state: DuelState, intent: DuelIntent): DuelAffordances {
@@ -318,7 +320,7 @@ export function reduceIntent(
           reference.player === PLAYER && reference.zoneType === "monster"
             ? state.players[PLAYER].field.monsters[reference.index]
             : undefined;
-        return zone && zone.occupied && !zone.hasChangedPosition
+        return zone && zone.occupied && !zone.hasChangedPosition && !zone.hasAttacked
           ? { intent: idleIntent, action: { type: "change_position", zone: reference } }
           : { intent };
       }
@@ -394,7 +396,7 @@ export function zoneAffordance(
       reference.player === PLAYER && reference.zoneType === "monster"
         ? state.players[PLAYER].field.monsters[reference.index]
         : undefined;
-    return zone && zone.occupied && !zone.hasChangedPosition ? "selectable" : "idle";
+    return zone && zone.occupied && !zone.hasChangedPosition && !zone.hasAttacked ? "selectable" : "idle";
   }
 
   return "idle";
