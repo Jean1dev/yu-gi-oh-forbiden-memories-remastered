@@ -1,7 +1,14 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import type { ApplyResult, DuelSession, DuelState, Duelist, ReadyDeck } from "@yugioh/shared";
+import {
+  ok,
+  type ApplyResult,
+  type DuelSession,
+  type DuelState,
+  type Duelist,
+  type ReadyDeck,
+} from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import {
   DuelScreen,
@@ -18,8 +25,8 @@ const emptyField = {
 };
 const activeState: DuelState = {
   players: {
-    P1: { lp: 8000, hand: [], deck: [], field: emptyField },
-    P2: { lp: 8000, hand: [], deck: [], field: emptyField },
+    P1: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
+    P2: { lp: 8000, hand: [], deck: [], field: emptyField, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P2",
@@ -27,7 +34,10 @@ const activeState: DuelState = {
   phase: "main",
   seed: 1,
 };
-const endedState: DuelState = { ...activeState, phase: "end" };
+const endedState: DuelState = {
+  ...activeState,
+  outcome: { status: "decisive", winner: "P2", loser: "P1", reason: "surrender" },
+};
 const duelist = {
   id: "seto",
   name: "Seto",
@@ -52,14 +62,20 @@ const session: DuelSession = {
 describe("surrender integration", () => {
   it("confirms a defeat-producing engine intent outside the player's turn", async () => {
     const apply = vi.fn(
-      (): ApplyResult => ({ state: endedState, events: [{ type: "duel_ended" }] as never }),
+      () => ok({ state: endedState, events: [] } satisfies ApplyResult),
     );
+    const resolveResult = vi.fn(async (ended: Extract<DuelSession, { status: "ended" }>) => ({
+      status: "defeat" as const,
+      duelSessionId: ended.duelSessionId,
+      reason: "surrender" as const,
+    }));
     render(
       <DuelScreen
         duelistId="seto"
         loadContext={async () => context}
         startMatch={() => session}
         applyAction={apply}
+        resolveResult={resolveResult}
       />,
     );
 
@@ -69,12 +85,18 @@ describe("surrender integration", () => {
 
     expect(apply).toHaveBeenCalledWith(activeState, {
       type: "surrender",
-      playerId: "P1",
+      player: "P1",
+    });
+    expect(resolveResult).toHaveBeenCalledWith({
+      status: "ended",
+      duelSessionId: "duel-1",
+      duelistId: "seto",
+      finalState: endedState,
     });
     expect(
-      await screen.findByRole("heading", { name: "Resultado indisponível" }),
+      await screen.findByRole("heading", { name: "Derrota" }),
     ).toBeTruthy();
-    expect(screen.getByText("Não foi possível apurar o resultado do duelo.")).toBeTruthy();
+    expect(screen.getByText("Você se rendeu.")).toBeTruthy();
     expect(screen.queryByText(/estrelas/)).toBeNull();
     await waitFor(() =>
       expect(screen.queryByRole("button", { name: "Render-se" })).toBeNull(),

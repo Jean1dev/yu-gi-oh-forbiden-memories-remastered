@@ -21,8 +21,8 @@ const field = {
 };
 const finalState: DuelState = {
   players: {
-    P1: { lp: 8000, hand: [], deck: [], field },
-    P2: { lp: 0, hand: [], deck: [], field },
+    P1: { lp: 8000, hand: [], deck: [], field, handPlayUsed: false },
+    P2: { lp: 0, hand: [], deck: [], field, handPlayUsed: false },
   },
   activeField: null,
   activePlayer: "P1",
@@ -46,7 +46,7 @@ const results: readonly ConsolidatedDuelResult[] = [
   {
     status: "victory",
     duelSessionId: "session-1",
-    reason: "lp_zerado",
+    reason: "lp_depleted",
     rating: {
       source: "rating_engine",
       grade: "A",
@@ -54,7 +54,7 @@ const results: readonly ConsolidatedDuelResult[] = [
     },
   },
   { status: "defeat", duelSessionId: "session-1", reason: "deck_out" },
-  { status: "draw", duelSessionId: "session-1", reason: "empate" },
+  { status: "draw", duelSessionId: "session-1", reason: "draw" },
   { status: "unavailable", duelSessionId: "session-1", reason: "missing_outcome" },
 ];
 

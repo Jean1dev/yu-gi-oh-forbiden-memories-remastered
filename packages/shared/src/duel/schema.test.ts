@@ -38,6 +38,7 @@ function validPlayer(overrides: Partial<PlayerState> = {}): PlayerState {
     hand: [],
     deck: [],
     field: emptyField(),
+    handPlayUsed: false,
     ...overrides,
   };
 }

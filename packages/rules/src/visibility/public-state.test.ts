@@ -64,8 +64,8 @@ function duelState(): DuelState {
   const opponent = card("002");
   return {
     players: {
-      P1: { lp: 8000, hand: [own], deck: [own, own], field: field(own, false) },
-      P2: { lp: 7000, hand: [opponent], deck: [opponent], field: field(opponent, false) },
+      P1: { lp: 8000, hand: [own], deck: [own, own], field: field(own, false), handPlayUsed: false },
+      P2: { lp: 7000, hand: [opponent], deck: [opponent], field: field(opponent, false), handPlayUsed: false },
     },
     activeField: own,
     activePlayer: "P1",

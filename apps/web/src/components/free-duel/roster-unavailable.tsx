@@ -1,10 +1,12 @@
+import { OPPONENT_SELECTION_MESSAGES } from "../../lib/free-duel/opponent-selection-messages.ts";
+
 export function RosterUnavailable({ onRetry }: { onRetry(): void }) {
   return (
-    <main>
-      <h1>Free Duel unavailable</h1>
-      <p>Could not load the card catalog. Try again.</p>
+    <main className="page">
+      <h1>{OPPONENT_SELECTION_MESSAGES.unavailableTitle}</h1>
+      <p>{OPPONENT_SELECTION_MESSAGES.unavailableMessage}</p>
       <button type="button" onClick={onRetry}>
-        Try again
+        {OPPONENT_SELECTION_MESSAGES.retry}
       </button>
     </main>
   );

@@ -16,7 +16,18 @@ export {
 } from "./initialization/index.ts";
 export {
   calculateEffectiveAtkDef,
+  declareAttack,
+  resolveAttack,
+  resolveCombatTable,
   type CombatContext,
   type ModifierProviders,
+  type ResolveCombatTableInput,
+  type ResolveCombatTableResult,
 } from "./combat/index.ts";
+export { checkDuelEnd, isDuelOver, stampOutcome, surrender } from "./end/index.ts";
 export { load, serialize } from "./serialization/index.ts";
+export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
+export { drawUpToHandSize, getDeckOutPlayer, hasDeckedOut, resolveDrawPhase } from "./draw/index.ts";
+export { summonMonster } from "./summon/index.ts";
+export { getOpponent, playFieldSpell, playSpellOrTrap } from "./spells/index.ts";
+export { changePosition, isFaceDown, nextPosition } from "./position/index.ts";

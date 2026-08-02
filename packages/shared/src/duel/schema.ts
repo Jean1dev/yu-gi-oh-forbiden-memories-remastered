@@ -73,6 +73,7 @@ export const PlayerStateSchema = z.strictObject({
   hand: z.array(CardSchema),
   deck: z.array(CardSchema),
   field: PlayerFieldSchema,
+  handPlayUsed: z.boolean(),
 });
 
 export const EventTypeSchema = z.enum(EVENT_TYPES);
@@ -124,6 +125,36 @@ export const ReactionWindowSchema = z.strictObject({
   reactingPlayer: PlayerIdSchema,
 });
 
+export const DecisiveDuelEndReasonSchema = z.enum(["lp_depleted", "deck_out", "surrender"]);
+
+export const DuelEndReasonSchema = z.enum(["lp_depleted", "deck_out", "surrender", "draw"]);
+
+const DecisiveDuelOutcomeSchema = z
+  .strictObject({
+    status: z.literal("decisive"),
+    winner: PlayerIdSchema,
+    loser: PlayerIdSchema,
+    reason: DecisiveDuelEndReasonSchema,
+  })
+  .refine(({ winner, loser }) => winner !== loser, {
+    message: "winner and loser must be different players",
+  });
+
+const DrawDuelOutcomeSchema = z.strictObject({
+  status: z.literal("draw"),
+  winner: z.null(),
+  loser: z.null(),
+  reason: z.literal("draw"),
+});
+
+/**
+ * Lives here rather than in `./result-schema.ts` (which re-exports it) because
+ * `DuelStateSchema` below has to validate `outcome`, and that module already
+ * imports `PlayerIdSchema` from this one — defining it there would make the two
+ * files import each other at runtime.
+ */
+export const DuelOutcomeSchema = z.union([DecisiveDuelOutcomeSchema, DrawDuelOutcomeSchema]);
+
 export const DuelStateSchema = z.strictObject({
   players: z.strictObject({
     P1: PlayerStateSchema,
@@ -135,6 +166,8 @@ export const DuelStateSchema = z.strictObject({
   phase: PhaseSchema,
   pending: ReactionWindowSchema.optional(),
   seed: z.number().int().min(0).max(0xffffffff),
+  deckOutPlayer: PlayerIdSchema.optional(),
+  outcome: DuelOutcomeSchema.optional(),
 });
 
 export const PublicCardSchema = z.discriminatedUnion("visible", [

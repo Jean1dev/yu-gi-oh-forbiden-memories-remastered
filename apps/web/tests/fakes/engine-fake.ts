@@ -16,7 +16,10 @@ export type BuildInitializationInput = (
 ) => Result<InitializationInput, DomainError>;
 
 export type InitDuel = (input: InitializationInput) => DuelState;
-export type ApplyAction = (state: DuelState, action: DuelAction) => ApplyResult;
+export type ApplyAction = (
+  state: DuelState,
+  action: DuelAction,
+) => Result<ApplyResult, DomainError>;
 
 export function createEngineFake(options: {
   readonly initialState: DuelState;
@@ -34,12 +37,18 @@ export function createEngineFake(options: {
         });
   const apply: ApplyAction = (state, action) => {
     appliedActions.push(action);
-    return { state: transitions.shift() ?? state, events: [] };
+    return ok({ state: transitions.shift() ?? state, events: [] });
+  };
+  const closeReactionWindow = (state: DuelState): Result<DuelState, DomainError> => {
+    const { pending: _pending, ...next } = state;
+    void _pending;
+    return ok(next);
   };
   return {
     appliedActions,
     buildInitializationInput,
     initDuel: () => options.initialState,
     apply,
+    closeReactionWindow,
   };
 }

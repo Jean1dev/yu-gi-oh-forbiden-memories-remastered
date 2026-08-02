@@ -1,7 +1,17 @@
-export function LpIndicator({ label, lp }: { readonly label: string; readonly lp: number }) {
+import styles from "./lp-indicator.module.css";
+
+export function LpIndicator({
+  label,
+  lp,
+  cue,
+}: {
+  readonly label: string;
+  readonly lp: number;
+  readonly cue?: "damage" | undefined;
+}) {
   return (
-    <p aria-label={`${label} life points`}>
-      {label}: <strong>{lp} LP</strong>
+    <p className={styles.indicator} aria-label={`${label} pontos de vida`} data-cue={cue}>
+      {label}: <strong className={styles.value}>{lp} LP</strong>
     </p>
   );
 }

@@ -1,13 +1,15 @@
-import type { DuelAction, DuelSession, PlayerId } from "@yugioh/shared";
+import type {
+  DuelAction,
+  DuelSession,
+  PlayerId,
+  SurrenderAction as EngineSurrenderAction,
+} from "@yugioh/shared";
 import {
   interruptDuelSession,
   type ApplyAction,
 } from "./duel-session.ts";
 
-export type SurrenderAction = Readonly<{
-  type: "surrender";
-  playerId: PlayerId;
-}>;
+export type SurrenderAction = EngineSurrenderAction;
 
 export function canSurrender(session: DuelSession): session is Extract<
   DuelSession,
@@ -17,7 +19,7 @@ export function canSurrender(session: DuelSession): session is Extract<
 }
 
 export function createSurrenderAction(playerId: PlayerId): SurrenderAction {
-  return { type: "surrender", playerId };
+  return { type: "surrender", player: playerId };
 }
 
 export function surrender(

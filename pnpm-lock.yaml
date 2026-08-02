@@ -47,6 +47,9 @@ importers:
       '@yugioh/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@yugioh/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
       '@yugioh/rules':
         specifier: workspace:*
         version: link:../../packages/rules

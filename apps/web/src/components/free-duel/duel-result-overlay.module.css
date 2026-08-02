@@ -1,0 +1,27 @@
+.overlay {
+  position: absolute;
+  z-index: 10;
+  inset: var(--space-4);
+  display: grid;
+  place-items: center;
+  background: rgb(5 5 16 / 78%);
+}
+
+.panel {
+  width: min(100%, 560px);
+  max-height: min(80vh, 620px);
+  overflow: auto;
+  padding: var(--space-5);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    inset: var(--space-2);
+  }
+
+  .panel {
+    padding: var(--space-3);
+  }
+}

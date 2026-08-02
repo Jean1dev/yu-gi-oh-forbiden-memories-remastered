@@ -86,6 +86,7 @@ describe("free duel F01 -> F02 -> F03", () => {
               { occupied: false },
             ],
           },
+          handPlayUsed: false,
         },
         P2: {
           lp: 8000,
@@ -107,6 +108,7 @@ describe("free duel F01 -> F02 -> F03", () => {
               { occupied: false },
             ],
           },
+          handPlayUsed: false,
         },
       },
       activeField: null,
@@ -121,16 +123,14 @@ describe("free duel F01 -> F02 -> F03", () => {
       initDuel: () => initialState,
       seedGenerator: () => 42,
       catalog,
-      validateDeck: {},
+      validateDeck: () => ok({ composition: {}, cardNumbers: [], total: 40 }),
       generateSessionId: () => "duel-1",
     });
     if (session.status !== "in_progress") throw new Error("Expected an active session");
     const advanced = await advanceCpuDecisions(session, {
-      apply: (current) => ({
-        state: { ...current, activePlayer: "P1" },
-        events: [],
-      }),
-      aiAgent: { decide: async () => ({ type: "pass" }) },
+      apply: (current) => ok({ state: { ...current, activePlayer: "P1" }, events: [] }),
+      closeReactionWindow: (current) => ok(current),
+      aiAgent: { decide: async () => ({ type: "advance_phase" }) },
       getPublicDuelState,
       cpuProfile: duelist.profile,
     });

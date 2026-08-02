@@ -52,14 +52,14 @@ describe("OpponentSelection", () => {
   it("lists each available duelist with fixed difficulty", async () => {
     render(<OpponentSelection />);
     expect(await screen.findByText("Seto Kaiba")).toBeTruthy();
-    expect(screen.getByLabelText("Difficulty: Hard")).toBeTruthy();
-    expect(screen.queryByLabelText(/choose difficulty/i)).toBeNull();
+    expect(screen.getByLabelText("Dificuldade: Difícil")).toBeTruthy();
+    expect(screen.queryByLabelText(/escolher dificuldade/i)).toBeNull();
   });
 
   it("enables confirmation after keyboard-compatible selection and navigates", async () => {
     render(<OpponentSelection />);
     const card = await screen.findByRole("button", { name: /seto kaiba/i });
-    const confirm = screen.getByRole("button", { name: "Confirm opponent" });
+    const confirm = screen.getByRole("button", { name: "Iniciar Duelo" });
     expect((confirm as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(card);
     expect((confirm as HTMLButtonElement).disabled).toBe(false);
@@ -74,16 +74,16 @@ describe("OpponentSelection", () => {
       }),
     );
     render(<OpponentSelection />);
-    expect(await screen.findByText(/roster has not been configured/i)).toBeTruthy();
+    expect(await screen.findByText(/ainda não foi configurada/i)).toBeTruthy();
     expect(
-      (screen.getByRole("button", { name: "Confirm opponent" }) as HTMLButtonElement).disabled,
+      (screen.getByRole("button", { name: "Iniciar Duelo" }) as HTMLButtonElement).disabled,
     ).toBe(true);
   });
 
   it("shows the cache notice", async () => {
     mockedLoad.mockResolvedValue(result({ source: "cache", notice: "cache" }));
     render(<OpponentSelection />);
-    expect((await screen.findByRole("status")).textContent).toMatch(/loaded from cache/i);
+    expect((await screen.findByRole("status")).textContent).toMatch(/carregada do cache/i);
   });
 
   it("blocks and retries when the catalog is unavailable", async () => {
@@ -93,7 +93,7 @@ describe("OpponentSelection", () => {
       notice: "catalog_unavailable",
     });
     render(<OpponentSelection />);
-    const retry = await screen.findByRole("button", { name: "Try again" });
+    const retry = await screen.findByRole("button", { name: "Tentar novamente" });
     mockedLoad.mockResolvedValueOnce(result());
     fireEvent.click(retry);
     await waitFor(() => expect(mockedLoad.mock.calls.length).toBeGreaterThanOrEqual(2));

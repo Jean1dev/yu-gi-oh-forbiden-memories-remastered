@@ -74,13 +74,26 @@ module.exports = {
       to: { path: "^packages/(?!engine|shared)" },
     },
     {
-      name: "web-has-no-engine-or-ai-dependency-yet",
+      name: "web-imports-engine-only-through-duel-runtime",
       comment:
-        "apps/web (build-deck/F01) depends on packages/shared, packages/rules and packages/data " +
-        "so far — no feature has wired packages/engine or packages/ai into the web app yet.",
+        "apps/web may consume packages/engine for the offline Free Duel runtime, but the import " +
+        "must stay confined to the composition root. The dedicated F09 script is the executable " +
+        "portão for workspace imports; this rule documents the same boundary for resolved paths.",
+      severity: "error",
+      from: {
+        path: "^apps/web/",
+        pathNot: "^apps/web/src/lib/free-duel/duel-runtime\\.ts$",
+      },
+      to: { path: "^packages/engine/" },
+    },
+    {
+      name: "web-has-no-ai-dependency-yet",
+      comment:
+        "apps/web still does not import packages/ai. F09 uses an injected passive agent until the " +
+        "cross-PRD AI package exists.",
       severity: "error",
       from: { path: "^apps/web/" },
-      to: { path: "^packages/(engine|ai)/" },
+      to: { path: "^packages/ai/" },
     },
     {
       name: "packages-never-import-apps",

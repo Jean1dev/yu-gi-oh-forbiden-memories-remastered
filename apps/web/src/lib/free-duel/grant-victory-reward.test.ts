@@ -13,7 +13,7 @@ import { log } from "../logging.ts";
 const result: Extract<ConsolidatedDuelResult, { status: "victory" }> = {
   status: "victory",
   duelSessionId: "session",
-  reason: "lp_zerado",
+  reason: "lp_depleted",
   rating: { source: "rating_engine", grade: "A", reward: { stars: 11, dropTier: "common" } },
 };
 const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];

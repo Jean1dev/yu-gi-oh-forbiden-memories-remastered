@@ -20,12 +20,19 @@ async function loadWithRealCatalog(file: string) {
 }
 
 describe("roster integration", () => {
-  it("loads the repository roster as a valid empty roster", async () => {
+  it("loads the repository roster with the committed test duelist", async () => {
     const result = await loadWithRealCatalog(ROSTER_FILE);
     expect(result).toMatchObject({
       ok: true,
-      value: { duelists: [], report: { valid: true } },
+      value: {
+        duelists: [{ id: "test-duelist", deck: expect.any(Array), dropPool: expect.any(Array) }],
+        report: { valid: true, availableDuelists: 1, hidden: [] },
+      },
     });
+    if (result.ok) {
+      expect(result.value.duelists[0]?.deck).toHaveLength(40);
+      expect(result.value.duelists[0]?.dropPool[0]?.cardNumbers.length).toBeGreaterThan(0);
+    }
   });
 
   it("accepts a fixture whose cards exist in the canonical catalog", async () => {

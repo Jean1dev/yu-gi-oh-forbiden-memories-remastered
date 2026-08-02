@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import type { Duelist, DuelistId } from "@yugioh/shared";
 
+import { OPPONENT_SELECTION_MESSAGES } from "../../lib/free-duel/opponent-selection-messages.ts";
 import { DifficultyIndicator } from "./difficulty-indicator.tsx";
 import styles from "./duelist-card.module.css";
 
@@ -26,7 +27,10 @@ export function DuelistCard({
         onClick={() => onSelect(duelist.id)}
       >
         {portraitFailed ? (
-          <span className={styles.placeholder} aria-label="Portrait unavailable">
+          <span
+            className={styles.placeholder}
+            aria-label={OPPONENT_SELECTION_MESSAGES.portraitUnavailable}
+          >
             ?
           </span>
         ) : (
@@ -38,7 +42,7 @@ export function DuelistCard({
             onError={() => setPortraitFailed(true)}
           />
         )}
-        <strong>{duelist.name}</strong>
+        <strong className={styles.name}>{duelist.name}</strong>
         <DifficultyIndicator difficulty={duelist.difficulty} />
       </button>
     </div>
