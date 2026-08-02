@@ -20,6 +20,7 @@ import { useCollectionPanel } from "../../hooks/use-collection-panel.ts";
 import { useDeckDraft } from "../../hooks/use-deck-draft.ts";
 import { useDeckValidation } from "../../hooks/use-deck-validation.ts";
 import { useUnsavedChangesWarning } from "../../hooks/use-unsaved-changes-warning.ts";
+import { useVictoryRewardSync } from "../../hooks/use-victory-reward-sync.ts";
 import { buildCatalogLookup } from "../../lib/build-deck/catalog-lookup.ts";
 import { useDeckDraftStore } from "../../stores/deck-draft-store.ts";
 import styles from "./build-deck-client.module.css";
@@ -62,6 +63,7 @@ const CARD_TYPE_FILTERS: readonly ("todos" | CardType)[] = ["todos", ...CARD_TYP
 export function BuildDeckClient({ catalogResult }: BuildDeckClientProps) {
   const cards = catalogResult.status === "ok" ? catalogResult.cards : EMPTY_CARDS;
   const catalog = useMemo(() => buildCatalogLookup(cards), [cards]);
+  useVictoryRewardSync(catalogResult.status === "ok" ? catalog : undefined);
 
   const { state: activeDeckState, saveStatus, save } = useActiveDeckPersistence();
   const syncSummary = useActiveDeckSync();

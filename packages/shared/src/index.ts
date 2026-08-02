@@ -1,4 +1,7 @@
 export { err, ok, type Result } from "./result.ts";
+export { EXPENSIVE_REDEMPTION_THRESHOLD_STARS } from "./economy/constants.ts";
+export type { CardRedemptionIntent, CardRedemptionOutcome, PendingCardRedemption, RedemptionEligibility, RedemptionLedgerState } from "./economy/redemption.ts";
+export { CardRedemptionIntentSchema, PendingCardRedemptionSchema, RedeemCardResponseSchema, type RedeemCardResponse } from "./economy/redemption-schema.ts";
 export { DomainError } from "./errors.ts";
 export {
   CANONICAL_CARD_TOTAL,
@@ -237,17 +240,33 @@ export type {
   DropRewardSource,
 } from "./duelist/drop-reward.ts";
 export { DefaultCommonDropPoolSchema } from "./duelist/drop-reward-schema.ts";
+export {
+  INITIAL_WALLET_STARS,
+  PASSWORD_DIGIT_COUNT,
+  PASSWORD_MAX_INPUT_LENGTH,
+  UNPRICED_CARD_STARS,
+} from "./economy/constants.ts";
+export type {
+  CardPrice,
+  NormalizedPasswordInput,
+  PasswordAffordability,
+  PasswordCardLookup,
+  PasswordResolution,
+} from "./economy/password.ts";
 export type {
   LoadedWalletBalance,
   PendingVictoryReward,
+  ReconciledWalletBalance,
   VictoryRewardEvent,
   VictoryRewardResult,
   WalletBalance,
 } from "./economy/wallet.ts";
 export {
   ApplyVictoryRewardResponseSchema,
+  EnsureWalletResponseSchema,
   PendingVictoryRewardSchema,
   VictoryRewardEventSchema,
   WalletBalanceSchema,
   type ApplyVictoryRewardResponse,
+  type EnsureWalletResponse,
 } from "./economy/wallet-schema.ts";

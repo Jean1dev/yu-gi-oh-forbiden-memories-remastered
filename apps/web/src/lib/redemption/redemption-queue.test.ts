@@ -1,0 +1,3 @@
+// @vitest-environment jsdom
+import "fake-indexeddb/auto";import{describe,expect,it}from"vitest";import{createIndexedDbRedemptionQueue}from"./redemption-queue.ts";
+describe("redemption queue",()=>{it("replaces the same redemption id",async()=>{const queue=createIndexedDbRedemptionQueue();const item={redemptionId:"00000000-0000-4000-8000-000000000001",playerId:"00000000-0000-4000-8000-000000000002",password:"12 34 56 78",expectedCardNumber:"001",expectedStars:10,createdAt:"2026-01-01T00:00:00.000Z",queuedAt:"2026-01-01T00:00:00.000Z",attempts:0}as const;await queue.enqueue(item);await queue.enqueue({...item,attempts:1});expect(await queue.listPending(item.playerId)).toHaveLength(1);});});

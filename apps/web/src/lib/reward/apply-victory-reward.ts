@@ -17,6 +17,7 @@ import {
 import type { CollectionCache } from "../collection/indexeddb-cache.ts";
 import type { Clock } from "../collection/load-collection.ts";
 import type { WalletCache } from "../wallet/indexeddb-cache.ts";
+import { log } from "../logging.ts";
 import type {
   OfflineVictoryRewardApplication,
   applyOfflineVictoryReward,
@@ -62,22 +63,62 @@ export async function applyVictoryReward(
 ): Promise<Result<VictoryRewardResult, DomainError>> {
   const parsed = VictoryRewardEventSchema.safeParse(event);
   if (!parsed.success) {
-    return err(new DomainError("Victory reward event failed validation.", "malformed_victory_reward_event"));
+    log("warn", "victory_reward_event_malformed", { issues: parsed.error.issues });
+    return err(
+      new DomainError("Victory reward event failed validation.", "malformed_victory_reward_event", {
+        issues: parsed.error.issues,
+      }),
+    );
   }
   const { playerId, duelId, cardNumber, stars } = parsed.data;
   const cardValidation = validateRewardCardNumber(cardNumber, deps.catalog);
-  if (!cardValidation.ok) return cardValidation;
+  if (!cardValidation.ok) {
+    log("warn", "victory_reward_apply_failed", {
+      playerId,
+      duelId,
+      cardNumber,
+      code: cardValidation.error.code,
+    });
+    return cardValidation;
+  }
   const starsValidation = validateVictoryRewardStars(stars);
-  if (!starsValidation.ok) return starsValidation;
+  if (!starsValidation.ok) {
+    log("warn", "victory_reward_apply_failed", {
+      playerId,
+      duelId,
+      code: starsValidation.error.code,
+    });
+    return starsValidation;
+  }
 
-  const pending = await deps.victoryRewardQueue.listPendingRewards(playerId);
+  let pending: Awaited<ReturnType<VictoryRewardQueue["listPendingRewards"]>> = [];
+  try {
+    pending = await deps.victoryRewardQueue.listPendingRewards(playerId);
+  } catch (queueError) {
+    log("warn", "victory_reward_queue_unavailable", {
+      playerId,
+      cause: queueError instanceof Error ? queueError.message : "unknown error",
+    });
+  }
   if (pending.some((item) => item.duelId === duelId)) {
+    log("info", "victory_reward_apply_finished", {
+      playerId,
+      duelId,
+      status: "already_applied",
+      source: "local_queue",
+    });
     return ok({ status: "already_applied" });
   }
 
+  log("debug", "victory_reward_apply_started", { playerId, duelId });
   const server = await deps.victoryRewardRepository.apply(playerId, duelId, cardNumber, stars);
   if (server.ok) {
     const { applied, cardQuantity, walletStars } = server.value;
+    log("info", "victory_reward_apply_finished", {
+      playerId,
+      duelId,
+      status: applied ? "applied" : "already_applied",
+    });
     if (!applied) {
       await reconcileCaches(deps, playerId, cardNumber, cardQuantity, walletStars);
       return ok({ status: "already_applied", cardQuantity, walletStars });
@@ -99,12 +140,24 @@ export async function applyVictoryReward(
       },
     };
     const offline = await deps.applyOfflineVictoryReward(application);
+    log("warn", "victory_reward_apply_failed", {
+      playerId,
+      duelId,
+      cause: server.error.message,
+      fallback: "applied_offline",
+    });
     return ok({
       status: "applied_offline",
       localCardQuantity: offline.collection.get(cardNumber) ?? 0,
       localWalletStars: offline.wallet.stars,
     });
-  } catch {
+  } catch (offlineError) {
+    log("warn", "victory_reward_apply_failed", {
+      playerId,
+      duelId,
+      cause: offlineError instanceof Error ? offlineError.message : "unknown error",
+      stage: "offline_cache_unavailable",
+    });
     return err(
       new DomainError("Victory reward is unavailable online and offline.", "victory_reward_apply_unavailable", {
         duelId,

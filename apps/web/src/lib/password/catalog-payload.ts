@@ -1,0 +1,48 @@
+import type { CardNumber, ObtainedArtReference } from "@yugioh/shared";
+
+import type {
+  PasswordCatalog,
+  PasswordCatalogLookup,
+  PasswordCatalogPayload,
+} from "./types.ts";
+
+const payloads = new WeakMap<PasswordCatalog, PasswordCatalogPayload>();
+
+export function toPasswordPayload(catalog: PasswordCatalog): PasswordCatalogPayload {
+  const cached = payloads.get(catalog);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const cards = catalog.cards.filter((card) => card.password !== null);
+  const arts: Record<CardNumber, ObtainedArtReference> = {};
+  for (const card of cards) {
+    arts[card.numero] = catalog.artLookup(card.numero);
+  }
+
+  const payload: PasswordCatalogPayload = { status: "ok", cards, arts };
+  payloads.set(catalog, payload);
+  return payload;
+}
+
+export function fromPasswordPayload(
+  payload: PasswordCatalogPayload,
+): PasswordCatalogLookup | undefined {
+  if (payload.status === "error") {
+    return undefined;
+  }
+
+  const byPassword = new Map(
+    payload.cards.flatMap((card) => (card.password === null ? [] : [[card.password, card] as const])),
+  );
+
+  return {
+    lookup: (canonicalPassword) => byPassword.get(canonicalPassword),
+    artLookup: (cardNumber) => {
+      const art = Object.hasOwn(payload.arts, cardNumber)
+        ? payload.arts[cardNumber]
+        : undefined;
+      return art ?? { kind: "placeholder" };
+    },
+  };
+}

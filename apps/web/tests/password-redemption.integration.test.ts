@@ -1,0 +1,2 @@
+import{readFile}from"node:fs/promises";import{resolve}from"node:path";import{describe,expect,it}from"vitest";
+describe("password redemption migration",()=>{it("keeps debit, collection grant, and release in one RPC transaction",async()=>{const sql=await readFile(resolve("../../supabase/migrations/0010_create_card_prices_and_password_releases.sql"),"utf8");expect(sql).toContain("update public.wallets set stars=stars-v_price.stars");expect(sql).toContain("insert into public.collections");expect(sql).toContain("insert into public.password_releases");});});

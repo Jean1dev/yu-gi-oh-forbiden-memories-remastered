@@ -49,7 +49,8 @@ export const MENU_ITEMS: readonly MenuItem[] = [
     id: "password",
     label: "Password",
     description: "Resgate cartas pelo código de 8 dígitos.",
-    status: "soon",
+    status: "ready",
+    href: "/password",
   },
   {
     id: "save",

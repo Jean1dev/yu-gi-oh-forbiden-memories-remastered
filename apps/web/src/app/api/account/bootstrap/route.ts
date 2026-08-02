@@ -44,6 +44,13 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: result.error.code }, { status: 503 });
   }
 
-  log("info", "account_bootstrap_succeeded", { playerId, createdNow: result.value.createdNow });
-  return Response.json({ createdNow: result.value.createdNow });
+  log("info", "account_bootstrap_succeeded", {
+    playerId,
+    createdNow: result.value.initialDeck.createdNow,
+    walletCreatedNow: result.value.wallet.createdNow,
+  });
+  return Response.json({
+    createdNow: result.value.initialDeck.createdNow,
+    walletCreatedNow: result.value.wallet.createdNow,
+  });
 }
