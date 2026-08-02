@@ -28,14 +28,18 @@ export const BUILD_DECK_MESSAGES = {
   deckSaveSessionExpired: "Faça login novamente para sincronizar seu deck.",
   deckSavePersistenceUnavailable: "Não foi possível salvar seu deck agora. Tente novamente.",
   deckSaving: "Salvando…",
-  deckConflictNotice: "Seu deck foi atualizado em outro dispositivo; a versão mais recente foi mantida.",
+  deckConflictNotice:
+    "Seu deck foi atualizado em outro dispositivo; a versão mais recente foi mantida.",
   saveDeckButton: "Salvar deck",
   tabAllCards: "Todas as Cartas",
   viewList: "Lista",
   viewGrid: "Grade",
   allCardTypes: "Todos",
-  allMonsterClasses: "Todos",
-  emptyFilterResult: "Nenhuma carta desse tipo na sua coleção.",
+  allCardClasses: "Todas",
+  allGuardians: "Todos",
+  sortAscending: "Ordem crescente; mudar para decrescente",
+  sortDescending: "Ordem decrescente; mudar para crescente",
+  emptyFilterResult: "Nenhuma carta para esses filtros na sua coleção.",
   emptyDeckTab: 'Nenhuma carta no deck ainda — vá em "Todas as Cartas" para adicionar.',
 } as const;
 

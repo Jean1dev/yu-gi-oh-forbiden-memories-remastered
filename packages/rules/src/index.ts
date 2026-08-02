@@ -7,8 +7,11 @@ export {
   ownedEntries,
   ownedQuantity,
   owns,
+  filterCollectionItems,
+  queryCollectionItems,
   searchByName,
   serializeCollection,
+  sortCollectionItems,
   validateRewardCardNumber,
   withDeckQuantity,
 } from "./collection/index.ts";
