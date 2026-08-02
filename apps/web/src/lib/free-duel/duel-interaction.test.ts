@@ -280,6 +280,21 @@ describe("duel affordances", () => {
     ).toBe(false);
   });
 
+  it("denies canAdvancePhase during draw and end (auto-advanced), allows it during main and battle", () => {
+    for (const phase of ["draw", "end"] as const) {
+      expect(
+        describeAffordances({ state: state({ phase }), isPlayerTurn: true, busy: false, intent: { kind: "idle" } })
+          .canAdvancePhase,
+      ).toBe(false);
+    }
+    for (const phase of ["main", "battle"] as const) {
+      expect(
+        describeAffordances({ state: state({ phase }), isPlayerTurn: true, busy: false, intent: { kind: "idle" } })
+          .canAdvancePhase,
+      ).toBe(true);
+    }
+  });
+
   it("returns exactly three slots and keeps phase advance in the primary slot", () => {
     const affordances = describeAffordances({
       state: state(),

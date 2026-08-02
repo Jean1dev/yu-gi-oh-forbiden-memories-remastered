@@ -140,6 +140,8 @@ alterados**.
 | `apps/web/src/hooks/use-duel-interaction.test.ts` | web | novo | Seleção → zona → posição produz a ação esperada (jsdom) |
 | `apps/web/src/hooks/use-duel-cues.ts` | web | novo | Fila de cues, cue ativa, `busy`, respeito a movimento reduzido |
 | `apps/web/src/hooks/use-duel-cues.test.ts` | web | novo | Temporização com timers falsos; caminho de movimento reduzido (jsdom) |
+| `apps/web/src/hooks/use-auto-advance-phase.ts` | web | **novo (correção 2026-08-02)** | Dispara `advance_phase` sozinho nas fases Compra/Fim após 1000ms (configurável), cancelando o timer se a fase mudar ou o jogador deixar de ser o decisor antes disso |
+| `apps/web/src/hooks/use-auto-advance-phase.test.ts` | web | **novo (correção 2026-08-02)** | Timers falsos: dispara em draw/end após o delay, nunca em main/battle, cancela quando fica inativo |
 | `apps/web/src/components/free-duel/duel-top-bar.tsx` (+ `.module.css`, `.test.tsx`) | web | novo | Terreno / Fase / Turno / rendição / `◀ Sair do Duelo` |
 | `apps/web/src/components/free-duel/duel-card-art.tsx` (+ `.module.css`) | web | novo | Arte por `numero` com fallback em erro, no molde de `library/card-art.tsx` |
 | `apps/web/src/components/free-duel/duel-zone.tsx` (+ `.module.css`, `.test.tsx`) | web | novo | Uma zona: arte, faixa `{atk}/{def}`, `Vazio`/`—`, afordância, cue |
@@ -265,9 +267,15 @@ componente.
 
 **Passar fase**
 
-15. O slot C é **sempre** `Passar Fase` (`advance_phase`), habilitado sempre que `canAct`. A compra da
-    fase de compra está embutida no avanço (motor-duelo-1x1/F07), então passar da fase de fim entrega
-    a vez e a CPU começa a agir.
+15. O slot C é **sempre** `Passar Fase` (`advance_phase`), presente em todo estado. **Correção
+    (2026-08-02, pedido do usuário):** nas fases de Compra e Fim, o próprio hook
+    `use-auto-advance-phase.ts` dispara `advance_phase` sozinho depois de um delay fixo de 1000ms —
+    o jogador não precisa (e não consegue: `canAdvancePhase` fica `false`) clicar em **Passar
+    Fase** nessas duas fases. O slot volta a ficar habilitado assim que a fase muda para Principal
+    ou Batalha, onde há jogadas reais a fazer. A compra da fase de compra continua embutida no
+    próprio `advance_phase` (motor-duelo-1x1/F07); passar da fase de Fim entrega a vez e a CPU
+    começa a agir. Motivo da correção: antes, exigir um clique manual para uma fase sem nenhuma
+    decisão do jogador (Compra) ou já concluída (Fim) era atrito sem propósito.
 
 **Turno da CPU**
 
@@ -298,7 +306,7 @@ componente.
 | `canAttack` | `canAct` ∧ `phase === "battle"` ∧ `activePlayer === "P1"` ∧ `turn > 1` ∧ ∃ monstro próprio em `attack_face_up`/`attack_face_down` com `!hasAttacked` | `wrong_phase`, `first_turn_attack_forbidden`, `attacker_not_in_attack_position`, `attacker_already_attacked` |
 | `canDirectAttack` | `canAttack` ∧ nenhuma zona de monstro do oponente ocupada | `direct_attack_blocked_by_monsters` |
 | `canChangePosition` | `canAct` ∧ `phase === "battle"` ∧ `activePlayer === "P1"` ∧ ∃ monstro próprio com `!hasChangedPosition` ∧ `!hasAttacked` (correção 2026-08-02 — motor-duelo-1x1/F10 Decisão 6, revisada) | `wrong_phase`, `already_changed_position`, `already_attacked`, `zone_not_owned_by_active_player` |
-| `canAdvancePhase` | `canAct` | `duel_already_ended` |
+| `canAdvancePhase` | `canAct` ∧ `phase !== "draw"` ∧ `phase !== "end"` (correção 2026-08-02 — essas duas fases avançam sozinhas, ver passo 15) | `duel_already_ended` |
 
 > `attack_face_down` **conta como posição de ataque** no motor (`ATTACK_POSITIONS` inclui as duas
 > variantes), e `turn > 1` é a forma de `isFirstDuelTurn`. Espelhar errado qualquer um dos dois

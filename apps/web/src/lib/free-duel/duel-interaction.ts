@@ -13,6 +13,7 @@ const OPPONENT: PlayerId = "P2";
 const SUMMONABLE_TYPES = new Set(["monstro", "ritual"]);
 const SPELL_TRAP_TYPES = new Set(["armadilha", "equipamento", "magica"]);
 const ATTACK_POSITIONS = new Set<MonsterPosition>(["attack_face_up", "attack_face_down"]);
+const AUTO_ADVANCE_PHASES = new Set<DuelState["phase"]>(["draw", "end"]);
 
 export type DuelIntent =
   | Readonly<{ kind: "idle" }>
@@ -155,7 +156,7 @@ export function describeAffordances(input: Readonly<{
     canAttack,
     canDirectAttack: canAttack && !hasOpponentMonsters(state),
     canChangePosition: battleActionsAvailable && canAnyMonsterChangePosition(state),
-    canAdvancePhase: canAct && state.activePlayer === PLAYER,
+    canAdvancePhase: canAct && state.activePlayer === PLAYER && !AUTO_ADVANCE_PHASES.has(state.phase),
   };
 }
 

@@ -78,11 +78,11 @@ describe("free duel playable screen with real engine", () => {
         catalogResult={{ status: "ready", cards }}
         loadContext={async () => ({ duelist, playerDeck: deck })}
         createRuntime={() => runtime}
+        autoAdvanceDelayMs={0}
       />,
     );
 
     expect(await screen.findByRole("heading", { name: "Duelo" })).toBeTruthy();
-    if (screen.queryByText("Fase: Compra")) await clickPassPhaseWhenEnabled();
     await waitFor(() => expect(screen.getByText("Fase: Principal")).toBeTruthy());
 
     const hand = within(screen.getByLabelText("Mao do jogador"));
