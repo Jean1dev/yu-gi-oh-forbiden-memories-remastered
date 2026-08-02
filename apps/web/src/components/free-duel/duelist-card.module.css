@@ -1,37 +1,44 @@
 .card {
   display: grid;
-  gap: 0.65rem;
+  gap: var(--space-3);
   min-width: 0;
-  padding: 0.8rem;
-  border: 2px solid #5d536e;
-  border-radius: 0.75rem;
-  color: inherit;
+  padding: var(--space-3);
+  border: none;
+  border-radius: var(--radius);
+  color: var(--text-primary);
   text-align: left;
-  background: #201b2d;
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .card[aria-pressed="true"] {
-  border-color: #d8ba6b;
-  box-shadow: 0 0 0 2px rgb(216 186 107 / 25%);
+  box-shadow: var(--shadow-bevel-pressed);
 }
 
 .card:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
 }
 
 .portrait,
 .placeholder {
   width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: 0.4rem;
   object-fit: cover;
-  background: #0e0c15;
+  background: var(--surface-sunken);
 }
 
 .placeholder {
   display: grid;
   place-items: center;
-  color: #a69db5;
-  font-size: 3rem;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-body-lg);
+}
+
+.name {
+  font-size: var(--text-body-md);
 }

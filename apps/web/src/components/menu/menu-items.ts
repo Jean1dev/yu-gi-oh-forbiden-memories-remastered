@@ -23,7 +23,8 @@ export const MENU_ITEMS: readonly MenuItem[] = [
     id: "free-duel",
     label: "Free Duel",
     description: "Duele contra um oponente controlado pela máquina.",
-    status: "soon",
+    href: "/free-duel",
+    status: "ready",
   },
   {
     id: "online-duel",
