@@ -19,6 +19,6 @@ describe("DuelistCard", () => {
   it("uses a placeholder when the declared portrait fails", () => {
     render(<DuelistCard duelist={duelist} selected={false} onSelect={vi.fn()} />);
     fireEvent.error(screen.getByRole("presentation"));
-    expect(screen.getByLabelText("Portrait unavailable")).toBeTruthy();
+    expect(screen.getByLabelText("Retrato indisponível")).toBeTruthy();
   });
 });

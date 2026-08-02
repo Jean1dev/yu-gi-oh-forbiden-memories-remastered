@@ -1,3 +1,5 @@
+import { OPPONENT_SELECTION_MESSAGES } from "../../lib/free-duel/opponent-selection-messages.ts";
+
 export function RosterNotice() {
-  return <p role="status">The duelist list was loaded from cache and may be out of date.</p>;
+  return <p role="status">{OPPONENT_SELECTION_MESSAGES.cacheNotice}</p>;
 }
