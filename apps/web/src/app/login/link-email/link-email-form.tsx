@@ -58,7 +58,10 @@ export function LinkEmailForm() {
       return;
     }
 
-    const { data, error } = await client.auth.updateUser({ email, password });
+    const { data, error } = await client.auth.updateUser(
+      { email, password },
+      { emailRedirectTo: `${window.location.origin}/login/link-email` },
+    );
     if (error) {
       log("warn", "link_email_failed", { cause: error.message, code: error.code });
       setStatus({
