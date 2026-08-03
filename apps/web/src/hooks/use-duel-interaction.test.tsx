@@ -50,7 +50,7 @@ const state: DuelState = {
 };
 
 describe("useDuelInteraction", () => {
-  it("dispatches one summon action after card, slot, zone and position are chosen", () => {
+  it("dispatches one summon action into the next free zone after card, slot and position are chosen", () => {
     const dispatch = vi.fn();
     const { result } = renderHook(() =>
       useDuelInteraction({ state, isPlayerTurn: true, busy: false, dispatch }),
@@ -58,7 +58,6 @@ describe("useDuelInteraction", () => {
 
     act(() => result.current.onSelectHandCard(0));
     act(() => result.current.onInvokeSlot("summon"));
-    act(() => result.current.onZoneActivate({ player: "P1", zoneType: "monster", index: 2 }));
     act(() => result.current.onChoosePosition("attack_face_up"));
 
     expect(dispatch).toHaveBeenCalledOnce();
@@ -66,7 +65,7 @@ describe("useDuelInteraction", () => {
       type: "summon_monster",
       player: "P1",
       handIndex: 0,
-      zoneIndex: 2,
+      zoneIndex: 0,
       position: "attack_face_up",
     });
     expect(result.current.intent).toEqual({ kind: "idle" });

@@ -18,7 +18,8 @@ import { isFaceDown, nextPosition } from "./next-position.ts";
  * Changes the position of the monster referenced by `zone` (motor-duelo-1x1
  * F10): alternates attack/defense and, if the monster was face-down, reveals
  * it in the process. Restricted to the Battle phase; does not consume the
- * turn's hand play and does not read/write `hasAttacked` (spec Decision 6).
+ * turn's hand play. A monster that already attacked this turn cannot change
+ * position (spec Decision 6, corrected — see spec.md).
  */
 export function changePosition(
   state: DuelState,
@@ -61,6 +62,16 @@ export function changePosition(
   const monsterZone = state.players[zone.player].field.monsters[zone.index];
   if (!monsterZone.occupied) {
     return err(new DomainError("The referenced monster zone is empty.", "zone_empty", { zone }));
+  }
+
+  if (monsterZone.hasAttacked) {
+    return err(
+      new DomainError(
+        "A monster that already attacked this turn cannot change position.",
+        "already_attacked",
+        { zone },
+      ),
+    );
   }
 
   if (monsterZone.hasChangedPosition) {

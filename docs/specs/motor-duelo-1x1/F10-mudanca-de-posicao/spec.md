@@ -43,10 +43,9 @@ feature descrita.
 
 ### Fronteiras
 
-- **Resolução de combate e declaração de ataque** → **F11**. F10 não lê nem escreve `hasAttacked`;
-  os dois flags (`hasAttacked`, `hasChangedPosition`) são independentes desde F01, e o PRD não impõe
-  nenhuma regra de "monstro que já atacou não pode mudar de posição" — nem em F10 nem em F06/F11.
-  Esta spec não inventa essa restrição.
+- **Resolução de combate e declaração de ataque** → **F11**. F10 não escreve `hasAttacked` — quem
+  seta essa flag é F11. **Correção (2026-08-02):** F10 agora **lê** `hasAttacked` para recusar a
+  mudança de posição quando `true` — ver Decisão 6, revisada.
 - **Reset da flag `hasChangedPosition` ao fim do turno** → já especificado por **F06** (Fluxo passo
   3b: reseta `hasAttacked`/`hasChangedPosition` das zonas do jogador cujo turno termina). F10 só
   consome o estado inicial dessa flag (sempre `false` no início do turno de quem vai agir) e a
@@ -73,7 +72,7 @@ já internas ao próprio módulo `motor-duelo-1x1`, nenhuma cross-PRD.
 | 3 | Matriz de transição (função total `nextPosition: MonsterPosition → MonsterPosition`), decidida por não haver dado externo pendente que a defina e por precisar ser total sobre as 4 posições já modeladas em F01: cada mudança de posição **sempre alterna a postura** (ataque↔defesa) **e sempre força a face para cima** se estava para baixo (nunca o inverso — não existe "esconder" um monstro já face-cima via mudança manual de posição, fiel à regra clássica de Yu-Gi-Oh de que um flip summon manual de um monstro em defesa face-baixo sempre vira **ataque** face-cima). Concretamente: `attack_face_up → defense_face_up`; `defense_face_up → attack_face_up`; `defense_face_down → attack_face_up` (revela); `attack_face_down → defense_face_up` (revela, caso simétrico e não-canônico, mas presente no schema desde F01). | Regra clássica de Yu-Gi-Oh (fiel ao FM, citada por analogia às "Notas de fidelidade" de F04/F11); nenhuma tabela externa pendente envolvida — decisão puramente de regras já contida no schema de F01 | confirmada (Auto-Aceite — default de boa prática, PRD omite a matriz exata) |
 | 4 | `onFlip` só é emitido quando a posição de origem é face-baixo (`isFaceDown(position)` antes da transição); `onPositionChange` é **sempre** emitido, independentemente de revelar ou não. Quando ambos disparam, a ordem é `onFlip` primeiro, `onPositionChange` depois — o monstro é revelado e só então a mudança de postura é registrada, mesma ordem causal usada por F11 ("Um monstro face-baixo do defensor é revelado antes da resolução"). | PRD F10 Capabilities ("emite onFlip quando um monstro face-baixo é virado para cima") + PRD F11 Capabilities (precedente de ordem revelar-antes-de-resolver) | confirmada |
 | 5 | Guard de fase: `state.phase !== "battle"` recusa com `DomainError` (`wrong_phase`) antes de qualquer outra validação. Único guard de fase explícito no PRD F10 ("Consumes: F06: turno ativo, fase de Batalha"). | PRD F10 Consumes (leitura literal) | confirmada |
-| 6 | `hasAttacked` nunca é lido nem alterado por esta feature — os dois flags de turno (`hasAttacked`, `hasChangedPosition`) são independentes desde F01 e o PRD não liga um ao outro em nenhum dos dois sentidos. Um monstro que já atacou neste turno ainda pode mudar de posição; um monstro que mudou de posição ainda pode atacar (dentro das próprias regras de F11). | PRD F10/F06/F11 (ausência de menção cruzada); Fase 0.3 (invariantes) não impõe essa restrição | confirmada (Auto-Aceite — não inventar restrição não pedida) |
+| 6 | ~~`hasAttacked` nunca é lido nem alterado por esta feature... um monstro que já atacou neste turno ainda pode mudar de posição~~ — **revisada (2026-08-02):** `changePosition` agora **recusa** com `already_attacked` quando `monsterZone.hasAttacked === true`, checado antes de `hasChangedPosition` (mas depois de `zone_empty`). A decisão original leu literalmente o silêncio do PRD como "permitido"; correção pedida diretamente pelo usuário por não corresponder à regra clássica de Yu-Gi-Oh (um monstro que atacou já se comprometeu com a posição de ataque até o fim do turno) nem ao comportamento do FM original. `hasAttacked` continua sendo escrito só por F11 — F10 passa a **ler**, nunca escrever. Um monstro ainda **não** atacado pode mudar de posição e **depois** atacar no mesmo turno (F11 não é afetado por esta correção). | Correção pontual solicitada pelo usuário (trilha curta — `AGENTS.md` "Small fixes and adjustments"), não uma reabertura de PRD | corrigida (substitui a decisão original) |
 | 7 | Nem `onFlip` nem `onPositionChange` abrem janela de reação — o único evento do motor com janela documentada até agora é `onAttackDeclared` (F11), citado como exemplo único em F02 Capabilities. Mesmo precedente já registrado por F06 Decisão 12 para `onTurnStart`/`onTurnEnd`: o Effect System (cross-PRD) pode reagir a `onFlip`/`onPositionChange` fora de uma janela suspensiva, se algum dia precisar. | `docs/prds/motor-duelo-1x1.md` §6 F02 Capabilities (único exemplo de janela é `onAttackDeclared`); `docs/specs/motor-duelo-1x1/F06-.../spec.md` Decisão 12 (precedente direto) | confirmada (precedente, não reaberta) |
 | 8 | O guard de janela de reação aberta (`hasOpenReactionWindow`) é consultado **dentro da própria função `changePosition`**, não centralizado no dispatcher `apply`. Seguindo o padrão que F06 já aplicou para `advancePhase` (o guard vive dentro da função que trata a ação, não como um pré-check genérico do `switch`) e o comentário já presente em `packages/engine/src/events/reaction-window.ts` ("Guard that F06-F12 must consult before accepting a new player action") — a obrigação é de cada feature de ação, não do dispatcher. | `packages/engine/src/events/reaction-window.ts` (comentário existente); `docs/specs/motor-duelo-1x1/F06-.../spec.md` Fluxo passo 1 (precedente de implementação) | confirmada |
 | 9 | Validação defensiva extra, além dos casos citados textualmente no PRD: `zone.zoneType !== "monster"` recusa com `zone_not_monster`. Necessária porque `ZoneReference` (reutilizado pela Decisão 1) também permite `zoneType: "spell"`, e mudar posição só faz sentido para monstros — sem essa checagem, um `zone` apontando para uma zona de magia/armadilha cairia num acesso inválido ao array errado. | Consequência direta da Decisão 1 (reuso de `ZoneReference`); Auto-Aceite "especificação parcial no PRD" (o PRD não previu a reutilização de um tipo genérico, então esta spec preenche a lacuna) | confirmada |
@@ -145,16 +144,18 @@ possível dentro do tipo.
 4. Recusa se `zone.player !== state.activePlayer` (Decisão 1) → `zone_not_owned_by_active_player`.
 5. Lê `const monsterZone = state.players[zone.player].field.monsters[zone.index]`. Recusa se
    `monsterZone.occupied === false` → `zone_empty`.
-6. Recusa se `monsterZone.hasChangedPosition === true` → `already_changed_position`.
-7. Calcula `const revealed = isFaceDown(monsterZone.position)` e
+6. Recusa se `monsterZone.hasAttacked === true` → `already_attacked` (Decisão 6, revisada).
+7. Recusa se `monsterZone.hasChangedPosition === true` → `already_changed_position`.
+8. Calcula `const revealed = isFaceDown(monsterZone.position)` e
    `const newPosition = nextPosition(monsterZone.position)`.
-8. Constrói o novo estado: a zona apontada por `zone` passa a ter
+9. Constrói o novo estado: a zona apontada por `zone` passa a ter
    `{ ...monsterZone, position: newPosition, hasChangedPosition: true }`; `card` e `hasAttacked`
-   permanecem inalterados (Decisão 6); nenhuma outra zona, jogador ou campo global é tocado.
-9. Monta a lista de eventos: se `revealed`, primeiro `onFlip`, depois sempre `onPositionChange`
-   (Decisão 4) — ambos com `originPlayer = zone.player`, `involvedCards = [monsterZone.card]`,
-   `involvedZones = [zone]`.
-10. Devolve `ok({ state: <novo estado>, events })`.
+   permanecem inalterados (não são escritos — só lidos no passo 6); nenhuma outra zona, jogador ou
+   campo global é tocado.
+10. Monta a lista de eventos: se `revealed`, primeiro `onFlip`, depois sempre `onPositionChange`
+    (Decisão 4) — ambos com `originPlayer = zone.player`, `involvedCards = [monsterZone.card]`,
+    `involvedZones = [zone]`.
+11. Devolve `ok({ state: <novo estado>, events })`.
 
 ### Regras de negócio
 
@@ -164,8 +165,8 @@ possível dentro do tipo.
   `changePosition` nunca lê nem escreve `handPlayUsed`/`hasUsedHandPlay`/`markHandPlayUsed`.
 - **Restrito à fase de Batalha** (PRD F10 Consumes): único guard de fase, sem exceção para outras
   fases.
-- **Sem exigência de "ainda não atacou"** (Decisão 6): a única checagem de disponibilidade é a
-  própria flag de posição.
+- **Exige "ainda não atacou"** (Decisão 6, revisada): `hasAttacked === true` recusa com
+  `already_attacked`, checado antes de `hasChangedPosition`.
 
 ### Eventos
 
@@ -219,7 +220,8 @@ changePosition(state: DuelState, zone: ZoneReference): Result<ApplyResult, Domai
   // pré: nenhuma (zone já validado por ZoneReferenceSchema na fronteira externa, se vier de fora)
   // pós: ok ⇒ { state, events } com a posição da zona atualizada e hasChangedPosition = true
   //      erro ⇒ code em {reaction_window_open, wrong_phase, zone_not_monster,
-  //              zone_not_owned_by_active_player, zone_empty, already_changed_position}
+  //              zone_not_owned_by_active_player, zone_empty, already_attacked,
+  //              already_changed_position}
   // total: nunca lança
 ```
 
@@ -324,7 +326,7 @@ e do Consumes da feature (Auto-Aceite — "PRD sem bloco explícito de Error Han
 | `zone.player` é o jogador **inativo** | `zone.player !== state.activePlayer` | `Result` de erro, estado inalterado | `zone_not_owned_by_active_player` |
 | Zona de monstro apontada está vazia | `monsterZone.occupied === false` | `Result` de erro, estado inalterado | `zone_empty` |
 | Monstro já mudou de posição neste turno | `monsterZone.hasChangedPosition === true` | `Result` de erro, estado inalterado | `already_changed_position` |
-| Monstro já atacou neste turno, mas ainda não mudou de posição | Não é um caso de recusa — `hasAttacked` não é consultado (Decisão 6) | Aceito normalmente | — |
+| Monstro já atacou neste turno | `monsterZone.hasAttacked === true` | `Result` de erro, estado inalterado | `already_attacked` (Decisão 6, revisada) |
 | `Action` recebida de fora (rede/UI) não corresponde a nenhuma variante conhecida | `ActionSchema.safeParse` na fronteira (fora do `engine`) | Rejeição de schema antes de chegar a `apply` — mesmo padrão já descrito por F06 | erro de validação zod padrão |
 | Índice de zona fora de `0..4` | Impossível pelo tipo `ZoneIndex` (`0\|1\|2\|3\|4`) e por `ZoneIndexSchema` na fronteira | Rejeitado na fronteira, nunca chega a `changePosition` | erro de validação zod padrão |
 
@@ -350,6 +352,7 @@ e do Consumes da feature (Auto-Aceite — "PRD sem bloco explícito de Error Han
 - `changePosition não altera handPlayUsed de nenhum dos jogadores`
 - `changePosition não altera as demais zonas de monstro do jogador ativo`
 - `changePosition não altera nenhuma zona do jogador oponente`
+- `changePosition recusa com already_attacked quando o monstro já atacou neste turno, sem alterar o estado` (Decisão 6, revisada)
 - `changePosition recusa com already_changed_position quando a zona já mudou de posição neste turno, sem alterar o estado`
 - `changePosition recusa com zone_empty quando a zona apontada está vazia, sem alterar o estado`
 - `changePosition recusa com wrong_phase nas fases draw, main e end, sem alterar o estado`

@@ -78,11 +78,11 @@ describe("free duel playable screen with real engine", () => {
         catalogResult={{ status: "ready", cards }}
         loadContext={async () => ({ duelist, playerDeck: deck })}
         createRuntime={() => runtime}
+        autoAdvanceDelayMs={0}
       />,
     );
 
     expect(await screen.findByRole("heading", { name: "Duelo" })).toBeTruthy();
-    if (screen.queryByText("Fase: Compra")) await clickPassPhaseWhenEnabled();
     await waitFor(() => expect(screen.getByText("Fase: Principal")).toBeTruthy());
 
     const hand = within(screen.getByLabelText("Mao do jogador"));
@@ -101,7 +101,6 @@ describe("free duel playable screen with real engine", () => {
     expect(chosenName).not.toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Invocar" }));
-    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }));
     fireEvent.click(screen.getByRole("button", { name: "Ataque" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: `Zona de monstro Jogador 1, ${chosenName}` })).toBeTruthy(),

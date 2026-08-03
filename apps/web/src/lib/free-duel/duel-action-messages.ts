@@ -27,6 +27,7 @@ const REFUSAL_MESSAGES: Readonly<Record<string, string>> = {
   zone_not_monster: "Escolha uma zona de monstro.",
   zone_not_owned_by_active_player: "Escolha um monstro do jogador ativo.",
   already_changed_position: "Esse monstro ja mudou de posicao neste turno.",
+  already_attacked: "Esse monstro ja atacou neste turno e nao pode mudar de posicao.",
   attacker_zone_empty: "Nao ha monstro nessa zona para atacar.",
   attacker_not_in_attack_position: "Apenas monstros em posicao de ataque podem atacar.",
   attacker_already_attacked: "Esse monstro ja atacou neste turno.",

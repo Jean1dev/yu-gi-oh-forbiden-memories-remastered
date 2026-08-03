@@ -235,7 +235,7 @@ describe("changePosition — success", () => {
           field: {
             ...emptyField(),
             monsters: [
-              occupiedZone("attack_face_up", { hasAttacked: true }),
+              occupiedZone("attack_face_up", { hasAttacked: false }),
               emptyMonsterZone,
               emptyMonsterZone,
               emptyMonsterZone,
@@ -251,7 +251,7 @@ describe("changePosition — success", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ hasAttacked: true });
+      expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ hasAttacked: false });
     }
   });
 
@@ -350,6 +350,33 @@ describe("changePosition — success", () => {
 });
 
 describe("changePosition — rejections", () => {
+  it("recusa com already_attacked quando o monstro já atacou neste turno, sem alterar o estado", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up", { hasAttacked: true }),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
+        P2: makePlayer(),
+      },
+    });
+    const snapshot = JSON.parse(JSON.stringify(state));
+
+    const result = changePosition(state, { player: "P1", zoneType: "monster", index: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("already_attacked");
+    expect(state).toEqual(snapshot);
+  });
+
   it("recusa com already_changed_position quando a zona já mudou de posição neste turno, sem alterar o estado", () => {
     const state = makeState({
       players: {
