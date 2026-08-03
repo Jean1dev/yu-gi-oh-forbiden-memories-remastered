@@ -100,7 +100,7 @@ describe("apply", () => {
   });
 
   it("roteia play_field_spell para playFieldSpell", () => {
-    const card = makeCard({ tipo: "magica" });
+    const card = makeCard({ numero: "330", tipo: "magica" });
     const state = makeState({
       phase: "main",
       players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() },

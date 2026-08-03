@@ -45,6 +45,16 @@ describe("duel cues", () => {
     ).toEqual([{ kind: "place", zone: zone("P1", 0) }, { kind: "draw", player: "P1" }]);
   });
 
+  it("does not animate healing as damage", () => {
+    expect(
+      toCues([
+        event("onDamage", {
+          context: { toPlayer: "P1", amount: 1000, kind: "effect_heal" },
+        }),
+      ]),
+    ).toEqual([]);
+  });
+
   it("limits the queue", () => {
     const events = Array.from({ length: 40 }, () => event("onDraw"));
     expect(toCues(events)).toHaveLength(MAX_CUE_QUEUE);

@@ -41,6 +41,7 @@ function cueFromEvent(event: DuelEvent): DuelCue | undefined {
       return { kind: "attack", zone, target: event.involvedZones[1] };
     }
     case "onDamage": {
+      if (event.context.kind === "effect_heal") return undefined;
       const player = playerFromContext(event.context.toPlayer);
       const amount = numberFromContext(event.context.amount);
       return player && amount !== undefined ? { kind: "damage", player, amount } : undefined;

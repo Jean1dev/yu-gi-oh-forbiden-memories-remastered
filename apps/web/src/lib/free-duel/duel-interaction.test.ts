@@ -34,6 +34,10 @@ const spell: Card = {
   tipo: "magica",
 };
 
+const equip: Card = { ...spell, id: 3, numero: "301", nome: "Legendary Sword", tipo: "equipamento" };
+const forest: Card = { ...spell, id: 4, numero: "330", nome: "Forest" };
+const raigeki: Card = { ...spell, id: 5, numero: "337", nome: "Raigeki" };
+
 function emptyField(): PlayerField {
   return {
     monsters: [
@@ -56,7 +60,13 @@ function emptyField(): PlayerField {
 function state(overrides: Partial<DuelState> = {}): DuelState {
   return {
     players: {
-      P1: { lp: 8000, hand: [monster, spell], deck: [], field: emptyField(), handPlayUsed: false },
+      P1: {
+        lp: 8000,
+        hand: [monster, spell, equip, forest, raigeki],
+        deck: [],
+        field: emptyField(),
+        handPlayUsed: false,
+      },
       P2: { lp: 8000, hand: [], deck: [], field: emptyField(), handPlayUsed: false },
     },
     activeField: null,
@@ -158,6 +168,63 @@ describe("duel interaction reducer", () => {
         state(),
       ).action,
     ).toEqual({ type: "play_spell_or_trap", handIndex: 1, zoneIndex: 3 });
+  });
+
+  it("offers Equip and emits equip_card for an owned monster", () => {
+    const base = withMonster(state(), zoneReference("P1", "monster", 2));
+    const intent: DuelIntent = { kind: "card_selected", handIndex: 2 };
+    const affordances = describeAffordances({ state: base, isPlayerTurn: true, busy: false, intent });
+
+    expect(describeActionSlots({ intent, state: base }, affordances)[0]).toMatchObject({
+      id: "equip",
+      label: "Equipar",
+      disabled: false,
+    });
+
+    const choosing = reduceIntent(intent, { type: "invoke_slot", id: "equip" }, base);
+    expect(choosing.intent).toEqual({ kind: "choosing_equip_target", handIndex: 2 });
+    expect(
+      reduceIntent(
+        choosing.intent,
+        { type: "activate_zone", reference: zoneReference("P1", "monster", 2) },
+        base,
+      ).action,
+    ).toEqual({
+      type: "equip_card",
+      handIndex: 2,
+      targetZone: zoneReference("P1", "monster", 2),
+    });
+  });
+
+  it("offers Campo for Forest and emits play_field_spell", () => {
+    const intent: DuelIntent = { kind: "card_selected", handIndex: 3 };
+    const base = state();
+    const affordances = describeAffordances({ state: base, isPlayerTurn: true, busy: false, intent });
+
+    expect(describeActionSlots({ intent, state: base }, affordances)[0]).toMatchObject({
+      id: "place_terrain",
+      label: "Campo",
+      disabled: false,
+    });
+    expect(reduceIntent(intent, { type: "invoke_slot", id: "place_terrain" }, base).action).toEqual({
+      type: "play_field_spell",
+      handIndex: 3,
+    });
+  });
+
+  it("offers Ativar for Raigeki and emits activate_spell", () => {
+    const intent: DuelIntent = { kind: "card_selected", handIndex: 4 };
+    const base = state();
+    const affordances = describeAffordances({ state: base, isPlayerTurn: true, busy: false, intent });
+
+    expect(describeActionSlots({ intent, state: base }, affordances)[0]).toMatchObject({
+      id: "activate",
+      label: "Ativar",
+    });
+    expect(reduceIntent(intent, { type: "invoke_slot", id: "activate" }, base).action).toEqual({
+      type: "activate_spell",
+      handIndex: 4,
+    });
   });
 
   it("declares targeted and direct attacks", () => {
@@ -324,6 +391,15 @@ describe("duel affordances", () => {
         intent: { kind: "idle" },
       }).canAttack,
     ).toBe(true);
+
+    expect(
+      describeAffordances({
+        state: { ...faceDownAttack, attackLocks: [{ player: "P1", untilTurn: 8 }] },
+        isPlayerTurn: true,
+        busy: false,
+        intent: { kind: "idle" },
+      }).canAttack,
+    ).toBe(false);
 
     const alreadyAttacked = withMonster(
       state({ phase: "battle" }),
