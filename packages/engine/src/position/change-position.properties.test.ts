@@ -48,14 +48,32 @@ function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
 }
 
 function makeState(card: Card, position: MonsterPosition, zoneIndex: 0 | 1 | 2 | 3 | 4): DuelState {
-  const targetZone = { occupied: true as const, card, position, hasAttacked: false, hasChangedPosition: false };
+  const targetZone = {
+    occupied: true as const,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
   const [e0, e1, e2, e3, e4] = emptyField().monsters;
   const pick = (index: number, empty: typeof e0) => (index === zoneIndex ? targetZone : empty);
-  const monsters: PlayerField["monsters"] = [pick(0, e0), pick(1, e1), pick(2, e2), pick(3, e3), pick(4, e4)];
+  const monsters: PlayerField["monsters"] = [
+    pick(0, e0),
+    pick(1, e1),
+    pick(2, e2),
+    pick(3, e3),
+    pick(4, e4),
+  ];
 
   return {
     players: {
-      P1: makePlayer({ lp: 6000, hand: [card], deck: [card], field: { ...emptyField(), monsters } }),
+      P1: makePlayer({
+        lp: 6000,
+        hand: [card],
+        deck: [card],
+        field: { ...emptyField(), monsters },
+      }),
       P2: makePlayer(),
     },
     activeField: card,
@@ -66,45 +84,60 @@ function makeState(card: Card, position: MonsterPosition, zoneIndex: 0 | 1 | 2 |
   };
 }
 
-const zoneIndexArbitrary = fc.constantFrom(0 as const, 1 as const, 2 as const, 3 as const, 4 as const);
+const zoneIndexArbitrary = fc.constantFrom(
+  0 as const,
+  1 as const,
+  2 as const,
+  3 as const,
+  4 as const,
+);
 
 describe("changePosition properties", () => {
   it("altera exclusivamente position e hasChangedPosition da zona-alvo, preservando o restante do estado", () => {
     fc.assert(
-      fc.property(cardArbitrary, positionArbitrary, zoneIndexArbitrary, (card, position, zoneIndex) => {
-        const state = makeState(card, position, zoneIndex);
+      fc.property(
+        cardArbitrary,
+        positionArbitrary,
+        zoneIndexArbitrary,
+        (card, position, zoneIndex) => {
+          const state = makeState(card, position, zoneIndex);
 
-        const result = changePosition(state, { player: "P1", zoneType: "monster", index: zoneIndex });
+          const result = changePosition(state, {
+            player: "P1",
+            zoneType: "monster",
+            index: zoneIndex,
+          });
 
-        expect(result.ok).toBe(true);
-        if (!result.ok) return;
-        const { state: nextState } = result.value;
+          expect(result.ok).toBe(true);
+          if (!result.ok) return;
+          const { state: nextState } = result.value;
 
-        expect(nextState.players.P1.lp).toBe(state.players.P1.lp);
-        expect(nextState.players.P1.hand).toEqual(state.players.P1.hand);
-        expect(nextState.players.P1.deck).toEqual(state.players.P1.deck);
-        expect(nextState.players.P1.field.spells).toEqual(state.players.P1.field.spells);
-        expect(nextState.players.P1.handPlayUsed).toBe(state.players.P1.handPlayUsed);
-        expect(nextState.players.P2).toEqual(state.players.P2);
-        expect(nextState.activeField).toEqual(state.activeField);
-        expect(nextState.activePlayer).toBe(state.activePlayer);
-        expect(nextState.turn).toBe(state.turn);
-        expect(nextState.phase).toBe(state.phase);
-        expect(nextState.seed).toBe(state.seed);
+          expect(nextState.players.P1.lp).toBe(state.players.P1.lp);
+          expect(nextState.players.P1.hand).toEqual(state.players.P1.hand);
+          expect(nextState.players.P1.deck).toEqual(state.players.P1.deck);
+          expect(nextState.players.P1.field.spells).toEqual(state.players.P1.field.spells);
+          expect(nextState.players.P1.handPlayUsed).toBe(state.players.P1.handPlayUsed);
+          expect(nextState.players.P2).toEqual(state.players.P2);
+          expect(nextState.activeField).toEqual(state.activeField);
+          expect(nextState.activePlayer).toBe(state.activePlayer);
+          expect(nextState.turn).toBe(state.turn);
+          expect(nextState.phase).toBe(state.phase);
+          expect(nextState.seed).toBe(state.seed);
 
-        for (const [index, zone] of nextState.players.P1.field.monsters.entries()) {
-          if (index === zoneIndex) continue;
-          expect(zone).toEqual(state.players.P1.field.monsters[index]);
-        }
+          for (const [index, zone] of nextState.players.P1.field.monsters.entries()) {
+            if (index === zoneIndex) continue;
+            expect(zone).toEqual(state.players.P1.field.monsters[index]);
+          }
 
-        const changedZone = nextState.players.P1.field.monsters[zoneIndex];
-        expect(changedZone).toMatchObject({
-          occupied: true,
-          card,
-          position: nextPosition(position),
-          hasChangedPosition: true,
-        });
-      }),
+          const changedZone = nextState.players.P1.field.monsters[zoneIndex];
+          expect(changedZone).toMatchObject({
+            occupied: true,
+            card,
+            position: nextPosition(position),
+            hasChangedPosition: true,
+          });
+        },
+      ),
       { numRuns: 1000 },
     );
   });
@@ -121,18 +154,23 @@ describe("changePosition properties", () => {
 
   it("recusa determinística da 2ª troca: aplicar changePosition de novo sobre o mesmo estado resultante sempre falha", () => {
     fc.assert(
-      fc.property(cardArbitrary, positionArbitrary, zoneIndexArbitrary, (card, position, zoneIndex) => {
-        const state = makeState(card, position, zoneIndex);
-        const zone = { player: "P1" as const, zoneType: "monster" as const, index: zoneIndex };
+      fc.property(
+        cardArbitrary,
+        positionArbitrary,
+        zoneIndexArbitrary,
+        (card, position, zoneIndex) => {
+          const state = makeState(card, position, zoneIndex);
+          const zone = { player: "P1" as const, zoneType: "monster" as const, index: zoneIndex };
 
-        const first = changePosition(state, zone);
-        expect(first.ok).toBe(true);
-        if (!first.ok) return;
+          const first = changePosition(state, zone);
+          expect(first.ok).toBe(true);
+          if (!first.ok) return;
 
-        const second = changePosition(first.value.state, zone);
-        expect(second.ok).toBe(false);
-        if (!second.ok) expect(second.error.code).toBe("already_changed_position");
-      }),
+          const second = changePosition(first.value.state, zone);
+          expect(second.ok).toBe(false);
+          if (!second.ok) expect(second.error.code).toBe("already_changed_position");
+        },
+      ),
       { numRuns: 1000 },
     );
   });

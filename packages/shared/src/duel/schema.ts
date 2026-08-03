@@ -4,6 +4,7 @@ import { CardSchema } from "../card/schema.ts";
 import { EVENT_TYPES } from "./constants.ts";
 import type { DuelEvent, EventType, JsonValue, ReactionWindow, ZoneReference } from "./events.ts";
 import type {
+  AttackLock,
   DuelState,
   MonsterZone,
   PlayerField,
@@ -39,6 +40,7 @@ export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
+    equips: z.array(CardSchema),
   }),
 ]);
 
@@ -155,6 +157,22 @@ const DrawDuelOutcomeSchema = z.strictObject({
  */
 export const DuelOutcomeSchema = z.union([DecisiveDuelOutcomeSchema, DrawDuelOutcomeSchema]);
 
+export const AttackLockSchema = z.strictObject({
+  player: PlayerIdSchema,
+  untilTurn: z.number().int().min(1),
+});
+
+/**
+ * At most one lock per player. The writer guarantees it by replacing an
+ * existing entry instead of appending a second one; this refine keeps a
+ * hand-built or tampered snapshot from smuggling in two.
+ */
+const AttackLocksSchema = z
+  .array(AttackLockSchema)
+  .refine((locks) => new Set(locks.map((lock) => lock.player)).size === locks.length, {
+    message: "attackLocks must hold at most one entry per player",
+  });
+
 export const DuelStateSchema = z.strictObject({
   players: z.strictObject({
     P1: PlayerStateSchema,
@@ -167,6 +185,7 @@ export const DuelStateSchema = z.strictObject({
   pending: ReactionWindowSchema.optional(),
   seed: z.number().int().min(0).max(0xffffffff),
   deckOutPlayer: PlayerIdSchema.optional(),
+  attackLocks: AttackLocksSchema.optional(),
   outcome: DuelOutcomeSchema.optional(),
 });
 
@@ -188,6 +207,7 @@ export const PublicMonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
+    equips: z.array(CardSchema),
   }),
 ]);
 
@@ -248,6 +268,7 @@ export const PublicDuelStateSchema = z.strictObject({
   turn: z.number().int().min(1),
   phase: PhaseSchema,
   pending: PublicReactionWindowSchema.optional(),
+  attackLocks: AttackLocksSchema.optional(),
 });
 
 /**
@@ -265,6 +286,8 @@ const _monsterZoneMatchesDeclaredType: MonsterZone = {} as z.infer<typeof Monste
 void _monsterZoneMatchesDeclaredType;
 const _spellZoneMatchesDeclaredType: SpellZone = {} as z.infer<typeof SpellZoneSchema>;
 void _spellZoneMatchesDeclaredType;
+const _attackLockMatchesDeclaredType: AttackLock = {} as z.infer<typeof AttackLockSchema>;
+void _attackLockMatchesDeclaredType;
 const _eventTypeMatchesDeclaredType: EventType = {} as z.infer<typeof EventTypeSchema>;
 void _eventTypeMatchesDeclaredType;
 const _zoneReferenceMatchesDeclaredType: ZoneReference = {} as z.infer<typeof ZoneReferenceSchema>;

@@ -46,11 +46,14 @@ export {
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
   INITIAL_LP,
+  LP_CHANGE_KINDS,
   MAX_CPU_ACTIONS_PER_ADVANCE,
   TOTAL_MONSTER_ZONES,
   TOTAL_SPELL_ZONES,
+  TURNS_PER_ROUND,
 } from "./duel/constants.ts";
 export type {
+  AttackLock,
   DuelState,
   MonsterPosition,
   MonsterZone,
@@ -151,6 +154,7 @@ export type {
   DuelEvent,
   EventType,
   JsonValue,
+  LpChangeKind,
   ReactionWindow,
   ZoneIndex,
   ZoneReference,
@@ -240,6 +244,7 @@ export {
   type PersistInitialDeckResponse,
 } from "./initial-deck/schema.ts";
 export {
+  AttackLockSchema,
   DuelEventSchema,
   DuelStateSchema,
   EventTypeSchema,

@@ -1,4 +1,11 @@
-import type { Card, DuelState, MonsterPosition, MonsterZone, PlayerField, PlayerState } from "@yugioh/shared";
+import type {
+  Card,
+  DuelState,
+  MonsterPosition,
+  MonsterZone,
+  PlayerField,
+  PlayerState,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { summonMonster } from "./summon-monster.ts";
@@ -23,20 +30,29 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
-function occupiedZone(overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {}): MonsterZone {
+function occupiedZone(
+  overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {},
+): MonsterZone {
   return {
     occupied: true,
     card: makeCard({ numero: "999" }),
     position: "attack_face_up",
     hasAttacked: false,
     hasChangedPosition: false,
+    equips: [],
     ...overrides,
   };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },
@@ -71,24 +87,27 @@ describe("summonMonster — success", () => {
     ["defense_face_down", "onSet"],
   ];
 
-  it.each(positions)("places the monster in the chosen zone in the %s position and emits %s", (position, eventType) => {
-    const card = makeCard();
-    const state = makeState({ players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() } });
+  it.each(positions)(
+    "places the monster in the chosen zone in the %s position and emits %s",
+    (position, eventType) => {
+      const card = makeCard();
+      const state = makeState({ players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() } });
 
-    const result = summonMonster(state, {
-      type: "summon_monster",
-      player: "P1",
-      handIndex: 0,
-      zoneIndex: 2,
-      position,
-    });
+      const result = summonMonster(state, {
+        type: "summon_monster",
+        player: "P1",
+        handIndex: 0,
+        zoneIndex: 2,
+        position,
+      });
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    const zone = result.value.state.players.P1.field.monsters[2];
-    expect(zone).toMatchObject({ occupied: true, card, position });
-    expect(result.value.events).toEqual([expect.objectContaining({ type: eventType })]);
-  });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const zone = result.value.state.players.P1.field.monsters[2];
+      expect(zone).toMatchObject({ occupied: true, card, position });
+      expect(result.value.events).toEqual([expect.objectContaining({ type: eventType })]);
+    },
+  );
 
   it("removes the summoned card from the player's hand", () => {
     const card = makeCard();
@@ -204,7 +223,9 @@ describe("summonMonster — rejections", () => {
   });
 
   it("rejects with card_not_in_hand when handIndex is negative", () => {
-    const state = makeState({ players: { P1: makePlayer({ hand: [makeCard()] }), P2: makePlayer() } });
+    const state = makeState({
+      players: { P1: makePlayer({ hand: [makeCard()] }), P2: makePlayer() },
+    });
 
     const result = summonMonster(state, {
       type: "summon_monster",
@@ -219,7 +240,9 @@ describe("summonMonster — rejections", () => {
   });
 
   it("rejects with card_not_in_hand when handIndex is beyond the hand's length", () => {
-    const state = makeState({ players: { P1: makePlayer({ hand: [makeCard()] }), P2: makePlayer() } });
+    const state = makeState({
+      players: { P1: makePlayer({ hand: [makeCard()] }), P2: makePlayer() },
+    });
 
     const result = summonMonster(state, {
       type: "summon_monster",
@@ -255,7 +278,16 @@ describe("summonMonster — rejections", () => {
       players: {
         P1: makePlayer({
           hand: [card],
-          field: { ...emptyField(), monsters: [occupiedZone(), occupiedZone(), occupiedZone(), occupiedZone(), occupiedZone()] },
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone(),
+              occupiedZone(),
+              occupiedZone(),
+              occupiedZone(),
+              occupiedZone(),
+            ],
+          },
         }),
         P2: makePlayer(),
       },
@@ -281,7 +313,13 @@ describe("summonMonster — rejections", () => {
           hand: [card],
           field: {
             ...emptyField(),
-            monsters: [occupiedZone(), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+            monsters: [
+              occupiedZone(),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
           },
         }),
         P2: makePlayer(),

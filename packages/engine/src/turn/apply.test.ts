@@ -140,6 +140,7 @@ describe("apply", () => {
       position: "attack_face_up" as const,
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const [, e1, e2, e3, e4] = emptyField().monsters;
     const state = makeState({
@@ -150,7 +151,10 @@ describe("apply", () => {
       },
     });
 
-    const result = apply(state, { type: "change_position", zone: { player: "P1", zoneType: "monster", index: 0 } });
+    const result = apply(state, {
+      type: "change_position",
+      zone: { player: "P1", zoneType: "monster", index: 0 },
+    });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -164,7 +168,10 @@ describe("apply", () => {
   it("devolve o erro de changePosition sem processamento adicional quando a mudança de posição é recusada", () => {
     const state = makeState({ phase: "battle" });
 
-    const result = apply(state, { type: "change_position", zone: { player: "P1", zoneType: "monster", index: 0 } });
+    const result = apply(state, {
+      type: "change_position",
+      zone: { player: "P1", zoneType: "monster", index: 0 },
+    });
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("zone_empty");
@@ -178,6 +185,7 @@ describe("apply", () => {
       position: "attack_face_up" as const,
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const [, e1, e2, e3, e4] = emptyField().monsters;
     const state = makeState({
@@ -194,7 +202,10 @@ describe("apply", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.events).toEqual([expect.objectContaining({ type: "onAttackDeclared" })]);
-      expect(result.value.state.pending).toMatchObject({ type: "reaction_window", reactingPlayer: "P2" });
+      expect(result.value.state.pending).toMatchObject({
+        type: "reaction_window",
+        reactingPlayer: "P2",
+      });
     }
   });
 
@@ -206,6 +217,7 @@ describe("apply", () => {
       position: "attack_face_up" as const,
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const [, e1, e2, e3, e4] = emptyField().monsters;
     const state = makeState({
@@ -284,6 +296,7 @@ describe("apply", () => {
       position: "attack_face_up" as const,
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const [, e1, e2, e3, e4] = emptyField().monsters;
     const state = makeState({

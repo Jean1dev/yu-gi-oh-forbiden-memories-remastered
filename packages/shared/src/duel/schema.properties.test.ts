@@ -77,6 +77,7 @@ describe("MonsterZoneSchema acceptance of any valid canonical card", () => {
             position,
             hasAttacked,
             hasChangedPosition,
+            equips: [],
           };
           expect(MonsterZoneSchema.safeParse(zone).success).toBe(true);
         },
@@ -100,6 +101,7 @@ describe("MonsterZoneSchema base value preservation", () => {
             position,
             hasAttacked: false,
             hasChangedPosition: false,
+            equips: [],
           };
           const result = MonsterZoneSchema.parse(zone);
           if (!result.occupied) throw new Error("expected an occupied zone");

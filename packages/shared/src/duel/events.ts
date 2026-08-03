@@ -1,5 +1,5 @@
 import type { Card } from "../card/types.ts";
-import type { EVENT_TYPES } from "./constants.ts";
+import type { EVENT_TYPES, LP_CHANGE_KINDS } from "./constants.ts";
 import type { PlayerId } from "./player.ts";
 
 /**
@@ -9,6 +9,13 @@ import type { PlayerId } from "./player.ts";
  * documentation.
  */
 export type EventType = (typeof EVENT_TYPES)[number];
+
+/**
+ * How a life-point change came about. Carried in `onDamage`'s `context.kind`
+ * so the ten-event vocabulary does not have to grow for healing
+ * (`docs/spells/life-points.md` §3).
+ */
+export type LpChangeKind = (typeof LP_CHANGE_KINDS)[number];
 
 /** Which of a player's two zone tuples (`monsters` or `spells`) a `ZoneReference` points to. */
 export type ZoneType = "monster" | "spell";
@@ -28,12 +35,7 @@ export type ZoneReference = Readonly<{
  * `undefined`, `Map`/`Set` or unserialized dates.
  */
 export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | readonly JsonValue[]
-  | { readonly [key: string]: JsonValue };
+  string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 
 /** One occurrence of a duel trigger, ready to be consumed by the Effect System (cross-PRD). */
 export type DuelEvent = Readonly<{

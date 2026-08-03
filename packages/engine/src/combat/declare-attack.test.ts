@@ -1,4 +1,11 @@
-import type { Card, DuelState, MonsterPosition, MonsterZone, PlayerField, PlayerState } from "@yugioh/shared";
+import type {
+  Card,
+  DuelState,
+  MonsterPosition,
+  MonsterZone,
+  PlayerField,
+  PlayerState,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { declareAttack } from "./declare-attack.ts";
@@ -23,20 +30,30 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
-function occupiedZone(position: MonsterPosition, overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {}): MonsterZone {
+function occupiedZone(
+  position: MonsterPosition,
+  overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {},
+): MonsterZone {
   return {
     occupied: true,
     card: makeCard(),
     position,
     hasAttacked: false,
     hasChangedPosition: false,
+    equips: [],
     ...overrides,
   };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },
@@ -47,8 +64,20 @@ function emptyField(): PlayerField {
   };
 }
 
-function fieldWithAttacker(position: MonsterPosition, overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {}): PlayerField {
-  return { ...emptyField(), monsters: [occupiedZone(position, overrides), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] };
+function fieldWithAttacker(
+  position: MonsterPosition,
+  overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {},
+): PlayerField {
+  return {
+    ...emptyField(),
+    monsters: [
+      occupiedZone(position, overrides),
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
+  };
 }
 
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -89,7 +118,11 @@ describe("declareAttack — success", () => {
       },
     });
 
-    const result = declareAttack(state, { type: "declare_attack", attackerZoneIndex: 0, targetZoneIndex: 0 });
+    const result = declareAttack(state, {
+      type: "declare_attack",
+      attackerZoneIndex: 0,
+      targetZoneIndex: 0,
+    });
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -145,7 +178,10 @@ describe("declareAttack — rejections", () => {
 
   it("recusa com attacker_not_in_attack_position quando o atacante está em defesa", () => {
     const state = makeState({
-      players: { P1: makePlayer({ field: fieldWithAttacker("defense_face_up") }), P2: makePlayer() },
+      players: {
+        P1: makePlayer({ field: fieldWithAttacker("defense_face_up") }),
+        P2: makePlayer(),
+      },
     });
 
     const result = declareAttack(state, { type: "declare_attack", attackerZoneIndex: 0 });
@@ -173,7 +209,11 @@ describe("declareAttack — rejections", () => {
       players: { P1: makePlayer({ field: fieldWithAttacker("attack_face_up") }), P2: makePlayer() },
     });
 
-    const result = declareAttack(state, { type: "declare_attack", attackerZoneIndex: 0, targetZoneIndex: 0 });
+    const result = declareAttack(state, {
+      type: "declare_attack",
+      attackerZoneIndex: 0,
+      targetZoneIndex: 0,
+    });
 
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe("target_zone_empty");

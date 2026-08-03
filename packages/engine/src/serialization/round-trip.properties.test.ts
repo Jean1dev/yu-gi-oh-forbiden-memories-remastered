@@ -48,6 +48,7 @@ const monsterZoneArbitrary = fc.oneof(
     position: fc.constantFrom(...monsterPositions),
     hasAttacked: fc.boolean(),
     hasChangedPosition: fc.boolean(),
+    equips: fc.array(cardArbitrary, { maxLength: 2 }),
   }),
 );
 
@@ -131,6 +132,26 @@ const outcomeArbitrary = fc.oneof(
   fc.constant({ status: "draw" as const, winner: null, loser: null, reason: "draw" as const }),
 );
 
+/**
+ * At most one lock per player, as `DuelStateSchema` refines: draws a subset of
+ * the two players and gives each an `untilTurn`, so `load` never rejects on a
+ * duplicated player.
+ */
+const attackLocksArbitrary = fc
+  .subarray(["P1", "P2"] as const)
+  .chain((players) =>
+    fc.tuple(
+      fc.constant(players),
+      fc.array(fc.integer({ min: 1, max: 999 }), {
+        minLength: players.length,
+        maxLength: players.length,
+      }),
+    ),
+  )
+  .map(([players, turns]) =>
+    players.map((player, index) => ({ player, untilTurn: turns[index] ?? 1 })),
+  );
+
 const duelStateArbitrary = fc.record(
   {
     players: fc.record({ P1: playerStateArbitrary, P2: playerStateArbitrary }),
@@ -141,6 +162,7 @@ const duelStateArbitrary = fc.record(
     seed: fc.integer({ min: 0, max: 0xffffffff }),
     pending: reactionWindowArbitrary,
     deckOutPlayer: playerIdArbitrary,
+    attackLocks: attackLocksArbitrary,
     outcome: outcomeArbitrary,
   },
   { requiredKeys: ["players", "activeField", "activePlayer", "turn", "phase", "seed"] },

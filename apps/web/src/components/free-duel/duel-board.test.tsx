@@ -43,7 +43,17 @@ function view(): PublicDuelState {
         hand: { visible: true, cards: [card] },
         remainingDeck: 35,
         field: {
-          monsters: [{ occupied: true, card: { visible: true, card }, position: "attack_face_up", hasAttacked: false, hasChangedPosition: false }, ...emptyMonsters.slice(1)] as never,
+          monsters: [
+            {
+              occupied: true,
+              card: { visible: true, card },
+              position: "attack_face_up",
+              hasAttacked: false,
+              hasChangedPosition: false,
+              equips: [],
+            },
+            ...emptyMonsters.slice(1),
+          ] as never,
           spells: emptySpells,
         },
       },
@@ -52,7 +62,17 @@ function view(): PublicDuelState {
         hand: { visible: false, count: 5 },
         remainingDeck: 35,
         field: {
-          monsters: [{ occupied: true, card: { visible: false }, position: "defense_face_down", hasAttacked: false, hasChangedPosition: false }, ...emptyMonsters.slice(1)] as never,
+          monsters: [
+            {
+              occupied: true,
+              card: { visible: false },
+              position: "defense_face_down",
+              hasAttacked: false,
+              hasChangedPosition: false,
+              equips: [],
+            },
+            ...emptyMonsters.slice(1),
+          ] as never,
           spells: emptySpells,
         },
       },

@@ -36,7 +36,14 @@ const positionArbitrary = fc.constantFrom(
 function makeField(occupiedFlags: readonly boolean[], filler: Card): PlayerField {
   const zoneFor = (occupied: boolean): MonsterZone =>
     occupied
-      ? { occupied: true, card: filler, position: "attack_face_up", hasAttacked: false, hasChangedPosition: false }
+      ? {
+          occupied: true,
+          card: filler,
+          position: "attack_face_up",
+          hasAttacked: false,
+          hasChangedPosition: false,
+          equips: [],
+        }
       : { occupied: false };
   const [f0, f1, f2, f3, f4] = occupiedFlags;
   return {
@@ -57,7 +64,11 @@ function makeField(occupiedFlags: readonly boolean[], filler: Card): PlayerField
   };
 }
 
-function makeState(hand: readonly Card[], occupiedFlags: readonly boolean[], filler: Card): DuelState {
+function makeState(
+  hand: readonly Card[],
+  occupiedFlags: readonly boolean[],
+  filler: Card,
+): DuelState {
   const active: PlayerState = {
     lp: 8000,
     hand,
@@ -106,69 +117,78 @@ const scenarioArbitrary = fc
 describe("summonMonster properties", () => {
   it("a mão perde exatamente 1 carta e o campo ganha exatamente 1 zona ocupada a mais", () => {
     fc.assert(
-      fc.property(scenarioArbitrary, ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
-        const state = makeState(hand, occupiedFlags, fillerCard);
-        const occupiedBefore = occupiedFlags.filter(Boolean).length;
+      fc.property(
+        scenarioArbitrary,
+        ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
+          const state = makeState(hand, occupiedFlags, fillerCard);
+          const occupiedBefore = occupiedFlags.filter(Boolean).length;
 
-        const result = summonMonster(state, {
-          type: "summon_monster",
-          player: "P1",
-          handIndex,
-          zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
-          position,
-        });
+          const result = summonMonster(state, {
+            type: "summon_monster",
+            player: "P1",
+            handIndex,
+            zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
+            position,
+          });
 
-        expect(result.ok).toBe(true);
-        if (!result.ok) return;
-        expect(result.value.state.players.P1.hand.length).toBe(hand.length - 1);
-        const occupiedAfter = result.value.state.players.P1.field.monsters.filter(
-          (zone) => zone.occupied,
-        ).length;
-        expect(occupiedAfter).toBe(occupiedBefore + 1);
-      }),
+          expect(result.ok).toBe(true);
+          if (!result.ok) return;
+          expect(result.value.state.players.P1.hand.length).toBe(hand.length - 1);
+          const occupiedAfter = result.value.state.players.P1.field.monsters.filter(
+            (zone) => zone.occupied,
+          ).length;
+          expect(occupiedAfter).toBe(occupiedBefore + 1);
+        },
+      ),
       { numRuns: 1000 },
     );
   });
 
   it("preserva atk/def base da carta movida", () => {
     fc.assert(
-      fc.property(scenarioArbitrary, ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
-        const state = makeState(hand, occupiedFlags, fillerCard);
-        const card = hand[handIndex];
-        if (card === undefined) return;
+      fc.property(
+        scenarioArbitrary,
+        ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
+          const state = makeState(hand, occupiedFlags, fillerCard);
+          const card = hand[handIndex];
+          if (card === undefined) return;
 
-        const result = summonMonster(state, {
-          type: "summon_monster",
-          player: "P1",
-          handIndex,
-          zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
-          position,
-        });
+          const result = summonMonster(state, {
+            type: "summon_monster",
+            player: "P1",
+            handIndex,
+            zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
+            position,
+          });
 
-        expect(result.ok).toBe(true);
-        if (!result.ok) return;
-        const zone = result.value.state.players.P1.field.monsters[zoneIndex];
-        expect(zone?.occupied && zone.card.atk).toBe(card.atk);
-        expect(zone?.occupied && zone.card.def).toBe(card.def);
-      }),
+          expect(result.ok).toBe(true);
+          if (!result.ok) return;
+          const zone = result.value.state.players.P1.field.monsters[zoneIndex];
+          expect(zone?.occupied && zone.card.atk).toBe(card.atk);
+          expect(zone?.occupied && zone.card.def).toBe(card.def);
+        },
+      ),
       { numRuns: 1000 },
     );
   });
 
   it("determinismo: a mesma entrada produz sempre o mesmo ApplyResult", () => {
     fc.assert(
-      fc.property(scenarioArbitrary, ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
-        const state = makeState(hand, occupiedFlags, fillerCard);
-        const action = {
-          type: "summon_monster" as const,
-          player: "P1" as const,
-          handIndex,
-          zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
-          position,
-        };
+      fc.property(
+        scenarioArbitrary,
+        ({ hand, occupiedFlags, fillerCard, handIndex, zoneIndex, position }) => {
+          const state = makeState(hand, occupiedFlags, fillerCard);
+          const action = {
+            type: "summon_monster" as const,
+            player: "P1" as const,
+            handIndex,
+            zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
+            position,
+          };
 
-        expect(summonMonster(state, action)).toEqual(summonMonster(state, action));
-      }),
+          expect(summonMonster(state, action)).toEqual(summonMonster(state, action));
+        },
+      ),
       { numRuns: 1000 },
     );
   });

@@ -1,4 +1,11 @@
-import type { Card, DuelState, MonsterPosition, MonsterZone, PlayerField, PlayerState } from "@yugioh/shared";
+import type {
+  Card,
+  DuelState,
+  MonsterPosition,
+  MonsterZone,
+  PlayerField,
+  PlayerState,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { declareAttack } from "./declare-attack.ts";
@@ -25,12 +32,25 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
 function occupiedZone(card: Card, position: MonsterPosition): MonsterZone {
-  return { occupied: true, card, position, hasAttacked: false, hasChangedPosition: false };
+  return {
+    occupied: true,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },
@@ -42,7 +62,16 @@ function emptyField(): PlayerField {
 }
 
 function fieldWithMonster(card: Card, position: MonsterPosition): PlayerField {
-  return { ...emptyField(), monsters: [occupiedZone(card, position), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] };
+  return {
+    ...emptyField(),
+    monsters: [
+      occupiedZone(card, position),
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
+  };
 }
 
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -213,7 +242,12 @@ describe("resolveAttack", () => {
   it("marca hasAttacked do atacante quando ele sobrevive", () => {
     const attacker = makeCard({ numero: "001", atk: 2000 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     const result = resolveAttack(declared);
@@ -248,7 +282,12 @@ describe("resolveAttack", () => {
   it("fecha a janela de reação após resolver", () => {
     const attacker = makeCard({ numero: "001", atk: 1500 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     const result = resolveAttack(declared);
@@ -271,7 +310,12 @@ describe("resolveAttack", () => {
   it("aplicar resolveAttack duas vezes com o mesmo estado produz sempre o mesmo resultado", () => {
     const attacker = makeCard({ numero: "001", atk: 1500 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     expect(resolveAttack(declared)).toEqual(resolveAttack(declared));
