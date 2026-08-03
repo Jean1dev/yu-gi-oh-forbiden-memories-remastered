@@ -179,6 +179,21 @@ export {
   SurrenderActionSchema,
 } from "./duel/action.schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
+export {
+  CardClassFilterSchema,
+  EffectSideSchema,
+  EffectTargetsSchema,
+  SPELL_EFFECTS,
+  SpellEffectSchema,
+  getSpellEffect,
+  matchesClassFilter,
+  spellPlayMode,
+  type CardClassFilter,
+  type EffectSide,
+  type EffectTargets,
+  type SpellEffect,
+  type SpellPlayMode,
+} from "./duel/spell-effects/index.ts";
 export type {
   CardRewardEvent,
   Collection,
