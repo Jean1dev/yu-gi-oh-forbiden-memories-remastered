@@ -11,6 +11,7 @@ import {
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
+import { isAttackLocked } from "../spells/effects/attack-lock.ts";
 import { getOpponent } from "../spells/opponent.ts";
 import { isFirstDuelTurn } from "../turn/first-turn.ts";
 
@@ -38,6 +39,17 @@ export function declareAttack(
 
   const activePlayer = state.activePlayer;
   const opponent = getOpponent(activePlayer);
+
+  if (isAttackLocked(state, activePlayer)) {
+    return err(
+      new DomainError(
+        "This player cannot attack while a spell effect is active.",
+        "attack_locked_by_effect",
+        { player: activePlayer, turn: state.turn },
+      ),
+    );
+  }
+
   const attackerZone = state.players[activePlayer].field.monsters[action.attackerZoneIndex];
 
   if (!attackerZone.occupied) {

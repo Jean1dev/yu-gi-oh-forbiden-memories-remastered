@@ -55,6 +55,7 @@ const dragonCaptureJar = magic("329", "Dragon Capture Jar");
 const darkHole = magic("336", "Dark Hole");
 const raigeki = magic("337", "Raigeki");
 const dianKeto = magic("342", "Dian Keto the Cure Master");
+const swordsOfRevealingLight = magic("348", "Swords of Revealing Light");
 const featherDuster = magic("672", "Harpie's Feather Duster");
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
@@ -493,5 +494,24 @@ describe("activateSpell — determinismo", () => {
       events.filter((event) => event.type === "onDestroy").map((event) => event.involvedZones[0]);
 
     expect(zonesOf(byP1.events)).toEqual(zonesOf(byP2.value.events));
+  });
+});
+
+describe("activateSpell - attack locks", () => {
+  it("locks the opponent for their next three turns", () => {
+    const { state: next } = activate(swordsOfRevealingLight, makeState({ turn: 3 }));
+
+    expect(next.attackLocks).toEqual([{ player: "P2", untilTurn: 9 }]);
+  });
+
+  it("recasting restarts the count from the current turn", () => {
+    const state = makeState({
+      turn: 7,
+      attackLocks: [{ player: "P2", untilTurn: 9 }],
+    });
+
+    const { state: next } = activate(swordsOfRevealingLight, state);
+
+    expect(next.attackLocks).toEqual([{ player: "P2", untilTurn: 13 }]);
   });
 });
