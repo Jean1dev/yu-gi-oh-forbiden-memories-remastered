@@ -163,6 +163,7 @@ export type {
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
   Action,
+  ActivateSpellAction,
   AdvancePhaseAction,
   ChangePositionAction,
   EquipCardAction,
@@ -174,6 +175,7 @@ export type {
 } from "./duel/action.ts";
 export {
   ActionSchema,
+  ActivateSpellActionSchema,
   AdvancePhaseActionSchema,
   ChangePositionActionSchema,
   DeclareAttackActionSchema,

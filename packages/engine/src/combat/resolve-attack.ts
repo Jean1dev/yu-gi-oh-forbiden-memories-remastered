@@ -173,7 +173,7 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
       createEvent({
         type: "onDamage",
         originPlayer: attackerPlayer,
-        context: { toPlayer: damagedPlayer, amount: damageAmount },
+        context: { toPlayer: damagedPlayer, amount: damageAmount, kind: "battle_damage" },
       }),
     );
   }

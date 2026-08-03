@@ -39,6 +39,17 @@ export type EquipCardAction = Readonly<{
   targetZone: ZoneReference;
 }>;
 
+/**
+ * Plays a magic/equip card whose effect resolves immediately
+ * (`docs/spells/README.md` §4). Carries no zone: the card never occupies one —
+ * it resolves and leaves play in the same transition.
+ *
+ * Separate from `PlaySpellOrTrapAction`, whose required `zoneIndex` would be
+ * permanently ignored here, so each action keeps a single-valued
+ * postcondition.
+ */
+export type ActivateSpellAction = Readonly<{ type: "activate_spell"; handIndex: number }>;
+
 /** Plays a field-spell card from hand, replacing the single `activeField` slot (motor-duelo-1x1 F09). */
 export type PlayFieldSpellAction = Readonly<{
   type: "play_field_spell";
@@ -85,6 +96,7 @@ export type Action =
   | SummonMonsterAction
   | PlaySpellOrTrapAction
   | EquipCardAction
+  | ActivateSpellAction
   | PlayFieldSpellAction
   | ChangePositionAction
   | DeclareAttackAction

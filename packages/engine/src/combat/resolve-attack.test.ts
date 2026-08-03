@@ -163,7 +163,10 @@ describe("resolveAttack", () => {
     if (result.ok) {
       expect(result.value.state.players.P2.lp).toBe(8000 - 1000);
       expect(result.value.events).toContainEqual(
-        expect.objectContaining({ type: "onDamage", context: { toPlayer: "P2", amount: 1000 } }),
+        expect.objectContaining({
+          type: "onDamage",
+          context: { toPlayer: "P2", amount: 1000, kind: "battle_damage" },
+        }),
       );
     }
   });
@@ -187,7 +190,10 @@ describe("resolveAttack", () => {
     if (result.ok) {
       expect(result.value.state.players.P1.lp).toBe(8000 - 800);
       expect(result.value.events).toContainEqual(
-        expect.objectContaining({ type: "onDamage", context: { toPlayer: "P1", amount: 800 } }),
+        expect.objectContaining({
+          type: "onDamage",
+          context: { toPlayer: "P1", amount: 800, kind: "battle_damage" },
+        }),
       );
     }
   });

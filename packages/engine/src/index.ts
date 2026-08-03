@@ -35,11 +35,17 @@ export {
 } from "./draw/index.ts";
 export { summonMonster } from "./summon/index.ts";
 export {
+  activateSpell,
+  attackLockUntilTurn,
   equipCard,
   equipCombatProviders,
   getOpponent,
+  isAttackLocked,
   playFieldSpell,
   playSpellOrTrap,
+  playersForSide,
+  resolveOneShotEffect,
   sumEquipBonuses,
+  withAttackLock,
 } from "./spells/index.ts";
 export { changePosition, isFaceDown, nextPosition } from "./position/index.ts";

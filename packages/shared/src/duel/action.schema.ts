@@ -35,6 +35,11 @@ export const EquipCardActionSchema = z.strictObject({
   targetZone: ZoneReferenceSchema,
 });
 
+export const ActivateSpellActionSchema = z.strictObject({
+  type: z.literal("activate_spell"),
+  handIndex: z.number().int().min(0),
+});
+
 export const PlayFieldSpellActionSchema = z.strictObject({
   type: z.literal("play_field_spell"),
   handIndex: z.number().int().min(0),
@@ -69,6 +74,7 @@ export const ActionSchema = z.discriminatedUnion("type", [
   SummonMonsterActionSchema,
   PlaySpellOrTrapActionSchema,
   EquipCardActionSchema,
+  ActivateSpellActionSchema,
   PlayFieldSpellActionSchema,
   ChangePositionActionSchema,
   DeclareAttackActionSchema,

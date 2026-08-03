@@ -13,7 +13,7 @@ import { declareAttack, resolveAttack } from "../combat/index.ts";
 import { stampOutcome, surrender } from "../end/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
-import { equipCard, playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
+import { activateSpell, equipCard, playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
 
@@ -123,6 +123,15 @@ function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainE
       );
       if (phaseError) return err(phaseError);
       return equipCard(state, action);
+    }
+    case "activate_spell": {
+      const phaseError = requirePhase(
+        state,
+        "main",
+        "A spell can only be activated during the Main phase.",
+      );
+      if (phaseError) return err(phaseError);
+      return activateSpell(state, action);
     }
     case "play_field_spell": {
       const phaseError = requirePhase(

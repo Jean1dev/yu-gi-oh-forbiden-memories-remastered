@@ -232,3 +232,64 @@ describe("playSpellOrTrap — rejections", () => {
     expect(state).toEqual(snapshot);
   });
 });
+
+describe("playSpellOrTrap — cartas que pertencem a outra acao", () => {
+  const misroutes: readonly { name: string; card: Card; code: string }[] = [
+    {
+      name: "recusa Legendary Sword com equip_requires_target",
+      card: makeCard({ numero: "301", nome: "Legendary Sword", classe: "Equip", tipo: "equipamento" }),
+      code: "equip_requires_target",
+    },
+    {
+      name: "recusa Forest com terrain_requires_field_zone",
+      card: makeCard({ numero: "330", nome: "Forest" }),
+      code: "terrain_requires_field_zone",
+    },
+    {
+      name: "recusa Raigeki com spell_requires_activation",
+      card: makeCard({ numero: "337", nome: "Raigeki" }),
+      code: "spell_requires_activation",
+    },
+    {
+      name: "recusa Sword of Dark Destruction com spell_requires_activation, apesar de ser equipamento",
+      card: makeCard({ numero: "302", classe: "Equip", tipo: "equipamento" }),
+      code: "spell_requires_activation",
+    },
+  ];
+
+  for (const { name, card, code } of misroutes) {
+    it(name, () => {
+      const state = makeState({ players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() } });
+
+      const result = playSpellOrTrap(state, {
+        type: "play_spell_or_trap",
+        handIndex: 0,
+        zoneIndex: 0,
+      });
+
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.code).toBe(code);
+      expect(state.players.P1.field.spells[0].occupied).toBe(false);
+    });
+  }
+
+  it("continua posicionando uma carta de magia sem entrada na tabela de efeitos", () => {
+    const inert = makeCard({ numero: "030" });
+    const state = makeState({ players: { P1: makePlayer({ hand: [inert] }), P2: makePlayer() } });
+
+    const result = playSpellOrTrap(state, {
+      type: "play_spell_or_trap",
+      handIndex: 0,
+      zoneIndex: 0,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.players.P1.field.spells[0]).toEqual({
+      occupied: true,
+      card: inert,
+      faceUp: true,
+    });
+  });
+});
