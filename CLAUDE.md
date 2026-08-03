@@ -128,6 +128,10 @@ Feature IDs are local to each PRD, so always name the module too ("build-deck F0
 Three skills drive this (see `AGENTS.md`): `duel-feature-prd` → `spec-writer` →
 `implement-feature`. The implementation skill commits one commit per phase.
 
+That pipeline is for new behavior only. Bugs and small adjustments to already-specified behavior
+go through the lighter path in `AGENTS.md` ("Small fixes and adjustments") instead — a direct
+`Corrige`/`Ajusta` commit, no new spec.md.
+
 `TypeScript-development-guidelines.md` is the declared language standard for the repo. It is
 generic and long — consult it for a specific question rather than reading it end to end.
 

@@ -9,6 +9,7 @@ import {
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
+import { replaceZone } from "../field/replace-zone.ts";
 import { changePosition } from "./change-position.ts";
 import { nextPosition } from "./next-position.ts";
 
@@ -114,6 +115,30 @@ describe("changePosition properties", () => {
       fc.property(positionArbitrary, (position) => {
         const result = nextPosition(position);
         expect(result === "attack_face_up" || result === "defense_face_up").toBe(true);
+      }),
+      { numRuns: 1000 },
+    );
+  });
+
+  it("recusa determinística para monstro que já atacou: changePosition sempre falha com already_attacked", () => {
+    fc.assert(
+      fc.property(cardArbitrary, positionArbitrary, zoneIndexArbitrary, (card, position, zoneIndex) => {
+        const state = makeState(card, position, zoneIndex);
+        const targetZone = state.players.P1.field.monsters[zoneIndex];
+        const attackedField = replaceZone(
+          state.players.P1.field.monsters,
+          zoneIndex,
+          targetZone.occupied ? { ...targetZone, hasAttacked: true } : targetZone,
+        );
+        const attackedState: DuelState = {
+          ...state,
+          players: { ...state.players, P1: { ...state.players.P1, field: { ...state.players.P1.field, monsters: attackedField } } },
+        };
+
+        const result = changePosition(attackedState, { player: "P1", zoneType: "monster", index: zoneIndex });
+
+        expect(result.ok).toBe(false);
+        if (!result.ok) expect(result.error.code).toBe("already_attacked");
       }),
       { numRuns: 1000 },
     );

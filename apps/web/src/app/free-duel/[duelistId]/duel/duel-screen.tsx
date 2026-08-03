@@ -28,6 +28,7 @@ import { PostDuelActions } from "../../../../components/free-duel/post-duel-acti
 import { SurrenderButton } from "../../../../components/free-duel/surrender-button.tsx";
 import { SurrenderConfirmationDialog } from "../../../../components/free-duel/surrender-confirmation-dialog.tsx";
 import { DuelTopBar } from "../../../../components/free-duel/duel-top-bar.tsx";
+import { useAutoAdvancePhase } from "../../../../hooks/use-auto-advance-phase.ts";
 import { useDuelCues } from "../../../../hooks/use-duel-cues.ts";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
@@ -145,6 +146,7 @@ export function DuelScreen({
   createRuntime,
   resolveResult,
   grantVictoryReward,
+  autoAdvanceDelayMs,
 }: {
   readonly duelistId: string;
   readonly catalogResult?: DuelScreenCatalogResult;
@@ -154,6 +156,8 @@ export function DuelScreen({
   readonly createRuntime?: ((input: CreateDuelRuntimeInput) => DuelRuntime) | undefined;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
   readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
+  /** Draw/end auto-advance delay; only ever overridden by tests (default 1000ms). */
+  readonly autoAdvanceDelayMs?: number | undefined;
 }) {
   const router = useRouter();
   const cues = useDuelCues();
@@ -194,6 +198,13 @@ export function DuelScreen({
     : session.status === "in_progress" && !isPlayerTurn
       ? DUEL_SCREEN_MESSAGES.opponentTurn
       : null;
+
+  useAutoAdvancePhase({
+    phase: session.status === "in_progress" ? session.state.phase : null,
+    active: session.status === "in_progress" && isPlayerTurn && !duel.busy && !cues.busy,
+    dispatch: (action) => void duel.submitAction(action),
+    delayMs: autoAdvanceDelayMs,
+  });
 
   useEffect(() => {
     if (session.status === "ended") cues.clear();
