@@ -6,7 +6,7 @@ import { playFieldSpell } from "./play-field-spell.ts";
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
     id: 1,
-    numero: "050",
+    numero: "334",
     nome: "Umi",
     img: null,
     classe: "Magic",
@@ -60,8 +60,8 @@ describe("playFieldSpell — success", () => {
   });
 
   it("substitui um terreno já ativo sem emitir nenhum evento sobre o terreno anterior", () => {
-    const previousField = makeCard({ numero: "051", nome: "Wasteland" });
-    const nextField = makeCard({ numero: "052", nome: "Forest" });
+    const previousField = makeCard({ numero: "331", nome: "Wasteland" });
+    const nextField = makeCard({ numero: "330", nome: "Forest" });
     const state = makeState({
       activeField: previousField,
       players: { P1: makePlayer({ hand: [nextField] }), P2: makePlayer() },
@@ -188,5 +188,27 @@ describe("playFieldSpell — rejections", () => {
 
     expect(result.ok).toBe(false);
     expect(state).toEqual(snapshot);
+  });
+});
+
+describe("playFieldSpell - effect table routing", () => {
+  it.each(["330", "331", "332", "333", "334", "335"])(
+    "accepts terrain card %s",
+    (numero) => {
+      const card = makeCard({ numero });
+      const state = makeState({ players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() } });
+
+      expect(playFieldSpell(state, { type: "play_field_spell", handIndex: 0 }).ok).toBe(true);
+    },
+  );
+
+  it("rejects Raigeki even though it is a Magic card", () => {
+    const card = makeCard({ numero: "337", nome: "Raigeki" });
+    const state = makeState({ players: { P1: makePlayer({ hand: [card] }), P2: makePlayer() } });
+
+    const result = playFieldSpell(state, { type: "play_field_spell", handIndex: 0 });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("invalid_field_spell_card_type");
   });
 });

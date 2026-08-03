@@ -1,6 +1,7 @@
 import {
   DomainError,
   err,
+  getSpellEffect,
   ok,
   type ApplyResult,
   type DuelState,
@@ -41,11 +42,12 @@ export function playFieldSpell(
     );
   }
 
-  if (card.tipo !== "magica" || card.classe !== "Magic") {
+  if (card.tipo !== "magica" || getSpellEffect(card.numero)?.type !== "terrain") {
     return err(
       new DomainError("This card is not a field-spell card.", "invalid_field_spell_card_type", {
         tipo: card.tipo,
         classe: card.classe,
+        numero: card.numero,
       }),
     );
   }
