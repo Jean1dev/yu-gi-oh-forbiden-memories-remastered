@@ -1,16 +1,27 @@
-import { DomainError, err, ok, type Action, type ApplyResult, type DuelState, type Phase, type Result } from "@yugioh/shared";
+import {
+  DomainError,
+  err,
+  ok,
+  type Action,
+  type ApplyResult,
+  type DuelState,
+  type Phase,
+  type Result,
+} from "@yugioh/shared";
 
 import { declareAttack, resolveAttack } from "../combat/index.ts";
 import { stampOutcome, surrender } from "../end/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
-import { playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
+import { equipCard, playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { advancePhase } from "./advance-phase.ts";
 
 /** `undefined` when `state.phase === phase`; otherwise the `wrong_phase` error to return. */
 function requirePhase(state: DuelState, phase: Phase, message: string): DomainError | undefined {
-  return state.phase === phase ? undefined : new DomainError(message, "wrong_phase", { phase: state.phase });
+  return state.phase === phase
+    ? undefined
+    : new DomainError(message, "wrong_phase", { phase: state.phase });
 }
 
 /**
@@ -55,7 +66,11 @@ function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainE
   if (action.type === "resolve_attack") {
     if (state.pending?.event.type !== "onAttackDeclared") {
       return err(
-        new DomainError("There is no pending attack to resolve.", "no_pending_attack_to_resolve", {}),
+        new DomainError(
+          "There is no pending attack to resolve.",
+          "no_pending_attack_to_resolve",
+          {},
+        ),
       );
     }
     return resolveAttack(state);
@@ -75,7 +90,11 @@ function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainE
     case "advance_phase":
       return ok(advancePhase(state));
     case "summon_monster": {
-      const phaseError = requirePhase(state, "main", "A monster can only be summoned during the Main phase.");
+      const phaseError = requirePhase(
+        state,
+        "main",
+        "A monster can only be summoned during the Main phase.",
+      );
       if (phaseError) return err(phaseError);
       if (state.activePlayer !== action.player) {
         return err(
@@ -88,19 +107,40 @@ function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainE
       return summonMonster(state, action);
     }
     case "play_spell_or_trap": {
-      const phaseError = requirePhase(state, "main", "A spell/trap card can only be played during the Main phase.");
+      const phaseError = requirePhase(
+        state,
+        "main",
+        "A spell/trap card can only be played during the Main phase.",
+      );
       if (phaseError) return err(phaseError);
       return playSpellOrTrap(state, action);
     }
+    case "equip_card": {
+      const phaseError = requirePhase(
+        state,
+        "main",
+        "An equip card can only be played during the Main phase.",
+      );
+      if (phaseError) return err(phaseError);
+      return equipCard(state, action);
+    }
     case "play_field_spell": {
-      const phaseError = requirePhase(state, "main", "A field-spell card can only be played during the Main phase.");
+      const phaseError = requirePhase(
+        state,
+        "main",
+        "A field-spell card can only be played during the Main phase.",
+      );
       if (phaseError) return err(phaseError);
       return playFieldSpell(state, action);
     }
     case "change_position":
       return changePosition(state, action.zone);
     case "declare_attack": {
-      const phaseError = requirePhase(state, "battle", "An attack can only be declared during the Battle phase.");
+      const phaseError = requirePhase(
+        state,
+        "battle",
+        "An attack can only be declared during the Battle phase.",
+      );
       if (phaseError) return err(phaseError);
       return declareAttack(state, action);
     }

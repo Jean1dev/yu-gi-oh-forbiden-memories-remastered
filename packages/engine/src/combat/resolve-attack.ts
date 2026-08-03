@@ -15,16 +15,21 @@ import {
 import { closeReactionWindow, createEvent } from "../events/index.ts";
 import { replaceZone } from "../field/replace-zone.ts";
 import { isFaceDown } from "../position/next-position.ts";
+import { equipCombatProviders } from "../spells/effects/index.ts";
 import { getOpponent } from "../spells/opponent.ts";
 import { calculateEffectiveAtkDef } from "./calculate-effective-atk-def.ts";
-import { neutralCombatProviders } from "./neutral-combat-providers.ts";
 import { resolveCombatTable } from "./resolve-combat-table.ts";
 
 function postureOf(position: MonsterPosition): "attack" | "defense" {
   return position === "attack_face_up" || position === "attack_face_down" ? "attack" : "defense";
 }
 
-function withMonsterZone(state: DuelState, player: PlayerId, index: ZoneIndex, zone: MonsterZone): DuelState {
+function withMonsterZone(
+  state: DuelState,
+  player: PlayerId,
+  index: ZoneIndex,
+  zone: MonsterZone,
+): DuelState {
   const player_ = state.players[player];
   return {
     ...state,
@@ -59,7 +64,9 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
 
   const closed = closeReactionWindow(state);
   if (!closed.ok) {
-    throw new Error("Unreachable: state.pending was just confirmed to hold an onAttackDeclared window.");
+    throw new Error(
+      "Unreachable: state.pending was just confirmed to hold an onAttackDeclared window.",
+    );
   }
 
   let workingState = closed.value;
@@ -69,16 +76,21 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
 
   const attackerZone = workingState.players[attackerPlayer].field.monsters[attackerZoneRef.index];
   if (!attackerZone.occupied) {
-    throw new Error("Unreachable: nothing can vacate the attacker's zone between declare and resolve.");
+    throw new Error(
+      "Unreachable: nothing can vacate the attacker's zone between declare and resolve.",
+    );
   }
 
+  let defenderZone: typeof attackerZone | undefined;
   let defenderCard: (typeof attackerZone)["card"] | undefined;
   let defenderPosture: "attack" | "defense" | undefined;
 
   if (targetZoneRef !== undefined) {
     const targetZone = workingState.players[opponentPlayer].field.monsters[targetZoneRef.index];
     if (!targetZone.occupied) {
-      throw new Error("Unreachable: nothing can vacate the target's zone between declare and resolve.");
+      throw new Error(
+        "Unreachable: nothing can vacate the target's zone between declare and resolve.",
+      );
     }
 
     let revealedZone = targetZone;
@@ -86,7 +98,12 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
       const revealedPosition: MonsterPosition =
         targetZone.position === "attack_face_down" ? "attack_face_up" : "defense_face_up";
       revealedZone = { ...targetZone, position: revealedPosition };
-      workingState = withMonsterZone(workingState, opponentPlayer, targetZoneRef.index, revealedZone);
+      workingState = withMonsterZone(
+        workingState,
+        opponentPlayer,
+        targetZoneRef.index,
+        revealedZone,
+      );
       events.push(
         createEvent({
           type: "onFlip",
@@ -97,22 +114,25 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
       );
     }
 
+    defenderZone = revealedZone;
     defenderCard = revealedZone.card;
     defenderPosture = postureOf(revealedZone.position);
   }
 
+  // Each side gets providers closed over its own zone, so attached equips
+  // reach the combat table without `apply` growing a third parameter.
   const attackerEffective = calculateEffectiveAtkDef(
     attackerZone.card,
     { activeField: workingState.activeField, opponent: defenderCard ?? null },
-    neutralCombatProviders,
+    equipCombatProviders(attackerZone),
   );
   const defenderEffective =
-    defenderCard === undefined
+    defenderZone === undefined
       ? undefined
       : calculateEffectiveAtkDef(
-          defenderCard,
+          defenderZone.card,
           { activeField: workingState.activeField, opponent: attackerZone.card },
-          neutralCombatProviders,
+          equipCombatProviders(defenderZone),
         );
 
   const combatResult = resolveCombatTable({
@@ -129,11 +149,16 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
   );
 
   if (targetZoneRef !== undefined && combatResult.defenderDestroyed) {
-    workingState = withMonsterZone(workingState, opponentPlayer, targetZoneRef.index, { occupied: false });
+    workingState = withMonsterZone(workingState, opponentPlayer, targetZoneRef.index, {
+      occupied: false,
+    });
   }
 
   const damagedPlayer = combatResult.damage.toAttackerOwner > 0 ? attackerPlayer : opponentPlayer;
-  const damageAmount = Math.max(combatResult.damage.toAttackerOwner, combatResult.damage.toDefenderOwner);
+  const damageAmount = Math.max(
+    combatResult.damage.toAttackerOwner,
+    combatResult.damage.toDefenderOwner,
+  );
 
   if (damageAmount > 0) {
     const owner = workingState.players[damagedPlayer];
