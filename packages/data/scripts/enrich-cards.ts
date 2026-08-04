@@ -2,7 +2,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { type Card, type CardNumber } from "@yugioh/shared";
+import { CANONICAL_CARD_TOTAL, CARD_NUMBER_LENGTH, type Card, type CardNumber } from "@yugioh/shared";
 import { z } from "zod";
 
 import { CardEnrichmentTableSchema, type CardEnrichmentTable } from "../src/ingestion/enrichment.ts";
@@ -67,6 +67,13 @@ export const PILOT_CARD_NUMBERS: readonly CardNumber[] = [
   "681",
   "685",
 ];
+
+/** Every canonical `numero`, `"001"`..`"722"` — `renderizacao-cartas/F07`'s full-rollout target list. */
+export function allCardNumbers(): readonly CardNumber[] {
+  return Array.from({ length: CANONICAL_CARD_TOTAL }, (_unused, index) =>
+    String(index + 1).padStart(CARD_NUMBER_LENGTH, "0"),
+  );
+}
 
 export const DEFAULT_OPTIONS: EnrichmentOptions = {
   sourceDir: join(REPO_ROOT, "cards-data", "dados"),
@@ -251,5 +258,9 @@ const invokedPath = process.argv[1];
 const isEntryPoint =
   invokedPath !== undefined && fileURLToPath(import.meta.url) === resolve(invokedPath);
 if (isEntryPoint) {
-  process.exitCode = await runEnrichment();
+  // `--all` is `renderizacao-cartas/F07`: the same script run against every
+  // canonical numero instead of just the pilot (spec F02, plan.md Fase 3 —
+  // "mesmo script de F02/F03, não uma reimplementação").
+  const targetNumbers = process.argv.includes("--all") ? allCardNumbers() : PILOT_CARD_NUMBERS;
+  process.exitCode = await runEnrichment({ ...DEFAULT_OPTIONS, targetNumbers });
 }

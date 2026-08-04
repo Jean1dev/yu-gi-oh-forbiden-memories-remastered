@@ -8,7 +8,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { sourceFile } from "../tests/fixtures/source-records.ts";
 import type { CardEnrichmentTable } from "../src/ingestion/enrichment.ts";
 import type { YgoprodeckCardResponse } from "../src/ygoprodeck/types.ts";
-import { runEnrichment, type EnrichmentOptions, type YgoprodeckClient } from "./enrich-cards.ts";
+import {
+  allCardNumbers,
+  runEnrichment,
+  type EnrichmentOptions,
+  type YgoprodeckClient,
+} from "./enrich-cards.ts";
 
 function apiRecord(overrides: Partial<YgoprodeckCardResponse> = {}): YgoprodeckCardResponse {
   return {
@@ -187,5 +192,17 @@ describe("runEnrichment", () => {
 
     const table = await readTable(join(workDir, "enriquecimento-ygoprodeck.json"));
     expect(Object.keys(table)).toEqual(["001"]);
+  });
+});
+
+describe("allCardNumbers", () => {
+  it("returns exactly the canonical 001-722 sequence in order", () => {
+    const numbers = allCardNumbers();
+
+    expect(numbers).toHaveLength(722);
+    expect(numbers[0]).toBe("001");
+    expect(numbers.at(-1)).toBe("722");
+    expect(new Set(numbers)).toHaveLength(722);
+    expect(numbers).toEqual([...numbers].sort((left, right) => left.localeCompare(right)));
   });
 });

@@ -6,7 +6,7 @@ import { type CardNumber } from "@yugioh/shared";
 import { z } from "zod";
 
 import { readJpegDimensions } from "../src/art/jpeg-dimensions.ts";
-import { PILOT_CARD_NUMBERS } from "./enrich-cards.ts";
+import { allCardNumbers, PILOT_CARD_NUMBERS } from "./enrich-cards.ts";
 
 /**
  * Downloads the crop art `renderizacao-cartas/F02` resolved URLs for, one card
@@ -152,5 +152,6 @@ const invokedPath = process.argv[1];
 const isEntryPoint =
   invokedPath !== undefined && fileURLToPath(import.meta.url) === resolve(invokedPath);
 if (isEntryPoint) {
-  process.exitCode = await runDownload();
+  const targetNumbers = process.argv.includes("--all") ? allCardNumbers() : PILOT_CARD_NUMBERS;
+  process.exitCode = await runDownload({ ...DEFAULT_OPTIONS, targetNumbers });
 }
