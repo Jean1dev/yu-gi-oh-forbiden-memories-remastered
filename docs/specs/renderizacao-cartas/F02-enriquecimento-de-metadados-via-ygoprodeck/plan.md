@@ -25,10 +25,10 @@ timeout de 10s e o único `fetch()` desta feature.
 
 **5. Script de enriquecimento** — criar `packages/data/scripts/enrich-cards.ts`: lê as cartas locais e os
 overrides, resolve casamento por id/nome com o *rate limit* de 300ms, grava
-`cards-data/dados/enriquecimento-ygoprodeck.json` e `packages/data/generated/ygoprodeck-art-urls.json`,
+`cards-data/enriquecimento-ygoprodeck.json` e `packages/data/generated/ygoprodeck-art-urls.json`,
 imprime o relatório de casadas/não-casadas.
 
-**6. Arquivo de overrides vazio** — criar `cards-data/dados/overrides-nomes-ygoprodeck.json` com `{}`.
+**6. Arquivo de overrides vazio** — criar `cards-data/overrides-nomes-ygoprodeck.json` com `{}`.
 
 **7. Testes do orquestrador** — cobrir os casos da Seção 7 da spec em `enrich-cards.test.ts`, com o cliente
 HTTP stubado (o stub vive só no arquivo de teste).

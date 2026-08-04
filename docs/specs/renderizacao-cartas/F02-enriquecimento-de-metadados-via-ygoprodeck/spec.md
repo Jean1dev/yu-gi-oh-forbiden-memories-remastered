@@ -7,7 +7,7 @@
 
 Esta feature busca `atributo`, `nivel` e `descricao` para as cartas do piloto (~15 cartas
 representativas, ver Decisão 1) na API pública do YGOPRODeck e grava o resultado na tabela auxiliar que
-`renderizacao-cartas/F01` já criou (`cards-data/dados/enriquecimento-ygoprodeck.json`). Também resolve, para
+`renderizacao-cartas/F01` já criou (`cards-data/enriquecimento-ygoprodeck.json`). Também resolve, para
 cada carta casada, a URL da arte "crop" (só a ilustração, sem moldura) que `renderizacao-cartas/F03` vai
 baixar — mas não baixa nada ela mesma.
 
@@ -22,7 +22,7 @@ suportá-lo porque F07 (rollout completo) vai precisar.
 - Parser puro que valida a resposta da API e a converte no formato interno de enriquecimento
 - Script de I/O (`packages/data/scripts/enrich-cards.ts`) que orquestra: lê as cartas locais do piloto,
   resolve a chave de casamento (`password` → `id`, ou nome via arquivo de overrides), chama a API, grava
-  `cards-data/dados/enriquecimento-ygoprodeck.json` (atributo/nível/descrição) e
+  `cards-data/enriquecimento-ygoprodeck.json` (atributo/nível/descrição) e
   `packages/data/generated/ygoprodeck-art-urls.json` (numero → URL da arte crop, consumido por F03)
 - Suporte a lista de cartas-alvo configurável, para o mesmo script servir o piloto (esta entrega) e o
   rollout completo (F07, sessão futura) sem reescrita
@@ -40,7 +40,7 @@ suportá-lo porque F07 (rollout completo) vai precisar.
 |---|--------------------|--------|--------|
 | 1 | Piloto = 15 cartas: `001` Blue-eyes White Dragon (monstro/LIGHT/8), `002` Mystical Elf (monstro/LIGHT/4), `003` Hitotsu-me Giant (monstro/EARTH/4), `004` Baby Dragon (monstro/WIND/3), `006` Feral Imp (monstro/DARK/4), `050` Basic Insect (monstro/EARTH/2), `300` Kurama (monstro/WIND/3), `301` Legendary Sword (equipamento), `304` Axe of Despair (equipamento), `320` Stop Defense (magica), `330` Forest (magica), `670` Black Luster Ritual (ritual), `671` Zera Ritual (ritual), `681` House of Adhesive Tape (armadilha), `685` Acid Trap Hole (armadilha) — cobre os 5 tipos e uma variedade de atributos, e todas já foram verificadas manualmente contra a API (Decisão 2) | PRD F02 Capabilities ("~15-20 cartas representativas") + verificação manual durante o planejamento desta spec | confirmada |
 | 2 | `password` do dataset local == `id` da YGOPRODeck, sem espaços — casamento primário por ID, não por nome | PRD F02 Capabilities, "Achado de exploração" | confirmada |
-| 3 | Casamento por nome (`?name=`) só para cartas sem `password` (24 no catálogo inteiro, nenhuma no piloto) — exato, case-insensitive, com fallback para o arquivo de overrides `cards-data/dados/overrides-nomes-ygoprodeck.json` (mapa `numero` → `nome YGOPRODeck`) quando o nome local não bate | PRD F02 Capabilities | confirmada |
+| 3 | Casamento por nome (`?name=`) só para cartas sem `password` (24 no catálogo inteiro, nenhuma no piloto) — exato, case-insensitive, com fallback para o arquivo de overrides `cards-data/overrides-nomes-ygoprodeck.json` (mapa `numero` → `nome YGOPRODeck`) quando o nome local não bate | PRD F02 Capabilities | confirmada |
 | 4 | `nivel` só é gravado quando `tipo` local é `monstro` — para os demais tipos, `nivel` sai `null` mesmo que a API retorne um `level` (spell/trap não tem nível no TCG, então a API nunca retorna nesse caso, mas o código não confia nisso: filtra pelo `tipo` local) | Invariante já travado em `CardSchema.superRefine` (F01) | confirmada |
 | 5 | Rate limit: 1 requisição a cada 300ms, sequencial, sem paralelismo | PRD F02 Capabilities | confirmada |
 | 6 | URL da arte crop fica num artefato **gerado** (`packages/data/generated/ygoprodeck-art-urls.json`, gitignored, como `arts-manifest.json`), não em `cards-data/dados/`: é um ponteiro de download efêmero, não dado canônico do catálogo — `renderizacao-cartas/F03` o lê e descarta após baixar | Adaptação técnica desta spec: `CardEnrichmentEntrySchema` (F01, `strictObject`) não tem campo de URL, e misturar "dado canônico" com "ponteiro de download" no mesmo arquivo versionado quebraria essa fronteira | confirmada |
@@ -57,7 +57,7 @@ suportá-lo porque F07 (rollout completo) vai precisar.
 | `packages/data/scripts/ygoprodeck-client.ts` | data | novo | `fetchById(id)`, `fetchByName(name)` — único lugar com `fetch()` real, com *rate limit* e timeout |
 | `packages/data/scripts/enrich-cards.ts` | data | novo | orquestração de I/O: lê `dados/*.json` + overrides, casa, chama o cliente, grava os dois artefatos, imprime relatório |
 | `packages/data/scripts/enrich-cards.test.ts` | data | novo | testes do orquestrador com cliente HTTP stubado (stub só em teste, nunca em produção) |
-| `cards-data/dados/overrides-nomes-ygoprodeck.json` | dados | novo | mapa vazio (`{}`) nesta entrega — infraestrutura para F07 |
+| `cards-data/overrides-nomes-ygoprodeck.json` | dados | novo | mapa vazio (`{}`) nesta entrega — infraestrutura para F07 |
 
 **Verificação da direção de dependências:** tudo em `packages/data`, que já depende só de `@yugioh/shared`.
 `fetch()` fica isolado em `packages/data/scripts/ygoprodeck-client.ts` — o único arquivo desta feature com
@@ -86,7 +86,7 @@ MatchOutcome =
 
 1. O script lê `cards-data/dados/*.json` (via o mesmo adapter de leitura que `ingest-cards.ts` já tem) e
    filtra pela lista de cartas-alvo (piloto = os 15 `numero` da Decisão 1; parametrizável para F07)
-2. Lê `cards-data/dados/overrides-nomes-ygoprodeck.json` (ausente = `{}`, mesmo tratamento neutro de F01)
+2. Lê `cards-data/overrides-nomes-ygoprodeck.json` (ausente = `{}`, mesmo tratamento neutro de F01)
 3. Para cada carta-alvo, na ordem de `numero` ascendente:
    a. Se `password` não for nulo: chama `fetchById(password sem espaços)`
    b. Se `password` for nulo: procura `overrides[numero]`; se ausente, marca `unmatched` com
@@ -98,7 +98,7 @@ MatchOutcome =
       `unmatched` (`invalid_response`)
    f. Aguarda 300ms antes da próxima iteração (Decisão 5)
 4. Ao final: funde os `matched` na tabela de enriquecimento existente (sobrescrevendo por `numero`, Decisão
-   7), grava `cards-data/dados/enriquecimento-ygoprodeck.json` e
+   7), grava `cards-data/enriquecimento-ygoprodeck.json` e
    `packages/data/generated/ygoprodeck-art-urls.json`, e imprime o relatório (contagem de casadas,
    não-casadas por motivo, lista de `numero` não-casados)
 
@@ -184,9 +184,9 @@ Nenhum — API pública de terceiros, não um módulo interno do projeto.
 
 ### Arquivos de dados versionados
 
-`cards-data/dados/enriquecimento-ygoprodeck.json` (já schematizado por F01) recebe as 15 entradas do piloto.
+`cards-data/enriquecimento-ygoprodeck.json` (já schematizado por F01) recebe as 15 entradas do piloto.
 
-`cards-data/dados/overrides-nomes-ygoprodeck.json` (novo, versionado):
+`cards-data/overrides-nomes-ygoprodeck.json` (novo, versionado):
 ```json
 {}
 ```

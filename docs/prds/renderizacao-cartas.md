@@ -175,7 +175,7 @@ campos) e F04/F05 (quem lê).
 - Casamento por nome (case-insensitive, ignorando espaços nas pontas) contra
   `GET https://db.ygoprodeck.com/api/v7/cardinfo.php?name={nome}` só para as ~24 cartas sem `password`;
   nome sem correspondência exata consulta o arquivo de overrides
-  `cards-data/dados/overrides-nomes-ygoprodeck.json` (mapa `nome local` → `nome YGOPRODeck`) antes de entrar
+  `cards-data/overrides-nomes-ygoprodeck.json` (mapa `nome local` → `nome YGOPRODeck`) antes de entrar
   no relatório de não-casados
 - Script idempotente: rodar de novo sobre uma carta já enriquecida não duplica nem altera o resultado, a
   menos que o override para aquele nome tenha mudado

@@ -16,7 +16,7 @@ Se os três campos fossem obrigatórios em `SourceCardSchema` (`strictObject`, s
 `packages/data/src/ingestion/envelope.ts`), a ingestão inteira quebraria para as ~700 cartas ainda não
 migradas. A spec resolve isso tratando o enriquecimento como **uma tabela auxiliar separada**, no mesmo
 espírito das já existentes e pendentes do projeto (`fusions.json`, matriz de Guardiões, terrenos, drops —
-`docs/arquitetura.md`): um arquivo `cards-data/dados/enriquecimento-ygoprodeck.json` (`numero` → dados),
+`docs/arquitetura.md`): um arquivo `cards-data/enriquecimento-ygoprodeck.json` (`numero` → dados),
 gerado por F02/F07 e consumido no fim do pipeline de ingestão, nunca escrito de volta em `dados/NNN.json`.
 Isso mantém o dataset fonte imutável e faz o pipeline continuar validando as 722 cartas em qualquer ponto
 do rollout, com os três campos novos simplesmente `null` para quem ainda não tem entrada na tabela.
@@ -24,7 +24,7 @@ do rollout, com os três campos novos simplesmente `null` para quem ainda não t
 ### Incluído
 - `atributo` (enum fechado dos 7 valores padrão do TCG), `nivel` (inteiro 1-12, só para `tipo = monstro`)
   e `descricao` (string) em `CardSchema`, todos `nullable`, seguindo o padrão de `atk`/`def`
-- Schema e loader da tabela auxiliar de enriquecimento (`cards-data/dados/enriquecimento-ygoprodeck.json`),
+- Schema e loader da tabela auxiliar de enriquecimento (`cards-data/enriquecimento-ygoprodeck.json`),
   vazia por padrão (nenhuma entrada) até F02 escrever nela
 - Função pura que mescla uma entrada de enriquecimento num `Card` já normalizado
 - Wiring da mescla dentro de `ingestSource` (`packages/data/src/ingestion/ingest-source.ts`), sem quebrar
@@ -43,7 +43,7 @@ do rollout, com os três campos novos simplesmente `null` para quem ainda não t
 | 2 | Enum de `atributo`: `DARK, LIGHT, EARTH, WATER, FIRE, WIND, DIVINE` — os 7 valores padrão do TCG real, cobrindo o que a YGOPRODeck retorna | PRD F01 Capabilities + domínio do jogo (não é uma tabela de lore pendente como Guardiões/Terrenos — são os atributos padrão do TCG) | confirmada |
 | 3 | `nivel`: inteiro 1-12 (intervalo real de nível de monstro no TCG); obrigatoriamente `null` quando `tipo != monstro` | PRD F01 Capabilities | confirmada |
 | 4 | Tabela de enriquecimento vazia (nenhuma entrada) é o estado inicial válido — todo card com `atributo/nivel/descricao = null` até ter entrada | Fase 0.4 do spec-writer (nunca inventar dado de tabela auxiliar) | confirmada |
-| 5 | Nome do arquivo: `cards-data/dados/enriquecimento-ygoprodeck.json`, ao lado dos `NNN.json` — versionado no git (não é `packages/data/generated/`, que é gitignored: o enriquecimento é dado de origem, não artefato de build) | Segue o precedente de `cards-data/dados/` como diretório de dados-fonte versionados | confirmada |
+| 5 | Nome do arquivo: `cards-data/enriquecimento-ygoprodeck.json`, ao lado dos `NNN.json` — versionado no git (não é `packages/data/generated/`, que é gitignored: o enriquecimento é dado de origem, não artefato de build) | Segue o precedente de `cards-data/dados/` como diretório de dados-fonte versionados | confirmada |
 | 6 | `atributo`/`nivel`/`descricao` são campos **opcionais** (`?:`) no tipo `Card`, e `.nullish()` (aceita `undefined` OU `null`) no `CardSchema` — não apenas `.nullable()` com chave obrigatória | Descoberta durante a implementação: ~85 arquivos em todo o monorepo já constroem literais `Card` para teste sem os campos novos; torná-los obrigatórios quebraria o typecheck de `packages/rules`, `packages/engine` e `apps/web` — um raio de explosão incompatível com o Objetivo 4 do PRD ("não regredir cartas ainda não migradas"). Código de produção (`normalizeCard`, `applyEnrichment`, `toCanonicalRecord`) sempre atribui `null` explicitamente, nunca omite a chave — `cards.json` mantém as 3 chaves em todo registro | confirmada |
 
 ## 2. Alocação no Monorepo
@@ -59,7 +59,7 @@ do rollout, com os três campos novos simplesmente `null` para quem ainda não t
 | `packages/data/src/ingestion/ingest-source.ts` | data | alterado | `IngestionInput` ganha `enrichment?: CardEnrichmentTable`; mescla antes de `candidates.push` |
 | `packages/data/src/ingestion/ingest-source.test.ts` | data | alterado | casos novos: carta com/sem entrada de enriquecimento |
 | `packages/data/src/ingestion/index.ts` | data | alterado | exporta o módulo `enrichment.ts` |
-| `packages/data/scripts/ingest-cards.ts` | data | alterado | lê `cards-data/dados/enriquecimento-ygoprodeck.json` (se existir; ausência = tabela vazia) e passa para `ingestSource` |
+| `packages/data/scripts/ingest-cards.ts` | data | alterado | lê `cards-data/enriquecimento-ygoprodeck.json` (se existir; ausência = tabela vazia) e passa para `ingestSource` |
 
 **Verificação da direção de dependências:** `packages/shared` não importa nada — raiz do grafo, como hoje.
 `packages/data` continua importando só `@yugioh/shared`, nenhuma inversão. Nenhum arquivo tocado é
@@ -154,7 +154,7 @@ Nenhum — esta feature não depende de nada fora do próprio módulo.
 
 ### Arquivos de dados versionados
 
-`cards-data/dados/enriquecimento-ygoprodeck.json`:
+`cards-data/enriquecimento-ygoprodeck.json`:
 
 ```json
 {

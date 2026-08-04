@@ -31,7 +31,7 @@ enriquecimento e a função pura que mescla uma entrada num `Card` já normaliza
 mescla a cada card normalizado antes da agregação, com tabela ausente/vazia como caminho neutro.
 
 **6. Adapter de I/O** — atualizar `packages/data/scripts/ingest-cards.ts` para ler
-`cards-data/dados/enriquecimento-ygoprodeck.json` do disco quando existir, e passar `{}` quando não
+`cards-data/enriquecimento-ygoprodeck.json` do disco quando existir, e passar `{}` quando não
 existir.
 
 **7. Testes de mescla e integração** — cobrir `enrichment.ts` isoladamente e os novos casos de
