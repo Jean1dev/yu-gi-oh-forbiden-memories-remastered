@@ -6,6 +6,7 @@ import { buildArtManifest } from "../src/ingestion/art-manifest.ts";
 import { CardEnrichmentTableSchema, type CardEnrichmentTable } from "../src/ingestion/enrichment.ts";
 import { ingestSource, type SourceFile } from "../src/ingestion/ingest-source.ts";
 import { serializeArtifacts, serializeArtManifest } from "../src/ingestion/serialize.ts";
+import { checkCardFrameCoverage } from "../src/validation/check-card-frame-coverage.ts";
 
 /**
  * The only boundary with the filesystem. Everything below `src/ingestion` is
@@ -181,6 +182,17 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
   const cropArts = await listArtPaths(options.cropArtsDir);
   const cropManifest = buildArtManifest(ingestion.value.cards, cropArts);
   const cropArtManifestJson = serializeArtManifest(cropManifest.manifest);
+  const coverageReport = checkCardFrameCoverage({
+    cardNumbers: ingestion.value.cards.map((card) => card.numero),
+    enrichedNumbers: new Set(
+      ingestion.value.cards
+        .filter((card) => card.descricao !== null)
+        .map((card) => card.numero),
+    ),
+    validCropArtNumbers: new Set(Object.keys(cropManifest.manifest)),
+    legacyArtNumbers: new Set(Object.keys(ingestion.value.manifest)),
+  });
+  const coverageReportJson = `${JSON.stringify(coverageReport, null, 2)}\n`;
 
   try {
     await mkdir(options.outputDir, { recursive: true });
@@ -188,6 +200,11 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
       writeFile(join(options.outputDir, "cards.json"), artifacts.cardsJson, "utf8"),
       writeFile(join(options.outputDir, "arts-manifest.json"), artifacts.artManifestJson, "utf8"),
       writeFile(join(options.outputDir, "crop-arts-manifest.json"), cropArtManifestJson, "utf8"),
+      writeFile(
+        join(options.outputDir, "card-frame-coverage-report.json"),
+        coverageReportJson,
+        "utf8",
+      ),
       writeFile(
         join(options.outputDir, "ingestion-report.json"),
         artifacts.ingestionReportJson,
@@ -202,7 +219,11 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
 
   printSummary(ingestion.value.report);
   console.log(`Crop arts resolved:    ${String(Object.keys(cropManifest.manifest).length)}`);
-  return ingestion.value.report.complete ? EXIT_SUCCESS : EXIT_FAILURE;
+  console.log(`CardFrame migrated:    ${String(coverageReport.migrated.length)}`);
+  console.log(`Legacy fallbacks:      ${String(coverageReport.legacyFallback.length)}`);
+  return ingestion.value.report.complete && coverageReport.complete
+    ? EXIT_SUCCESS
+    : EXIT_FAILURE;
 }
 
 const invokedPath = process.argv[1];

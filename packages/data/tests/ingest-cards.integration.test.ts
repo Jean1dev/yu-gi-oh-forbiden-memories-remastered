@@ -32,6 +32,14 @@ type Artifacts = Readonly<{
   };
   cardsJson: string;
   artManifestJson: string;
+  coverage: {
+    totalCards: number;
+    migrated: readonly string[];
+    legacyFallback: readonly string[];
+    inconsistent: readonly string[];
+    uncovered: readonly string[];
+    complete: boolean;
+  };
 }>;
 
 async function ingestInto(outputDir: string): Promise<Artifacts> {
@@ -39,6 +47,10 @@ async function ingestInto(outputDir: string): Promise<Artifacts> {
   const cardsJson = await readFile(join(outputDir, "cards.json"), "utf8");
   const artManifestJson = await readFile(join(outputDir, "arts-manifest.json"), "utf8");
   const reportJson = await readFile(join(outputDir, "ingestion-report.json"), "utf8");
+  const coverageJson = await readFile(
+    join(outputDir, "card-frame-coverage-report.json"),
+    "utf8",
+  );
   return {
     exitCode,
     cards: JSON.parse(cardsJson) as Card[],
@@ -46,6 +58,7 @@ async function ingestInto(outputDir: string): Promise<Artifacts> {
     report: JSON.parse(reportJson) as Artifacts["report"],
     cardsJson,
     artManifestJson,
+    coverage: JSON.parse(coverageJson) as Artifacts["coverage"],
   };
 }
 
@@ -160,6 +173,16 @@ describe("real ingestion", () => {
   it("finishes complete with exit code zero", () => {
     expect(artifacts.report.complete).toBe(true);
     expect(artifacts.exitCode).toBe(0);
+  });
+
+  it("reports combined CardFrame and legacy coverage for all 722 cards", () => {
+    expect(artifacts.coverage.totalCards).toBe(722);
+    expect(artifacts.coverage.inconsistent).toEqual([]);
+    expect(artifacts.coverage.uncovered).toEqual([]);
+    expect(
+      artifacts.coverage.migrated.length + artifacts.coverage.legacyFallback.length,
+    ).toBe(722);
+    expect(artifacts.coverage.complete).toBe(true);
   });
 
   it("produces identical bytes across two consecutive runs", async () => {

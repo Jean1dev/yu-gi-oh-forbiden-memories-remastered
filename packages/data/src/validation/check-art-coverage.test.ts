@@ -16,6 +16,20 @@ describe("checkArtCoverage", () => {
     expect(checkArtCoverage([monsterCard()], {}, PLACEHOLDER_EXISTS)).toEqual([]);
   });
 
+  it("accepts missing legacy art when an enriched card has crop art", () => {
+    const card = monsterCard({ descricao: "Migrated" });
+
+    expect(
+      checkArtCoverage([card], {}, PLACEHOLDER_MISSING, manifestFor([card])),
+    ).toEqual([]);
+  });
+
+  it("rejects crop art without enrichment as combined coverage", () => {
+    const card = monsterCard({ descricao: null });
+
+    expect(checkArtCoverage([card], {}, PLACEHOLDER_MISSING, manifestFor([card]))).toHaveLength(1);
+  });
+
   it("rejects a card absent from the manifest when the placeholder does not exist", () => {
     expect(checkArtCoverage([monsterCard()], {}, PLACEHOLDER_MISSING)).toEqual([
       {

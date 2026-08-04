@@ -18,13 +18,18 @@ export function checkArtCoverage(
   cards: readonly Card[],
   manifest: ArtManifest,
   placeholderExists: boolean,
+  cropManifest: ArtManifest = {},
 ): readonly ValidationViolation[] {
   if (placeholderExists) {
     return [];
   }
 
   return cards
-    .filter((card) => manifest[card.numero] === undefined)
+    .filter(
+      (card) =>
+        manifest[card.numero] === undefined &&
+        !(card.descricao !== null && cropManifest[card.numero] !== undefined),
+    )
     .map((card) => ({
       category: "arte" as const,
       numero: card.numero,

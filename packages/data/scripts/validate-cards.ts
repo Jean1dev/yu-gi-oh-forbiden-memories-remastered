@@ -92,6 +92,7 @@ function printSummary(report: ValidationReport): void {
 export async function runValidation(options: ValidationOptions = DEFAULT_OPTIONS): Promise<number> {
   const cardsPath = join(options.generatedDir, "cards.json");
   const manifestPath = join(options.generatedDir, "arts-manifest.json");
+  const cropManifestPath = join(options.generatedDir, "crop-arts-manifest.json");
 
   const rawCards = await readJson(cardsPath);
   if (rawCards === null) {
@@ -110,12 +111,15 @@ export async function runValidation(options: ValidationOptions = DEFAULT_OPTIONS
     return EXIT_FAILURE;
   }
   const manifest: ArtManifest = parsedManifest.data;
+  const parsedCropManifest = ArtManifestSchema.safeParse(await readJson(cropManifestPath));
+  const cropManifest: ArtManifest = parsedCropManifest.success ? parsedCropManifest.data : {};
 
   const placeholderExists = await fileExists(options.placeholderPath);
 
   const { report, seal } = validateDataset({
     rawCards,
     manifest,
+    cropManifest,
     placeholderExists,
     generatedAt: new Date().toISOString(),
   });
