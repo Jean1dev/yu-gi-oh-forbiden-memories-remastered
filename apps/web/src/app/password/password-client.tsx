@@ -44,7 +44,7 @@ function ReadyPassword({ catalogResult }: PasswordClientProps) {
       <StarBalance state={wallet} />
       <PasswordField value={lookup.rawInput} onChange={lookup.setRawInput} onSubmit={lookup.submit} />
       {resolution?.status === "resolved" && catalog !== undefined ? (
-        <CardPreview resolution={resolution} art={catalog.artLookup(resolution.card.numero)} action={<><RedeemAction priceStars={resolution.price.stars} disabled={!playerId || redemption.eligibility?.status!=="ready"} submitting={redemption.submitting} onRedeem={()=>void redemption.redeem()} /><RedemptionFeedback outcome={redemption.outcome} cardName={resolution.card.nome} /></>} />
+        <CardPreview resolution={resolution} art={catalog.artLookup(resolution.card.numero)} cropArt={catalog.cropArtLookup(resolution.card.numero)} action={<><RedeemAction priceStars={resolution.price.stars} disabled={!playerId || redemption.eligibility?.status!=="ready"} submitting={redemption.submitting} onRedeem={()=>void redemption.redeem()} /><RedemptionFeedback outcome={redemption.outcome} cardName={resolution.card.nome} /></>} />
       ) : resolution !== undefined && resolution.status !== "resolved" ? (
         <LookupFailure resolution={resolution} />
       ) : null}
