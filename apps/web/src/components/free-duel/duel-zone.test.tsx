@@ -54,6 +54,7 @@ describe("DuelZone", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const hidden: PublicMonsterZone = { ...visible, card: { visible: false } };
 
@@ -120,6 +121,7 @@ describe("DuelZone", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
 
     render(
