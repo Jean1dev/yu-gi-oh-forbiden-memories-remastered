@@ -44,7 +44,9 @@ describe("DuelZone", () => {
     );
 
     expect(screen.getByRole("button", { name: /Zona de monstro Jogador 1, Vazio/ })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Zona de magia\/armadilha Jogador 1, -/ })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: /Zona de magia\/armadilha Jogador 1, -/ }),
+    ).toBeTruthy();
   });
 
   it("shows visible monster stats and never exposes hidden opponent card data", () => {
@@ -54,7 +56,6 @@ describe("DuelZone", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
-      equips: [],
     };
     const hidden: PublicMonsterZone = { ...visible, card: { visible: false } };
 
@@ -115,14 +116,14 @@ describe("DuelZone", () => {
 
   it("renders CardFrame (compact) instead of the legacy image when the card is migrated", () => {
     const migratedCard: Card = { ...card, descricao: "A powerful dragon." };
-    const zone: PublicMonsterZone = {
+    const zone = {
       occupied: true,
       card: { visible: true, card: migratedCard },
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
       equips: [],
-    };
+    } as unknown as PublicMonsterZone;
 
     render(
       <DuelZone
@@ -138,13 +139,14 @@ describe("DuelZone", () => {
   });
 
   it("keeps rendering the legacy image for a card without descricao (regression fallback)", () => {
-    const zone: PublicMonsterZone = {
+    const zone = {
       occupied: true,
       card: { visible: true, card },
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
-    };
+      equips: [],
+    } as unknown as PublicMonsterZone;
 
     render(
       <DuelZone
