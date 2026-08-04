@@ -70,8 +70,8 @@ export const PILOT_CARD_NUMBERS: readonly CardNumber[] = [
 
 export const DEFAULT_OPTIONS: EnrichmentOptions = {
   sourceDir: join(REPO_ROOT, "cards-data", "dados"),
-  enrichmentTablePath: join(REPO_ROOT, "cards-data", "dados", "enriquecimento-ygoprodeck.json"),
-  overridesPath: join(REPO_ROOT, "cards-data", "dados", "overrides-nomes-ygoprodeck.json"),
+  enrichmentTablePath: join(REPO_ROOT, "cards-data", "enriquecimento-ygoprodeck.json"),
+  overridesPath: join(REPO_ROOT, "cards-data", "overrides-nomes-ygoprodeck.json"),
   artUrlsPath: join(PACKAGE_ROOT, "generated", "ygoprodeck-art-urls.json"),
   targetNumbers: PILOT_CARD_NUMBERS,
   client: REAL_CLIENT,

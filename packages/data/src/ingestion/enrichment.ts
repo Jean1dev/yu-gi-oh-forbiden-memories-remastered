@@ -25,7 +25,7 @@ export const CardEnrichmentEntrySchema = z.strictObject({
 export type CardEnrichmentEntry = z.infer<typeof CardEnrichmentEntrySchema>;
 
 /**
- * Contract of `cards-data/dados/enriquecimento-ygoprodeck.json` when read back
+ * Contract of `cards-data/enriquecimento-ygoprodeck.json` when read back
  * from disk: a sparse map, keyed by `numero`, covering only the cards a run of
  * F02/F07 has enriched so far. An absent key is a valid, expected state — not
  * every card has to be present (spec F01, Decisions 1 and 4).

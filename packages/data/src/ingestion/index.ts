@@ -32,4 +32,8 @@ export {
   type IngestionReport,
   type IngestionReportInput,
 } from "./report.ts";
-export { serializeArtifacts, type SerializedArtifacts } from "./serialize.ts";
+export {
+  serializeArtifacts,
+  serializeArtManifest,
+  type SerializedArtifacts,
+} from "./serialize.ts";

@@ -2,9 +2,10 @@ import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildArtManifest } from "../src/ingestion/art-manifest.ts";
 import { CardEnrichmentTableSchema, type CardEnrichmentTable } from "../src/ingestion/enrichment.ts";
 import { ingestSource, type SourceFile } from "../src/ingestion/ingest-source.ts";
-import { serializeArtifacts } from "../src/ingestion/serialize.ts";
+import { serializeArtifacts, serializeArtManifest } from "../src/ingestion/serialize.ts";
 
 /**
  * The only boundary with the filesystem. Everything below `src/ingestion` is
@@ -18,6 +19,8 @@ const REPO_ROOT = resolve(PACKAGE_ROOT, "..", "..");
 export type IngestionOptions = Readonly<{
   sourceDir: string;
   artsDir: string;
+  /** `cards-data/art/` — the crop-art pilot from `renderizacao-cartas/F03`. */
+  cropArtsDir: string;
   outputDir: string;
   enrichmentPath: string;
 }>;
@@ -25,8 +28,9 @@ export type IngestionOptions = Readonly<{
 export const DEFAULT_OPTIONS: IngestionOptions = {
   sourceDir: join(REPO_ROOT, "cards-data", "dados"),
   artsDir: join(REPO_ROOT, "cards-data"),
+  cropArtsDir: join(REPO_ROOT, "cards-data", "art"),
   outputDir: join(PACKAGE_ROOT, "generated"),
-  enrichmentPath: join(REPO_ROOT, "cards-data", "dados", "enriquecimento-ygoprodeck.json"),
+  enrichmentPath: join(REPO_ROOT, "cards-data", "enriquecimento-ygoprodeck.json"),
 };
 
 const EXIT_SUCCESS = 0;
@@ -174,11 +178,16 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
 
   const artifacts = serializeArtifacts(ingestion.value);
 
+  const cropArts = await listArtPaths(options.cropArtsDir);
+  const cropManifest = buildArtManifest(ingestion.value.cards, cropArts);
+  const cropArtManifestJson = serializeArtManifest(cropManifest.manifest);
+
   try {
     await mkdir(options.outputDir, { recursive: true });
     await Promise.all([
       writeFile(join(options.outputDir, "cards.json"), artifacts.cardsJson, "utf8"),
       writeFile(join(options.outputDir, "arts-manifest.json"), artifacts.artManifestJson, "utf8"),
+      writeFile(join(options.outputDir, "crop-arts-manifest.json"), cropArtManifestJson, "utf8"),
       writeFile(
         join(options.outputDir, "ingestion-report.json"),
         artifacts.ingestionReportJson,
@@ -192,6 +201,7 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
   }
 
   printSummary(ingestion.value.report);
+  console.log(`Crop arts resolved:    ${String(Object.keys(cropManifest.manifest).length)}`);
   return ingestion.value.report.complete ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

@@ -42,6 +42,16 @@ function toSortedManifest(manifest: ArtManifest): Record<string, string> {
 }
 
 /**
+ * Serializes an art manifest on its own — same byte-deterministic shape
+ * `serializeArtifacts` uses for `arts-manifest.json`, reused by
+ * `renderizacao-cartas/F03` for the second (crop-art) manifest so the two
+ * never drift into different formats (spec F03, Decision 2).
+ */
+export function serializeArtManifest(manifest: ArtManifest): string {
+  return toJsonDocument(toSortedManifest(manifest));
+}
+
+/**
  * Serializes the three artifacts.
  *
  * `cards.json` and `arts-manifest.json` are byte-deterministic: stable ordering,
@@ -52,7 +62,7 @@ function toSortedManifest(manifest: ArtManifest): Record<string, string> {
 export function serializeArtifacts(output: IngestionOutput): SerializedArtifacts {
   return {
     cardsJson: toJsonDocument(output.cards.map(toCanonicalRecord)),
-    artManifestJson: toJsonDocument(toSortedManifest(output.manifest)),
+    artManifestJson: serializeArtManifest(output.manifest),
     ingestionReportJson: toJsonDocument(output.report),
   };
 }
