@@ -33,20 +33,30 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
-function occupiedZone(position: MonsterPosition, overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {}): MonsterZone {
+function occupiedZone(
+  position: MonsterPosition,
+  overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {},
+): MonsterZone {
   return {
     occupied: true,
     card: makeCard(),
     position,
     hasAttacked: false,
     hasChangedPosition: false,
+    equips: [],
     ...overrides,
   };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },
@@ -77,7 +87,18 @@ describe("changePosition — success", () => {
   it("muda um monstro de attack_face_up para defense_face_up sem emitir onFlip", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -94,7 +115,18 @@ describe("changePosition — success", () => {
   it("muda um monstro de defense_face_up para attack_face_up sem emitir onFlip", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("defense_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("defense_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -103,14 +135,27 @@ describe("changePosition — success", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
+    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({
+      position: "attack_face_up",
+    });
     expect(result.value.events).toEqual([expect.objectContaining({ type: "onPositionChange" })]);
   });
 
   it("revela um monstro em defense_face_down, movendo-o para attack_face_up e emitindo onFlip seguido de onPositionChange", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("defense_face_down"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("defense_face_down"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -119,14 +164,27 @@ describe("changePosition — success", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
+    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({
+      position: "attack_face_up",
+    });
     expect(result.value.events.map((e) => e.type)).toEqual(["onFlip", "onPositionChange"]);
   });
 
   it("revela um monstro em attack_face_down, movendo-o para defense_face_up e emitindo onFlip seguido de onPositionChange", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_down"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_down"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -135,14 +193,27 @@ describe("changePosition — success", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ position: "defense_face_up" });
+    expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({
+      position: "defense_face_up",
+    });
     expect(result.value.events.map((e) => e.type)).toEqual(["onFlip", "onPositionChange"]);
   });
 
   it("marca hasChangedPosition como true na zona alterada", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -151,14 +222,27 @@ describe("changePosition — success", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({ hasChangedPosition: true });
+      expect(result.value.state.players.P1.field.monsters[0]).toMatchObject({
+        hasChangedPosition: true,
+      });
     }
   });
 
   it("não altera hasAttacked da zona alterada", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up", { hasAttacked: false }), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up", { hasAttacked: false }),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -174,7 +258,18 @@ describe("changePosition — success", () => {
   it("não altera handPlayUsed de nenhum dos jogadores", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -192,7 +287,18 @@ describe("changePosition — success", () => {
     const untouched = occupiedZone("defense_face_down", { hasAttacked: true });
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), untouched, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              untouched,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -206,10 +312,30 @@ describe("changePosition — success", () => {
   });
 
   it("não altera nenhuma zona do jogador oponente", () => {
-    const opponentField = { ...emptyField(), monsters: [occupiedZone("attack_face_down"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] as PlayerField["monsters"] };
+    const opponentField = {
+      ...emptyField(),
+      monsters: [
+        occupiedZone("attack_face_down"),
+        emptyMonsterZone,
+        emptyMonsterZone,
+        emptyMonsterZone,
+        emptyMonsterZone,
+      ] as PlayerField["monsters"],
+    };
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer({ field: opponentField }),
       },
     });
@@ -227,7 +353,18 @@ describe("changePosition — rejections", () => {
   it("recusa com already_attacked quando o monstro já atacou neste turno, sem alterar o estado", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up", { hasAttacked: true }), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up", { hasAttacked: true }),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -243,7 +380,18 @@ describe("changePosition — rejections", () => {
   it("recusa com already_changed_position quando a zona já mudou de posição neste turno, sem alterar o estado", () => {
     const state = makeState({
       players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up", { hasChangedPosition: true }), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P1: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up", { hasChangedPosition: true }),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
         P2: makePlayer(),
       },
     });
@@ -267,29 +415,54 @@ describe("changePosition — rejections", () => {
     expect(state).toEqual(snapshot);
   });
 
-  it.each<Phase>(["draw", "main", "end"])("recusa com wrong_phase na fase %s, sem alterar o estado", (phase) => {
-    const state = makeState({
-      phase,
-      players: {
-        P1: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
-        P2: makePlayer(),
-      },
-    });
-    const snapshot = JSON.parse(JSON.stringify(state));
+  it.each<Phase>(["draw", "main", "end"])(
+    "recusa com wrong_phase na fase %s, sem alterar o estado",
+    (phase) => {
+      const state = makeState({
+        phase,
+        players: {
+          P1: makePlayer({
+            field: {
+              ...emptyField(),
+              monsters: [
+                occupiedZone("attack_face_up"),
+                emptyMonsterZone,
+                emptyMonsterZone,
+                emptyMonsterZone,
+                emptyMonsterZone,
+              ],
+            },
+          }),
+          P2: makePlayer(),
+        },
+      });
+      const snapshot = JSON.parse(JSON.stringify(state));
 
-    const result = changePosition(state, { player: "P1", zoneType: "monster", index: 0 });
+      const result = changePosition(state, { player: "P1", zoneType: "monster", index: 0 });
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe("wrong_phase");
-    expect(state).toEqual(snapshot);
-  });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("wrong_phase");
+      expect(state).toEqual(snapshot);
+    },
+  );
 
   it("recusa com zone_not_owned_by_active_player quando zone.player é o jogador inativo, sem alterar o estado", () => {
     const state = makeState({
       activePlayer: "P1",
       players: {
         P1: makePlayer(),
-        P2: makePlayer({ field: { ...emptyField(), monsters: [occupiedZone("attack_face_up"), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] } }),
+        P2: makePlayer({
+          field: {
+            ...emptyField(),
+            monsters: [
+              occupiedZone("attack_face_up"),
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+              emptyMonsterZone,
+            ],
+          },
+        }),
       },
     });
     const snapshot = JSON.parse(JSON.stringify(state));

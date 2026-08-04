@@ -45,6 +45,7 @@ const monsterZoneArbitrary = fc.oneof(
     ),
     hasAttacked: fc.boolean(),
     hasChangedPosition: fc.boolean(),
+    equips: fc.array(cardArbitrary, { maxLength: 2 }),
   }),
 );
 

@@ -1,4 +1,11 @@
-import type { Card, DuelState, MonsterPosition, MonsterZone, PlayerField, PlayerState } from "@yugioh/shared";
+import type {
+  Card,
+  DuelState,
+  MonsterPosition,
+  MonsterZone,
+  PlayerField,
+  PlayerState,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { declareAttack } from "./declare-attack.ts";
@@ -25,12 +32,25 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
 function occupiedZone(card: Card, position: MonsterPosition): MonsterZone {
-  return { occupied: true, card, position, hasAttacked: false, hasChangedPosition: false };
+  return {
+    occupied: true,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },
@@ -42,7 +62,16 @@ function emptyField(): PlayerField {
 }
 
 function fieldWithMonster(card: Card, position: MonsterPosition): PlayerField {
-  return { ...emptyField(), monsters: [occupiedZone(card, position), emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone] };
+  return {
+    ...emptyField(),
+    monsters: [
+      occupiedZone(card, position),
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
+  };
 }
 
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -134,7 +163,10 @@ describe("resolveAttack", () => {
     if (result.ok) {
       expect(result.value.state.players.P2.lp).toBe(8000 - 1000);
       expect(result.value.events).toContainEqual(
-        expect.objectContaining({ type: "onDamage", context: { toPlayer: "P2", amount: 1000 } }),
+        expect.objectContaining({
+          type: "onDamage",
+          context: { toPlayer: "P2", amount: 1000, kind: "battle_damage" },
+        }),
       );
     }
   });
@@ -158,7 +190,10 @@ describe("resolveAttack", () => {
     if (result.ok) {
       expect(result.value.state.players.P1.lp).toBe(8000 - 800);
       expect(result.value.events).toContainEqual(
-        expect.objectContaining({ type: "onDamage", context: { toPlayer: "P1", amount: 800 } }),
+        expect.objectContaining({
+          type: "onDamage",
+          context: { toPlayer: "P1", amount: 800, kind: "battle_damage" },
+        }),
       );
     }
   });
@@ -213,7 +248,12 @@ describe("resolveAttack", () => {
   it("marca hasAttacked do atacante quando ele sobrevive", () => {
     const attacker = makeCard({ numero: "001", atk: 2000 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     const result = resolveAttack(declared);
@@ -248,7 +288,12 @@ describe("resolveAttack", () => {
   it("fecha a janela de reação após resolver", () => {
     const attacker = makeCard({ numero: "001", atk: 1500 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     const result = resolveAttack(declared);
@@ -271,9 +316,157 @@ describe("resolveAttack", () => {
   it("aplicar resolveAttack duas vezes com o mesmo estado produz sempre o mesmo resultado", () => {
     const attacker = makeCard({ numero: "001", atk: 1500 });
     const declared = declaredState(
-      makeState({ players: { P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }), P2: makePlayer() } }),
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer(),
+        },
+      }),
     );
 
     expect(resolveAttack(declared)).toEqual(resolveAttack(declared));
+  });
+});
+
+describe("resolveAttack — bonus de equipamento", () => {
+  /** Legendary Sword: +500/+500 restricted to Warrior. */
+  const legendarySword = makeCard({
+    numero: "301",
+    nome: "Legendary Sword",
+    classe: "Equip",
+    atk: null,
+    def: null,
+    tipo: "equipamento",
+  });
+
+  function fieldWithEquippedMonster(
+    card: Card,
+    position: MonsterPosition,
+    equips: readonly Card[],
+  ): PlayerField {
+    const base = fieldWithMonster(card, position);
+    const [zone, ...rest] = base.monsters;
+    if (!zone.occupied) throw new Error("expected an occupied zone");
+    return { ...base, monsters: [{ ...zone, equips }, ...rest] as PlayerField["monsters"] };
+  }
+
+  it("o equipamento do atacante decide um combate que o ATK base perderia", () => {
+    // 1200 base < 1500 defender; +500 from Legendary Sword makes it 1700.
+    const attacker = makeCard({ numero: "010", classe: "Warrior", atk: 1200 });
+    const defender = makeCard({ numero: "002", classe: "Dragon", atk: 1500 });
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({
+            field: fieldWithEquippedMonster(attacker, "attack_face_up", [legendarySword]),
+          }),
+          P2: makePlayer({ field: fieldWithMonster(defender, "attack_face_up") }),
+        },
+      }),
+      0,
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.players.P2.field.monsters[0]).toEqual({ occupied: false });
+    expect(result.value.state.players.P1.field.monsters[0].occupied).toBe(true);
+    // 1700 - 1500 = 200 to the defender's owner.
+    expect(result.value.state.players.P2.lp).toBe(7800);
+  });
+
+  it("o equipamento do defensor tambem entra no calculo", () => {
+    const attacker = makeCard({ numero: "010", classe: "Dragon", atk: 1600 });
+    const defender = makeCard({ numero: "002", classe: "Warrior", atk: 1400 });
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer({
+            field: fieldWithEquippedMonster(defender, "attack_face_up", [legendarySword]),
+          }),
+        },
+      }),
+      0,
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // Defender becomes 1900 and wins: the attacker is destroyed instead.
+    expect(result.value.state.players.P1.field.monsters[0]).toEqual({ occupied: false });
+    expect(result.value.state.players.P1.lp).toBe(7700);
+  });
+
+  it("um equipamento restrito nao ajuda um hospedeiro de outra classe", () => {
+    const attacker = makeCard({ numero: "010", classe: "Dragon", atk: 1200 });
+    const defender = makeCard({ numero: "002", classe: "Dragon", atk: 1500 });
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({
+            field: fieldWithEquippedMonster(attacker, "attack_face_up", [legendarySword]),
+          }),
+          P2: makePlayer({ field: fieldWithMonster(defender, "attack_face_up") }),
+        },
+      }),
+      0,
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.state.players.P1.field.monsters[0]).toEqual({ occupied: false });
+  });
+
+  it("os equipamentos desaparecem junto com o monstro destruido em combate", () => {
+    const attacker = makeCard({ numero: "010", classe: "Dragon", atk: 2000 });
+    const defender = makeCard({ numero: "002", classe: "Warrior", atk: 1000 });
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer({
+            field: fieldWithEquippedMonster(defender, "attack_face_up", [legendarySword]),
+          }),
+        },
+      }),
+      0,
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // The zone carries no equips because it carries nothing at all.
+    expect(result.value.state.players.P2.field.monsters[0]).toEqual({ occupied: false });
+  });
+
+  it("o atacante sobrevivente mantem os equipamentos anexados", () => {
+    const attacker = makeCard({ numero: "010", classe: "Warrior", atk: 1200 });
+    const defender = makeCard({ numero: "002", classe: "Dragon", atk: 1000 });
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({
+            field: fieldWithEquippedMonster(attacker, "attack_face_up", [legendarySword]),
+          }),
+          P2: makePlayer({ field: fieldWithMonster(defender, "attack_face_up") }),
+        },
+      }),
+      0,
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const zone = result.value.state.players.P1.field.monsters[0];
+    if (!zone.occupied) throw new Error("expected an occupied zone");
+    expect(zone.equips).toEqual([legendarySword]);
+    expect(zone.card.atk).toBe(1200);
   });
 });

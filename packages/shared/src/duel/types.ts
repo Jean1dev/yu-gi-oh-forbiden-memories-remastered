@@ -26,6 +26,16 @@ export type MonsterZone =
       position: MonsterPosition;
       hasAttacked: boolean;
       hasChangedPosition: boolean;
+      /**
+       * Equip cards attached to this monster, in attach order. `[]` when none.
+       *
+       * The bonus itself is never stored — it is derived at combat time from
+       * each equip's table entry and this monster's `classe`, so the base
+       * `atk`/`def` are never overwritten (`docs/arquitetura.md` §3.1).
+       * Living on the zone rather than in a spell zone is what makes the
+       * equips vanish with a destroyed host, with no cleanup code.
+       */
+      equips: readonly Card[];
     }>;
 
 /**
@@ -40,6 +50,16 @@ export type PlayerField = Readonly<{
   monsters: readonly [MonsterZone, MonsterZone, MonsterZone, MonsterZone, MonsterZone];
   spells: readonly [SpellZone, SpellZone, SpellZone, SpellZone, SpellZone];
 }>;
+
+/**
+ * A player barred from declaring attacks by a card effect (348 Swords of
+ * Revealing Light). `untilTurn` is the first `DuelState.turn` on which that
+ * player may attack again; `declareAttack` refuses while `turn < untilTurn`.
+ *
+ * Never expires on its own — a lapsed lock is just a stale number compared
+ * against a monotonically increasing `turn` (`docs/spells/attack-lock.md` §4).
+ */
+export type AttackLock = Readonly<{ player: PlayerId; untilTurn: number }>;
 
 /** A player's state: life points, hand, deck and field. */
 export type PlayerState = Readonly<{
@@ -70,6 +90,8 @@ export type DuelState = Readonly<{
   seed: number;
   /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */
   deckOutPlayer?: PlayerId | undefined;
+  /** Absent while nobody is locked out of attacking (`docs/spells/attack-lock.md`). */
+  attackLocks?: readonly AttackLock[] | undefined;
   /**
    * Absent while the duel is running; present once it has ended (F12). Setting
    * it freezes the state: `apply` refuses every action from then on, and no
@@ -91,6 +113,12 @@ export type PublicMonsterZone =
       position: MonsterPosition;
       hasAttacked: boolean;
       hasChangedPosition: boolean;
+      /**
+       * Always visible, even when the host card is hidden: an equip is played
+       * by an explicit action the opponent witnessed, and hiding it would let
+       * a player bluff a buff that the combat table then applies anyway.
+       */
+      equips: readonly Card[];
     }>;
 
 export type PublicSpellZone =
@@ -141,6 +169,8 @@ export type PublicDuelState = Readonly<{
   turn: number;
   phase: Phase;
   pending?: PublicReactionWindow | undefined;
+  /** Mirrors `DuelState.attackLocks`; the UI reads it to disable the attack action. */
+  attackLocks?: readonly AttackLock[] | undefined;
 }>;
 
 const _publicEventShape: Omit<PublicDuelEvent, "involvedCards"> = {} as Omit<

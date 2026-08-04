@@ -101,6 +101,7 @@ function withMonster(base: DuelState, reference: ZoneReference): DuelState {
           position: "attack_face_up" as const,
           hasAttacked: false,
           hasChangedPosition: false,
+          equips: [],
         }
       : zone,
   ) as unknown as typeof player.field.monsters;
@@ -296,9 +297,7 @@ describe("DuelScreen", () => {
   });
 
   it("feeds runtime events into visual cues", async () => {
-    const { runtime } = createRuntimeHarness(state, () =>
-      ok({ state, events: [summonEvent()] }),
-    );
+    const { runtime } = createRuntimeHarness(state, () => ok({ state, events: [summonEvent()] }));
     render(
       <DuelScreen
         duelistId="seto"
@@ -312,7 +311,9 @@ describe("DuelScreen", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" }).getAttribute("data-cue"),
+        screen
+          .getByRole("button", { name: "Zona de monstro Jogador 1, Vazio" })
+          .getAttribute("data-cue"),
       ).toBe("place"),
     );
     expect(screen.getByRole("button", { name: "Blue Dragon" }).hasAttribute("disabled")).toBe(true);
@@ -373,7 +374,10 @@ describe("DuelScreen", () => {
   it("dispatches targeted and direct attacks", async () => {
     const battleState = withHand(
       withMonster(
-        withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+        withMonster(
+          { ...state, phase: "battle", turn: 2 },
+          { player: "P1", zoneType: "monster", index: 0 },
+        ),
         { player: "P2", zoneType: "monster", index: 0 },
       ),
       [],
@@ -390,7 +394,9 @@ describe("DuelScreen", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Atacar" }));
     fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Jogador 1, Blue Dragon" }));
-    fireEvent.click(screen.getByRole("button", { name: "Zona de monstro Oponente 1, Blue Dragon" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Zona de monstro Oponente 1, Blue Dragon" }),
+    );
     await waitFor(() =>
       expect(apply).toHaveBeenCalledWith(battleState, {
         type: "declare_attack",
@@ -401,7 +407,10 @@ describe("DuelScreen", () => {
     rendered.unmount();
 
     const directState = withHand(
-      withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+      withMonster(
+        { ...state, phase: "battle", turn: 2 },
+        { player: "P1", zoneType: "monster", index: 0 },
+      ),
       [],
     );
     const directHarness = createRuntimeHarness(directState);
@@ -426,7 +435,10 @@ describe("DuelScreen", () => {
 
   it("dispatches change_position and translates engine refusals", async () => {
     const battleState = withHand(
-      withMonster({ ...state, phase: "battle", turn: 2 }, { player: "P1", zoneType: "monster", index: 0 }),
+      withMonster(
+        { ...state, phase: "battle", turn: 2 },
+        { player: "P1", zoneType: "monster", index: 0 },
+      ),
       [],
     );
     const { apply, runtime } = createRuntimeHarness(battleState, () =>
@@ -513,7 +525,11 @@ describe("DuelScreen", () => {
           status: "victory",
           duelSessionId: "session-1",
           reason: "lp_depleted",
-          rating: { source: "rating_engine", grade: "A", reward: { stars: 10, dropTier: "common" } },
+          rating: {
+            source: "rating_engine",
+            grade: "A",
+            reward: { stars: 10, dropTier: "common" },
+          },
         })}
         grantVictoryReward={grantVictoryReward}
       />,

@@ -56,6 +56,7 @@ describe("DuelZone", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const hidden: PublicMonsterZone = { ...visible, card: { visible: false } };
 
@@ -82,7 +83,9 @@ describe("DuelZone", () => {
     );
     expect(screen.queryByText("Blue Dragon")).toBeNull();
     expect(screen.queryByText("1200 / 900")).toBeNull();
-    expect(screen.getByRole("button", { name: "Zona de monstro Oponente 1, Carta virada" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Zona de monstro Oponente 1, Carta virada" }),
+    ).toBeTruthy();
   });
 
   it("uses disabled state and data-affordance from props", () => {

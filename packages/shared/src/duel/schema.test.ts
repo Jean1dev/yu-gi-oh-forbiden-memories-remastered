@@ -89,6 +89,7 @@ describe("DuelStateSchema", () => {
             position,
             hasAttacked: false,
             hasChangedPosition: false,
+            equips: [],
           },
           emptyZone,
           emptyZone,
@@ -130,7 +131,12 @@ describe("DuelStateSchema", () => {
   it("rejects an occupied monster zone without the card field", () => {
     const state = stateWithP1Field({
       monsters: [
-        { occupied: true, position: "attack_face_up", hasAttacked: false, hasChangedPosition: false },
+        {
+          occupied: true,
+          position: "attack_face_up",
+          hasAttacked: false,
+          hasChangedPosition: false,
+        },
         emptyZone,
         emptyZone,
         emptyZone,
@@ -143,7 +149,13 @@ describe("DuelStateSchema", () => {
 
   it("rejects an empty monster zone with hasAttacked present", () => {
     const state = stateWithP1Field({
-      monsters: [{ occupied: false, hasAttacked: false }, emptyZone, emptyZone, emptyZone, emptyZone],
+      monsters: [
+        { occupied: false, hasAttacked: false },
+        emptyZone,
+        emptyZone,
+        emptyZone,
+        emptyZone,
+      ],
       spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],
     });
     expect(DuelStateSchema.safeParse(state).success).toBe(false);
@@ -300,9 +312,78 @@ describe("DuelEventSchema", () => {
   });
 
   it("rejects context with an undefined value", () => {
-    expect(DuelEventSchema.safeParse(baseEvent({ context: { a: undefined } })).success).toBe(
-      false,
-    );
+    expect(DuelEventSchema.safeParse(baseEvent({ context: { a: undefined } })).success).toBe(false);
+  });
+});
+
+describe("MonsterZoneSchema equips", () => {
+  function occupiedZone(equips: unknown) {
+    return {
+      occupied: true,
+      card: validCard(),
+      position: "attack_face_up",
+      hasAttacked: false,
+      hasChangedPosition: false,
+      ...(equips === undefined ? {} : { equips }),
+    };
+  }
+
+  it("exige equips na variante ocupada", () => {
+    const state = stateWithP1Field({
+      monsters: [occupiedZone(undefined), emptyZone, emptyZone, emptyZone, emptyZone],
+      spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],
+    });
+    expect(DuelStateSchema.safeParse(state).success).toBe(false);
+  });
+
+  it("aceita uma zona ocupada com equips vazio e com equipamentos anexados", () => {
+    for (const equips of [[], [validCard({ numero: "301", tipo: "equipamento" })]]) {
+      const state = stateWithP1Field({
+        monsters: [occupiedZone(equips), emptyZone, emptyZone, emptyZone, emptyZone],
+        spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],
+      });
+      expect(DuelStateSchema.safeParse(state).success).toBe(true);
+    }
+  });
+});
+
+describe("DuelStateSchema attackLocks", () => {
+  it("aceita um estado sem attackLocks e um com bloqueio para os dois jogadores", () => {
+    expect(DuelStateSchema.safeParse(validState()).success).toBe(true);
+    expect(
+      DuelStateSchema.safeParse({
+        ...validState(),
+        attackLocks: [
+          { player: "P1", untilTurn: 7 },
+          { player: "P2", untilTurn: 9 },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("recusa dois bloqueios para o mesmo jogador", () => {
+    expect(
+      DuelStateSchema.safeParse({
+        ...validState(),
+        attackLocks: [
+          { player: "P1", untilTurn: 7 },
+          { player: "P1", untilTurn: 9 },
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("recusa untilTurn menor que 1 e campo extra no bloqueio", () => {
+    expect(
+      DuelStateSchema.safeParse({ ...validState(), attackLocks: [{ player: "P1", untilTurn: 0 }] })
+        .success,
+    ).toBe(false);
+    expect(
+      DuelStateSchema.safeParse({
+        ...validState(),
+        attackLocks: [{ player: "P1", untilTurn: 7, extra: true }],
+      }).success,
+    ).toBe(false);
   });
 });
 

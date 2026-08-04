@@ -24,6 +24,32 @@ export type PlaySpellOrTrapAction = Readonly<{
   zoneIndex: ZoneIndex;
 }>;
 
+/**
+ * Attaches an equip card from the active player's hand to one of their own
+ * monsters (`docs/spells/equip-buffs.md`).
+ *
+ * The bonus is never carried here and never stored on the zone: it is derived
+ * at combat time from the equip's entry in `SPELL_EFFECTS` and the host's
+ * `classe`, so an equip whose class restriction the host fails contributes 0
+ * without the action being refused.
+ */
+export type EquipCardAction = Readonly<{
+  type: "equip_card";
+  handIndex: number;
+  targetZone: ZoneReference;
+}>;
+
+/**
+ * Plays a magic/equip card whose effect resolves immediately
+ * (`docs/spells/README.md` §4). Carries no zone: the card never occupies one —
+ * it resolves and leaves play in the same transition.
+ *
+ * Separate from `PlaySpellOrTrapAction`, whose required `zoneIndex` would be
+ * permanently ignored here, so each action keeps a single-valued
+ * postcondition.
+ */
+export type ActivateSpellAction = Readonly<{ type: "activate_spell"; handIndex: number }>;
+
 /** Plays a field-spell card from hand, replacing the single `activeField` slot (motor-duelo-1x1 F09). */
 export type PlayFieldSpellAction = Readonly<{
   type: "play_field_spell";
@@ -69,6 +95,8 @@ export type Action =
   | AdvancePhaseAction
   | SummonMonsterAction
   | PlaySpellOrTrapAction
+  | EquipCardAction
+  | ActivateSpellAction
   | PlayFieldSpellAction
   | ChangePositionAction
   | DeclareAttackAction

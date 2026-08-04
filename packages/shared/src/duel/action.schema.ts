@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 import type { Action } from "./action.ts";
-import { MonsterPositionSchema, PlayerIdSchema, ZoneIndexSchema, ZoneReferenceSchema } from "./schema.ts";
+import {
+  MonsterPositionSchema,
+  PlayerIdSchema,
+  ZoneIndexSchema,
+  ZoneReferenceSchema,
+} from "./schema.ts";
 
 export const AdvancePhaseActionSchema = z.strictObject({ type: z.literal("advance_phase") });
 
@@ -22,6 +27,17 @@ export const PlaySpellOrTrapActionSchema = z.strictObject({
   type: z.literal("play_spell_or_trap"),
   handIndex: z.number().int().min(0),
   zoneIndex: ZoneIndexSchema,
+});
+
+export const EquipCardActionSchema = z.strictObject({
+  type: z.literal("equip_card"),
+  handIndex: z.number().int().min(0),
+  targetZone: ZoneReferenceSchema,
+});
+
+export const ActivateSpellActionSchema = z.strictObject({
+  type: z.literal("activate_spell"),
+  handIndex: z.number().int().min(0),
 });
 
 export const PlayFieldSpellActionSchema = z.strictObject({
@@ -57,6 +73,8 @@ export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
   PlaySpellOrTrapActionSchema,
+  EquipCardActionSchema,
+  ActivateSpellActionSchema,
   PlayFieldSpellActionSchema,
   ChangePositionActionSchema,
   DeclareAttackActionSchema,

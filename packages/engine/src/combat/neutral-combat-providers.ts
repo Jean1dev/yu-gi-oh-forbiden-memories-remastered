@@ -9,9 +9,14 @@ import type { ModifierProviders } from "./calculate-effective-atk-def.ts";
  * `.dependency-cruiser.cjs`), and `apply(state, action)` stays a two-parameter
  * function for cross-node determinism (F09 spec Decision 2), so there is no
  * third parameter through which real providers could be injected today.
- * Documented pendency, not a blocker: once GuardianStar/Terrain/Effect System
- * exist, something will need to decide how non-neutral providers reach
- * combat resolution without `engine` importing `rules`.
+ *
+ * The **equipment** slot is no longer neutral in combat: `resolveAttack` now
+ * composes this bundle through `equipCombatProviders`
+ * (`packages/engine/src/spells/effects/equip-bonus.ts`), which closes over the
+ * zone's attached equips at construction time — the answer to the pendency
+ * this comment used to describe, and the reason it needs no extra parameter.
+ * Guardian and terrain stay neutral until their tables in `packages/data`
+ * exist (`docs/arquitetura.md` §4.3).
  */
 export const neutralCombatProviders: ModifierProviders = {
   guardian: () => ({ atk: 0, def: 0 }),

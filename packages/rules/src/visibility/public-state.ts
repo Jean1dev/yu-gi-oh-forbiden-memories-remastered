@@ -126,5 +126,6 @@ export function getPublicDuelState(state: DuelState, forPlayer: PlayerId): Publi
           },
         }
       : {}),
+    ...(state.attackLocks ? { attackLocks: state.attackLocks } : {}),
   };
 }
