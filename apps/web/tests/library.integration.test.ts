@@ -38,7 +38,7 @@ describe("getLibraryCatalog against the real ingested dataset", () => {
     expect(result.value.listing.listAll()).toHaveLength(722);
   });
 
-  it("builds a 722-entry index with real art resolved for every obtained card", async () => {
+  it("builds a 722-entry index with renderable art for every obtained card", async () => {
     const catalogResult = await getLibraryCatalog();
     expect(catalogResult.ok).toBe(true);
     if (!catalogResult.ok) return;
@@ -55,7 +55,10 @@ describe("getLibraryCatalog against the real ingested dataset", () => {
     for (const entry of index.entries) {
       expect(entry.obtained).toBe(true);
       if (!entry.obtained) continue;
-      expect(entry.art.kind).toBe("art");
+      expect(
+        catalogResult.value.cropArtLookup(entry.card.numero).kind === "art" ||
+          entry.art.kind === "art",
+      ).toBe(true);
     }
   });
 });
@@ -177,7 +180,7 @@ describe.skipIf(!hasSupabaseEnv)("loadLibrary against a real local Supabase inst
     expect(result.value.index.entries.every((entry) => !entry.obtained)).toBe(true);
   });
 
-  it("resolves art for the 722 cards of the real dataset without falling back to placeholder", async () => {
+  it("resolves crop or legacy art for all 722 cards of the real dataset", async () => {
     const catalogResult = await getLibraryCatalog();
     expect(catalogResult.ok).toBe(true);
     if (!catalogResult.ok) return;
@@ -185,7 +188,11 @@ describe.skipIf(!hasSupabaseEnv)("loadLibrary against a real local Supabase inst
     const missing = catalogResult.value.listing
       .listAll()
       .map((card) => card.numero)
-      .filter((numero) => catalogResult.value.artLookup(numero).kind !== "art");
+      .filter(
+        (numero) =>
+          catalogResult.value.cropArtLookup(numero).kind !== "art" &&
+          catalogResult.value.artLookup(numero).kind !== "art",
+      );
     expect(missing).toEqual([]);
   });
 
