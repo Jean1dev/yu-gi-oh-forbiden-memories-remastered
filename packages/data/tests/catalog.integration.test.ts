@@ -176,13 +176,17 @@ describe("catalog over the real sealed dataset", () => {
     });
   });
 
-  it("exposes the art manifest F01 emitted, one entry per card", async () => {
+  it("exposes complementary legacy and crop manifests for every card", async () => {
     const onDisk = JSON.parse(
       await readFile(join(sealedDir, "arts-manifest.json"), "utf8"),
     ) as Record<string, string>;
 
     expect(catalog.getArtManifest()).toEqual(onDisk);
-    expect(Object.keys(catalog.getArtManifest())).toHaveLength(CANONICAL_CARD_TOTAL);
+    const legacyNumbers = Object.keys(catalog.getArtManifest());
+    const cropNumbers = Object.keys(catalog.getCropArtManifest());
+    expect(new Set([...legacyNumbers, ...cropNumbers]).size).toBe(CANONICAL_CARD_TOTAL);
+    expect(legacyNumbers).toHaveLength(38);
+    expect(cropNumbers).toHaveLength(684);
   });
 
   it("stays immutable: a write to a card it served throws", () => {

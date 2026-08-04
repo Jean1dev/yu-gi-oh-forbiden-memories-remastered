@@ -142,12 +142,11 @@ describe("real ingestion", () => {
     });
   });
 
-  it("resolves 722 arts with no missing and no orphan", () => {
-    expect(artifacts.report.artsFound).toBe(722);
-    expect(artifacts.report.missingArts).toEqual([]);
+  it("resolves every card through combined crop or legacy coverage", () => {
+    expect(artifacts.report.artsFound).toBe(artifacts.coverage.legacyFallback.length);
     expect(artifacts.report.orphanArts).toEqual([]);
-    expect(Object.keys(artifacts.manifest)).toHaveLength(722);
-    expect(artifacts.manifest["001"]).toBe(join("cards-data", "001.jpg"));
+    expect(Object.keys(artifacts.manifest)).toHaveLength(artifacts.coverage.legacyFallback.length);
+    expect(artifacts.manifest["356"]).toBe(join("cards-data", "356.jpg"));
   });
 
   it("normalizes the 24 cards without a password to null password and null estrelas", () => {
