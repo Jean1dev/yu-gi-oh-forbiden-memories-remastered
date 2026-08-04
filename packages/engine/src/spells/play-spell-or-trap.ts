@@ -2,11 +2,13 @@ import {
   DomainError,
   err,
   ok,
+  spellPlayMode,
   TOTAL_SPELL_ZONES,
   type ApplyResult,
   type DuelState,
   type PlaySpellOrTrapAction,
   type Result,
+  type SpellPlayMode,
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
@@ -15,6 +17,24 @@ import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
 import { getOpponent } from "./opponent.ts";
 
 const SPELL_TRAP_TYPES = new Set(["armadilha", "equipamento", "magica"]);
+
+/**
+ * Which cards belong to another action, and the refusal that says so.
+ * `place` — every card without an effect-table entry — is absent, which is
+ * what keeps the other 42 magic/equip cards and all 10 traps behaving exactly
+ * as they did before the effect system existed.
+ */
+const MISROUTES: Partial<Record<SpellPlayMode, { code: string; message: string }>> = {
+  equip: { code: "equip_requires_target", message: "This equip card needs a target monster." },
+  terrain: {
+    code: "terrain_requires_field_zone",
+    message: "This terrain card must be played to the field slot.",
+  },
+  one_shot: {
+    code: "spell_requires_activation",
+    message: "This spell must be activated, not placed.",
+  },
+};
 
 /**
  * Places a magic/trap/equipment card from the active player's hand into a
@@ -53,6 +73,13 @@ export function playSpellOrTrap(
         { tipo: card.tipo },
       ),
     );
+  }
+
+  // A card carrying an effect has its own action; placing it here would park
+  // it in a zone and silently drop the effect (`docs/spells/README.md` §4).
+  const misroute = MISROUTES[spellPlayMode(card)];
+  if (misroute !== undefined) {
+    return err(new DomainError(misroute.message, misroute.code, { numero: card.numero }));
   }
 
   const occupiedZones = player.field.spells.filter((zone) => zone.occupied).length;

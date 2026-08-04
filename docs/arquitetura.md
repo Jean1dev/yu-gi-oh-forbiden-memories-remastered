@@ -125,6 +125,13 @@ type EffectHandler = (ctx: EffectCtx, ev: Evento) => Acao[] | void;
 const registry: Record<TipoEvento, EffectHandler[]>;  // cartas registram gatilhos aqui
 ```
 
+Para os efeitos de magia implementados em `docs/spells/`, o vocabulario e a tabela pura vivem em
+`packages/shared/src/duel/spell-effects/`, enquanto o interpretador vive em
+`packages/engine/src/spells/effects/`. Essa alocacao preserva duas fronteiras travadas: `engine`
+depende apenas de `shared`, e a UI precisa consultar o modo de jogo da carta sem importar o motor.
+O registry reativo futuro continua pertencendo a `packages/rules`; a tabela atual descreve efeitos
+deterministicos resolvidos pela transicao `apply(state, action)`.
+
 Com 722 cartas, isso evita que cada armadilha vire um ramo dentro do combate. — pilar
 "efeitos por eventos".
 

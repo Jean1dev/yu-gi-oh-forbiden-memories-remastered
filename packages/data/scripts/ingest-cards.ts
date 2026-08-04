@@ -53,10 +53,16 @@ async function readSourceFiles(directory: string): Promise<readonly SourceFile[]
 /**
  * Art paths are stored relative to the repository root, so the manifest means
  * the same thing regardless of where the ingestion ran from.
+ *
+ * Always with `/` separators: `relative` yields `\` on Windows, which
+ * `buildArtManifest` does not treat as a separator (so every art became an
+ * orphan) and which would leak into the `/cards-data/[file]` URL the web app
+ * builds from the manifest. The manifest is a portable artifact, not a
+ * platform path.
  */
 async function listArtPaths(directory: string): Promise<readonly string[]> {
   const names = await listFiles(directory, ".jpg");
-  return names.map((name) => relative(REPO_ROOT, join(directory, name)));
+  return names.map((name) => relative(REPO_ROOT, join(directory, name)).replaceAll("\\", "/"));
 }
 
 function printSummary(report: {

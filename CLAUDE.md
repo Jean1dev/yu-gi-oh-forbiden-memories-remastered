@@ -162,10 +162,14 @@ the integration shell (main menu, `/login`, `POST /api/account/bootstrap`, the
 
 The duel engine has a full turn cycle end to end: `apply(state, action)` dispatches
 `advance_phase` (with draw built in), `summon_monster`, `play_spell_or_trap`/`play_field_spell`,
+`equip_card`/`activate_spell`,
 `change_position`, and `declare_attack`/`resolve_attack` (complete FM combat table, no
 piercing). Once life points hit 0, a deck runs out, or a player surrenders, `motor-duelo-1x1/F12`
 freezes the state with a winner/loser (or draw) and refuses any further action — a duel can be
 played, and finished, from the first turn to the result screen (`free-duel/F09`–`F10`).
+
+The 25 spell cards documented in `docs/spells/` resolve through a shared effect table and a pure
+engine interpreter, including equipment bonuses, immediate effects, terrains and attack locks.
 
 Not implemented: Campanha, Online Duel, Save. `password/F05` (redemption history).
 `DeckValidator`/`montarDeckPronto` are still a forward-declared contract with no real

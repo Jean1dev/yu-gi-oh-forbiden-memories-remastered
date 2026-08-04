@@ -44,7 +44,9 @@ describe("DuelZone", () => {
     );
 
     expect(screen.getByRole("button", { name: /Zona de monstro Jogador 1, Vazio/ })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Zona de magia\/armadilha Jogador 1, -/ })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: /Zona de magia\/armadilha Jogador 1, -/ }),
+    ).toBeTruthy();
   });
 
   it("shows visible monster stats and never exposes hidden opponent card data", () => {
@@ -54,6 +56,7 @@ describe("DuelZone", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
+      equips: [],
     };
     const hidden: PublicMonsterZone = { ...visible, card: { visible: false } };
 
@@ -80,7 +83,9 @@ describe("DuelZone", () => {
     );
     expect(screen.queryByText("Blue Dragon")).toBeNull();
     expect(screen.queryByText("1200 / 900")).toBeNull();
-    expect(screen.getByRole("button", { name: "Zona de monstro Oponente 1, Carta virada" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Zona de monstro Oponente 1, Carta virada" }),
+    ).toBeTruthy();
   });
 
   it("uses disabled state and data-affordance from props", () => {

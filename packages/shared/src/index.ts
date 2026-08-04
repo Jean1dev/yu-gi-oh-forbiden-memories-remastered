@@ -46,11 +46,14 @@ export {
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
   INITIAL_LP,
+  LP_CHANGE_KINDS,
   MAX_CPU_ACTIONS_PER_ADVANCE,
   TOTAL_MONSTER_ZONES,
   TOTAL_SPELL_ZONES,
+  TURNS_PER_ROUND,
 } from "./duel/constants.ts";
 export type {
+  AttackLock,
   DuelState,
   MonsterPosition,
   MonsterZone,
@@ -151,6 +154,7 @@ export type {
   DuelEvent,
   EventType,
   JsonValue,
+  LpChangeKind,
   ReactionWindow,
   ZoneIndex,
   ZoneReference,
@@ -159,8 +163,10 @@ export type {
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
   Action,
+  ActivateSpellAction,
   AdvancePhaseAction,
   ChangePositionAction,
+  EquipCardAction,
   DeclareAttackAction,
   PlayFieldSpellAction,
   PlaySpellOrTrapAction,
@@ -169,9 +175,11 @@ export type {
 } from "./duel/action.ts";
 export {
   ActionSchema,
+  ActivateSpellActionSchema,
   AdvancePhaseActionSchema,
   ChangePositionActionSchema,
   DeclareAttackActionSchema,
+  EquipCardActionSchema,
   PlayFieldSpellActionSchema,
   PlaySpellOrTrapActionSchema,
   ResolveAttackActionSchema,
@@ -179,6 +187,21 @@ export {
   SurrenderActionSchema,
 } from "./duel/action.schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
+export {
+  CardClassFilterSchema,
+  EffectSideSchema,
+  EffectTargetsSchema,
+  SPELL_EFFECTS,
+  SpellEffectSchema,
+  getSpellEffect,
+  matchesClassFilter,
+  spellPlayMode,
+  type CardClassFilter,
+  type EffectSide,
+  type EffectTargets,
+  type SpellEffect,
+  type SpellPlayMode,
+} from "./duel/spell-effects/index.ts";
 export type {
   CardRewardEvent,
   Collection,
@@ -225,6 +248,7 @@ export {
   type PersistInitialDeckResponse,
 } from "./initial-deck/schema.ts";
 export {
+  AttackLockSchema,
   DuelEventSchema,
   DuelStateSchema,
   EventTypeSchema,

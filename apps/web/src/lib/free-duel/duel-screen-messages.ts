@@ -30,6 +30,7 @@ export const DUEL_SCREEN_MESSAGES = {
   opponentTurn: "Vez do oponente...",
   chooseZone: "Escolha uma zona para a magia/armadilha.",
   choosePosition: "Escolha a posicao.",
+  chooseEquipTarget: "Escolha um monstro para equipar.",
   chooseAttacker: "Escolha o atacante.",
   chooseTarget: "Escolha o alvo.",
   choosePositionChange: "Escolha um monstro para mudar de posicao.",

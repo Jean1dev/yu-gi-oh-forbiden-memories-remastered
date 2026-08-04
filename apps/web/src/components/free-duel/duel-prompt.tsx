@@ -16,6 +16,8 @@ function promptText(intent: DuelIntent): string {
       return DUEL_SCREEN_MESSAGES.chooseZone;
     case "choosing_position":
       return DUEL_SCREEN_MESSAGES.choosePosition;
+    case "choosing_equip_target":
+      return DUEL_SCREEN_MESSAGES.chooseEquipTarget;
     case "choosing_attacker":
       return DUEL_SCREEN_MESSAGES.chooseAttacker;
     case "choosing_target":

@@ -7,6 +7,7 @@ import type {
   ZoneIndex,
   ZoneReference,
 } from "@yugioh/shared";
+import { spellPlayMode } from "@yugioh/shared";
 
 const PLAYER: PlayerId = "P1";
 const OPPONENT: PlayerId = "P2";
@@ -20,6 +21,7 @@ export type DuelIntent =
   | Readonly<{ kind: "card_selected"; handIndex: number }>
   | Readonly<{ kind: "choosing_zone"; handIndex: number }>
   | Readonly<{ kind: "choosing_position"; handIndex: number; zoneIndex: ZoneIndex }>
+  | Readonly<{ kind: "choosing_equip_target"; handIndex: number }>
   | Readonly<{ kind: "choosing_attacker" }>
   | Readonly<{ kind: "choosing_target"; attackerZoneIndex: ZoneIndex }>
   | Readonly<{ kind: "choosing_flip" }>;
@@ -28,6 +30,9 @@ export type ActionSlotId =
   | "summon"
   | "set"
   | "place"
+  | "equip"
+  | "activate"
+  | "place_terrain"
   | "attack"
   | "change_position"
   | "direct_attack"
@@ -46,6 +51,9 @@ export type DuelAffordances = Readonly<{
   canAct: boolean;
   canSummon: boolean;
   canPlaceSpell: boolean;
+  canEquip: boolean;
+  canActivateSpell: boolean;
+  canPlayTerrain: boolean;
   canAttack: boolean;
   canDirectAttack: boolean;
   canChangePosition: boolean;
@@ -80,6 +88,7 @@ function selectedHandIndex(intent: DuelIntent): number | undefined {
     case "card_selected":
     case "choosing_zone":
     case "choosing_position":
+    case "choosing_equip_target":
       return intent.handIndex;
     default:
       return undefined;
@@ -123,6 +132,11 @@ function canAnyMonsterAttack(state: DuelState): boolean {
   );
 }
 
+function playerIsAttackLocked(state: DuelState): boolean {
+  const lock = state.attackLocks?.find((entry) => entry.player === PLAYER);
+  return lock !== undefined && state.turn < lock.untilTurn;
+}
+
 function canAnyMonsterChangePosition(state: DuelState): boolean {
   return state.players[PLAYER].field.monsters.some(
     (zone) => zone.occupied && !zone.hasChangedPosition && !zone.hasAttacked,
@@ -146,13 +160,28 @@ export function describeAffordances(input: Readonly<{
   const canSummon =
     canPlayFromHand && card !== undefined && SUMMONABLE_TYPES.has(card.tipo) && hasFreeMonsterZone(state);
   const canPlaceSpell =
-    canPlayFromHand && card !== undefined && SPELL_TRAP_TYPES.has(card.tipo) && hasFreeSpellZone(state);
+    canPlayFromHand &&
+    card !== undefined &&
+    SPELL_TRAP_TYPES.has(card.tipo) &&
+    spellPlayMode(card) === "place" &&
+    hasFreeSpellZone(state);
+  const canEquip =
+    canPlayFromHand &&
+    card !== undefined &&
+    spellPlayMode(card) === "equip" &&
+    state.players[PLAYER].field.monsters.some((zone) => zone.occupied);
+  const canActivateSpell = canPlayFromHand && card !== undefined && spellPlayMode(card) === "one_shot";
+  const canPlayTerrain = canPlayFromHand && card !== undefined && spellPlayMode(card) === "terrain";
   const battleActionsAvailable = canAct && state.phase === "battle" && state.activePlayer === PLAYER;
-  const canAttack = battleActionsAvailable && state.turn > 1 && canAnyMonsterAttack(state);
+  const canAttack =
+    battleActionsAvailable && state.turn > 1 && !playerIsAttackLocked(state) && canAnyMonsterAttack(state);
   return {
     canAct,
     canSummon,
     canPlaceSpell,
+    canEquip,
+    canActivateSpell,
+    canPlayTerrain,
     canAttack,
     canDirectAttack: canAttack && !hasOpponentMonsters(state),
     canChangePosition: battleActionsAvailable && canAnyMonsterChangePosition(state),
@@ -170,6 +199,7 @@ export function describeActionSlots(
   if (
     intent.kind === "choosing_zone" ||
     intent.kind === "choosing_position" ||
+    intent.kind === "choosing_equip_target" ||
     intent.kind === "choosing_attacker" ||
     intent.kind === "choosing_target" ||
     intent.kind === "choosing_flip"
@@ -191,7 +221,16 @@ export function describeActionSlots(
       ];
     }
     if (card && SPELL_TRAP_TYPES.has(card.tipo)) {
-      return [slot("place", "Colocar", !affordances.canPlaceSpell), emptySlot(), advance];
+      switch (spellPlayMode(card)) {
+        case "equip":
+          return [slot("equip", "Equipar", !affordances.canEquip), emptySlot(), advance];
+        case "one_shot":
+          return [slot("activate", "Ativar", !affordances.canActivateSpell), emptySlot(), advance];
+        case "terrain":
+          return [slot("place_terrain", "Campo", !affordances.canPlayTerrain), emptySlot(), advance];
+        case "place":
+          return [slot("place", "Colocar", !affordances.canPlaceSpell), emptySlot(), advance];
+      }
     }
   }
 
@@ -264,6 +303,18 @@ export function reduceIntent(
         return intent.kind === "card_selected" && affordances.canPlaceSpell
           ? { intent: { kind: "choosing_zone", handIndex: intent.handIndex } }
           : { intent };
+      case "equip":
+        return intent.kind === "card_selected" && affordances.canEquip
+          ? { intent: { kind: "choosing_equip_target", handIndex: intent.handIndex } }
+          : { intent };
+      case "activate":
+        return intent.kind === "card_selected" && affordances.canActivateSpell
+          ? { intent: idleIntent, action: { type: "activate_spell", handIndex: intent.handIndex } }
+          : { intent };
+      case "place_terrain":
+        return intent.kind === "card_selected" && affordances.canPlayTerrain
+          ? { intent: idleIntent, action: { type: "play_field_spell", handIndex: intent.handIndex } }
+          : { intent };
       case "attack":
         return affordances.canAttack ? { intent: { kind: "choosing_attacker" } } : { intent };
       case "direct_attack":
@@ -293,6 +344,18 @@ export function reduceIntent(
           attackerIsReady(state, reference.index)
           ? { intent: { kind: "choosing_target", attackerZoneIndex: reference.index } }
           : { intent };
+      case "choosing_equip_target": {
+        const zone =
+          reference.player === PLAYER && reference.zoneType === "monster"
+            ? state.players[PLAYER].field.monsters[reference.index]
+            : undefined;
+        return zone?.occupied
+          ? {
+              intent: idleIntent,
+              action: { type: "equip_card", handIndex: intent.handIndex, targetZone: reference },
+            }
+          : { intent };
+      }
       case "choosing_target":
         return reference.player === OPPONENT &&
           reference.zoneType === "monster" &&
@@ -362,6 +425,14 @@ export function zoneAffordance(
       attackerIsReady(state, reference.index)
       ? "selectable"
       : "idle";
+  }
+
+  if (intent.kind === "choosing_equip_target") {
+    const zone =
+      reference.player === PLAYER && reference.zoneType === "monster"
+        ? state.players[PLAYER].field.monsters[reference.index]
+        : undefined;
+    return zone?.occupied ? "target" : "idle";
   }
 
   if (intent.kind === "choosing_target") {

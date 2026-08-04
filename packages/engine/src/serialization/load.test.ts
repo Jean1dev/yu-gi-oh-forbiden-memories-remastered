@@ -1,9 +1,32 @@
-import { INITIAL_LP, type DuelState, type PlayerField, type PlayerState } from "@yugioh/shared";
+import {
+  INITIAL_LP,
+  type Card,
+  type DuelState,
+  type PlayerField,
+  type PlayerState,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { load } from "./load.ts";
 
 const emptyZone = { occupied: false } as const;
+
+function validCard(): Card {
+  return {
+    id: 1,
+    numero: "001",
+    nome: "Blue-eyes White Dragon",
+    img: null,
+    classe: "Dragon",
+    atk: 3000,
+    def: 2500,
+    guardiao1: "Sun",
+    guardiao2: "Mars",
+    password: "89 63 11 39",
+    estrelas: 999999,
+    tipo: "monstro",
+  };
+}
 
 function emptyField(): PlayerField {
   return {
@@ -13,7 +36,14 @@ function emptyField(): PlayerField {
 }
 
 function validPlayer(overrides: Partial<PlayerState> = {}): PlayerState {
-  return { lp: INITIAL_LP, hand: [], deck: [], field: emptyField(), handPlayUsed: false, ...overrides };
+  return {
+    lp: INITIAL_LP,
+    hand: [],
+    deck: [],
+    field: emptyField(),
+    handPlayUsed: false,
+    ...overrides,
+  };
 }
 
 function validState(overrides: Partial<DuelState> = {}): DuelState {
@@ -68,7 +98,12 @@ describe("load", () => {
       name: "has an occupied monster zone without a card",
       snapshot: stateWithP1Field({
         monsters: [
-          { occupied: true, position: "attack_face_up", hasAttacked: false, hasChangedPosition: false },
+          {
+            occupied: true,
+            position: "attack_face_up",
+            hasAttacked: false,
+            hasChangedPosition: false,
+          },
           emptyZone,
           emptyZone,
           emptyZone,
@@ -76,6 +111,35 @@ describe("load", () => {
         ],
         spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],
       }),
+    },
+    {
+      name: "has an occupied monster zone without equips",
+      snapshot: stateWithP1Field({
+        monsters: [
+          {
+            occupied: true,
+            card: validCard(),
+            position: "attack_face_up",
+            hasAttacked: false,
+            hasChangedPosition: false,
+          },
+          emptyZone,
+          emptyZone,
+          emptyZone,
+          emptyZone,
+        ],
+        spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],
+      }),
+    },
+    {
+      name: "locks the same player out of attacking twice",
+      snapshot: {
+        ...validState(),
+        attackLocks: [
+          { player: "P1", untilTurn: 7 },
+          { player: "P1", untilTurn: 9 },
+        ],
+      },
     },
   ];
 

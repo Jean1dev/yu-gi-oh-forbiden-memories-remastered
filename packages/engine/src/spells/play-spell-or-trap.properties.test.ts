@@ -1,5 +1,6 @@
 import {
   GUARDIAN_STARS,
+  spellPlayMode,
   type Card,
   type DuelState,
   type PlayerField,
@@ -25,11 +26,28 @@ const baseCardArbitrary = fc.record({
   estrelas: fc.option(fc.integer({ min: 0, max: 12 }), { nil: null }),
 });
 
-const spellTrapCardArbitrary = fc.tuple(baseCardArbitrary, fc.constantFrom("armadilha" as const, "equipamento" as const, "magica" as const)).map(
-  ([base, tipo]) => ({ ...base, classe: tipo === "magica" ? "Magic" : "Other", tipo }),
-);
+const spellTrapCardArbitrary = fc
+  .tuple(
+    baseCardArbitrary,
+    fc.constantFrom("armadilha" as const, "equipamento" as const, "magica" as const),
+  )
+  .map(([base, tipo]) => ({ ...base, classe: tipo === "magica" ? "Magic" : "Other", tipo }))
+  .filter((card) => spellPlayMode(card) === "place");
 
-const fieldSpellCardArbitrary = baseCardArbitrary.map((base) => ({ ...base, classe: "Magic", tipo: "magica" as const }));
+const activeFieldCardArbitrary = baseCardArbitrary.map((base) => ({
+  ...base,
+  classe: "Magic",
+  tipo: "magica" as const,
+}));
+
+const fieldSpellCardArbitrary = fc
+  .tuple(baseCardArbitrary, fc.constantFrom("330", "331", "332", "333", "334", "335"))
+  .map(([base, numero]) => ({
+    ...base,
+    numero,
+    classe: "Magic",
+    tipo: "magica" as const,
+  }));
 
 const emptySpellZone: SpellZone = { occupied: false };
 
@@ -80,7 +98,7 @@ describe("playSpellOrTrap properties", () => {
         spellTrapCardArbitrary,
         fc.array(baseCardArbitrary.map((c) => ({ ...c, classe: "Other", tipo: "monstro" as const })), { maxLength: 5 }),
         fc.constantFrom(0, 1, 2, 3, 4),
-        fieldSpellCardArbitrary,
+        activeFieldCardArbitrary,
         (card, deck, zoneIndex, currentField) => {
           const state = makeState([card], deck, currentField);
 

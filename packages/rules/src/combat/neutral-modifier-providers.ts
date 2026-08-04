@@ -10,8 +10,9 @@ import { neutralTerrainModifier } from "../terrain/index.ts";
 
 /**
  * Convenience bundle of the three neutral providers, ready to inject into
- * `calculateEffectiveAtkDef` before GuardianStar Engine, Terrain Engine and
- * Effect System exist (motor-duelo-1x1/F04, Decision 8).
+ * `calculateEffectiveAtkDef` in rules-only callers. The duel engine composes
+ * the equipment slot with attached zone context; guardian and terrain remain
+ * neutral until their canonical tables exist.
  */
 export const neutralModifierProviders: Readonly<{
   guardian: GuardianModifierProvider;

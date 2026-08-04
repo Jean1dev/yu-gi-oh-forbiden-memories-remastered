@@ -23,20 +23,29 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
-function occupiedZone(overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {}): MonsterZone {
+function occupiedZone(
+  overrides: Partial<Extract<MonsterZone, { occupied: true }>> = {},
+): MonsterZone {
   return {
     occupied: true,
     card: makeCard(),
     position: "attack_face_up",
     hasAttacked: false,
     hasChangedPosition: false,
+    equips: [],
     ...overrides,
   };
 }
 
 function emptyField(): PlayerField {
   return {
-    monsters: [emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone, emptyMonsterZone],
+    monsters: [
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+      emptyMonsterZone,
+    ],
     spells: [
       { occupied: false },
       { occupied: false },

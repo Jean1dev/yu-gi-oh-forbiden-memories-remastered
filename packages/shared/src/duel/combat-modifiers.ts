@@ -35,7 +35,8 @@ export type TerrainModifierProvider = (monster: Card, activeField: Card | null) 
  * not the full `DuelState` nor a zone reference: whoever builds the real
  * implementation closes over whatever additional context it needs (state,
  * zone) at the point where the function is constructed, not in this
- * signature. Until Effect System exists, every implementation of this port
- * returns `{ atk: 0, def: 0 }` (`packages/rules/src/effect-system`).
+ * signature. The engine's combat adapter now closes over
+ * `MonsterZone.equips`; the rules-only implementation remains neutral because
+ * it has no zone context (`packages/rules/src/effect-system`).
  */
 export type EquipmentModifierProvider = (monster: Card) => EffectiveAtkDef;

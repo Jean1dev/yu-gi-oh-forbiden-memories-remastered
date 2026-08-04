@@ -43,6 +43,7 @@ function field(monster: Card, faceUp: boolean): PlayerField {
         position: faceUp ? "attack_face_up" : "defense_face_down",
         hasAttacked: false,
         hasChangedPosition: false,
+        equips: [],
       },
       emptyMonsters[1],
       emptyMonsters[2],
@@ -64,8 +65,20 @@ function duelState(): DuelState {
   const opponent = card("002");
   return {
     players: {
-      P1: { lp: 8000, hand: [own], deck: [own, own], field: field(own, false), handPlayUsed: false },
-      P2: { lp: 7000, hand: [opponent], deck: [opponent], field: field(opponent, false), handPlayUsed: false },
+      P1: {
+        lp: 8000,
+        hand: [own],
+        deck: [own, own],
+        field: field(own, false),
+        handPlayUsed: false,
+      },
+      P2: {
+        lp: 7000,
+        hand: [opponent],
+        deck: [opponent],
+        field: field(opponent, false),
+        handPlayUsed: false,
+      },
     },
     activeField: own,
     activePlayer: "P1",
@@ -134,5 +147,46 @@ describe("public duel state", () => {
     expect(getPublicDuelState(withPending, "P1").pending?.event.involvedCards).toEqual([
       { visible: false },
     ]);
+  });
+
+  it("expoe os equips mesmo de um monstro virado para baixo do oponente", () => {
+    const equip = card("301");
+    const state = duelState();
+    const opponentField = state.players.P2.field;
+    const [hostZone, ...rest] = opponentField.monsters;
+    if (!hostZone.occupied) throw new Error("expected an occupied zone");
+
+    const withEquip: DuelState = {
+      ...state,
+      players: {
+        ...state.players,
+        P2: {
+          ...state.players.P2,
+          field: {
+            ...opponentField,
+            monsters: [{ ...hostZone, equips: [equip] }, ...rest] as PlayerField["monsters"],
+          },
+        },
+      },
+    };
+
+    const zone = getPublicDuelState(withEquip, "P1").players.P2.field.monsters[0];
+    if (!zone.occupied) throw new Error("expected an occupied zone");
+
+    // The host itself stays hidden — only the equipment is public.
+    expect(zone.card).toEqual({ visible: false });
+    expect(zone.equips).toEqual([equip]);
+  });
+
+  it("repassa attackLocks para os dois pontos de vista", () => {
+    const locks = [{ player: "P2" as const, untilTurn: 8 }];
+    const withLock: DuelState = { ...duelState(), attackLocks: locks };
+
+    expect(getPublicDuelState(withLock, "P1").attackLocks).toEqual(locks);
+    expect(getPublicDuelState(withLock, "P2").attackLocks).toEqual(locks);
+  });
+
+  it("omite attackLocks quando ninguem esta travado", () => {
+    expect(getPublicDuelState(duelState(), "P1").attackLocks).toBeUndefined();
   });
 });

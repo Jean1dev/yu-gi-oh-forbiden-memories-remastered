@@ -81,6 +81,7 @@ export function summonMonster(
     position: action.position,
     hasAttacked: false,
     hasChangedPosition: false,
+    equips: [],
   };
   const nextMonsters = replaceZone(player.field.monsters, action.zoneIndex, summonedZone);
 
