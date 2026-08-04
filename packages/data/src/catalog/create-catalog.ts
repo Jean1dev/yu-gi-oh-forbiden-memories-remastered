@@ -25,6 +25,8 @@ export type CatalogInput = Readonly<{
   /** `JSON.parse` of `cards.json`, still untrusted. */
   rawCards: unknown;
   manifest: ArtManifest;
+  /** `renderizacao-cartas/F03`'s crop-art manifest. Defaults to `{}` — no card enriched yet. */
+  cropArtManifest?: ArtManifest;
   /** F02's verdict. Without a valid one there is no catalog at all. */
   seal: DatasetSeal;
 }>;
@@ -103,6 +105,7 @@ export function createCatalog(input: CatalogInput): Result<CardCatalog, DomainEr
 
   const indexes = buildIndexes(cards.map((card) => Object.freeze(card)));
   const manifest: ArtManifest = Object.freeze({ ...input.manifest });
+  const cropArtManifest: ArtManifest = Object.freeze({ ...(input.cropArtManifest ?? {}) });
   const total = cards.length;
   const perTipo = countByTipo(indexes);
   const perClasse = countByClasse(indexes);
@@ -141,6 +144,9 @@ export function createCatalog(input: CatalogInput): Result<CardCatalog, DomainEr
     },
     getArtManifest() {
       return manifest;
+    },
+    getCropArtManifest() {
+      return cropArtManifest;
     },
   };
 

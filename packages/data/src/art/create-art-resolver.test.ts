@@ -27,6 +27,7 @@ function fakeCatalog(manifest: ArtManifest): CardCatalog {
     countByTipo: () => zeroCounts,
     countByClasse: () => Object.freeze({}),
     getArtManifest: () => manifest,
+    getCropArtManifest: () => Object.freeze({}),
   });
 }
 

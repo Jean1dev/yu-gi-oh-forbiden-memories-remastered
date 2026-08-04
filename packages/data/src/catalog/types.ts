@@ -31,6 +31,11 @@ export type CardCatalog = Readonly<{
   countByClasse(): Readonly<Record<string, number>>;
   /** The manifest as F01 emitted it: existing art only, no placeholder logic. */
   getArtManifest(): ArtManifest;
+  /**
+   * The crop-art manifest (`renderizacao-cartas/F03`): art alone, no frame,
+   * for the cards the pilot has migrated. `{}` until a card is enriched.
+   */
+  getCropArtManifest(): ArtManifest;
 }>;
 
 /**
