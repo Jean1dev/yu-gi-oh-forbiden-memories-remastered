@@ -1,11 +1,12 @@
 import {
-  apply,
+  createApply,
   buildInitializationInput,
   closeReactionWindow,
   initDuel,
   serialize,
 } from "@yugioh/engine";
-import { buildReadyDeck, getPublicDuelState } from "@yugioh/rules";
+import { buildReadyDeck, createFusionSequenceResolver, getPublicDuelState } from "@yugioh/rules";
+import { OFFICIAL_FUSIONS } from "@yugioh/data/fusion/official";
 import type {
   Card,
   CardCatalogLookup,
@@ -51,6 +52,15 @@ function createCatalogLookup(cards: readonly Card[]): CardCatalogLookup {
 
 export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
   const catalog = createCatalogLookup(input.cards);
+  const fusionResults = new Map(
+    OFFICIAL_FUSIONS.flatMap((recipe) =>
+      recipe.kind === "materials" ? [[recipe.materials.join(":"), recipe.result] as const] : [],
+    ),
+  );
+  const resolveFusion = createFusionSequenceResolver((left, right) =>
+    fusionResults.get([left, right].sort().join(":")),
+  );
+  const apply = createApply({ resolveFusion, getCard: catalog });
   const seedGenerator = createCryptoSeedGenerator();
   const aiAgent = createPassiveAiAgent({ sleep: input.sleep });
   const resolveResult: ResolveEndedDuelResult = (session) =>
