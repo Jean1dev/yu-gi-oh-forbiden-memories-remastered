@@ -2,6 +2,7 @@ import { readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { CardEnrichmentTableSchema, type CardEnrichmentTable } from "../src/ingestion/enrichment.ts";
 import { ingestSource, type SourceFile } from "../src/ingestion/ingest-source.ts";
 import { serializeArtifacts } from "../src/ingestion/serialize.ts";
 
@@ -18,12 +19,14 @@ export type IngestionOptions = Readonly<{
   sourceDir: string;
   artsDir: string;
   outputDir: string;
+  enrichmentPath: string;
 }>;
 
 export const DEFAULT_OPTIONS: IngestionOptions = {
   sourceDir: join(REPO_ROOT, "cards-data", "dados"),
   artsDir: join(REPO_ROOT, "cards-data"),
   outputDir: join(PACKAGE_ROOT, "generated"),
+  enrichmentPath: join(REPO_ROOT, "cards-data", "dados", "enriquecimento-ygoprodeck.json"),
 };
 
 const EXIT_SUCCESS = 0;
@@ -59,6 +62,44 @@ async function listArtPaths(directory: string): Promise<readonly string[]> {
   return names.map((name) => relative(REPO_ROOT, join(directory, name)));
 }
 
+function isFileNotFound(error: unknown): boolean {
+  return error instanceof Error && "code" in error && error.code === "ENOENT";
+}
+
+/**
+ * Reads the external enrichment table (spec `renderizacao-cartas/F01` §5). An
+ * absent file is the normal state before F02/F07 has run and means "nothing
+ * enriched yet" — never an error. A file that exists but is corrupt is a build
+ * error and aborts the whole ingestion (spec §6), same severity as a broken
+ * source directory.
+ */
+async function readEnrichmentTable(path: string): Promise<CardEnrichmentTable> {
+  let raw: string;
+  try {
+    raw = await readFile(path, "utf8");
+  } catch (error: unknown) {
+    if (isFileNotFound(error)) {
+      return {};
+    }
+    throw new Error(`failed to read enrichment table at ${path}`, { cause: error });
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error: unknown) {
+    throw new Error(`enrichment table at ${path} is not valid JSON`, { cause: error });
+  }
+
+  const validated = CardEnrichmentTableSchema.safeParse(parsed);
+  if (!validated.success) {
+    throw new Error(`enrichment table at ${path} does not match the expected shape`, {
+      cause: validated.error,
+    });
+  }
+  return validated.data;
+}
+
 function printSummary(report: {
   filesRead: number;
   discardedByError: number;
@@ -68,6 +109,7 @@ function printSummary(report: {
   missingNumbers: readonly string[];
   missingArts: readonly string[];
   orphanArts: readonly string[];
+  discardedEnrichment: readonly { numero: string; reason: string }[];
   complete: boolean;
 }): void {
   console.log(`Files read:            ${String(report.filesRead)}`);
@@ -75,6 +117,7 @@ function printSummary(report: {
   console.log(`Discarded (invalid):   ${String(report.discardedAsInvalid.length)}`);
   console.log(`Cards emitted:         ${String(report.cardsEmitted)}`);
   console.log(`Arts resolved:         ${String(report.artsFound)}`);
+  console.log(`Enrichment discarded:  ${String(report.discardedEnrichment.length)}`);
 
   for (const discarded of report.discardedAsInvalid) {
     console.warn(`Invalid record ignored: ${discarded.file} (${discarded.reason})`);
@@ -87,6 +130,9 @@ function printSummary(report: {
   }
   for (const path of report.orphanArts) {
     console.warn(`Orphan art: ${path}`);
+  }
+  for (const discarded of report.discardedEnrichment) {
+    console.warn(`Enrichment ignored for card ${discarded.numero}: ${discarded.reason}`);
   }
 
   console.log(
@@ -113,10 +159,12 @@ export async function runIngestion(options: IngestionOptions = DEFAULT_OPTIONS):
   }
 
   const availableArts = await listArtPaths(options.artsDir);
+  const enrichment = await readEnrichmentTable(options.enrichmentPath);
 
   const ingestion = ingestSource({
     files,
     availableArts,
+    enrichment,
     generatedAt: new Date().toISOString(),
   });
   if (!ingestion.ok) {
