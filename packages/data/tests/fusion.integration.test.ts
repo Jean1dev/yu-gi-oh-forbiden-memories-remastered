@@ -51,8 +51,8 @@ afterAll(async () => {
 });
 
 describe("fusion table over the real seed", () => {
-  it("loads the empty seed without error and with nothing indexed", async () => {
-    const reportDir = join(workDir, "empty-seed-report");
+  it("loads the generated official recipes without rejections", async () => {
+    const reportDir = join(workDir, "official-seed-report");
     const result = await loadFusionTableFromDisk({
       filePath: FUSION_OPTIONS.filePath,
       catalog,
@@ -63,13 +63,13 @@ describe("fusion table over the real seed", () => {
     if (!result.ok) {
       return;
     }
-    expect(result.value.table.listAllRecipes()).toEqual([]);
-    expect(result.value.report.totalInFile).toBe(0);
+    expect(result.value.table.listAllRecipes().length).toBeGreaterThan(0);
+    expect(result.value.report.totalInFile).toBeGreaterThan(0);
     expect(result.value.report.rejectedRecipes).toEqual([]);
   });
 
-  it("returns undefined from findByMaterialPair while the table is empty", async () => {
-    const reportDir = join(workDir, "empty-seed-report-materials");
+  it("finds an official fusion independently of material order", async () => {
+    const reportDir = join(workDir, "official-seed-report-materials");
     const result = await loadFusionTableFromDisk({
       filePath: FUSION_OPTIONS.filePath,
       catalog,
@@ -80,11 +80,12 @@ describe("fusion table over the real seed", () => {
     if (!result.ok) {
       return;
     }
-    expect(result.value.table.findByMaterialPair("001", "002")).toBeUndefined();
+    expect(result.value.table.findByMaterialPair("002", "008")?.result).toBe("638");
+    expect(result.value.table.findByMaterialPair("008", "002")?.result).toBe("638");
   });
 
-  it("returns undefined from findByClassPair while the table is empty", async () => {
-    const reportDir = join(workDir, "empty-seed-report-classes");
+  it("returns undefined from findByClassPair because the official seed uses material pairs", async () => {
+    const reportDir = join(workDir, "official-seed-report-classes");
     const result = await loadFusionTableFromDisk({
       filePath: FUSION_OPTIONS.filePath,
       catalog,
