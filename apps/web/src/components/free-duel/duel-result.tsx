@@ -1,4 +1,4 @@
-import type { ConsolidatedDuelResult } from "@yugioh/shared";
+import type { Card, ConsolidatedDuelResult } from "@yugioh/shared";
 
 import {
   getDuelResultReasonMessage,
@@ -12,9 +12,11 @@ import { StarsRewardBadge } from "./stars-reward-badge.tsx";
 export function DuelResult({
   result,
   victoryRewardState = { status: "not_applicable" },
+  rewardCard,
 }: {
   readonly result: ConsolidatedDuelResult;
   readonly victoryRewardState?: VictoryRewardViewState;
+  readonly rewardCard?: Card | undefined;
 }) {
   return (
     <section aria-labelledby="duel-result-title" role="status">
@@ -30,7 +32,7 @@ export function DuelResult({
           {victoryRewardState.status === "not_applicable" ? (
             <p>+{result.rating.reward.stars} estrelas</p>
           ) : null}
-          <CardDropReward state={victoryRewardState} />
+          <CardDropReward state={victoryRewardState} card={rewardCard} />
           <StarsRewardBadge
             state={victoryRewardState}
             stars={result.rating.reward.stars}

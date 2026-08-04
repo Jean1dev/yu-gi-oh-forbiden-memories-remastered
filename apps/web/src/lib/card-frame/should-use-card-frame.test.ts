@@ -38,7 +38,8 @@ describe("shouldUseCardFrame", () => {
     const artRef = { kind: "art" as const, path: "/cards-data/art/700.jpg" };
     expect(shouldUseCardFrame(card({ descricao: null }), artRef)).toBe(false);
 
-    const { descricao: _omitted, ...withoutDescricao } = card();
+    const { descricao, ...withoutDescricao } = card();
+    void descricao;
     expect(shouldUseCardFrame(withoutDescricao, artRef)).toBe(false);
   });
 });
