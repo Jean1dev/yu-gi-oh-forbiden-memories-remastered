@@ -84,4 +84,23 @@ describe("CollectionCardItem", () => {
 
     expect(onSelectCard).toHaveBeenCalledWith("001");
   });
+
+  it("uses the crop art URL for a migrated card, keeping the row layout unchanged", () => {
+    render(
+      <CollectionCardItem
+        item={item({ card: card({ descricao: "A powerful dragon." }) })}
+        selected={false}
+        onSelectCard={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByAltText("").getAttribute("src")).toBe("/cards-data/art/001.jpg");
+    expect(screen.getByText("Blue-eyes White Dragon")).toBeTruthy();
+  });
+
+  it("keeps the legacy art URL for a card without descricao (regression fallback)", () => {
+    render(<CollectionCardItem item={item()} selected={false} onSelectCard={vi.fn()} />);
+
+    expect(screen.getByAltText("").getAttribute("src")).toBe("/cards-data/001.jpg");
+  });
 });
