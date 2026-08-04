@@ -127,6 +127,29 @@ export const ReactionWindowSchema = z.strictObject({
   reactingPlayer: PlayerIdSchema,
 });
 
+const FusionStepSchema = z.strictObject({
+  material: z.string().regex(/^\d{3}$/u),
+  accumulator: z.string().regex(/^\d{3}$/u),
+  result: z
+    .string()
+    .regex(/^\d{3}$/u)
+    .nullable(),
+});
+export const PendingFusionSchema = z.strictObject({
+  type: z.literal("fusion"),
+  player: PlayerIdSchema,
+  resultCard: CardSchema,
+  resolution: z.strictObject({
+    materials: z
+      .array(z.string().regex(/^\d{3}$/u))
+      .min(2)
+      .max(5),
+    result: z.string().regex(/^\d{3}$/u),
+    steps: z.array(FusionStepSchema).min(1).max(4),
+    fused: z.boolean(),
+  }),
+});
+
 export const DecisiveDuelEndReasonSchema = z.enum(["lp_depleted", "deck_out", "surrender"]);
 
 export const DuelEndReasonSchema = z.enum(["lp_depleted", "deck_out", "surrender", "draw"]);
@@ -183,6 +206,7 @@ export const DuelStateSchema = z.strictObject({
   turn: z.number().int().min(1),
   phase: PhaseSchema,
   pending: ReactionWindowSchema.optional(),
+  pendingFusion: PendingFusionSchema.optional(),
   seed: z.number().int().min(0).max(0xffffffff),
   deckOutPlayer: PlayerIdSchema.optional(),
   attackLocks: AttackLocksSchema.optional(),
