@@ -76,6 +76,26 @@ export const KNOWN_CLASSES = [
 ] as const;
 
 /**
+ * The seven standard TCG attributes. Unlike the Guardian Star / Terrain
+ * matrices, this is not project-specific lore pending external data — it is
+ * the fixed real-world vocabulary `renderizacao-cartas/F02` enriches cards
+ * against (spec F01, Decision 2).
+ */
+export const CARD_ATTRIBUTES = [
+  "DARK",
+  "LIGHT",
+  "EARTH",
+  "WATER",
+  "FIRE",
+  "WIND",
+  "DIVINE",
+] as const;
+
+/** Real-world TCG monster level range (spec F01, Decision 3). */
+export const MIN_MONSTER_LEVEL = 1;
+export const MAX_MONSTER_LEVEL = 12;
+
+/**
  * Canonical path of the fallback art, relative to the repository root, in the
  * same coordinate system the art manifest uses.
  *
@@ -103,4 +123,7 @@ export const CARD_FIELD_ORDER = [
   "password",
   "estrelas",
   "tipo",
+  "atributo",
+  "nivel",
+  "descricao",
 ] as const;

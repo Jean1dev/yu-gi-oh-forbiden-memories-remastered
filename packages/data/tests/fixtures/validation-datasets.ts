@@ -32,6 +32,9 @@ export function monsterCard(overrides: Partial<Card> = {}): Card {
     password: "89 63 11 39",
     estrelas: 999999,
     tipo: "monstro",
+    atributo: null,
+    nivel: null,
+    descricao: null,
     ...overrides,
   };
 }

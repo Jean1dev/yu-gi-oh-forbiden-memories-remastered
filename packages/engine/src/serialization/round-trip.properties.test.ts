@@ -1,7 +1,10 @@
 import {
+  CARD_ATTRIBUTES,
   CARD_TYPES,
   EVENT_TYPES,
   GUARDIAN_STARS,
+  MAX_MONSTER_LEVEL,
+  MIN_MONSTER_LEVEL,
   type MonsterPosition,
   type MonsterZone,
   type PlayerId,
@@ -35,7 +38,10 @@ const cardArbitrary = fc.record({
   password: fc.constant(null),
   estrelas: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
   tipo: fc.constantFrom(...CARD_TYPES),
-});
+  atributo: fc.option(fc.constantFrom(...CARD_ATTRIBUTES), { nil: null }),
+  nivel: fc.option(fc.integer({ min: MIN_MONSTER_LEVEL, max: MAX_MONSTER_LEVEL }), { nil: null }),
+  descricao: fc.option(fc.string({ minLength: 1, maxLength: 40 }), { nil: null }),
+}).map((card) => (card.tipo === "monstro" ? card : { ...card, nivel: null }));
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 const emptySpellZone: SpellZone = { occupied: false };

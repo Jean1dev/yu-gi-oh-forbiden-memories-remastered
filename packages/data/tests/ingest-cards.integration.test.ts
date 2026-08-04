@@ -95,13 +95,13 @@ describe("real ingestion", () => {
     expect(new Set(numbers).size).toBe(numbers.length);
   });
 
-  it("emits every card in the canonical 12-field schema", () => {
+  it("emits every card in the canonical 15-field schema", () => {
     for (const card of artifacts.cards) {
       const parsed = CardSchema.safeParse(card);
       if (!parsed.success) {
         throw new Error(`card ${card.numero} is not canonical: ${parsed.error.message}`);
       }
-      expect(Object.keys(card)).toHaveLength(12);
+      expect(Object.keys(card)).toHaveLength(15);
     }
   });
 

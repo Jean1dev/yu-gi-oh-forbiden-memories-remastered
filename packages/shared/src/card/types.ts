@@ -1,10 +1,13 @@
-import type { CARD_TYPES, GUARDIAN_STARS } from "./constants.ts";
+import type { CARD_ATTRIBUTES, CARD_TYPES, GUARDIAN_STARS } from "./constants.ts";
 
 /** One of the five card types. */
 export type CardType = (typeof CARD_TYPES)[number];
 
 /** One of the ten Guardian Stars. */
 export type GuardianStar = (typeof GUARDIAN_STARS)[number];
+
+/** One of the seven standard TCG attributes. */
+export type Attribute = (typeof CARD_ATTRIBUTES)[number];
 
 /**
  * Card identity within the collection: a string of exactly 3 digits
@@ -55,4 +58,19 @@ export type Card = Readonly<{
   /** Price in stars. `null` = card cannot be bought. */
   estrelas: number | null;
   tipo: CardType;
+  /**
+   * `null`/absent = not yet enriched by `renderizacao-cartas/F02`, or no
+   * applicable attribute. Optional so the ~85 pre-existing `Card` fixtures
+   * across the monorepo (predating this field) keep compiling unchanged
+   * (spec `renderizacao-cartas/F01`, Decision 6) — code that produces real
+   * catalog cards always sets it explicitly, to `null` when unenriched.
+   */
+  atributo?: Attribute | null;
+  /**
+   * 1-12, only when `tipo` is `"monstro"`. `null`/absent = not yet enriched,
+   * or not applicable. See `atributo` for why this is optional.
+   */
+  nivel?: number | null;
+  /** `null`/absent = not yet enriched by `renderizacao-cartas/F02`. See `atributo`. */
+  descricao?: string | null;
 }>;
