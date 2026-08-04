@@ -36,7 +36,7 @@ export function CardDetail({ entry, returnDestination, returnMode = "link" }: Ca
     <article className={styles.detail} aria-labelledby="card-detail-title">
       <LibraryBackAction returnDestination={returnDestination} mode={returnMode} />
       <div className={styles.layout}>
-        <CardDetailArt art={entry.art} label={card.nome} />
+        <CardDetailArt card={card} art={entry.art} cropArt={entry.cropArt} label={card.nome} />
         <div className={styles.content}>
           <header>
             <p className={styles.number}>#{entry.cardNumber}</p>

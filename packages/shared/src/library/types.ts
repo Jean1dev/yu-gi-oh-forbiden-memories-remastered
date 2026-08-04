@@ -25,7 +25,14 @@ export type ObtainedArtReference = Exclude<ArtReference, Readonly<{ kind: "silho
  * enforces instead of a rule UI code has to remember.
  */
 export type LibraryEntry =
-  | Readonly<{ obtained: true; cardNumber: CardNumber; card: Card; art: ObtainedArtReference }>
+  | Readonly<{
+      obtained: true;
+      cardNumber: CardNumber;
+      card: Card;
+      art: ObtainedArtReference;
+      /** Crop art (`renderizacao-cartas/F03`), when the card has been migrated. */
+      cropArt?: ObtainedArtReference;
+    }>
   | Readonly<{ obtained: false; cardNumber: CardNumber; art: Readonly<{ kind: "silhouette" }> }>;
 
 /**

@@ -39,7 +39,7 @@ function fakeCatalog(numbers: readonly string[]): LibraryCatalog {
     listAll: () => cards,
     totalCount: () => cards.length,
   };
-  return { listing, artLookup: placeholderArtLookup };
+  return { listing, artLookup: placeholderArtLookup, cropArtLookup: placeholderArtLookup };
 }
 
 function fakeLoadedCollection(

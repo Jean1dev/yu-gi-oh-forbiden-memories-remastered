@@ -8,6 +8,20 @@ function numeroOf(entrada: Card | CardNumber): CardNumber {
 }
 
 /**
+ * Looks up a card's crop art path (`renderizacao-cartas/F03`), or `undefined`
+ * when the card has not been migrated. Unlike {@link resolveArt}, absence is
+ * not resolved to a placeholder: "no crop art" is exactly the signal
+ * `renderizacao-cartas/F06`'s `shouldUseCardFrame` uses to fall back to the
+ * legacy full-card image instead.
+ */
+export function resolveCropArtPath(
+  entrada: Card | CardNumber,
+  cropArtManifest: ArtManifest,
+): string | undefined {
+  return cropArtManifest[numeroOf(entrada)];
+}
+
+/**
  * Resolves the art reference for a card, given the manifest F01 built and F03
  * exposes in memory. Pure and total: a `numero` that is not a key of
  * `manifest` — art genuinely missing, or a `numero` unknown to the catalog —

@@ -1,4 +1,4 @@
-import { createArtResolverFromCatalog } from "@yugioh/data/art";
+import { createArtResolverFromCatalog, resolveCropArtPath } from "@yugioh/data/art";
 import {
   DomainError,
   err,
@@ -8,7 +8,7 @@ import {
   type Result,
 } from "@yugioh/shared";
 
-import { cardArtUrl } from "../card-art-url.ts";
+import { cardArtUrl, cropArtUrl } from "../card-art-url.ts";
 import { getSealedCatalog, listAllCards } from "../catalog/sealed-catalog.ts";
 import type { LibraryCatalog } from "./types.ts";
 
@@ -42,7 +42,17 @@ async function loadOnce(): Promise<Result<LibraryCatalog, DomainError>> {
     return resolved.tipo === "arte" ? { kind: "art", path: cardArtUrl(cardNumber) } : { kind: "placeholder" };
   };
 
-  return ok({ listing, artLookup });
+  // Same idea for the crop art (renderizacao-cartas/F03): a card outside the
+  // pilot simply has no entry in the manifest, and resolves to "placeholder"
+  // the same way — `shouldUseCardFrame` is what turns that into the legacy
+  // full-card fallback, not this lookup.
+  const cropArtManifest = catalog.getCropArtManifest();
+  const cropArtLookup: CardArtLookup = (cardNumber) => {
+    const path = resolveCropArtPath(cardNumber, cropArtManifest);
+    return path === undefined ? { kind: "placeholder" } : { kind: "art", path: cropArtUrl(cardNumber) };
+  };
+
+  return ok({ listing, artLookup, cropArtLookup });
 }
 
 /**

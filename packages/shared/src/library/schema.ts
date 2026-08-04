@@ -33,6 +33,8 @@ export const LibraryEntrySchema = z.discriminatedUnion("obtained", [
     cardNumber: CardNumberSchema,
     card: CardSchema,
     art: ObtainedArtReferenceSchema,
+    /** Crop art (`renderizacao-cartas/F03`), when the card has been migrated. */
+    cropArt: ObtainedArtReferenceSchema.optional(),
   }),
   z.strictObject({
     obtained: z.literal(false),

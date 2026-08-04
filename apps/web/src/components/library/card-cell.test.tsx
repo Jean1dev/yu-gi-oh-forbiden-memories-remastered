@@ -27,6 +27,21 @@ const OBTAINED_ENTRY: LibraryEntry = {
   art: { kind: "art", path: "/cards-data/001.jpg" },
 };
 
+const ENRICHED_CARD: Card = {
+  ...CARD,
+  atributo: "LIGHT",
+  nivel: 8,
+  descricao: "This legendary dragon is a powerful engine of destruction.",
+};
+
+const MIGRATED_ENTRY: LibraryEntry = {
+  obtained: true,
+  cardNumber: "001",
+  card: ENRICHED_CARD,
+  art: { kind: "art", path: "/cards-data/001.jpg" },
+  cropArt: { kind: "art", path: "/cards-data/art/001.jpg" },
+};
+
 const BLOCKED_ENTRY: LibraryEntry = {
   obtained: false,
   cardNumber: "042",
@@ -132,5 +147,19 @@ describe("CardCell", () => {
     const { container } = render(<CardCell entry={OBTAINED_ENTRY} />);
 
     expect(container.textContent ?? "").not.toMatch(/possui \d/i);
+  });
+
+  it("renders CardFrame (compact, with ATK/DEF) instead of the legacy image when the card is migrated", () => {
+    render(<CardCell entry={MIGRATED_ENTRY} />);
+
+    expect(screen.getByText("ATK 3000 / DEF 2500")).toBeTruthy();
+    expect(screen.getByText("001")).toBeTruthy();
+  });
+
+  it("keeps rendering the legacy image for a card without cropArt (regression fallback)", () => {
+    render(<CardCell entry={OBTAINED_ENTRY} />);
+
+    expect(screen.queryByText("ATK 3000 / DEF 2500")).toBeNull();
+    expect(screen.getByRole("img", { name: "Blue-Eyes White Dragon" })).toBeTruthy();
   });
 });
