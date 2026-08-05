@@ -9,9 +9,7 @@ export type FmBasicPolicyDependencies = Readonly<{
   evaluateCandidate: EvaluateAiCandidate;
 }>;
 
-export function createFmBasicPolicy(
-  dependencies: FmBasicPolicyDependencies,
-): StrategyPolicy {
+export function createFmBasicPolicy(dependencies: FmBasicPolicyDependencies): StrategyPolicy {
   return Object.freeze({
     name: "fm-basic",
     decide: ({ state, parameters }) => {

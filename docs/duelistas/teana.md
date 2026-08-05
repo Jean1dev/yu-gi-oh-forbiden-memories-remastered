@@ -8,7 +8,7 @@
 | Mão no original | 5 cartas |
 | Dificuldade | `easy` |
 | Retrato | `cards-data/art/395.jpg` (Dancing Elf, uma das cartas dela) |
-| Estratégia da IA | `passive` — ver [Perfil de IA](#perfil-de-ia) |
+| Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20260817` |
 
 ## Quem é
@@ -115,12 +115,12 @@ efeito).
 ## Perfil de IA
 
 ```json
-{ "strategy": "passive", "parameters": {} }
+{ "strategy": "fm-basic", "parameters": { "aggression": 0.5, "playsSpells": true, "playsFieldSpells": false, "defensiveThreshold": 0 } }
 ```
 
-`passive` é o andaime declarado do `free-duel` F09 — devolve a vez e não decide jogada. Ele fica
-até a IA de NPCs existir; a estratégia final e seus `parameters` entram por
-`docs/prds/ia-de-npcs.md`.
+`fm-basic` escolhe a melhor jogada visível sem erro proposital: invoca o monstro mais forte,
+defende quando não vence a troca e ataca apenas quando tem vantagem. Magias só são usadas quando
+possuem efeito conhecido pelo motor.
 
 ## Fontes
 

@@ -7,8 +7,13 @@
       "portrait": "cards-data/art/004.jpg",
       "difficulty": "easy",
       "profile": {
-        "strategy": "passive",
-        "parameters": {}
+        "strategy": "fm-basic",
+        "parameters": {
+          "aggression": 0.5,
+          "playsSpells": true,
+          "playsFieldSpells": false,
+          "defensiveThreshold": 0
+        }
       },
       "deck": [
         "547",
@@ -242,8 +247,13 @@
       "portrait": "cards-data/art/395.jpg",
       "difficulty": "easy",
       "profile": {
-        "strategy": "passive",
-        "parameters": {}
+        "strategy": "fm-basic",
+        "parameters": {
+          "aggression": 0.5,
+          "playsSpells": true,
+          "playsFieldSpells": false,
+          "defensiveThreshold": 0
+        }
       },
       "deck": [
         "399",

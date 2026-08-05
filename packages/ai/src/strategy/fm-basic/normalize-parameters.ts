@@ -8,7 +8,10 @@ export function normalizeFmBasicParameters(
   const threshold = parameters.defensiveThreshold;
   return {
     aggression:
-      typeof aggression === "number" && Number.isFinite(aggression) && aggression >= 0 && aggression <= 1
+      typeof aggression === "number" &&
+      Number.isFinite(aggression) &&
+      aggression >= 0 &&
+      aggression <= 1
         ? aggression
         : 0.5,
     playsSpells: typeof parameters.playsSpells === "boolean" ? parameters.playsSpells : true,

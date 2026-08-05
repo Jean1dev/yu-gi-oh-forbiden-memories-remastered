@@ -23,14 +23,18 @@ export function selectSummon(
       const card = hand.cards[action.handIndex];
       if (card === undefined) return false;
       const offensive = (card.atk ?? 0) > strongestOpponent + parameters.defensiveThreshold;
-      const preferred = strongestOpponent === 0 || offensive ? "attack_face_up" : "defense_face_down";
+      const preferred =
+        strongestOpponent === 0 || offensive ? "attack_face_up" : "defense_face_down";
       return action.position === preferred;
     })
     .sort((left, right) => {
       const leftAction = left.action as Extract<typeof left.action, { type: "summon_monster" }>;
       const rightAction = right.action as Extract<typeof right.action, { type: "summon_monster" }>;
-      return (hand.cards[rightAction.handIndex]?.atk ?? 0) - (hand.cards[leftAction.handIndex]?.atk ?? 0)
-        || leftAction.handIndex - rightAction.handIndex
-        || leftAction.zoneIndex - rightAction.zoneIndex;
+      return (
+        (hand.cards[rightAction.handIndex]?.atk ?? 0) -
+          (hand.cards[leftAction.handIndex]?.atk ?? 0) ||
+        leftAction.handIndex - rightAction.handIndex ||
+        leftAction.zoneIndex - rightAction.zoneIndex
+      );
     })[0];
 }

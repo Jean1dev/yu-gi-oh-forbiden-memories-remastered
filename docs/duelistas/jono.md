@@ -8,7 +8,7 @@
 | Mão no original | 5 cartas |
 | Dificuldade | `easy` |
 | Retrato | `cards-data/art/004.jpg` (Baby Dragon, a carta-assinatura dele) |
-| Estratégia da IA | `passive` — ver [Perfil de IA](#perfil-de-ia) |
+| Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20261019` |
 
 ## Quem é
@@ -112,11 +112,12 @@ Mesma IA genérica dos duelistas iniciais do original, sem personalidade própri
 ## Perfil de IA
 
 ```json
-{ "strategy": "passive", "parameters": {} }
+{ "strategy": "fm-basic", "parameters": { "aggression": 0.5, "playsSpells": true, "playsFieldSpells": false, "defensiveThreshold": 0 } }
 ```
 
-`passive` é o andaime declarado do `free-duel` F09 — devolve a vez e não decide jogada. A
-estratégia final e seus `parameters` entram por `docs/prds/ia-de-npcs.md`.
+`fm-basic` escolhe a melhor jogada visível sem erro proposital: invoca o monstro mais forte,
+defende quando não vence a troca e ataca apenas quando tem vantagem. Magias só são usadas quando
+possuem efeito conhecido pelo motor.
 
 ## Fontes
 

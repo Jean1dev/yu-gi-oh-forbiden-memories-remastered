@@ -6,8 +6,13 @@
   "difficulty": "easy",
   "portrait": "cards-data/art/395.jpg",
   "profile": {
-    "strategy": "passive",
-    "parameters": {}
+    "strategy": "fm-basic",
+    "parameters": {
+      "aggression": 0.5,
+      "playsSpells": true,
+      "playsFieldSpells": false,
+      "defensiveThreshold": 0
+    }
   },
   "deckSeed": 20260817,
   "deckPool": [
