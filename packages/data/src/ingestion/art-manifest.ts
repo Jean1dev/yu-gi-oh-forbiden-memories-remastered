@@ -26,8 +26,12 @@ export type ArtManifestResult = Readonly<{
 
 const ART_FILE_PATTERN = /^([0-9]+)\.[A-Za-z0-9]+$/;
 
+/**
+ * `path.relative` returns `\`-separated paths on Windows, so both separators
+ * have to be recognized — a path built on one OS is still read on the other.
+ */
 function baseName(path: string): string {
-  const lastSeparator = path.lastIndexOf("/");
+  const lastSeparator = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
   return lastSeparator === -1 ? path : path.slice(lastSeparator + 1);
 }
 

@@ -126,6 +126,19 @@ describe("validateDataset", () => {
 
     expect(report.valid).toBe(true);
   });
+
+  it("covers missing legacy art with enriched crop art", () => {
+    const cards = validDataset().map((card) => ({ ...card, descricao: "Migrated" }));
+    const { report } = validateDataset({
+      rawCards: rawDataset(cards),
+      manifest: {},
+      cropManifest: manifestFor(cards),
+      placeholderExists: false,
+      generatedAt: GENERATED_AT,
+    });
+
+    expect(report.valid).toBe(true);
+  });
 });
 
 describe("validateDataset properties", () => {

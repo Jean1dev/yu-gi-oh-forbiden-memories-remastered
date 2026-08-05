@@ -200,4 +200,34 @@ describe("buildLibraryIndex", () => {
 
     expect(result.obtained).toBe(result.total);
   });
+
+  it("sets cropArt on an obtained entry when cropArtLookup is provided", () => {
+    const cards = [card("001")];
+
+    const result = buildLibraryIndex({
+      catalog: fakeCatalog(cards),
+      obtainedCardNumbers: new Set(["001"]),
+      artLookup: placeholderArtLookup(),
+      cropArtLookup: () => ({ kind: "art", path: "/cards-data/art/001.jpg" }),
+    });
+
+    const entry = result.byCardNumber.get("001");
+    expect(entry?.obtained && entry.cropArt).toEqual({
+      kind: "art",
+      path: "/cards-data/art/001.jpg",
+    });
+  });
+
+  it("leaves cropArt unset when cropArtLookup is not provided", () => {
+    const cards = [card("001")];
+
+    const result = buildLibraryIndex({
+      catalog: fakeCatalog(cards),
+      obtainedCardNumbers: new Set(["001"]),
+      artLookup: placeholderArtLookup(),
+    });
+
+    const entry = result.byCardNumber.get("001");
+    expect(entry?.obtained && entry.cropArt).toBeUndefined();
+  });
 });

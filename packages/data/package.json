@@ -21,6 +21,9 @@
   "scripts": {
     "data:guardian-matrix": "node scripts/build-guardian-matrix.ts",
     "data:ingest": "node scripts/ingest-cards.ts",
+    "data:enrich": "node scripts/enrich-cards.ts",
+    "data:download-art": "node scripts/download-card-art.ts",
+    "data:rollout-card-frame": "node scripts/rollout-card-frame.ts",
     "data:prices-seed": "node scripts/generate-card-prices-seed.ts",
     "data:test-duelist": "node scripts/generate-test-duelist.ts",
     "data:validate": "node scripts/validate-cards.ts",

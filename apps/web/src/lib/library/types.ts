@@ -16,6 +16,8 @@ import type {
 export type LibraryCatalog = Readonly<{
   listing: LibraryCatalogListing;
   artLookup: CardArtLookup;
+  /** Crop art (`renderizacao-cartas/F06`) — `{kind:"placeholder"}` for a card not yet migrated. */
+  cropArtLookup: CardArtLookup;
 }>;
 
 /**
@@ -32,5 +34,6 @@ export type LibraryCatalogPayload =
       status: "ok";
       cards: readonly Card[];
       arts: Readonly<Record<CardNumber, ObtainedArtReference>>;
+      cropArts: Readonly<Record<CardNumber, ObtainedArtReference>>;
     }>
   | Readonly<{ status: "error" }>;

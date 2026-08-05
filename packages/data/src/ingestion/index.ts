@@ -6,6 +6,13 @@ export {
   type ArtManifestResult,
 } from "./art-manifest.ts";
 export {
+  applyEnrichment,
+  CardEnrichmentEntrySchema,
+  CardEnrichmentTableSchema,
+  type CardEnrichmentEntry,
+  type CardEnrichmentTable,
+} from "./enrichment.ts";
+export {
   SourceCardSchema,
   SourceEnvelopeSchema,
   type SourceCard,
@@ -20,8 +27,13 @@ export {
 export { cardNumberFromFileName, normalizeCard, normalizeCardNumber } from "./normalize-card.ts";
 export {
   buildIngestionReport,
+  type DiscardedEnrichment,
   type DiscardedRecord,
   type IngestionReport,
   type IngestionReportInput,
 } from "./report.ts";
-export { serializeArtifacts, type SerializedArtifacts } from "./serialize.ts";
+export {
+  serializeArtifacts,
+  serializeArtManifest,
+  type SerializedArtifacts,
+} from "./serialize.ts";

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ArtManifest } from "../ingestion/art-manifest.ts";
 import { monsterCard } from "../../tests/fixtures/validation-datasets.ts";
-import { resolveArt } from "./resolve-art.ts";
+import { resolveArt, resolveCropArtPath } from "./resolve-art.ts";
 
 const MANIFEST: ArtManifest = Object.freeze({
   "001": "cards-data/001.jpg",
@@ -80,6 +80,21 @@ describe("resolveArt", () => {
       tipo: "placeholder",
       caminho: DEFAULT_ART_PLACEHOLDER_PATH,
     });
+  });
+});
+
+describe("resolveCropArtPath", () => {
+  it("returns the path for a numero present in the manifest", () => {
+    expect(resolveCropArtPath("001", MANIFEST)).toBe("cards-data/001.jpg");
+  });
+
+  it("returns undefined for a numero absent from the manifest, not a placeholder", () => {
+    expect(resolveCropArtPath("999" as CardNumber, MANIFEST)).toBeUndefined();
+  });
+
+  it("accepts a Card as input and uses the card's own numero", () => {
+    const card = monsterCard({ numero: "001" });
+    expect(resolveCropArtPath(card, MANIFEST)).toBe("cards-data/001.jpg");
   });
 });
 

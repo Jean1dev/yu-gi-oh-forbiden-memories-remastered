@@ -45,6 +45,7 @@ export async function loadLibrary(
     catalog: catalogResult.value.listing,
     obtainedCardNumbers,
     artLookup: catalogResult.value.artLookup,
+    cropArtLookup: catalogResult.value.cropArtLookup,
   });
 
   return ok({

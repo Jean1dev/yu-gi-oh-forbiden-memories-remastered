@@ -38,6 +38,7 @@ export const DEFAULT_OPTIONS: LoadCatalogOptions = {
 
 const CARDS_FILE = "cards.json";
 const MANIFEST_FILE = "arts-manifest.json";
+const CROP_MANIFEST_FILE = "crop-arts-manifest.json";
 const SEAL_FILE = "dataset-seal.json";
 
 function missingArtifact(path: string): DomainError {
@@ -85,6 +86,14 @@ export async function loadCatalogFromDisk(
     return err(missingArtifact(manifestPath));
   }
 
+  // Unlike the manifest above, a missing or malformed crop manifest never
+  // fails the catalog: `renderizacao-cartas/F03`'s pilot art is additive, and
+  // a checkout that has not run the updated `data:ingest` yet is a normal
+  // state, not a broken one (spec F06, Alocação no Monorepo).
+  const cropManifestPath = join(options.generatedDir, CROP_MANIFEST_FILE);
+  const parsedCropManifest = ArtManifestSchema.safeParse(await readJson(cropManifestPath));
+  const cropArtManifest = parsedCropManifest.success ? parsedCropManifest.data : {};
+
   const cardsPath = join(options.generatedDir, CARDS_FILE);
   const rawCards = await readJson(cardsPath);
   if (rawCards === null) {
@@ -94,6 +103,7 @@ export async function loadCatalogFromDisk(
   return createCatalog({
     rawCards,
     manifest: parsedManifest.data,
+    cropArtManifest,
     seal: parsedSeal.data,
   });
 }

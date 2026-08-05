@@ -25,6 +25,7 @@ function catalogOf(cards: readonly Card[]): LibraryCatalog {
   return {
     listing: { listAll: () => cards, totalCount: () => cards.length },
     artLookup: (cardNumber) => ({ kind: "art", path: `/cards-data/${cardNumber}.jpg` }),
+    cropArtLookup: (cardNumber) => ({ kind: "art", path: `/cards-data/art/${cardNumber}.jpg` }),
   };
 }
 
@@ -38,6 +39,7 @@ describe("catalog payload round trip", () => {
     expect(rebuilt?.listing.listAll()).toEqual(original.listing.listAll());
     expect(rebuilt?.listing.totalCount()).toBe(2);
     expect(rebuilt?.artLookup("001")).toEqual({ kind: "art", path: "/cards-data/001.jpg" });
+    expect(rebuilt?.cropArtLookup("001")).toEqual({ kind: "art", path: "/cards-data/art/001.jpg" });
   });
 
   it("survives JSON serialization, the form the payload actually travels in", () => {
@@ -55,13 +57,13 @@ describe("catalog payload round trip", () => {
   });
 
   it("falls back to the placeholder for a card whose art did not travel", () => {
-    const rebuilt = fromCatalogPayload({ status: "ok", cards: [card("001")], arts: {} });
+    const rebuilt = fromCatalogPayload({ status: "ok", cards: [card("001")], arts: {}, cropArts: {} });
 
     expect(rebuilt?.artLookup("001")).toEqual({ kind: "placeholder" });
   });
 
   it("never mistakes an inherited object key for a resolved art", () => {
-    const rebuilt = fromCatalogPayload({ status: "ok", cards: [], arts: {} });
+    const rebuilt = fromCatalogPayload({ status: "ok", cards: [], arts: {}, cropArts: {} });
 
     // "toString" is not a card number, but it *is* on Object.prototype: without
     // the `hasOwn` guard this would hand `CardArt` a function.

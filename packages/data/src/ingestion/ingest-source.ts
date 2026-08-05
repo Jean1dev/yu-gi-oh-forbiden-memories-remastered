@@ -2,9 +2,15 @@ import { DomainError, err, ok, type Card, type Result } from "@yugioh/shared";
 
 import { aggregateCards, type CandidateCard } from "./aggregate-cards.ts";
 import { buildArtManifest, type ArtManifest } from "./art-manifest.ts";
+import { applyEnrichment, type CardEnrichmentTable } from "./enrichment.ts";
 import { SourceEnvelopeSchema } from "./envelope.ts";
 import { normalizeCard } from "./normalize-card.ts";
-import { buildIngestionReport, type DiscardedRecord, type IngestionReport } from "./report.ts";
+import {
+  buildIngestionReport,
+  type DiscardedEnrichment,
+  type DiscardedRecord,
+  type IngestionReport,
+} from "./report.ts";
 
 /** A source file already read from disk by the adapter. */
 export type SourceFile = Readonly<{
@@ -16,6 +22,12 @@ export type IngestionInput = Readonly<{
   files: readonly SourceFile[];
   /** Art file paths relative to the repository root. */
   availableArts: readonly string[];
+  /**
+   * External enrichment (`atributo`/`nivel`/`descricao`) keyed by `numero`.
+   * Absent or empty is the normal state before `renderizacao-cartas/F02`
+   * covers a card — every field simply stays `null` (spec F01, Decision 4).
+   */
+  enrichment?: CardEnrichmentTable;
   /** Injected so the orchestrator stays pure and reproducible. */
   generatedAt: string;
 }>;
@@ -71,9 +83,11 @@ export function ingestSource(input: IngestionInput): Result<IngestionOutput, Dom
   }
 
   const orderedFiles = [...input.files].sort((left, right) => left.name.localeCompare(right.name));
+  const enrichment = input.enrichment ?? {};
 
   const candidates: CandidateCard[] = [];
   const discardedAsInvalid: DiscardedRecord[] = [];
+  const discardedEnrichment: DiscardedEnrichment[] = [];
   let discardedByError = 0;
 
   for (const file of orderedFiles) {
@@ -114,7 +128,18 @@ export function ingestSource(input: IngestionInput): Result<IngestionOutput, Dom
       continue;
     }
 
-    candidates.push({ card: normalized.value, file: file.name });
+    const enriched = applyEnrichment(normalized.value, enrichment);
+    if (!enriched.ok) {
+      discardedEnrichment.push({
+        numero: normalized.value.numero,
+        reason: enriched.error.message,
+        code: enriched.error.code,
+      });
+      candidates.push({ card: normalized.value, file: file.name });
+      continue;
+    }
+
+    candidates.push({ card: enriched.value, file: file.name });
   }
 
   const aggregation = aggregateCards(candidates);
@@ -137,6 +162,7 @@ export function ingestSource(input: IngestionInput): Result<IngestionOutput, Dom
       artsFound: Object.keys(arts.manifest).length,
       missingArts: arts.missingArts,
       orphanArts: arts.orphanArts,
+      discardedEnrichment,
       generatedAt: input.generatedAt,
     }),
   });

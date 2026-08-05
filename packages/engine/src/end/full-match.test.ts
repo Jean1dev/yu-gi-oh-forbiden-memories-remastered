@@ -21,6 +21,9 @@ function makeCard(index: number, atk: number): Card {
     password: null,
     estrelas: null,
     tipo: "monstro",
+    atributo: null,
+    nivel: null,
+    descricao: null,
   };
 }
 

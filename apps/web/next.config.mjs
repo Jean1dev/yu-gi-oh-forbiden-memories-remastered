@@ -7,6 +7,7 @@ const catalogRuntimeFiles = [
   "../../pnpm-workspace.yaml",
   "../../packages/data/generated/cards.json",
   "../../packages/data/generated/arts-manifest.json",
+  "../../packages/data/generated/crop-arts-manifest.json",
   "../../packages/data/generated/dataset-seal.json",
 ];
 
@@ -28,6 +29,7 @@ const nextConfig = {
     "/library/[cardNumber]": catalogRuntimeFiles,
     "/library/(.)[cardNumber]": catalogRuntimeFiles,
     "/cards-data/\\[file\\]": ["../../pnpm-workspace.yaml", "../../cards-data/*.jpg"],
+    "/cards-data/art/\\[file\\]": ["../../pnpm-workspace.yaml", "../../cards-data/art/*.jpg"],
   },
 };
 

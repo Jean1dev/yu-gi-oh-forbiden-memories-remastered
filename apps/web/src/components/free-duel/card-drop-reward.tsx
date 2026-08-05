@@ -1,5 +1,9 @@
-import { cardArtUrl } from "../../lib/card-art-url.ts";
+import type { Card } from "@yugioh/shared";
+
+import { cardArtUrl, cropArtUrl } from "../../lib/card-art-url.ts";
+import { shouldUseCardFrame } from "../../lib/card-frame/should-use-card-frame.ts";
 import type { VictoryRewardViewState } from "../../hooks/use-victory-reward.ts";
+import { CardFrame } from "../card-frame/card-frame.tsx";
 
 export const CARD_DROP_ADDED_MESSAGE = "Adicionada à sua coleção.";
 export const CARD_DROP_OFFLINE_MESSAGE = "Carta conquistada salva localmente; sincronizando…";
@@ -14,7 +18,13 @@ export const CARD_DROP_PENDING_MESSAGE =
  * `RewardResult` status. `already_applied` shows only the message — the card
  * was already granted in an earlier attempt, so its art is not repeated.
  */
-export function CardDropReward({ state }: { readonly state: VictoryRewardViewState }) {
+export function CardDropReward({
+  state,
+  card,
+}: {
+  readonly state: VictoryRewardViewState;
+  readonly card?: Card | undefined;
+}) {
   if (state.status === "not_applicable") return null;
   if (state.status === "loading") return <p aria-busy="true">Selecionando recompensa…</p>;
   if (state.status === "unavailable") return <p role="alert">{CARD_DROP_PENDING_MESSAGE}</p>;
@@ -24,13 +34,20 @@ export function CardDropReward({ state }: { readonly state: VictoryRewardViewSta
     return <p>{CARD_DROP_ALREADY_APPLIED_MESSAGE}</p>;
   }
 
+  const cropArt = card ? { kind: "art" as const, path: cropArtUrl(card.numero) } : undefined;
+  const useFrame = card !== undefined && shouldUseCardFrame(card, cropArt);
+
   return (
     <section aria-label="Carta conquistada">
-      <img
-        src={cardArtUrl(granted.outcome.cardNumber)}
-        alt={`Carta ${granted.outcome.cardNumber}`}
-        loading="lazy"
-      />
+      {useFrame && cropArt !== undefined ? (
+        <CardFrame card={card} art={cropArt} size="completo" />
+      ) : (
+        <img
+          src={cardArtUrl(granted.outcome.cardNumber)}
+          alt={`Carta ${granted.outcome.cardNumber}`}
+          loading="lazy"
+        />
+      )}
       <p>Faixa: {granted.outcome.tier}</p>
       <p>
         {granted.reward.status === "applied_offline"

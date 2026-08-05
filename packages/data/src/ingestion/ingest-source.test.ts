@@ -13,12 +13,22 @@ import { serializeArtifacts } from "./serialize.ts";
 
 const GENERATED_AT = "2026-07-27T12:00:00.000Z";
 
-function ingest(files: readonly SourceFile[], availableArts: readonly string[] = []) {
-  return ingestSource({ files, availableArts, generatedAt: GENERATED_AT });
+type EnrichmentTable = NonNullable<Parameters<typeof ingestSource>[0]["enrichment"]>;
+
+function ingest(
+  files: readonly SourceFile[],
+  availableArts: readonly string[] = [],
+  enrichment: EnrichmentTable = {},
+) {
+  return ingestSource({ files, availableArts, enrichment, generatedAt: GENERATED_AT });
 }
 
-function ingestOrThrow(files: readonly SourceFile[], availableArts: readonly string[] = []) {
-  const result = ingest(files, availableArts);
+function ingestOrThrow(
+  files: readonly SourceFile[],
+  availableArts: readonly string[] = [],
+  enrichment: EnrichmentTable = {},
+) {
+  const result = ingest(files, availableArts, enrichment);
   if (!result.ok) {
     throw new Error(`expected ingestion to succeed, got ${result.error.code}`);
   }
@@ -148,6 +158,42 @@ describe("ingestSource report", () => {
       { name: "002.json", content: MALFORMED_JSON },
     ]);
     expect(report.filesRead).toBe(3);
+  });
+});
+
+describe("ingestSource enrichment", () => {
+  it("fills atributo/nivel/descricao for a card present in the enrichment table", () => {
+    const { cards } = ingestOrThrow([sourceFile("001", { tipo: "monstro" })], [], {
+      "001": { atributo: "LIGHT", nivel: 8, descricao: "A powerful dragon." },
+    });
+    expect(cards[0]).toMatchObject({ atributo: "LIGHT", nivel: 8, descricao: "A powerful dragon." });
+  });
+
+  it("keeps atributo/nivel/descricao null for a card absent from the enrichment table", () => {
+    const { cards } = ingestOrThrow([sourceFile("001")], [], {
+      "002": { atributo: "LIGHT", nivel: 8, descricao: "A powerful dragon." },
+    });
+    expect(cards[0]).toMatchObject({ atributo: null, nivel: null, descricao: null });
+  });
+
+  it("produces the same result with an empty or absent enrichment table", () => {
+    const withoutTable = ingestOrThrow([sourceFile("001")]);
+    const withEmptyTable = ingestOrThrow([sourceFile("001")], [], {});
+    expect(withEmptyTable.cards).toEqual(withoutTable.cards);
+  });
+
+  it("discards an enrichment entry that violates the schema and reports it, keeping the card", () => {
+    const { cards, report } = ingestOrThrow([sourceFile("001", { tipo: "armadilha" })], [], {
+      "001": { atributo: null, nivel: 4, descricao: null },
+    });
+    expect(cards[0]?.nivel).toBeNull();
+    expect(report.discardedEnrichment).toEqual([
+      {
+        numero: "001",
+        reason: expect.stringContaining("001") as unknown as string,
+        code: "invalid_enrichment_entry",
+      },
+    ]);
   });
 });
 

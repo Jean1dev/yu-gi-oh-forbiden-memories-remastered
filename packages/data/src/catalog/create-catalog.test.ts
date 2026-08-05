@@ -130,6 +130,19 @@ describe("createCatalog", () => {
 
     expect(catalog.getArtManifest()["001"]).toBe("cards-data/001.jpg");
   });
+
+  it("getCropArtManifest returns the manifest it was handed", () => {
+    const cropArtManifest = { "001": "cards-data/art/001.jpg" };
+    const catalog = buildOrFail({ cropArtManifest });
+
+    expect(catalog.getCropArtManifest()).toEqual(cropArtManifest);
+  });
+
+  it("getCropArtManifest returns {} when cropArtManifest was not provided", () => {
+    const catalog = buildOrFail();
+
+    expect(catalog.getCropArtManifest()).toEqual({});
+  });
 });
 
 describe("CardCatalog", () => {

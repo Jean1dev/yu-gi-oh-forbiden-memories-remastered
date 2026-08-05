@@ -49,6 +49,7 @@ const CATALOG_RESULT: LibraryCatalogPayload = {
   status: "ok",
   cards: [CARD],
   arts: { "001": { kind: "placeholder" } },
+  cropArts: {},
 };
 const LOADED: LoadedLibrary = {
   index: {

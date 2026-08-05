@@ -77,6 +77,7 @@ const CATALOG_PAYLOAD: LibraryCatalogPayload = {
   status: "ok",
   cards: [card("001"), card("002"), card("003")],
   arts: {},
+  cropArts: {},
 };
 
 describe("LibraryClient", () => {

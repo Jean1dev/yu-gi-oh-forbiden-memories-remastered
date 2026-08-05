@@ -8,6 +8,17 @@ export type DiscardedRecord = Readonly<{
 }>;
 
 /**
+ * One enrichment entry that failed to merge into its card and was skipped —
+ * the card itself is still emitted, just without the enrichment applied
+ * (`renderizacao-cartas/F01` spec §6).
+ */
+export type DiscardedEnrichment = Readonly<{
+  numero: CardNumber;
+  reason: string;
+  code: string;
+}>;
+
+/**
  * Process evidence consumed by F02 and by the maintainer.
  *
  * This is deliberately not embedded in `cards.json`: the domain dataset stays
@@ -24,6 +35,8 @@ export type IngestionReport = Readonly<{
   artsFound: number;
   missingArts: readonly CardNumber[];
   orphanArts: readonly string[];
+  /** Enrichment entries that failed to merge — the card is still emitted, unenriched. */
+  discardedEnrichment: readonly DiscardedEnrichment[];
   /**
    * Distinct classes observed in the emitted dataset. Input for F02, never a
    * hard-coded list (spec F01, Decision 8).
@@ -45,6 +58,7 @@ export type IngestionReportInput = Readonly<{
   artsFound: number;
   missingArts: readonly CardNumber[];
   orphanArts: readonly string[];
+  discardedEnrichment: readonly DiscardedEnrichment[];
   generatedAt: string;
 }>;
 
@@ -82,6 +96,7 @@ export function buildIngestionReport(input: IngestionReportInput): IngestionRepo
     artsFound: input.artsFound,
     missingArts: input.missingArts,
     orphanArts: input.orphanArts,
+    discardedEnrichment: input.discardedEnrichment,
     observedClasses: collectObservedClasses(input.cards),
     observedTypes: countObservedTypes(input.cards),
     complete: input.missingNumbers.length === 0 && input.discardedAsInvalid.length === 0,

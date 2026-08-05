@@ -6,6 +6,7 @@
       "outputs": [
         "generated/cards.json",
         "generated/arts-manifest.json",
+        "generated/crop-arts-manifest.json",
         "generated/ingestion-report.json"
       ]
     },

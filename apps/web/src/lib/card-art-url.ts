@@ -13,3 +13,11 @@ import type { CardNumber } from "@yugioh/shared";
 export function cardArtUrl(cardNumber: CardNumber): string {
   return `/cards-data/${cardNumber}.jpg`;
 }
+
+/**
+ * URL of a card's crop art (`renderizacao-cartas/F03`: the illustration
+ * alone, no frame), as served by `app/cards-data/art/[file]/route.ts`.
+ */
+export function cropArtUrl(cardNumber: CardNumber): string {
+  return `/cards-data/art/${cardNumber}.jpg`;
+}

@@ -16,11 +16,13 @@ export function toPasswordPayload(catalog: PasswordCatalog): PasswordCatalogPayl
 
   const cards = catalog.cards.filter((card) => card.password !== null);
   const arts: Record<CardNumber, ObtainedArtReference> = {};
+  const cropArts: Record<CardNumber, ObtainedArtReference> = {};
   for (const card of cards) {
     arts[card.numero] = catalog.artLookup(card.numero);
+    cropArts[card.numero] = catalog.cropArtLookup(card.numero);
   }
 
-  const payload: PasswordCatalogPayload = { status: "ok", cards, arts };
+  const payload: PasswordCatalogPayload = { status: "ok", cards, arts, cropArts };
   payloads.set(catalog, payload);
   return payload;
 }
@@ -43,6 +45,12 @@ export function fromPasswordPayload(
         ? payload.arts[cardNumber]
         : undefined;
       return art ?? { kind: "placeholder" };
+    },
+    cropArtLookup: (cardNumber) => {
+      const cropArt = Object.hasOwn(payload.cropArts, cardNumber)
+        ? payload.cropArts[cardNumber]
+        : undefined;
+      return cropArt ?? { kind: "placeholder" };
     },
   };
 }
