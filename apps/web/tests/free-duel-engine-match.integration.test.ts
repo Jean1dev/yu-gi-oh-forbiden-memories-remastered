@@ -35,16 +35,62 @@ async function advanceToPlayerMain(
   }
   if (current.status !== "in_progress") return current;
   if (current.state.phase === "draw") {
-    const advanced = await submitPlayerAction(current, { type: "advance_phase" }, {
-      ...runtime.advanceDependencies,
-      cpuProfile: duelist.profile,
-    });
+    const advanced = await submitPlayerAction(
+      current,
+      { type: "advance_phase" },
+      {
+        ...runtime.advanceDependencies,
+        cpuProfile: duelist.profile,
+      },
+    );
     current = advanced.session;
   }
   return current;
 }
 
 describe("free duel with real engine", () => {
+  it("lets fm-basic complete a CPU turn with a legal summon", async () => {
+    const catalog = await getSealedCatalog();
+    expect(catalog.ok).toBe(true);
+    if (!catalog.ok) return;
+    const cards = listAllCards(catalog.value);
+    const deck = buildDeck(cards);
+    const duelist: Duelist = {
+      id: "fm-basic-test",
+      name: "FM Basic Test",
+      portrait: "cards-data/001.jpg",
+      difficulty: "easy",
+      profile: { strategy: "fm-basic", parameters: {} },
+      deck: deck.cardNumbers,
+      dropPool: [{ tier: "common", cardNumbers: deck.cardNumbers.slice(0, 8) }],
+    };
+    const runtime = createDuelRuntime({ cards, sleep: async () => undefined });
+    let started: DuelSession = { status: "not_started" };
+    for (let seed = 1; seed <= 20; seed += 1) {
+      started = runtime.start(
+        {
+          duelistId: duelist.id,
+          playerComposition: deck.composition,
+          cpuComposition: deck.composition,
+          seed,
+        },
+        duelist,
+      );
+      if (started.status === "in_progress" && started.currentDecider === "P2") break;
+    }
+    expect(started).toMatchObject({ status: "in_progress", currentDecider: "P2" });
+    if (started.status !== "in_progress") return;
+    const advanced = await advanceCpuDecisions(started, {
+      ...runtime.advanceDependencies,
+      cpuProfile: duelist.profile,
+    });
+    expect(advanced.status).toBe("in_progress");
+    if (advanced.status === "in_progress") {
+      expect(advanced.state.players.P2.field.monsters.some((zone) => zone.occupied)).toBe(true);
+      expect(advanced.currentDecider).toBe("P1");
+    }
+  });
+
   it("starts, summons through apply, settles reactions, and ends by surrender", async () => {
     const catalog = await getSealedCatalog();
     expect(catalog.ok).toBe(true);
