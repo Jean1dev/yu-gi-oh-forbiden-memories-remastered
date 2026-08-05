@@ -2,10 +2,20 @@ import { describe, expect, it } from "vitest";
 import type { Card, PublicDuelState, PublicMonsterZone, PublicPlayerState } from "@yugioh/shared";
 import { generateCandidates } from "./generate-candidates.ts";
 
-const emptyMonsters = (): PublicPlayerState["field"]["monsters"] =>
-  [{ occupied: false }, { occupied: false }, { occupied: false }, { occupied: false }, { occupied: false }];
-const emptySpells = (): PublicPlayerState["field"]["spells"] =>
-  [{ occupied: false }, { occupied: false }, { occupied: false }, { occupied: false }, { occupied: false }];
+const emptyMonsters = (): PublicPlayerState["field"]["monsters"] => [
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+];
+const emptySpells = (): PublicPlayerState["field"]["spells"] => [
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+  { occupied: false },
+];
 const card = (id: number): Card => ({
   id,
   numero: String(id).padStart(3, "0"),
@@ -22,7 +32,10 @@ const card = (id: number): Card => ({
 });
 
 function state(hand: readonly Card[], opponentMonsters = emptyMonsters()): PublicDuelState {
-  const player = (ownHand: PublicPlayerState["hand"], monsters: PublicPlayerState["field"]["monsters"]): PublicPlayerState => ({
+  const player = (
+    ownHand: PublicPlayerState["hand"],
+    monsters: PublicPlayerState["field"]["monsters"],
+  ): PublicPlayerState => ({
     lp: 8000,
     hand: ownHand,
     remainingDeck: 35,
@@ -52,7 +65,9 @@ describe("generateCandidates", () => {
     const first = generateCandidates(input, "P2");
     expect(first.at(-1)).toEqual({ type: "advance_phase" });
     expect(first.filter((action) => action.type === "advance_phase")).toHaveLength(1);
-    expect(first.some((action) => action.type === "surrender" || action.type === "resolve_attack")).toBe(false);
+    expect(
+      first.some((action) => action.type === "surrender" || action.type === "resolve_attack"),
+    ).toBe(false);
     expect(generateCandidates(input, "P2")).toEqual(first);
     expect(JSON.stringify(input)).toBe(before);
   });
@@ -74,7 +89,9 @@ describe("generateCandidates", () => {
       { occupied: false },
     ];
     const actions = generateCandidates(state([], withHidden), "P2");
-    expect(actions.some((action) => action.type === "declare_attack" && action.targetZoneIndex === 0)).toBe(false);
+    expect(
+      actions.some((action) => action.type === "declare_attack" && action.targetZoneIndex === 0),
+    ).toBe(false);
   });
 
   it("returns only advance when the requested hand is hidden", () => {

@@ -1,9 +1,7 @@
 import type { StrategyPolicy, StrategyRegistry } from "./types.ts";
 import { passivePolicy } from "./passive-policy.ts";
 
-export function createStrategyRegistry(
-  policies: readonly StrategyPolicy[],
-): StrategyRegistry {
+export function createStrategyRegistry(policies: readonly StrategyPolicy[]): StrategyRegistry {
   const byName = new Map<string, StrategyPolicy>();
   for (const policy of policies) {
     if (policy.name.trim().length === 0) {

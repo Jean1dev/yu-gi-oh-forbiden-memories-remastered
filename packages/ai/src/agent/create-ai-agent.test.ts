@@ -19,7 +19,7 @@ function setup(extra: readonly StrategyPolicy[] = []) {
 
 describe("createAiAgent", () => {
   it("delegates a known strategy and waits 650ms", async () => {
-    const decide = vi.fn(() => ({ type: "advance_phase" } as const));
+    const decide = vi.fn(() => ({ type: "advance_phase" }) as const);
     const parameters = { custom: true };
     const { agent, sleep, warn } = setup([{ name: "known", decide }]);
     await expect(agent.decide(state, { strategy: "known", parameters })).resolves.toEqual({

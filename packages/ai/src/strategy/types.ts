@@ -1,8 +1,4 @@
-import type {
-  DifficultyProfile,
-  DuelAction,
-  PublicDuelState,
-} from "@yugioh/shared";
+import type { DifficultyProfile, DuelAction, PublicDuelState } from "@yugioh/shared";
 
 export type StrategyContext = Readonly<{
   state: PublicDuelState;

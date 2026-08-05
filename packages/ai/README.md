@@ -5,3 +5,7 @@ shared action contracts; it never owns duel rules, UI, persistence, or transport
 
 Public APIs are exported from `src/index.ts`. Run `pnpm --filter @yugioh/ai test` and
 `pnpm --filter @yugioh/ai typecheck` from the repository root.
+
+`generateCandidates(publicState, playerId)` enumerates deterministic structural actions from the
+NPC's public view. It never reads private duel state or decides legality; the engine-backed filter
+is the next stage of the decision pipeline.
