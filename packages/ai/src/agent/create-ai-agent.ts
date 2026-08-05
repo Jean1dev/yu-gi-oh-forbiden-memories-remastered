@@ -1,4 +1,4 @@
-import type { AiAgent } from "@yugioh/shared";
+import { PublicDuelStateSchema, type AiAgent, type DuelAction } from "@yugioh/shared";
 import type { AiLogger, StrategyRegistry } from "../strategy/types.ts";
 
 const DEFAULT_AI_DELAY_MS = 650;
@@ -8,6 +8,7 @@ export type CreateAiAgentOptions = Readonly<{
   logger: AiLogger;
   sleep?: ((ms: number) => Promise<void>) | undefined;
   delayMs?: number | undefined;
+  validateState?: boolean | undefined;
 }>;
 
 async function defaultSleep(ms: number): Promise<void> {
@@ -29,21 +30,50 @@ export function createAiAgent(options: CreateAiAgentOptions): AiAgent {
     throw new Error('The AI strategy registry must contain "passive".');
   }
   const sleep = options.sleep ?? defaultSleep;
+  const safeLog = (
+    level: "warn" | "error",
+    event: string,
+    context: Readonly<Record<string, unknown>>,
+  ) => {
+    try {
+      options.logger[level]?.(event, context);
+    } catch {
+      // Observability is best-effort and must never break a duel.
+    }
+  };
   return Object.freeze({
     async decide(state, profile) {
+      if ((options.validateState ?? true) && !PublicDuelStateSchema.safeParse(state).success) {
+        safeLog("warn", "ai_invalid_public_state", {});
+        return { type: "advance_phase" };
+      }
       const requested = profile.strategy;
       const blank = requested.trim().length === 0;
       const selected = blank ? undefined : options.registry.resolve(requested);
       const policy = selected ?? passive;
       if (selected === undefined) {
-        options.logger.warn("ai_strategy_fallback", {
+        safeLog("warn", "ai_strategy_fallback", {
           requestedStrategy: requested,
           fallbackStrategy: "passive",
           reason: blank ? "empty_strategy" : "unknown_strategy",
         });
       }
-      const action = await policy.decide({ state, parameters: profile.parameters });
-      await sleep(delayMs);
+      let action: DuelAction = { type: "advance_phase" };
+      try {
+        action = await policy.decide({ state, parameters: profile.parameters });
+      } catch (error) {
+        safeLog("error", "ai_decision_failed", {
+          message: error instanceof Error ? error.message : "unknown error",
+          strategy: policy.name,
+        });
+      }
+      try {
+        await sleep(delayMs);
+      } catch (error) {
+        safeLog("error", "ai_presentation_delay_failed", {
+          message: error instanceof Error ? error.message : "unknown error",
+        });
+      }
       return action;
     },
   });

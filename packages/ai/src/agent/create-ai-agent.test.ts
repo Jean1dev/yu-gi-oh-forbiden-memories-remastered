@@ -13,6 +13,7 @@ function setup(extra: readonly StrategyPolicy[] = []) {
     registry: createStrategyRegistry([passivePolicy, ...extra]),
     logger: { warn },
     sleep,
+    validateState: false,
   });
   return { agent, warn, sleep };
 }
@@ -49,12 +50,51 @@ describe("createAiAgent", () => {
     const registry = createStrategyRegistry([passivePolicy]);
     const logger = { warn: vi.fn() };
     await expect(
-      createAiAgent({ registry, logger, delayMs: 0 }).decide(state, {
+      createAiAgent({ registry, logger, delayMs: 0, validateState: false }).decide(state, {
         strategy: "passive",
         parameters: {},
       }),
     ).resolves.toEqual({ type: "advance_phase" });
     expect(() => createAiAgent({ registry, logger, delayMs: -1 })).toThrow(/delay/);
     expect(() => createAiAgent({ registry, logger, delayMs: Number.NaN })).toThrow(/delay/);
+  });
+
+  it("never rejects for malformed state, policy, logger, or sleep failures", async () => {
+    const throwing = {
+      name: "throwing",
+      decide: () => {
+        throw new Error("boom");
+      },
+    };
+    const agent = createAiAgent({
+      registry: createStrategyRegistry([passivePolicy, throwing]),
+      logger: {
+        warn: () => {
+          throw new Error("logger");
+        },
+        error: () => {
+          throw new Error("logger");
+        },
+      },
+      sleep: async () => {
+        throw new Error("timer");
+      },
+      delayMs: 0,
+      validateState: false,
+    });
+    await expect(agent.decide(state, { strategy: "throwing", parameters: {} })).resolves.toEqual({
+      type: "advance_phase",
+    });
+    await expect(
+      createAiAgent({
+        registry: createStrategyRegistry([passivePolicy]),
+        logger: {
+          warn: () => {
+            throw new Error("logger");
+          },
+        },
+        delayMs: 0,
+      }).decide({} as never, { strategy: "passive", parameters: {} }),
+    ).resolves.toEqual({ type: "advance_phase" });
   });
 });
