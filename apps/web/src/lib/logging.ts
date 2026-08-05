@@ -20,3 +20,10 @@ const SINKS: Readonly<Record<LogLevel, (message: string) => void>> = {
 export function log(level: LogLevel, event: string, context: Record<string, unknown> = {}): void {
   SINKS[level](JSON.stringify({ level, event, ...context }));
 }
+
+export const aiLogger = Object.freeze({
+  warn: (event: string, context: Readonly<Record<string, unknown>>) =>
+    log("warn", event, { ...context }),
+  error: (event: string, context: Readonly<Record<string, unknown>>) =>
+    log("error", event, { ...context }),
+});

@@ -1,3 +1,4 @@
+import { createAiAgent, createF01StrategyRegistry } from "@yugioh/ai";
 import {
   apply,
   buildInitializationInput,
@@ -15,6 +16,7 @@ import type {
   EndedDuelSession,
   MatchOrchestrationInput,
 } from "@yugioh/shared";
+import { aiLogger } from "../logging.ts";
 
 import { resolveDuelResult } from "./resolve-duel-result.ts";
 import {
@@ -22,7 +24,6 @@ import {
   readDuelOutcome,
   unavailableRatingEngine,
 } from "./rating-policy.ts";
-import { createPassiveAiAgent } from "./passive-ai-agent.ts";
 import { createCryptoSeedGenerator, generateDuelSessionId } from "./seed-generator.ts";
 import {
   createDuelSession,
@@ -52,7 +53,11 @@ function createCatalogLookup(cards: readonly Card[]): CardCatalogLookup {
 export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
   const catalog = createCatalogLookup(input.cards);
   const seedGenerator = createCryptoSeedGenerator();
-  const aiAgent = createPassiveAiAgent({ sleep: input.sleep });
+  const aiAgent = createAiAgent({
+    registry: createF01StrategyRegistry(),
+    logger: aiLogger,
+    sleep: input.sleep,
+  });
   const resolveResult: ResolveEndedDuelResult = (session) =>
     resolveDuelResult(session, {
       readOutcome: readDuelOutcome,

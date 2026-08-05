@@ -44,6 +44,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.110.9
         version: 2.110.9
+      '@yugioh/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@yugioh/data':
         specifier: workspace:*
         version: link:../../packages/data

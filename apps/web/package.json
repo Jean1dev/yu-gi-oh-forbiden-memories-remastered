@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.110.9",
+    "@yugioh/ai": "workspace:*",
     "@yugioh/data": "workspace:*",
     "@yugioh/engine": "workspace:*",
     "@yugioh/rules": "workspace:*",

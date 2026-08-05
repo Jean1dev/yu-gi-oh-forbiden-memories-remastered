@@ -87,12 +87,13 @@ module.exports = {
       to: { path: "^packages/engine/" },
     },
     {
-      name: "web-has-no-ai-dependency-yet",
-      comment:
-        "apps/web still does not import packages/ai. F09 uses an injected passive agent until the " +
-        "cross-PRD AI package exists.",
+      name: "web-imports-ai-only-through-duel-runtime",
+      comment: "The Free Duel composition root is the only web module that constructs NPC AI.",
       severity: "error",
-      from: { path: "^apps/web/" },
+      from: {
+        path: "^apps/web/",
+        pathNot: "^apps/web/src/lib/free-duel/duel-runtime\\.ts$",
+      },
       to: { path: "^packages/ai/" },
     },
     {
@@ -129,7 +130,10 @@ module.exports = {
       name: "free-duel-does-not-import-ai",
       comment: "F01 transports an opaque difficulty profile and never decides CPU actions.",
       severity: "error",
-      from: { path: "^(packages/data/src/roster/|apps/web/src/(app|components|lib)/free-duel/)" },
+      from: {
+        path: "^(packages/data/src/roster/|apps/web/src/(app|components|lib)/free-duel/)",
+        pathNot: "^apps/web/src/lib/free-duel/duel-runtime\\.ts$",
+      },
       to: { path: "^packages/ai/" },
     },
     {
