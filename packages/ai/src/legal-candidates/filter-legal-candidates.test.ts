@@ -9,13 +9,23 @@ describe("filterLegalCandidates", () => {
     const result = filterLegalCandidates({
       state,
       candidates: actions,
-      evaluate: () => (++call === 1 ? { kind: "rejected" } : { kind: "accepted", resultingState: state }),
+      evaluate: () =>
+        ++call === 1 ? { kind: "rejected" } : { kind: "accepted", resultingState: state },
     });
-    expect(result).toEqual({ kind: "legal_candidates", candidates: [{ action: actions[1], resultingState: state }] });
+    expect(result).toEqual({
+      kind: "legal_candidates",
+      candidates: [{ action: actions[1], resultingState: state }],
+    });
   });
 
   it("returns an explicit fallback when nothing is accepted", () => {
-    expect(filterLegalCandidates({ state: {} as never, candidates: [], evaluate: () => ({ kind: "rejected" }) })).toEqual({
+    expect(
+      filterLegalCandidates({
+        state: {} as never,
+        candidates: [],
+        evaluate: () => ({ kind: "rejected" }),
+      }),
+    ).toEqual({
       kind: "fallback",
       action: { type: "advance_phase" },
     });

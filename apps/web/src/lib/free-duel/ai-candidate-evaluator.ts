@@ -18,10 +18,12 @@ export type AiCandidateEvaluator = Readonly<{
   evaluate: EvaluateAiCandidate;
 }>;
 
-export function createAiCandidateEvaluator(dependencies: Readonly<{
-  apply: ApplyAction;
-  getPublicDuelState: GetPublicDuelState;
-}>): AiCandidateEvaluator {
+export function createAiCandidateEvaluator(
+  dependencies: Readonly<{
+    apply: ApplyAction;
+    getPublicDuelState: GetPublicDuelState;
+  }>,
+): AiCandidateEvaluator {
   const contexts = new WeakMap<PublicDuelState, { state: DuelState; active: boolean }>();
   return {
     open(publicState, privateState) {

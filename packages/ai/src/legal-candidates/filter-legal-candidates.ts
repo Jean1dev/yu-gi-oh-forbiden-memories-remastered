@@ -6,11 +6,13 @@ import type {
   PublicDuelState,
 } from "@yugioh/shared";
 
-export function filterLegalCandidates(input: Readonly<{
-  state: PublicDuelState;
-  candidates: readonly DuelAction[];
-  evaluate: EvaluateAiCandidate;
-}>): LegalCandidateFilterResult {
+export function filterLegalCandidates(
+  input: Readonly<{
+    state: PublicDuelState;
+    candidates: readonly DuelAction[];
+    evaluate: EvaluateAiCandidate;
+  }>,
+): LegalCandidateFilterResult {
   const legal: LegalCandidate[] = [];
   for (const action of input.candidates) {
     const result = input.evaluate(input.state, action);
