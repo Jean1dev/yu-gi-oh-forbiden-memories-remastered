@@ -1,6 +1,7 @@
 import type { ZoneIndex, ZoneReference } from "./events.ts";
 import type { PlayerId } from "./player.ts";
 import type { SummonMonsterAction } from "./summon-monster-action.ts";
+import type { MonsterPosition } from "./types.ts";
 
 /**
  * The union of every action a player (or the system) can submit to the
@@ -91,6 +92,28 @@ export type ResolveAttackAction = Readonly<{ type: "resolve_attack" }>;
  */
 export type SurrenderAction = Readonly<{ type: "surrender"; player: PlayerId }>;
 
+export type BeginFusionAction = Readonly<{
+  type: "begin_fusion";
+  player: PlayerId;
+  handIndexes: readonly number[];
+}>;
+
+export type FusionPlacement =
+  | Readonly<{
+      kind: "monster";
+      zoneIndex: ZoneIndex;
+      position: MonsterPosition;
+    }>
+  | Readonly<{ kind: "spell_or_trap"; zoneIndex: ZoneIndex }>
+  | Readonly<{ kind: "equip"; targetZone: ZoneReference }>
+  | Readonly<{ kind: "activate_spell" }>
+  | Readonly<{ kind: "field_spell" }>;
+
+export type CompleteFusionAction = Readonly<{
+  type: "complete_fusion";
+  placement: FusionPlacement;
+}>;
+
 export type Action =
   | AdvancePhaseAction
   | SummonMonsterAction
@@ -101,4 +124,6 @@ export type Action =
   | ChangePositionAction
   | DeclareAttackAction
   | ResolveAttackAction
+  | BeginFusionAction
+  | CompleteFusionAction
   | SurrenderAction;

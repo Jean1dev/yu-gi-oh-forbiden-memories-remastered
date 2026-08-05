@@ -168,8 +168,9 @@ normalizado (`01.json` inválido vs `001.json` válido), valida com zod e emite:
 
 Fusões, drops por duelista, matriz de guardiões, matriz terreno↔classe: **os valores não
 existem no repositório**. Entregar schema + loader + validação; viajam vazias/parciais no
-bundle. O motor trata ausência como neutro (modificador 0 / "sem fusão conhecida"). São
-**dado externo pendente**, fornecido por você. — `banco-de-cartas` F05–F08.
+bundle. O motor trata ausência como neutro (modificador 0 / "sem fusão conhecida"). A tabela de
+fusões foi preenchida pelo Fusion System/F01 a partir do snapshot upstream fixado; as demais
+tabelas continuam seguindo seus PRDs. — `banco-de-cartas` F05–F08; `fusion-system` F01.
 
 ## 5. Persistência (Supabase / Postgres)
 
@@ -266,7 +267,7 @@ duelar contra a CPU → ganhar carta/estrelas → liberar carta por senha. Tudo 
 
 - [ ] Regra F02 de guardiões vs rituais (ver 4.2) — corrigir critério.
 - [ ] Unificar carteira e handler `onVictory` entre `free-duel` e `password` (ver 5.3).
-- [ ] **Valores** das tabelas: fusões, drops por duelista, matriz de guardiões (10×10),
+- [ ] **Valores** das tabelas: drops por duelista, matriz de guardiões (10×10),
       matriz terreno↔classe (~24 classes). — fornecidos por você.
 - [ ] Rating Engine: escala de notas + tabela nota→recompensa (free-duel F05).
 - [ ] Balanceamento: pool do deck inicial, `N` estrelas/vitória, saldo inicial, roster de

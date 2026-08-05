@@ -10,10 +10,12 @@ import type {
   Duelist,
   ReadyDeck,
   Result,
+  CompleteFusionAction,
 } from "@yugioh/shared";
+import { spellPlayMode } from "@yugioh/shared";
 import { getPublicDuelState } from "@yugioh/rules";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DuelActions } from "../../../../components/free-duel/duel-actions.tsx";
 import { DuelBoard } from "../../../../components/free-duel/duel-board.tsx";
 import { DuelCardPreview } from "../../../../components/free-duel/duel-card-preview.tsx";
@@ -32,18 +34,10 @@ import { useAutoAdvancePhase } from "../../../../hooks/use-auto-advance-phase.ts
 import { useDuelCues } from "../../../../hooks/use-duel-cues.ts";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
-import {
-  useVictoryReward,
-} from "../../../../hooks/use-victory-reward.ts";
+import { useVictoryReward } from "../../../../hooks/use-victory-reward.ts";
 import type { GrantedVictoryReward } from "../../../../lib/free-duel/grant-victory-reward.ts";
-import {
-  useDuelResult,
-  type ResolveEndedDuelResult,
-} from "../../../../hooks/use-duel-result.ts";
-import {
-  useDuelSession,
-  type StartDuelMatch,
-} from "../../../../hooks/use-duel-session.ts";
+import { useDuelResult, type ResolveEndedDuelResult } from "../../../../hooks/use-duel-result.ts";
+import { useDuelSession, type StartDuelMatch } from "../../../../hooks/use-duel-session.ts";
 import { useSurrender } from "../../../../hooks/use-surrender.ts";
 import type {
   CreateDuelRuntimeInput,
@@ -58,8 +52,7 @@ import styles from "./duel-screen.module.css";
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 export type DuelScreenCatalogResult =
-  | Readonly<{ status: "ready"; cards: readonly Card[] }>
-  | Readonly<{ status: "error" }>;
+  Readonly<{ status: "ready"; cards: readonly Card[] }> | Readonly<{ status: "error" }>;
 
 /** Bound with the duelist's `dropPool` at composition time; see `ResolvedDuelResult`. */
 export type GrantVictoryRewardForVictory = (
@@ -90,7 +83,10 @@ function selectedHandIndex(intent: ReturnType<typeof useDuelInteraction>["intent
   }
 }
 
-function selectedCard(state: DuelState | null, intent: ReturnType<typeof useDuelInteraction>["intent"]): Card | null {
+function selectedCard(
+  state: DuelState | null,
+  intent: ReturnType<typeof useDuelInteraction>["intent"],
+): Card | null {
   const handIndex = selectedHandIndex(intent);
   return state && handIndex !== null ? (state.players.P1.hand[handIndex] ?? null) : null;
 }
@@ -174,6 +170,8 @@ export function DuelScreen({
   /** Draw/end auto-advance delay; only ever overridden by tests (default 1000ms). */
   readonly autoAdvanceDelayMs?: number | undefined;
 }) {
+  const [fusionMode, setFusionMode] = useState(false);
+  const [fusionIndexes, setFusionIndexes] = useState<readonly number[]>([]);
   const router = useRouter();
   const cues = useDuelCues();
   const duel = useDuelSession({
@@ -197,7 +195,11 @@ export function DuelScreen({
     onInterrupt: duel.applyAction ? duel.interrupt : undefined,
   });
   const activeState =
-    session.status === "in_progress" ? session.state : session.status === "ended" ? session.finalState : null;
+    session.status === "in_progress"
+      ? session.state
+      : session.status === "ended"
+        ? session.finalState
+        : null;
   const interactionState = session.status === "in_progress" ? session.state : null;
   const isPlayerTurn = session.status === "in_progress" && session.currentDecider === "P1";
   const interaction = useDuelInteraction({
@@ -216,7 +218,12 @@ export function DuelScreen({
 
   useAutoAdvancePhase({
     phase: session.status === "in_progress" ? session.state.phase : null,
-    active: session.status === "in_progress" && isPlayerTurn && !duel.busy && !cues.busy,
+    active:
+      session.status === "in_progress" &&
+      isPlayerTurn &&
+      !duel.busy &&
+      !cues.busy &&
+      session.state.pendingFusion === undefined,
     dispatch: (action) => void duel.submitAction(action),
     delayMs: autoAdvanceDelayMs,
   });
@@ -226,7 +233,12 @@ export function DuelScreen({
   }, [cues, session.status]);
 
   if (catalogResult.status === "error") return <DuelUnavailableNotice />;
-  if (session.status === "not_started") return <main className={styles.loading} aria-busy="true">Iniciando duelo...</main>;
+  if (session.status === "not_started")
+    return (
+      <main className={styles.loading} aria-busy="true">
+        Iniciando duelo...
+      </main>
+    );
   if (session.status === "failed") {
     return (
       <main className={styles.failed}>
@@ -234,9 +246,50 @@ export function DuelScreen({
       </main>
     );
   }
-  if (activeState === null) return <main className={styles.loading} aria-busy="true">Iniciando duelo...</main>;
+  if (activeState === null)
+    return (
+      <main className={styles.loading} aria-busy="true">
+        Iniciando duelo...
+      </main>
+    );
   const state = activeState;
   const view = getPublicDuelState(state, "P1");
+  const pendingFusion = state.pendingFusion;
+  const completeFusion = () => {
+    if (!pendingFusion) return;
+    const card = pendingFusion.resultCard;
+    let placement: CompleteFusionAction["placement"];
+    if (card.tipo === "monstro" || card.tipo === "ritual") {
+      const zoneIndex = state.players.P1.field.monsters.findIndex((zone) => !zone.occupied);
+      if (zoneIndex < 0 || zoneIndex > 4) return;
+      placement = {
+        kind: "monster",
+        zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4,
+        position: "attack_face_up",
+      };
+    } else {
+      const mode = spellPlayMode(card);
+      if (mode === "one_shot") placement = { kind: "activate_spell" };
+      else if (mode === "terrain") placement = { kind: "field_spell" };
+      else if (mode === "equip") {
+        const targetIndex = state.players.P1.field.monsters.findIndex((zone) => zone.occupied);
+        if (targetIndex < 0 || targetIndex > 4) return;
+        placement = {
+          kind: "equip",
+          targetZone: {
+            player: "P1",
+            zoneType: "monster",
+            index: targetIndex as 0 | 1 | 2 | 3 | 4,
+          },
+        };
+      } else {
+        const zoneIndex = state.players.P1.field.spells.findIndex((zone) => !zone.occupied);
+        if (zoneIndex < 0 || zoneIndex > 4) return;
+        placement = { kind: "spell_or_trap", zoneIndex: zoneIndex as 0 | 1 | 2 | 3 | 4 };
+      }
+    }
+    void duel.submitAction({ type: "complete_fusion", placement });
+  };
   return (
     <main className={styles.screen}>
       <h1 className={styles.title}>Duelo</h1>
@@ -268,13 +321,72 @@ export function DuelScreen({
             onCancel={interaction.reset}
           />
           <DuelHandBar>
+            {pendingFusion ? (
+              <section aria-live="polite">
+                <p>Resultado: {pendingFusion.resultCard.nome}</p>
+                <ol>
+                  {pendingFusion.resolution.steps.map((step, index) => (
+                    <li key={index}>
+                      {step.accumulator} + {step.material} → {step.result ?? step.material}
+                    </li>
+                  ))}
+                </ol>
+                <button type="button" onClick={completeFusion}>
+                  Colocar fusão
+                </button>
+              </section>
+            ) : null}
             <PlayerHand
               cards={state.players.P1.hand}
-              disabled={!isPlayerTurn || duel.busy || cues.busy}
+              disabled={!isPlayerTurn || duel.busy || cues.busy || pendingFusion !== undefined}
               selectedIndex={selectedIndex}
+              selectedIndices={fusionIndexes}
               drawnCount={cues.cueForPlayer("P1")?.kind === "draw" ? 1 : 0}
-              onSelect={interaction.onSelectHandCard}
+              onSelect={(index) =>
+                fusionMode
+                  ? setFusionIndexes((current) =>
+                      current.includes(index)
+                        ? current.filter((value) => value !== index)
+                        : current.length < 5
+                          ? [...current, index]
+                          : current,
+                    )
+                  : interaction.onSelectHandCard(index)
+              }
             />
+            <div>
+              <button
+                type="button"
+                disabled={
+                  pendingFusion !== undefined ||
+                  state.phase !== "main" ||
+                  state.players.P1.handPlayUsed
+                }
+                onClick={() => {
+                  setFusionMode((value) => !value);
+                  setFusionIndexes([]);
+                }}
+              >
+                {fusionMode ? "Cancelar fusão" : "Fundir"}
+              </button>
+              {fusionMode ? (
+                <button
+                  type="button"
+                  disabled={fusionIndexes.length < 2}
+                  onClick={() => {
+                    void duel.submitAction({
+                      type: "begin_fusion",
+                      player: "P1",
+                      handIndexes: fusionIndexes,
+                    });
+                    setFusionMode(false);
+                    setFusionIndexes([]);
+                  }}
+                >
+                  Confirmar fusão
+                </button>
+              ) : null}
+            </div>
             <DuelActions slots={interaction.slots} onInvoke={interaction.onInvokeSlot} />
           </DuelHandBar>
           <DuelCardPreview card={previewCard} />

@@ -10,6 +10,7 @@
     "./drops": "./src/drops/index.ts",
     "./drops/disk": "./scripts/load-drop-table-from-disk.ts",
     "./fusion": "./src/fusion/index.ts",
+    "./fusion/official": "./src/fusion/official-fusions.ts",
     "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",
     "./guardian-stars": "./src/guardian-stars/index.ts",
     "./ingestion": "./src/ingestion/index.ts",
@@ -19,6 +20,7 @@
     "./validation": "./src/validation/index.ts"
   },
   "scripts": {
+    "data:generate-fusions": "node scripts/generate-fusions.ts",
     "data:guardian-matrix": "node scripts/build-guardian-matrix.ts",
     "data:ingest": "node scripts/ingest-cards.ts",
     "data:enrich": "node scripts/enrich-cards.ts",
