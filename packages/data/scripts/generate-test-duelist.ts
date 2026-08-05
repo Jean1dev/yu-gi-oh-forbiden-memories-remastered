@@ -1,5 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -12,9 +12,10 @@ import {
   type CardNumber,
   type Duelist,
   type Result,
-  type Roster,
 } from "@yugioh/shared";
 
+import { createMulberry32 } from "../src/roster/deterministic-random.ts";
+import type { DuelistSource } from "../src/roster/duelist-source.ts";
 import { loadCatalogFromDisk } from "./load-catalog-from-disk.ts";
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -28,17 +29,6 @@ const DROP_POOL_SIZE = 8;
 export type BuildTestDuelistOptions = Readonly<{
   seed: number;
 }>;
-
-function createMulberry32(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state += 0x6d2b79f5;
-    let next = state;
-    next = Math.imul(next ^ (next >>> 15), next | 1);
-    next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
-    return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 function compareByNumero(left: Card, right: Card): number {
   return left.numero.localeCompare(right.numero);
@@ -175,15 +165,32 @@ async function main(): Promise<number> {
     return 1;
   }
 
-  const roster: Roster = {
-    rosterVersion: "1.0.0",
-    duelists: [duelist.value],
+  // Writes the duelist's own source file, never `roster.json` itself: the
+  // roster is composed from every file in `data/duelists/` by
+  // `scripts/build-roster.ts`, and overwriting it here would delete the real
+  // duelists. The deck travels as an explicit list because this duelist is
+  // sampled from the catalog and belongs to no weighted pool.
+  const source: DuelistSource = {
+    id: duelist.value.id,
+    name: duelist.value.name,
+    difficulty: duelist.value.difficulty,
+    portrait: duelist.value.portrait,
+    profile: duelist.value.profile,
+    deck: duelist.value.deck,
+    dropPools: duelist.value.dropPool.map((tier) => ({
+      tier: tier.tier,
+      entries: tier.cardNumbers.map((cardNumber) => ({ cardNumber, weight: 1 })),
+    })),
   };
+
+  const directory = join(PACKAGE_ROOT, "data", "duelists");
+  await mkdir(directory, { recursive: true });
   await writeFile(
-    resolve(PACKAGE_ROOT, "data", "roster.json"),
-    `${JSON.stringify(roster, null, 2)}\n`,
+    join(directory, `${TEST_DUELIST_ID}.json`),
+    `${JSON.stringify(source, null, 2)}\n`,
     "utf8",
   );
+  console.log(`Wrote data/duelists/${TEST_DUELIST_ID}.json. Run data:build-roster to publish it.`);
   return 0;
 }
 

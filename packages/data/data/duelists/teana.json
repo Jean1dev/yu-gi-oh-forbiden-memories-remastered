@@ -1,0 +1,352 @@
+{
+  "id": "teana",
+  "name": "Teana",
+  "fmDuelistId": 2,
+  "handSize": 5,
+  "difficulty": "easy",
+  "portrait": "cards-data/art/395.jpg",
+  "profile": {
+    "strategy": "passive",
+    "parameters": {}
+  },
+  "deckSeed": 20260817,
+  "deckPool": [
+    {
+      "cardNumber": "009",
+      "weight": 2
+    },
+    {
+      "cardNumber": "024",
+      "weight": 300
+    },
+    {
+      "cardNumber": "056",
+      "weight": 2
+    },
+    {
+      "cardNumber": "058",
+      "weight": 300
+    },
+    {
+      "cardNumber": "105",
+      "weight": 2
+    },
+    {
+      "cardNumber": "123",
+      "weight": 2
+    },
+    {
+      "cardNumber": "167",
+      "weight": 2
+    },
+    {
+      "cardNumber": "192",
+      "weight": 2
+    },
+    {
+      "cardNumber": "197",
+      "weight": 2
+    },
+    {
+      "cardNumber": "278",
+      "weight": 2
+    },
+    {
+      "cardNumber": "289",
+      "weight": 2
+    },
+    {
+      "cardNumber": "338",
+      "weight": 300
+    },
+    {
+      "cardNumber": "344",
+      "weight": 120
+    },
+    {
+      "cardNumber": "387",
+      "weight": 2
+    },
+    {
+      "cardNumber": "393",
+      "weight": 400
+    },
+    {
+      "cardNumber": "394",
+      "weight": 2
+    },
+    {
+      "cardNumber": "395",
+      "weight": 300
+    },
+    {
+      "cardNumber": "397",
+      "weight": 2
+    },
+    {
+      "cardNumber": "398",
+      "weight": 2
+    },
+    {
+      "cardNumber": "399",
+      "weight": 300
+    },
+    {
+      "cardNumber": "402",
+      "weight": 2
+    }
+  ],
+  "dropPools": [
+    {
+      "tier": "common",
+      "entries": [
+        {
+          "cardNumber": "019",
+          "weight": 6
+        },
+        {
+          "cardNumber": "024",
+          "weight": 180
+        },
+        {
+          "cardNumber": "058",
+          "weight": 180
+        },
+        {
+          "cardNumber": "167",
+          "weight": 180
+        },
+        {
+          "cardNumber": "302",
+          "weight": 16
+        },
+        {
+          "cardNumber": "330",
+          "weight": 30
+        },
+        {
+          "cardNumber": "393",
+          "weight": 180
+        },
+        {
+          "cardNumber": "395",
+          "weight": 178
+        },
+        {
+          "cardNumber": "398",
+          "weight": 178
+        },
+        {
+          "cardNumber": "399",
+          "weight": 178
+        },
+        {
+          "cardNumber": "402",
+          "weight": 178
+        },
+        {
+          "cardNumber": "469",
+          "weight": 178
+        },
+        {
+          "cardNumber": "475",
+          "weight": 178
+        },
+        {
+          "cardNumber": "527",
+          "weight": 178
+        },
+        {
+          "cardNumber": "681",
+          "weight": 14
+        },
+        {
+          "cardNumber": "690",
+          "weight": 15
+        },
+        {
+          "cardNumber": "699",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "tier": "sa-pow",
+      "entries": [
+        {
+          "cardNumber": "019",
+          "weight": 6
+        },
+        {
+          "cardNumber": "024",
+          "weight": 180
+        },
+        {
+          "cardNumber": "058",
+          "weight": 180
+        },
+        {
+          "cardNumber": "102",
+          "weight": 12
+        },
+        {
+          "cardNumber": "167",
+          "weight": 180
+        },
+        {
+          "cardNumber": "302",
+          "weight": 16
+        },
+        {
+          "cardNumber": "330",
+          "weight": 30
+        },
+        {
+          "cardNumber": "393",
+          "weight": 176
+        },
+        {
+          "cardNumber": "395",
+          "weight": 176
+        },
+        {
+          "cardNumber": "398",
+          "weight": 176
+        },
+        {
+          "cardNumber": "399",
+          "weight": 176
+        },
+        {
+          "cardNumber": "402",
+          "weight": 176
+        },
+        {
+          "cardNumber": "469",
+          "weight": 176
+        },
+        {
+          "cardNumber": "475",
+          "weight": 176
+        },
+        {
+          "cardNumber": "527",
+          "weight": 176
+        },
+        {
+          "cardNumber": "543",
+          "weight": 12
+        },
+        {
+          "cardNumber": "566",
+          "weight": 12
+        },
+        {
+          "cardNumber": "570",
+          "weight": 6
+        },
+        {
+          "cardNumber": "580",
+          "weight": 6
+        }
+      ]
+    },
+    {
+      "tier": "sa-tec",
+      "entries": [
+        {
+          "cardNumber": "019",
+          "weight": 6
+        },
+        {
+          "cardNumber": "024",
+          "weight": 170
+        },
+        {
+          "cardNumber": "058",
+          "weight": 170
+        },
+        {
+          "cardNumber": "167",
+          "weight": 168
+        },
+        {
+          "cardNumber": "302",
+          "weight": 16
+        },
+        {
+          "cardNumber": "312",
+          "weight": 15
+        },
+        {
+          "cardNumber": "313",
+          "weight": 15
+        },
+        {
+          "cardNumber": "330",
+          "weight": 30
+        },
+        {
+          "cardNumber": "336",
+          "weight": 15
+        },
+        {
+          "cardNumber": "345",
+          "weight": 15
+        },
+        {
+          "cardNumber": "350",
+          "weight": 30
+        },
+        {
+          "cardNumber": "393",
+          "weight": 170
+        },
+        {
+          "cardNumber": "395",
+          "weight": 170
+        },
+        {
+          "cardNumber": "398",
+          "weight": 170
+        },
+        {
+          "cardNumber": "399",
+          "weight": 170
+        },
+        {
+          "cardNumber": "402",
+          "weight": 168
+        },
+        {
+          "cardNumber": "469",
+          "weight": 168
+        },
+        {
+          "cardNumber": "475",
+          "weight": 168
+        },
+        {
+          "cardNumber": "527",
+          "weight": 168
+        },
+        {
+          "cardNumber": "681",
+          "weight": 15
+        },
+        {
+          "cardNumber": "682",
+          "weight": 15
+        },
+        {
+          "cardNumber": "690",
+          "weight": 15
+        },
+        {
+          "cardNumber": "699",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

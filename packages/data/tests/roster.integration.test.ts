@@ -20,20 +20,40 @@ async function loadWithRealCatalog(file: string) {
 }
 
 describe("roster integration", () => {
-  it("loads the repository roster with the committed test duelist", async () => {
+  it("loads every committed duelist against the real catalog", async () => {
     const result = await loadWithRealCatalog(ROSTER_FILE);
-    expect(result).toMatchObject({
-      ok: true,
-      value: {
-        duelists: [{ id: "test-duelist", deck: expect.any(Array), dropPool: expect.any(Array) }],
-        report: { valid: true, availableDuelists: 1, hidden: [] },
-      },
-    });
-    if (result.ok) {
-      expect(result.value.duelists[0]?.deck).toHaveLength(40);
-      expect(result.value.duelists[0]?.dropPool[0]?.cardNumbers.length).toBeGreaterThan(0);
+    expect(result).toMatchObject({ ok: true, value: { report: { valid: true, hidden: [] } } });
+    if (!result.ok) return;
+
+    // Not an exact list: the roster grows by dropping a source file into
+    // `data/duelists/`, and a new duelist must not fail this test.
+    expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
+      expect.arrayContaining(["jono", "teana", "test-duelist"]),
+    );
+    for (const duelist of result.value.duelists) {
+      expect(duelist.deck).toHaveLength(40);
+      expect(duelist.dropPool[0]?.cardNumbers.length).toBeGreaterThan(0);
     }
   });
+
+  it.each(["teana", "jono"])(
+    "derives a legal deck for the duelist ported from the original game (%s)",
+    async (duelistId) => {
+      const result = await loadWithRealCatalog(ROSTER_FILE);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+
+      const duelist = result.value.duelists.find((candidate) => candidate.id === duelistId);
+      expect(duelist).toBeDefined();
+      const copies = new Map<string, number>();
+      for (const cardNumber of duelist?.deck ?? []) {
+        copies.set(cardNumber, (copies.get(cardNumber) ?? 0) + 1);
+      }
+      expect(Math.max(...copies.values())).toBeLessThanOrEqual(3);
+      // The three FM drop pools, mapped onto our tiers by `build-roster`.
+      expect(duelist?.dropPool.map((tier) => tier.tier)).toEqual(["common", "sa-pow", "sa-tec"]);
+    },
+  );
 
   it("accepts a fixture whose cards exist in the canonical catalog", async () => {
     const result = await loadWithRealCatalog(VALID_FIXTURE);

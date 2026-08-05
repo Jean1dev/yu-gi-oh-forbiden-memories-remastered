@@ -26,6 +26,8 @@
     "data:rollout-card-frame": "node scripts/rollout-card-frame.ts",
     "data:prices-seed": "node scripts/generate-card-prices-seed.ts",
     "data:test-duelist": "node scripts/generate-test-duelist.ts",
+    "data:extract-fm-duelist": "node scripts/extract-fm-duelist.ts",
+    "data:build-roster": "node scripts/build-roster.ts",
     "data:validate": "node scripts/validate-cards.ts",
     "data:validate-fusions": "node scripts/validate-fusions.ts",
     "roster:validate": "node scripts/validate-roster.ts",
