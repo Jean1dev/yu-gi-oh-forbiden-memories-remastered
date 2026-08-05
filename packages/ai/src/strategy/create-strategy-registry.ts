@@ -1,4 +1,5 @@
 import type { StrategyPolicy, StrategyRegistry } from "./types.ts";
+import { passivePolicy } from "./passive-policy.ts";
 
 export function createStrategyRegistry(
   policies: readonly StrategyPolicy[],
@@ -21,4 +22,8 @@ export function createStrategyRegistry(
     resolve: (strategy: string) => byName.get(strategy),
     names: () => names,
   });
+}
+
+export function createF01StrategyRegistry(): StrategyRegistry {
+  return createStrategyRegistry([passivePolicy]);
 }
