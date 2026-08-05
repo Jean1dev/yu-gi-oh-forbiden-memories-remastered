@@ -1,5 +1,6 @@
 export { createAiAgent, type CreateAiAgentOptions } from "./agent/create-ai-agent.ts";
 export { generateCandidates } from "./candidates/index.ts";
+export { filterLegalCandidates } from "./legal-candidates/index.ts";
 export {
   createF01StrategyRegistry,
   createStrategyRegistry,
