@@ -7,6 +7,7 @@ import { CANONICAL_CARD_TOTAL, DEFAULT_ART_PLACEHOLDER_PATH } from "@yugioh/shar
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createArtResolverFromCatalog } from "../src/art/create-art-resolver.ts";
+import { resolveCropArtPath } from "../src/art/resolve-art.ts";
 import type { ArtManifest } from "../src/ingestion/art-manifest.ts";
 import type { CardCatalog } from "../src/catalog/types.ts";
 import { DEFAULT_OPTIONS as INGESTION_OPTIONS, runIngestion } from "../scripts/ingest-cards.ts";
@@ -49,31 +50,31 @@ afterAll(async () => {
 });
 
 describe("art resolution over the real sealed dataset", () => {
-  it("covers all 722 cards with tipo arte, none falling to placeholder", () => {
+  it("covers all 722 cards through crop art or legacy art", () => {
     const resolver = createArtResolverFromCatalog(catalog);
     const numeros = Array.from({ length: CANONICAL_CARD_TOTAL }, (_unused, index) =>
       String(index + 1).padStart(3, "0"),
     );
 
     for (const numero of numeros) {
-      const result = resolver.resolve(numero);
-      expect(result.tipo).toBe("arte");
-      expect(result.caminho).toBe(catalog.getArtManifest()[numero]);
+      const cropPath = resolveCropArtPath(numero, catalog.getCropArtManifest());
+      const legacy = resolver.resolve(numero);
+      expect(cropPath !== undefined || legacy.tipo === "arte").toBe(true);
     }
   });
 
-  it("resolves every card fetched from the catalog by getByNumero", () => {
+  it("resolves a pending card fetched from the catalog through legacy art", () => {
     const resolver = createArtResolverFromCatalog(catalog);
-    const card = catalog.getByNumero("001");
+    const card = catalog.getByNumero("356");
 
     expect(card).toBeDefined();
     if (card === undefined) {
       return;
     }
     expect(resolver.resolve(card)).toEqual({
-      numero: "001",
+      numero: "356",
       tipo: "arte",
-      caminho: catalog.getArtManifest()["001"],
+      caminho: catalog.getArtManifest()["356"],
     });
   });
 

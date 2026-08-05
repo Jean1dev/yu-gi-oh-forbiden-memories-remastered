@@ -190,6 +190,15 @@ describe("real validation on a tampered catalog", () => {
     ) as Record<string, string>;
     delete manifest["001"];
     await writeFile(join(target, "arts-manifest.json"), JSON.stringify(manifest), "utf8");
+    const cropManifest = JSON.parse(
+      await readFile(join(target, "crop-arts-manifest.json"), "utf8"),
+    ) as Record<string, string>;
+    delete cropManifest["001"];
+    await writeFile(
+      join(target, "crop-arts-manifest.json"),
+      JSON.stringify(cropManifest),
+      "utf8",
+    );
 
     const run = await validateIn(target, MISSING_PLACEHOLDER);
 

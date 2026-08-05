@@ -1,7 +1,10 @@
 import type { PublicMonsterZone, PublicSpellZone, ZoneReference } from "@yugioh/shared";
 import type { DuelCue } from "../../lib/free-duel/duel-cues.ts";
+import { cropArtUrl } from "../../lib/card-art-url.ts";
+import { shouldUseCardFrame } from "../../lib/card-frame/should-use-card-frame.ts";
 import type { ZoneAffordance } from "../../lib/free-duel/duel-interaction.ts";
 import { ZONE_LABELS } from "../../lib/free-duel/duel-screen-messages.ts";
+import { CardFrame } from "../card-frame/card-frame.tsx";
 import { DuelCardArt } from "./duel-card-art.tsx";
 import styles from "./duel-zone.module.css";
 
@@ -40,12 +43,20 @@ export function DuelZone({
 
   if (zone.occupied) {
     if (zone.card.visible) {
-      ariaLabel = `${label}, ${zone.card.card.nome}`;
-      content = (
+      const { card } = zone.card;
+      // Same client-side assumption as Build Deck (spec F06, Decision 1):
+      // no manifest reaches the duel board, so "migrated" is read straight
+      // off the card, and a wrong guess falls back through CardArt's
+      // `onError` inside `CardFrame` itself.
+      const useFrame = shouldUseCardFrame(card, { kind: "art", path: cropArtUrl(card.numero) });
+      ariaLabel = `${label}, ${card.nome}`;
+      content = useFrame ? (
+        <CardFrame card={card} art={{ kind: "art", path: cropArtUrl(card.numero) }} size="compacto" />
+      ) : (
         <>
-          <DuelCardArt cardNumber={zone.card.card.numero} label={zone.card.card.nome} />
+          <DuelCardArt cardNumber={card.numero} label={card.nome} />
           <span className={styles.name} aria-hidden="true">
-            {zone.card.card.nome}
+            {card.nome}
           </span>
           {stats ? (
             <span className={styles.stats} aria-hidden="true">

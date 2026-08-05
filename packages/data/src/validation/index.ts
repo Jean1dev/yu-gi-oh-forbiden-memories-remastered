@@ -4,6 +4,11 @@ export {
   type ValidationReportInput,
 } from "./build-validation-report.ts";
 export { checkArtCoverage } from "./check-art-coverage.ts";
+export {
+  checkCardFrameCoverage,
+  type CardFrameCoverageInput,
+  type CardFrameCoverageReport,
+} from "./check-card-frame-coverage.ts";
 export { checkCountAndContiguity } from "./check-count.ts";
 export { checkKnownClass, type KnownClassResult } from "./check-known-class.ts";
 export { checkTypeCoherence } from "./check-type-coherence.ts";

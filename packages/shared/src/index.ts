@@ -22,15 +22,26 @@ export type {
 } from "./fusion/index.ts";
 export {
   CANONICAL_CARD_TOTAL,
+  CARD_ATTRIBUTES,
   CARD_FIELD_ORDER,
   CARD_NUMBER_LENGTH,
   CARD_TYPES,
   DEFAULT_ART_PLACEHOLDER_PATH,
   GUARDIAN_STARS,
   KNOWN_CLASSES,
+  MAX_MONSTER_LEVEL,
+  MIN_MONSTER_LEVEL,
 } from "./card/constants.ts";
-export type { Card, CardCatalogLookup, CardNumber, CardType, GuardianStar } from "./card/types.ts";
+export type {
+  Attribute,
+  Card,
+  CardCatalogLookup,
+  CardNumber,
+  CardType,
+  GuardianStar,
+} from "./card/types.ts";
 export {
+  AttributeSchema,
   CardNumberSchema,
   CardPasswordSchema,
   CardSchema,

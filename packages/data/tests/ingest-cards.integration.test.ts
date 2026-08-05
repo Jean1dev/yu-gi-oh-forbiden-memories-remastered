@@ -32,6 +32,14 @@ type Artifacts = Readonly<{
   };
   cardsJson: string;
   artManifestJson: string;
+  coverage: {
+    totalCards: number;
+    migrated: readonly string[];
+    legacyFallback: readonly string[];
+    inconsistent: readonly string[];
+    uncovered: readonly string[];
+    complete: boolean;
+  };
 }>;
 
 async function ingestInto(outputDir: string): Promise<Artifacts> {
@@ -39,6 +47,10 @@ async function ingestInto(outputDir: string): Promise<Artifacts> {
   const cardsJson = await readFile(join(outputDir, "cards.json"), "utf8");
   const artManifestJson = await readFile(join(outputDir, "arts-manifest.json"), "utf8");
   const reportJson = await readFile(join(outputDir, "ingestion-report.json"), "utf8");
+  const coverageJson = await readFile(
+    join(outputDir, "card-frame-coverage-report.json"),
+    "utf8",
+  );
   return {
     exitCode,
     cards: JSON.parse(cardsJson) as Card[],
@@ -46,6 +58,7 @@ async function ingestInto(outputDir: string): Promise<Artifacts> {
     report: JSON.parse(reportJson) as Artifacts["report"],
     cardsJson,
     artManifestJson,
+    coverage: JSON.parse(coverageJson) as Artifacts["coverage"],
   };
 }
 
@@ -95,13 +108,13 @@ describe("real ingestion", () => {
     expect(new Set(numbers).size).toBe(numbers.length);
   });
 
-  it("emits every card in the canonical 12-field schema", () => {
+  it("emits every card in the canonical 15-field schema", () => {
     for (const card of artifacts.cards) {
       const parsed = CardSchema.safeParse(card);
       if (!parsed.success) {
         throw new Error(`card ${card.numero} is not canonical: ${parsed.error.message}`);
       }
-      expect(Object.keys(card)).toHaveLength(12);
+      expect(Object.keys(card)).toHaveLength(15);
     }
   });
 
@@ -129,12 +142,11 @@ describe("real ingestion", () => {
     });
   });
 
-  it("resolves 722 arts with no missing and no orphan", () => {
-    expect(artifacts.report.artsFound).toBe(722);
-    expect(artifacts.report.missingArts).toEqual([]);
+  it("resolves every card through combined crop or legacy coverage", () => {
+    expect(artifacts.report.artsFound).toBe(artifacts.coverage.legacyFallback.length);
     expect(artifacts.report.orphanArts).toEqual([]);
-    expect(Object.keys(artifacts.manifest)).toHaveLength(722);
-    expect(artifacts.manifest["001"]).toBe(join("cards-data", "001.jpg"));
+    expect(Object.keys(artifacts.manifest)).toHaveLength(artifacts.coverage.legacyFallback.length);
+    expect(artifacts.manifest["356"]).toBe(join("cards-data", "356.jpg"));
   });
 
   it("normalizes the 24 cards without a password to null password and null estrelas", () => {
@@ -160,6 +172,16 @@ describe("real ingestion", () => {
   it("finishes complete with exit code zero", () => {
     expect(artifacts.report.complete).toBe(true);
     expect(artifacts.exitCode).toBe(0);
+  });
+
+  it("reports combined CardFrame and legacy coverage for all 722 cards", () => {
+    expect(artifacts.coverage.totalCards).toBe(722);
+    expect(artifacts.coverage.inconsistent).toEqual([]);
+    expect(artifacts.coverage.uncovered).toEqual([]);
+    expect(
+      artifacts.coverage.migrated.length + artifacts.coverage.legacyFallback.length,
+    ).toBe(722);
+    expect(artifacts.coverage.complete).toBe(true);
   });
 
   it("produces identical bytes across two consecutive runs", async () => {

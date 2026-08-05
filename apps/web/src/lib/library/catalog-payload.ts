@@ -28,11 +28,13 @@ export function toCatalogPayload(catalog: LibraryCatalog): LibraryCatalogPayload
 
   const cards = catalog.listing.listAll();
   const arts: Record<CardNumber, ObtainedArtReference> = {};
+  const cropArts: Record<CardNumber, ObtainedArtReference> = {};
   for (const card of cards) {
     arts[card.numero] = catalog.artLookup(card.numero);
+    cropArts[card.numero] = catalog.cropArtLookup(card.numero);
   }
 
-  const payload: LibraryCatalogPayload = { status: "ok", cards, arts };
+  const payload: LibraryCatalogPayload = { status: "ok", cards, arts, cropArts };
   payloads.set(catalog, payload);
   return payload;
 }
@@ -50,7 +52,7 @@ export function fromCatalogPayload(payload: LibraryCatalogPayload): LibraryCatal
     return undefined;
   }
 
-  const { cards, arts } = payload;
+  const { cards, arts, cropArts } = payload;
   const listing: LibraryCatalogListing = {
     listAll: () => cards,
     totalCount: () => cards.length,
@@ -59,6 +61,10 @@ export function fromCatalogPayload(payload: LibraryCatalogPayload): LibraryCatal
     const art = Object.hasOwn(arts, cardNumber) ? arts[cardNumber] : undefined;
     return art ?? { kind: "placeholder" };
   };
+  const cropArtLookup: CardArtLookup = (cardNumber) => {
+    const cropArt = Object.hasOwn(cropArts, cardNumber) ? cropArts[cardNumber] : undefined;
+    return cropArt ?? { kind: "placeholder" };
+  };
 
-  return { listing, artLookup };
+  return { listing, artLookup, cropArtLookup };
 }

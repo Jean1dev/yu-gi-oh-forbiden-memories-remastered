@@ -1,0 +1,3422 @@
+{
+  "100": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A warrior that fights with his bare hands!!!"
+  },
+  "101": {
+    "atributo": "FIRE",
+    "nivel": 2,
+    "descricao": "Crimson wings of fire make this a very lethal creature."
+  },
+  "102": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "FLIP: Target 1 Trap in your GY; add that target to your hand."
+  },
+  "103": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A wicked mirror that blocks off the damaging effects of an attack.''"
+  },
+  "104": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "A curtain that a spellcaster made, it is said to raise a dark power."
+  },
+  "105": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Small but vicious, this monster even attacks its own kind."
+  },
+  "106": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "''A spirit of the wind that calls up a storm when it's in a bad mood.''"
+  },
+  "107": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "He yoozes both a physical and a shadow form ta attack. So he's a tough monstah ta beat!"
+  },
+  "108": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A graveyard that serves as a power source for zombies.''"
+  },
+  "109": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "You can substitute this card for any 1 Fusion Material Monster. When you do this, the other Fusion Material Monster(s) must be the correct one(s)."
+  },
+  "110": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Feel da strength ah dis sword-swingin' samurai from da Far East."
+  },
+  "111": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "This fairy rules over the end of existence."
+  },
+  "112": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A monster that feeds on the energy of other creatures."
+  },
+  "113": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Entirely gray, this beast has rarely been seen by mortal eyes."
+  },
+  "114": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "When this card inflicts Battle Damage to your opponent's Life Points, your opponent discards 1 card randomly from his/her hand."
+  },
+  "115": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "\"Mystical Elf\" + \"Curtain of the Dark Ones\""
+  },
+  "116": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A creature that generates nightmares to haunt an opponent, it attacks with four poisonous tails.''"
+  },
+  "117": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This wise spirit dwells in books, using its accumulated knowledge to defeat enemies."
+  },
+  "118": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A cute little elf that hides in the shadows and provides spiritual support.''"
+  },
+  "119": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This fiend passes judgment on enemies that are locked in coffins."
+  },
+  "120": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "When this card is changed from Attack Position to face-up Defense Position, select 1 monster your opponent controls and destroy it."
+  },
+  "121": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A ferocious animal that sleeps all day. Sometimes it's better to let Sleeping Lions lie."
+  },
+  "122": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "''A dragon conjured from the very scroll in which it was depicted.''"
+  },
+  "123": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "''This mutant flower draws its power from pollutants and the dark forces.''"
+  },
+  "124": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A destructive machine discovered in the Ruins of the Ancients."
+  },
+  "125": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This long-tailed bird blinds its enemies with mystical light."
+  },
+  "126": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "''None have lived to tell tales of this powerful battle fairy.''"
+  },
+  "127": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A silent and deadly warrior specializing in assassinations."
+  },
+  "128": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "''A sorcerer that draws its powers from the lunar landscape.''"
+  },
+  "129": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A child-like creature that controls a sleep fiend to beckon enemies into eternal slumber."
+  },
+  "130": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "''This creature controls weather and is often the cause of mountain storms.''"
+  },
+  "131": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "With the head of a fish and the legs of an octopus, this strange creature attacks enemies by flinging spears."
+  },
+  "132": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A zombie that suddenly appeared from plot #13 - an empty grave."
+  },
+  "133": {
+    "atributo": "FIRE",
+    "nivel": 3,
+    "descricao": "\"Monster Egg\" + \"Hinotama Soul\""
+  },
+  "134": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "''A mystical chain that binds enemies, rendering them immobile.''"
+  },
+  "135": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''Arms that reach out from the Swamp of Chaos to drag down the unwary.''"
+  },
+  "136": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Dressed in a night-black tuxedo, this creature presides over the darkness."
+  },
+  "137": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''This monster twists reality and reaches between dimensions to attack its enemies.''"
+  },
+  "138": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A stone warrior with the heart of a dragon.''"
+  },
+  "139": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "The beams from the eyes of this creature are said to turn enemies into zombies."
+  },
+  "140": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A hermit frog that has been in existence for thousands of years, it attacks with tadpoles.''"
+  },
+  "141": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A very fast, bipedal snail with a pair of lethal arms.''"
+  },
+  "142": {
+    "atributo": "FIRE",
+    "nivel": 3,
+    "descricao": "This Spellcaster attacks enemies with fire-related spells such as \"Sea of Flames\" and \"Wall of Fire\"."
+  },
+  "143": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "The one-eyed Necrolancer launches his onslaught from a dimensional ring that can appear out of thin air."
+  },
+  "144": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "''This creature generates gale-force winds and tornadoes to blow its enemies away.''"
+  },
+  "145": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''An elegant thief with a black cloak that charms its enemies.''"
+  },
+  "146": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A mysterious temple of skulls and bones that pulls in unsuspecting enemies."
+  },
+  "147": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A warrior hidden within an egg that attacks enemies by flinging eggshells."
+  },
+  "148": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A shadow that dwells in the dark, paralyzing its opponents and rendering them harmless."
+  },
+  "149": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This spirit emerges from the mystic lamp and obeys the wishes of its summoner."
+  },
+  "150": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''This strange creature hides in the deep, dark corners of the seven seas.''"
+  },
+  "151": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Armed with the Sword of Crimson Flames, this warrior can bind a monster with fiery restraints."
+  },
+  "152": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''This monster melts away to materialize under its enemies, taking them by surprise.''"
+  },
+  "153": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A messenger of doom that steals a soul with a single blow.''"
+  },
+  "154": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "A reaper with a flaming arrow that burns an enemy to a crisp."
+  },
+  "155": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A fast-moving, bird-like creature that strangles opposing monsters with its long, thin arms."
+  },
+  "156": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A living suit of armor that attacks enemies with a bone-jarring tackle."
+  },
+  "157": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "A fire-breathing plant found growing near volcanoes."
+  },
+  "158": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Man-eating plant with poison feelers for attacking enemies."
+  },
+  "159": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "This beast coils like a snake, and strikes quickly with its snapping beak."
+  },
+  "160": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Specializing in combination attacks, this warrior uses magnetism to block an enemy's escape."
+  },
+  "161": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Specializing in combination attacks, this warrior is equipped with a tough, magnetically coated armor."
+  },
+  "162": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "If this Attack Position card is changed to face-up Defense Position: Shuffle your Deck."
+  },
+  "163": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''A creature with sapphire eyes that mesmerizes and confuses enemies.''"
+  },
+  "164": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "''A wicked entity that manipulates enemies towards a path of destruction.''"
+  },
+  "165": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "An all-powerful hand that delivers ruthless attacks."
+  },
+  "166": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Each time you or your opponent Normal Summons or Flip Summons a monster, increase your Life Points by 500 points."
+  },
+  "167": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "''A very fragile jar that contains something ancient and dangerous.''"
+  },
+  "168": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "\"Firegrass\" + \"Petit Dragon\""
+  },
+  "169": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "It's said that this King of the Netherworld once had the power to rule over the dark."
+  },
+  "170": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A spirit that soothes the soul with the music of its heavenly harp."
+  },
+  "171": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "FLIP: Look at up to 5 cards from the top of your Deck, then place them on the top of the Deck in any order."
+  },
+  "172": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A strange warrior who manipulates three deadly blades with both hands and his tail."
+  },
+  "173": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "This monster bends light to hide its image from the eyes of opponents."
+  },
+  "174": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "''A tornado that ravages the wastelands with sharp winds that can cut to the bone.''"
+  },
+  "175": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A fallen fairy that is powerful in the dark."
+  },
+  "176": {
+    "atributo": "FIRE",
+    "nivel": 2,
+    "descricao": "''An eye engulfed in flames that flaps its wings to create hot blasts of air.''"
+  },
+  "177": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''Protected by a spiked shell, this turtle has a very nasty disposition.''"
+  },
+  "178": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "Stretching arms and razor-sharp claws make this monster a formidable opponent."
+  },
+  "179": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A sorcerer that can paralyze an enemy with a single curse.''"
+  },
+  "180": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A lady monster dwelling in a flower, she sprinkles the air with poisonous pollen.''"
+  },
+  "181": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "''A crystal monster that unleashes a brilliant light to blind enemies.''"
+  },
+  "182": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''This warrior's fatal dance is performed with a lethal sickle.''"
+  },
+  "183": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "This creature may look slim and weak, but it's protected by a mystical force."
+  },
+  "184": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''A creature that defeats its enemies using sleight-of-hand.''"
+  },
+  "185": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''This warrior transforms into various creatures to confuse enemies in battle.''"
+  },
+  "186": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A bird-beast that summons reinforcements with a hand mirror."
+  },
+  "187": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''This weird monster has a portal in its belly that brings reinforcements from the farthest reaches of the netherworld.''"
+  },
+  "188": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This two-headed creature spits laser blasts at its enemies.''"
+  },
+  "189": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "\"Petit Angel\" + \"Mystical Sheep #2\""
+  },
+  "190": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A sorcerer who utters spells that render monsters unconscious.''"
+  },
+  "191": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "''An electric cloud creature, its acid rain makes it very dangerous.''"
+  },
+  "192": {
+    "atributo": "LIGHT",
+    "nivel": 1,
+    "descricao": "Enemies' hearts will melt at the sight of this small fairy's cuteness."
+  },
+  "193": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A tiger encased in a protective shell that attacks with razor-sharp fangs."
+  },
+  "194": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Known as a swamp dweller, this creature is a minion of the dark forces."
+  },
+  "195": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''This monster splits in two and attacks from opposite sides.''"
+  },
+  "196": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "''An ammonite warrior that has protected the seas throughout history.''"
+  },
+  "197": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''This creature attacks by launching missile-like arms.''"
+  },
+  "198": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "Enemies become overjoyed when struck by the Heart Ray emitted from the forehead of this tiny cherub."
+  },
+  "199": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "When this card is sent directly from your Deck to the Graveyard by an effect of a card controlled by your opponent, unite your Graveyard cards and your own Deck, shuffle them and form a new Deck."
+  },
+  "200": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "A very small dragon known for its vicious attacks."
+  },
+  "201": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A savage beast that carries a big bamboo stick for beating down its enemies."
+  },
+  "202": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "An air marmot that has a nefarious horn and wings. It attacks by throwing acorns."
+  },
+  "203": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A vengeful spirit made up of many restless souls.''"
+  },
+  "204": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "''This cannon-like creature fires eyeballs so fast they can't be seen.''"
+  },
+  "205": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''This ugly monster emits a highly poisonous gas.''"
+  },
+  "206": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "With whip-like arms, this creature can attack enemies from a distance."
+  },
+  "207": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "This monster stuns its enemies with a massive beak and ear-piercing wails."
+  },
+  "208": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "A quick-moving and tiny fairy that's very difficult to hit."
+  },
+  "209": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Few can withstand the scythe-like arms of this dangerous creature."
+  },
+  "210": {
+    "atributo": "FIRE",
+    "nivel": 2,
+    "descricao": "An intensely hot flame creature that rams anything standing in its way."
+  },
+  "211": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "This monster stores electricity within his body, and can unleash it with catastrophic power."
+  },
+  "212": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Dis big ol' guy wit' a big ol' eye shoots a nasty ray beam right atcha!"
+  },
+  "213": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A wizard of the waters that conjures a liquid wall to crush any enemies that oppose him."
+  },
+  "214": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Serving as a double for the Ruler of the Blue Flame, he's a master swordsman that wields a fine blade."
+  },
+  "215": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "\"Skull Servant\" + \"Dissolverock\""
+  },
+  "216": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''A spirit of the forest powered by the surrounding trees and wildlife.''"
+  },
+  "217": {
+    "atributo": "DARK",
+    "nivel": 9,
+    "descricao": "\"Summoned Skull\" + \"Red-Eyes Black Dragon\"\r\n\r\n\r\n\r\n(This card is always treated as an \"Archfiend\" card.)"
+  },
+  "218": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A dinosaur with two deadly jaws, it stores electricity in its horn and releases high voltage bolts from the mouth on its back."
+  },
+  "219": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This beast-warrior swings a massive scythe that feeds on the souls of the slain.''"
+  },
+  "220": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "When this card inflicts Battle Damage to your opponent's Life Points, draw 1 card from your Deck."
+  },
+  "221": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A massive, intelligent spider that traps enemies with webbing."
+  },
+  "222": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''This monster only appears when a midnight tribute is made.''"
+  },
+  "223": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "\"Mystic Lamp\" + \"Hyosube\""
+  },
+  "224": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "FLIP: Select 1 Trap Card on the field and destroy it. If the selected card is Set, pick up and see the card. If it is a Trap Card, it is destroyed. If it is a Spell Card, return it to its original position."
+  },
+  "225": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "''Whoever resists the curse of this blade will gain untold power.''"
+  },
+  "226": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "Foist he's gonna grab yer monstah wit' his claws, den attack again wit' his poizin stingah!"
+  },
+  "227": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''A rabid starfish that spits a lethal acid that can melt almost anything.''"
+  },
+  "228": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A living corpse of wood re-animated by the power of darkness.''"
+  },
+  "229": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "This creature grants power instead of shortening life."
+  },
+  "230": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "\"Fusionist\" + \"Enchanting Mermaid\""
+  },
+  "231": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A creature with a wicked smile and a lethal sickle.''"
+  },
+  "232": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A living weapon that spits projectiles.''"
+  },
+  "233": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A fiend said to dwell in the world of dreams, it attacks enemies in their sleep."
+  },
+  "234": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A vicious creature that has decapitated numerous enemy monsters."
+  },
+  "235": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Increase this card's ATK by 100 points for every Plant-Type monster that is face-up on the field."
+  },
+  "236": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A monster that guards the entrance to the Netherworld."
+  },
+  "237": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "An earthen figure that protects the tomb of an ancient ruler."
+  },
+  "238": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''An intelligent palm tree that drops a hail of rock-hard coconuts on its enemies.''"
+  },
+  "239": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''This lady warrior with unquenchable bloodlust serves the forces of darkness.''"
+  },
+  "240": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A bipedal eyeball that seldom misses an enemy with its lethal talons.''"
+  },
+  "241": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Armed with the Psycho Sword, this sinister assassin rules the bad land."
+  },
+  "242": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "Decides the fate of an opponent when the candle on its fingertip burns out."
+  },
+  "243": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A sea-dwelling spirit that takes away sight by clouding the area in fog.''"
+  },
+  "244": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A monster born in the lava pits, it generates intense heat that can melt away its enemies."
+  },
+  "245": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "An eyeball fiend created by a servant of the wicked, it uses \"Dark Blasts\" to blow away its enemies."
+  },
+  "246": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''This dangerous creature brandishes a soul-sucking sword.''"
+  },
+  "247": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "An amphibian capable of calling up a massive tidal wave from the dark seas to wipe out enemy monsters."
+  },
+  "248": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A deadly duo consisting of a beast master and its loyal servant."
+  },
+  "249": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "Transforms the water overflowing from a jar into attacking dragons."
+  },
+  "250": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''None can survive the cold touch of this sub-zero warrior.''"
+  },
+  "251": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "A beautiful mermaid that lures voyagers to a watery grave."
+  },
+  "252": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A pussycat-fairy. Contrary to her lovely beauty, she claws on her enemies."
+  },
+  "253": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "Though destined to be a fairy, this creature chose the way of the witch instead."
+  },
+  "254": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''An imperfect monster with a belly vortex that sucks in opponents of any size.''"
+  },
+  "255": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "This creature is shielded with a tough hide of hair and is excellent at defending itself."
+  },
+  "256": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "After damage calculation, when this card battles a monster: Banish that monster, also banish this card."
+  },
+  "257": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Dis stone crittah's got rock-hahd fur. Dat gives him some really good dee-fense!"
+  },
+  "258": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "You can substitute this card for any 1 Fusion Material Monster. When you do this, the other Fusion Material Monster(s) must be the correct one(s)."
+  },
+  "259": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "''Armed with an array of magic wands, this creature is capable of multiple attacks.''"
+  },
+  "260": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''A lovely creature guarded by the moon. Her lunar curtain can block just about any attack.''"
+  },
+  "261": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A wicked mirror that hypnotizes enemies, diverting attacks from their intended targets.''"
+  },
+  "262": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "Offer 1 monster on your side of the field as a Tribute to increase this monster's ATK by 700 points until the end of the turn."
+  },
+  "263": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A golem formed by boulders, this monster turns its enemies to stone and crushes them to dust."
+  },
+  "264": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''This fairy in an eggshell uses massive wings to blow back almost any projectile attack.''"
+  },
+  "265": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "Grand King of the Seven Seas, he's able to summon massive tidal waves to drown the enemy."
+  },
+  "266": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "FLIP: Inflict 500 damage to your opponent for each Spell and Trap Card on your opponent's side of the field."
+  },
+  "267": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "The speed of this warrior creates an intense vacuum that can slice through a monster's hide."
+  },
+  "268": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "This wizard worships the darkness, and is served by a sinister hand that drags its enemies into oblivion."
+  },
+  "269": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "You can substitute this card for any 1 Fusion Material Monster. When you do this, the other Fusion Material Monster(s) must be the correct one(s)."
+  },
+  "270": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "A spirit that controls rain and is capable of summoning hurricanes to blow the enemy away."
+  },
+  "271": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''The fatal beams from the eyes of this monster result in grim destruction.''"
+  },
+  "272": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "\"Tyhone\" + \"Wings of Wicked Flame\""
+  },
+  "273": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This ancient arbor uses its extensive knowledge to avoid the damage of enemy attacks.''"
+  },
+  "274": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "This youthful king of the forests lives in a green world, abundant with trees and wildlife."
+  },
+  "275": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A surface battle robot that was once used for sea warfare."
+  },
+  "276": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "The Sun and the North Wind join hands to deliver a devastating combination of heat and gale-force winds."
+  },
+  "277": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''The gorgon egg's massive eyes are said to reflect the fate of its enemies.''"
+  },
+  "278": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "This small but deadly creature is better off avoided."
+  },
+  "279": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A fiend that dwells in a blinding curtain of smoke."
+  },
+  "280": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "While the king is away, this queen protects his throne with a mighty defense."
+  },
+  "281": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Nothing can stop the mad attack of this powerful creature."
+  },
+  "282": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A monstrous sheep with a long tail for hypnotizing enemies."
+  },
+  "283": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This machine generates illusions that leave an enemy wide open to attacks.''"
+  },
+  "284": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''Master of Yin and Yang, this wizard handles a delicate balance of spells and counter spells.''"
+  },
+  "285": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A snake with a single eye that blows an icy breath to freeze its opponents.''"
+  },
+  "286": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "An indestructible mechanoid created for the sole purpose of guarding the gateways."
+  },
+  "287": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "An ogre possessed by the powers of the dark. Few can withstand its rapid charge."
+  },
+  "288": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "If this card is being attacked by a LIGHT monster, its DEF is halved during damage calculation only."
+  },
+  "289": {
+    "atributo": "WATER",
+    "nivel": 1,
+    "descricao": "A slime that can morph and adopt the shape and size of any monster it chooses."
+  },
+  "290": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "Many have fallen victim to this lunar warrior's crescent pike."
+  },
+  "291": {
+    "atributo": "FIRE",
+    "nivel": 4,
+    "descricao": "A malevolent creature wrapped in flames that attacks enemies with intense fire."
+  },
+  "292": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "An amphibian with a myriad of powers to shield it from enemy attacks."
+  },
+  "293": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Legendary swordmaster Masaki is a veteran of over 100 battles."
+  },
+  "294": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "\"Armaill\" + \"One-Eyed Shield Dragon\""
+  },
+  "295": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "''A monster created from a major accident in an underground lab.''"
+  },
+  "296": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "This dragon wears a shield not only for its own protection, but also for ramming its enemies."
+  },
+  "297": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A mechanical soldier that won't stop attacking until all life readings have been extinguished from its sensors."
+  },
+  "298": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "''A two-headed dragon with a pair of jaws that can tear an enemy to shreds.''"
+  },
+  "299": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A maiden that uses sound to her advantage, she wields a scythe that's shaped like a musical note."
+  },
+  "300": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "A vicious bird that attacks from the skies with its whip-like tail."
+  },
+  "301": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a Warrior monster. It gains 300 ATK/DEF."
+  },
+  "302": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a DARK monster. It gains 400 ATK and loses 200 DEF."
+  },
+  "303": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase the ATK and DEF of a Fiend-Type monster equipped with this card by 300 points."
+  },
+  "304": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "(This card is always treated as an \"Archfiend\" card.)\nThe equipped monster gains 1000 ATK. When this card is sent from the field to the Graveyard: You can Tribute 1 monster; place this card on the top of your Deck."
+  },
+  "305": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to an Insect monster. It gains 300 ATK/DEF."
+  },
+  "306": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to an Insect monster. It gains 700 ATK."
+  },
+  "307": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A LIGHT monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+  },
+  "308": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A Beast-Type monster equipped with this card increases its ATK and DEF by 300 points."
+  },
+  "309": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A WATER monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+  },
+  "310": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A Plant-Type monster equipped with this card increases its ATK and DEF by 300 points."
+  },
+  "311": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "The equipped monster gains 500 ATK. When this card is sent from the field to the Graveyard: Inflict 500 damage to your opponent."
+  },
+  "312": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A Fairy-Type monster equipped with this card increases its ATK and DEF by 300 points."
+  },
+  "313": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase the DEF of a monster equipped with this card by 800 points. When this card is sent from the field to the Graveyard, if you pay 500 Life Points, this card returns to the top of your Deck."
+  },
+  "314": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "The equipped monster gains 700 ATK and DEF. When this card is sent from the field to the Graveyard: Return it to the top of the Deck."
+  },
+  "315": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A Dragon-Type monster equipped with this card increases its ATK and DEF by 300 points."
+  },
+  "316": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase the ATK and DEF of a Thunder-Type monster equipped with this card by 300 points."
+  },
+  "317": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to \"Harpie Lady\" or \"Harpie Lady Sisters\". It gains 500 ATK."
+  },
+  "318": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "If \"Harpie Lady\" is on the field: Special Summon 1 \"Harpie Lady\" or \"Harpie Lady Sisters\" from your hand or Deck."
+  },
+  "319": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a Beast-Warrior-Type monster. It gains 300 ATK and DEF."
+  },
+  "320": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Select 1 Defense Position monster on your opponent's side of the field and change it to Attack Position."
+  },
+  "321": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "The equipped monster gains 700 ATK. When this card is sent from the field to the Graveyard: You can pay 500 LP; place this card on the top of your Deck."
+  },
+  "322": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "(This card is not treated as a \"Crystal\" card.)\r\nEquip only to a Zombie monster. It gains 300 ATK/DEF."
+  },
+  "323": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "A Spellcaster-Type monster equipped with this card increases its ATK and DEF by 300 points."
+  },
+  "324": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "An EARTH monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+  },
+  "325": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a Machine monster. It gains 300 ATK/DEF."
+  },
+  "326": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a Dinosaur monster. It gains 300 ATK/DEF."
+  },
+  "327": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase the ATK and DEF of a Winged Beast-Type monster equipped with this card by 300 points."
+  },
+  "328": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to an Aqua monster. It gains 300 ATK/DEF."
+  },
+  "329": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Change all face-up Dragon-Type monsters on the field to Defense Position, also they cannot change their battle positions."
+  },
+  "330": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Insect, Beast, Plant, and Beast-Warrior monsters on the field gain 200 ATK/DEF."
+  },
+  "331": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Dinosaur, Zombie, and Rock monsters on the field gain 200 ATK/DEF."
+  },
+  "332": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Dragon, Winged Beast, and Thunder monsters on the field gain 200 ATK/DEF."
+  },
+  "333": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Warrior and Beast-Warrior monsters on the field gain 200 ATK/DEF."
+  },
+  "334": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Fish, Sea Serpent, Thunder, and Aqua monsters on the field gain 200 ATK/DEF, also all Machine and Pyro monsters on the field lose 200 ATK/DEF."
+  },
+  "335": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "All Fiend and Spellcaster monsters on the field gain 200 ATK/DEF, also all Fairy monsters on the field lose 200 ATK/DEF."
+  },
+  "336": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all monsters on the field."
+  },
+  "337": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all monsters your opponent controls."
+  },
+  "338": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Choose 1 player; that player gains 200 Life Points."
+  },
+  "339": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase your Life Points by 500 points."
+  },
+  "340": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase your Life Points by 600 points."
+  },
+  "341": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase your Life Points by 800 points."
+  },
+  "342": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Increase your Life Points by 1000 points."
+  },
+  "343": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Inflict 200 points of damage to your opponent's Life Points."
+  },
+  "344": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Inflict 500 damage to your opponent."
+  },
+  "345": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Inflict 600 points of damage to your opponent's Life Points."
+  },
+  "346": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Inflict 800 damage to your opponent."
+  },
+  "347": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Inflict 1000 points of damage to your opponent's Life Points and 500 points of damage to your Life Points."
+  },
+  "348": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "After this card's activation, it remains on the field, but you must destroy it during the End Phase of your opponent's 3rd turn. When this card is activated: If your opponent controls a face-down monster, flip all monsters they control face-up. While this card is face-up on the field, your opponent's monsters cannot declare an attack."
+  },
+  "349": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Activate this card by targeting 1 monster your opponent controls; it cannot attack or change its battle position. When that monster is destroyed, destroy this card."
+  },
+  "350": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Flip all face-down monsters on your opponent's side of the field face-up."
+  },
+  "351": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A treasure box containing a monster that attacks any unwary bandit."
+  },
+  "352": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A lady warrior armed with sword and shield, she floats lightly and stings sharply."
+  },
+  "353": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A member of a race of sea serpents that freely travels through the sea."
+  },
+  "354": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "It may look like a harmless stuffed animal, but its zipper mouth deals a deadly bite."
+  },
+  "355": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "Made of mysterious metal, this monster is a doomsday machine from the edge of the universe."
+  },
+  "357": {
+    "atributo": "FIRE",
+    "nivel": 5,
+    "descricao": "This monster has three fire-breathing heads and can form a sea of blazing flames."
+  },
+  "358": {
+    "atributo": "LIGHT",
+    "nivel": 7,
+    "descricao": "A mystical dragon that burns away the unworthy with its mystic flames."
+  },
+  "359": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A pair of friendly skeletons, lean and fat, that travel with extreme difficulty."
+  },
+  "361": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A very rare penguin that takes to the air with ears shaped like wings."
+  },
+  "362": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A famous shield said to belong to an ancient Egyptian Pharaoh. Legends tell of its power to block any strong attack."
+  },
+  "363": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "This flying monster is known for delivering happiness to all."
+  },
+  "366": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "These walls form a labyrinth with no exit for enemies."
+  },
+  "367": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "When this card declares an attack: Toss a coin and call it. If you call it wrong, lose half your Life Points."
+  },
+  "368": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "This card gains 100 ATK for each monster in your Graveyard."
+  },
+  "369": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "Cannot be Normal Summoned/Set. Must first be Special Summoned with \"Magical Labyrinth\"."
+  },
+  "370": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "\"Giga-Tech Wolf\" + \"Cannon Soldier\""
+  },
+  "371": {
+    "atributo": "LIGHT",
+    "nivel": 7,
+    "descricao": "During damage calculation in your opponent's turn, if this card is being attacked: You can target the attacking monster; make that target's ATK 0 during damage calculation only (this is a Quick Effect). This effect can only be used once while this card is face-up on the field."
+  },
+  "372": {
+    "atributo": "WIND",
+    "nivel": 7,
+    "descricao": "During damage calculation in your opponent's turn, if this card is being attacked: You can target the attacking monster; make that target's ATK 0 during damage calculation only (this is a Quick Effect). This effect can only be used once while this card is face-up on the field."
+  },
+  "373": {
+    "atributo": "WATER",
+    "nivel": 7,
+    "descricao": "During damage calculation in your opponent's turn, if this card is being attacked: You can target the attacking monster; make that target's ATK 0 during damage calculation only (this is a Quick Effect). This effect can only be used once while this card is face-up on the field."
+  },
+  "375": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "Hidden under the floors of a labyrinth, it swallows any who pass above."
+  },
+  "376": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A master of monsters that exercises control over several creatures."
+  },
+  "377": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A gargoyle enhanced by the powers of darkness. Very sharp talons make it a worthy opponent."
+  },
+  "378": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "A monster formed by the vengeful souls of those who passed away in battle."
+  },
+  "379": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A genie of the lamp that is at the beck and call of its master."
+  },
+  "381": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "An alligator monster straight from the cartoons."
+  },
+  "382": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "With an axe in each hand, this monster delivers heavy damage."
+  },
+  "383": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "A dragon from the cartoons that's more dangerous than it appears to be."
+  },
+  "384": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "He leaps up, down, and all around! Nobody can lay a hand on this funny bunny."
+  },
+  "385": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "\"Crass Clown\" + \"Dream Clown\""
+  },
+  "386": {
+    "atributo": "WIND",
+    "nivel": 7,
+    "descricao": "Gains 300 ATK/DEF for each \"Harpie Lady\" on the field."
+  },
+  "387": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "This monster can attack your opponent's Life Points directly."
+  },
+  "388": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "A horrible torture machine with a large pendulum blade."
+  },
+  "389": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "\"Guardian of the Labyrinth\" + \"Protector of the Throne\""
+  },
+  "390": {
+    "atributo": "FIRE",
+    "nivel": 7,
+    "descricao": "A mechanical spider with rocket launchers capable of random fire."
+  },
+  "391": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "A monster whose full potential can be achieved when outfitted with \"Metalmorph\"."
+  },
+  "392": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": "Cannot be Normal Summoned/Set. Must first be Special Summoned (from your Deck) by Tributing \"Zoa\" equipped with \"Metalmorph\"."
+  },
+  "393": {
+    "atributo": "WATER",
+    "nivel": 1,
+    "descricao": "A monster attacked by this card will be destroyed during the End Phase of the 5th turn after the attack."
+  },
+  "394": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "A non Machine-Type Monster attacking \"Steel Scorpion\" will be destroyed at the End Phase of your opponent's 2nd turn after the attack."
+  },
+  "395": {
+    "atributo": "WIND",
+    "nivel": 1,
+    "descricao": "An elf that dances across the sky with wings of razor-sharp blades."
+  },
+  "396": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "Frightening in appearance, this creature uses its large eyes and ears to keep track of any movement."
+  },
+  "397": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "This monster may attack your opponent's Life Points directly."
+  },
+  "398": {
+    "atributo": "WATER",
+    "nivel": 1,
+    "descricao": "This monster may attack your opponent's Life Points directly."
+  },
+  "399": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "If this card attacked an opponent's monster, after damage calculation: Destroy that monster during the 5th End Phase after the attack."
+  },
+  "400": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''A reptilian monster that sprays fire in every direction.''"
+  },
+  "401": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "A bull fiend restored by the dark arts, this monster appears out of a jar."
+  },
+  "402": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "You can pay 1000 Life Points; add 1 \"Polymerization\" from your Graveyard to your hand."
+  },
+  "403": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "Huge monster with a lion's mane similar to the King of Beasts."
+  },
+  "404": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''A bizarre monster with the torso of a horse and a fish's tail. It gallops through the sea as if it were the wind.''"
+  },
+  "405": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A lethal engine of destruction that wields two well-honed blades."
+  },
+  "406": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A cubical machine equipped with cutting blades for shredding an opponent to mincemeat."
+  },
+  "407": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This card gains 100 ATK for each Machine-Type monster on the field."
+  },
+  "408": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This monster swings an earth-shaking axe that cannot be blocked by a common sword."
+  },
+  "409": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "\"Steel Ogre Grotto #1\" + \"Lesser Dragon\""
+  },
+  "410": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "If this card attacks a DARK monster, destroy the attack target after damage calculation."
+  },
+  "411": {
+    "atributo": "WIND",
+    "nivel": 1,
+    "descricao": "''A mechanical bat that drops blasts from its wings.''"
+  },
+  "412": {
+    "atributo": "FIRE",
+    "nivel": 4,
+    "descricao": "An iron wolf with razor-sharp fangs that can penetrate any armor."
+  },
+  "413": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "''Guardian of the Machine King, it crushes opposition by rolling over them.''"
+  },
+  "414": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Armed with a pair of shovels, this monster will destroy anything that stands in its way."
+  },
+  "415": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A hunter that relentlessly pursues its target by order of the Machine King."
+  },
+  "416": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Constructed from several components, this monster can launch them in a pincer attack."
+  },
+  "417": {
+    "atributo": "FIRE",
+    "nivel": 3,
+    "descricao": "You can only activate this effect during your Standby Phase. Tribute this face-up card to select and destroy 2 face-up monsters with an ATK 1000 or less."
+  },
+  "418": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "An iron giant that appears from a dimensional rift."
+  },
+  "419": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A massive steel ball that mows down anything in its path."
+  },
+  "420": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "You can pay 5000 LP; Special Summon 1 Fusion Monster from your Extra Deck in Attack Position."
+  },
+  "421": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A strike force equipped with rocket launchers and bazookas.''"
+  },
+  "422": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "This monster can attack your opponent's Life Points directly."
+  },
+  "423": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''An armadillo monster that rolls up to form a dice-like shape.''"
+  },
+  "424": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "A flying dragon with four wings housing some very dangerous blades."
+  },
+  "425": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "You can discard this card; add up to 2 \"Thunder Dragon\" from your Deck to your hand."
+  },
+  "426": {
+    "atributo": "EARTH",
+    "nivel": 7,
+    "descricao": "A dragon formed by huge boulders that are also used to attack the enemy."
+  },
+  "427": {
+    "atributo": "LIGHT",
+    "nivel": 7,
+    "descricao": "\"Winged Dragon, Guardian of the Fortress #1\" + \"Fairy Dragon\""
+  },
+  "428": {
+    "atributo": "LIGHT",
+    "nivel": 1,
+    "descricao": "FLIP: Target 1 Spell in your GY; add that target to your hand."
+  },
+  "429": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "Once per turn: You can toss a coin and call Heads or Tails. If you call it right, double this card's ATK during this turn. If you call it wrong, halve its ATK during this turn."
+  },
+  "430": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "This monster swamps an opponent with an almost endless supply of water."
+  },
+  "431": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A very aggressive mermaid that attacks enemies with the spikes growing from its body.''"
+  },
+  "432": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A water fairy that is said to be able to summon a giant sea serpent.''"
+  },
+  "433": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "This elf is rumored to have lived for thousands of years. He leads an army of spirits against his enemies."
+  },
+  "434": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''A rare female beast-master with a very dangerous whip.''"
+  },
+  "435": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "''A lovely lady who can launch water projectiles that turn into lethal ice spikes before they reach an opponent.''"
+  },
+  "436": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''A white dolphin with a horn that summons huge tidal waves.''"
+  },
+  "437": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "\"Bottom Dweller\" + \"Tongyo\""
+  },
+  "438": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "A metal fish with a razor-sharp caudal fin."
+  },
+  "439": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "This is one sea creature whose wrath is something monsters fear to face."
+  },
+  "440": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A rare rainbow fish that has never been caught by mortal man."
+  },
+  "441": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''This monster carries a devastating plasma cannon on its powerful back.''"
+  },
+  "442": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "\"Fairy Dragon\" + \"Amazon of the Seas\" + \"Zone Eater\""
+  },
+  "443": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "''Protected by a tough shell, this master of the sea attacks its enemies with toxic bubbles.''"
+  },
+  "444": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "A strange, one-eyed monster that can fell an enemy with a single stab of its spear."
+  },
+  "445": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A merman warrior that relentlessly attacks those who pollute the seas with their presence."
+  },
+  "446": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''This monster hypnotizes an opponent with the ball on its tail and draws them to a watery doom.''"
+  },
+  "447": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A sea-dwelling snake that attacks passing enemies with its sharp teeth."
+  },
+  "448": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "Using the spikes sprouting from its body, this creature stabs its opponents and floods them with electricity."
+  },
+  "449": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''A huge turtle that has existed for over 30,000 years.''"
+  },
+  "450": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''An amphibian that sold his soul for unlimited power to avenge his late friend.''"
+  },
+  "451": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A monster crab with huge claws for clipping enemies to little pieces.''"
+  },
+  "452": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''A lethal crawfish with extremely dangerous claws.''"
+  },
+  "453": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "For nearly a millennium, this golem has served as guardian of an ancient treasure trove."
+  },
+  "454": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A golem with a massive right hand for crushing its victims."
+  },
+  "455": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''Shouldering a pair of machine guns, this monster is unstoppable.''"
+  },
+  "456": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''A rock warrior that wields a heavy blade carved from stone.''"
+  },
+  "457": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''With a head that erupts when angered, this monster launches a dangerous shower of boulders.''"
+  },
+  "458": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "\"Ocubeam\" + \"Mega Thunderball\""
+  },
+  "459": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "This creature attacks with electromagnetic waves."
+  },
+  "460": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''After rendering an opponent immobile by spitting a sticky goo, this monster closes in for the attack.''"
+  },
+  "461": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "With each arm forming an electric whip, this monster paralyzes its enemies with electric shocks."
+  },
+  "462": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "FLIP: Increase your Life Points by 3000 points. When this card is sent from the field to the Graveyard, you lose 5000 Life Points."
+  },
+  "463": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "When this card is discarded from your hand to the Graveyard by an effect of a card controlled by your opponent, draw 2 cards from your Deck."
+  },
+  "464": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "''This flying creature never misses its intended target.''"
+  },
+  "465": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "\"Blue-Winged Crown\" + \"Niwatori\""
+  },
+  "466": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This monster swoops down and attacks with a rain of knives stored in its wings."
+  },
+  "467": {
+    "atributo": "FIRE",
+    "nivel": 6,
+    "descricao": "\"Faith Bird\" + \"Skull Red Bird\""
+  },
+  "468": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "This monster attacks enemies using its huge beak."
+  },
+  "469": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "FLIP: Target 1 Spell Card on the field; destroy that target. (If the target is Set, reveal it, and destroy it if it is a Spell Card. Otherwise, return it to its original position.)"
+  },
+  "470": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This creature casts a spell of terror and confusion just before attacking its enemies."
+  },
+  "471": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "\"Lord of the Lamp\" + \"Invader from Another Dimension\""
+  },
+  "472": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "''A monster that feeds on oxygen, suffocating any who stand near.''"
+  },
+  "473": {
+    "atributo": "FIRE",
+    "nivel": 5,
+    "descricao": "\"Rhaimundos of the Red Sword\" + \"Fireyarou\""
+  },
+  "474": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A merciless monster that tears opponents to shreds with razor-like claws."
+  },
+  "475": {
+    "atributo": "WATER",
+    "nivel": 1,
+    "descricao": "During your Standby Phase, if this card is in your GY: You can add it to your hand, also banish 1 \"Sinister Serpent\" from your GY during your opponent's next End Phase. You can only use this effect of \"Sinister Serpent\" once per turn."
+  },
+  "476": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A crab that binds its enemies with a sticky web and attacks them with its sharp claws.''"
+  },
+  "477": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A stag beetle with a saw-like head and arms."
+  },
+  "478": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "If this card attacks a WIND monster, it gains 1000 ATK during the Damage Step only."
+  },
+  "479": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "When this card is sent to the Graveyard, it is returned to the top of the Deck."
+  },
+  "480": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A very vicious stag beetle that goes for the head."
+  },
+  "481": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A sly rat. He will come at you with his huge left claw."
+  },
+  "482": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "\"Trakodon\" + \"Flame Viper\""
+  },
+  "483": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "''A wicked beast that resembles a winged lion.''"
+  },
+  "484": {
+    "atributo": "WATER",
+    "nivel": 1,
+    "descricao": "When the control of this face-up card on the field shifts to your opponent, inflict 2000 points of damage to your opponent's Life Points. This effect can only be used once as long as this card remains face-up on the field."
+  },
+  "485": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A high-powered dung beetle that can roll dung larger than itself. It crushes its foes with its massive ball of dung.''"
+  },
+  "486": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A book-like wizard with a wealth of magic written inside.''"
+  },
+  "487": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "\"Silver Fang\" + \"Darkworld Thorns\""
+  },
+  "488": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "This monster may attack your opponent's Life Points directly."
+  },
+  "489": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This wicked flower attacks enemies with pollen projectiles.''"
+  },
+  "490": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "FLIP: You can pay 2000 Life Points to inflict 1000 damage to your opponent."
+  },
+  "491": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "A large peacock that launches its feathers in a lethal attack."
+  },
+  "492": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "All LIGHT monsters on the field gain 500 ATK, also all DARK monsters on the field lose 400 ATK."
+  },
+  "493": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "This card gains 500 ATK for each Equip Card equipped to this card."
+  },
+  "494": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "''A reticent mermaid who appears only on very rare occasions. She emerges only when a large rainbow arches across the sky.''"
+  },
+  "495": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "\"Witch of the Black Forest\" + \"Lady of Faith\""
+  },
+  "496": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A rabid rabbit that shears through opposition with its sharp skewers."
+  },
+  "497": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "When this card is changed from Attack Position to Defense Position, you can place any number of cards from your hand at the bottom of your Deck in any order you desire."
+  },
+  "498": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A strange fiend with long arms and razor-sharp talons."
+  },
+  "499": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "''Attacks enemies by spitting thin, sticky webs.''"
+  },
+  "500": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "When this card is Normal Summoned or Flip Summoned, destroy 1 face-up Dragon-Type monster on the field."
+  },
+  "501": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "FLIP: Target 1 monster on the field; destroy it."
+  },
+  "502": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Gifted with the power of dragons, this warrior wields a sword created from a dragon's fang."
+  },
+  "503": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "''A cunning raccoon protected by a solid turtle shell, it attacks with deception.''"
+  },
+  "504": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "''Melts away anything that dares to stand before it.''"
+  },
+  "505": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "This crystalline monster focuses light to create a lethal laser."
+  },
+  "506": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "You can pay 3000 Life Points to send 1 monster from your Extra Deck to the Graveyard."
+  },
+  "507": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A flying fish that attacks with its pointed head."
+  },
+  "508": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "\"Blast Juggler\" + \"Two-Headed King Rex\""
+  },
+  "509": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "\"Two-Headed King Rex\" + \"Crawling Dragon #2\""
+  },
+  "510": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A flower whose laugh can confuse the minds of enemies.''"
+  },
+  "511": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A plant-warrior that attacks with seeds and sword."
+  },
+  "512": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "You can Tribute 1 monster; inflict 500 damage to your opponent."
+  },
+  "513": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A robot guard built to protect throne rooms, it is armed with homing missiles."
+  },
+  "514": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Armed with a mass of scissors, this monster can clip an enemy into any desired shape and size."
+  },
+  "515": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A stone monument from Easter Island that launches laser blasts from its rock-hewn lips."
+  },
+  "516": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "This card gains 300 ATK and DEF for each card in your hand."
+  },
+  "517": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "Appears from underground and attacks with long, snake-like tentacles."
+  },
+  "518": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "''A stone turtle that is nearly indestructible.''"
+  },
+  "519": {
+    "atributo": "FIRE",
+    "nivel": 4,
+    "descricao": "A squid that thrives on fire and heat."
+  },
+  "520": {
+    "atributo": "WATER",
+    "nivel": 6,
+    "descricao": "An unusual turtle that not only swims at tremendous speeds, but can also sail across the skies."
+  },
+  "521": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "\"Takuhee\" + \"Temple of Skulls\""
+  },
+  "522": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "''Few have set eyes on this dive-bombing bird and lived to tell the tale.''"
+  },
+  "523": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "When this card inflicts Battle Damage to your opponent, your opponent draws 2 cards."
+  },
+  "524": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "As long as this card remains face-up on the field, increase the ATK of all WATER monsters by 500 points and decrease the ATK of all FIRE monsters by 400 points."
+  },
+  "525": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''An elderly magician that raises mountains with his flute.''"
+  },
+  "526": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "A fiend that wields a mean sickle and fires devastating beams from its eyes."
+  },
+  "527": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "As long as this card remains face-up on the field, increase the ATK of all EARTH monsters by 500 points and decrease the ATK of all WIND monsters by 400 points."
+  },
+  "528": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''An agile monster that rolls up to ram its opponents.''"
+  },
+  "529": {
+    "atributo": "FIRE",
+    "nivel": 6,
+    "descricao": "Known to many as the \"Burning Executioner\", this monster is capable of burning enemies to cinders."
+  },
+  "530": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''The cane of this monster is the source of many powerful spells.''"
+  },
+  "531": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "\"Giant Soldier of Stone\" + \"Ancient Elf\""
+  },
+  "532": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Elf twins that alternate their attacks."
+  },
+  "533": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "\"Kuwagata α\" + \"Hercules Beetle\""
+  },
+  "534": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "When this card is discarded directly from your hand to the Graveyard by an effect of a card controlled by your opponent, inflict 1000 points of damage to your opponent's Life Points."
+  },
+  "535": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''A man-shaped mantis with two razor-sharp scythes.''"
+  },
+  "536": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''This monster can hide just about anywhere by adopting the colors of its surroundings.''"
+  },
+  "537": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "Rolls along the ground releasing bolts of electricity to attack its enemies."
+  },
+  "538": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Swallows enemies whole and uses their essence as energy."
+  },
+  "539": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A zombie shark that can deliver its lethal curse with a spell."
+  },
+  "540": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "FLIP: Draw 1 card."
+  },
+  "541": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "FLIP: Select 1 monster on the field and return it to its owner's hand."
+  },
+  "542": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "A missile-launching fish protected by deadly spikes."
+  },
+  "543": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "This monster captures other fish with its long tongue and sucks the energy out of them."
+  },
+  "544": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "A monstrous creature whose body is lined with cannons that never miss their targets."
+  },
+  "545": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "\"The Snake Hair\" + \"Blackland Fire Dragon\""
+  },
+  "546": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A fish with arms, legs, and some very sharp teeth."
+  },
+  "547": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "When the control of this face-up card on the field shifts to your opponent, increase your Life Points by 3000 points. This effect can only be used once as long as this card remains face-up on the field."
+  },
+  "548": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "''A mouse that has returned as a zombie to seek revenge on cats.''"
+  },
+  "549": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "A slime with the head of a frog, it attacks by croaking terribly."
+  },
+  "550": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "With an enormous maw and massive teeth, this monstrosity is one dangerous and strange serpent from the deep."
+  },
+  "551": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This card requires a cost of 1000 of your own Life Points to attack."
+  },
+  "552": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This monster's wings are capable of generating tornadoes."
+  },
+  "553": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A player controlling this monster loses 300 Life Points during each of his/her Standby Phases when this card is face-up on the field. Control of this card is shifted to your opponent by paying 500 Life Points at your own End Phase."
+  },
+  "554": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "This card gains 500 ATK for each \"Swamp Battleguard\" you control."
+  },
+  "555": {
+    "atributo": "FIRE",
+    "nivel": 6,
+    "descricao": "A crimson dragon that spits fireballs to create a blazing sea of fire."
+  },
+  "556": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "''A monster that wanders the edges of the netherworld.''"
+  },
+  "557": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A steel idol worshipped in the Land of Machines."
+  },
+  "558": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A not-so-powerful servant, he is an errand boy of a master sorcerer.''"
+  },
+  "559": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A strange warrior from another dimension."
+  },
+  "560": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "An extraterrestrial monster that came from a distant galaxy."
+  },
+  "561": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "A minor dragon incapable of breathing fire."
+  },
+  "562": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "FLIP: Send the top 5 cards of your opponent's Deck to the Graveyard."
+  },
+  "563": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "A harmless monster found lurking in just about any attic."
+  },
+  "564": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "\"The Snake Hair\" + \"Dragon Zombie\""
+  },
+  "565": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "\"Sea Kamen\" + \"Gruesome Goo\" + \"Amazon of the Seas\""
+  },
+  "566": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''An extremely long snake that dwells in the world of myth.''"
+  },
+  "567": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A thorny plant found in the darklands that wraps itself around any unwary traveler."
+  },
+  "568": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Dis man-like dinosawz gotta high I.Q., even tho he's lackin' in da strength depawtment. (Kinda like yooz, if ya had a high I.Q.! Nyaah!)"
+  },
+  "569": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A blood-sucking snake in human form that attacks any living being that passes nearby."
+  },
+  "570": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A tiger-striped dragon that is often seen racing across the wasteland at tremendous speeds."
+  },
+  "571": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "''A jet-black dragon found in the deepest jungles who normally devours trees.''"
+  },
+  "572": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "\"Queen's Double\" + \"Hibikime\""
+  },
+  "573": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Yo, this tyrannosaurus tot's got a terrible temper."
+  },
+  "574": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "If this card is sent from the field to the GY: Add 1 monster with 1500 or less DEF from your Deck to your hand, but you cannot activate cards, or the effects of cards, with that name for the rest of this turn. You can only use this effect of \"Witch of the Black Forest\" once per turn."
+  },
+  "575": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This creature adopts the form of a white goat living in the forest, but is actually a Forest Elder."
+  },
+  "576": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''An extraordinary blue scorpion found in the tundra, not in the desert.''"
+  },
+  "577": {
+    "atributo": "WIND",
+    "nivel": 5,
+    "descricao": "''A clever long-nosed goblin, he is a force to be reckoned with.''"
+  },
+  "578": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''A wizard with a black mantle who is actually a talking lion in disguise.''"
+  },
+  "579": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A rarely seen flower that blossoms quietly on the edge of darkness.''"
+  },
+  "580": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "During your Standby Phase, you can look at 1 face-down card that's been Set by your opponent as long as this card remains face-up on the field."
+  },
+  "581": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This bird is known far and wide as a harbinger of doom."
+  },
+  "582": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "A popular creature in mythology that delivers fatal attacks with a sharp spear."
+  },
+  "583": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "FLIP: Destroys all of your opponent's face-up \"Swords of Revealing Light\" on the field. If \"Swords of Revealing Light\" is destroyed, you can perform your Battle Phase twice this turn (or your next turn, if activated during your opponent's turn)."
+  },
+  "584": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''The mystic links of this chain can rob enemies of their power.''"
+  },
+  "585": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A cyborg snail that still travels at a slow pace."
+  },
+  "586": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "FLIP: Target 2 Set Spell/Trap Cards on the field; destroy those targets."
+  },
+  "587": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''A further step in the evolutionary chain, it is much more powerful than \"Larvas\".''"
+  },
+  "588": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A living vase that bites enemies and blinds them with a blast of pollen from its flower.''"
+  },
+  "589": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "''A carnivorous plant that has an outgrowth of tentacles. It attacks someone nearby by extending its tentacles.''"
+  },
+  "590": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''This monster wraps itself around an opponent and pecks away with its huge beak.''"
+  },
+  "591": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "FLIP: Both players discard as many cards as possible from their hands, then each player draws 5 cards."
+  },
+  "592": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''A fairy of the arts that is unbeatable on the harp.''"
+  },
+  "593": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "A crimson-shelled tortoise that feeds on flames."
+  },
+  "594": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "\"Feral Imp\" + \"Snakeyashi\""
+  },
+  "595": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This monster can draw its enemies into a mirror world that renders them helpless."
+  },
+  "596": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "''A monster with a heavy appetite that has never been satisfied.''"
+  },
+  "597": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "With skin tinged a bluish-white, this strange creature is a fearsome sight to behold."
+  },
+  "598": {
+    "atributo": "FIRE",
+    "nivel": 2,
+    "descricao": "All FIRE monsters on the field gain 500 ATK. All WATER monsters on the field lose 400 ATK."
+  },
+  "599": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "This monster can call forth sudden torrents of battering rain."
+  },
+  "600": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This fiend brings out the worst in everyone."
+  },
+  "601": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "''An adorable fairy that celebrates the gift of love.''"
+  },
+  "602": {
+    "atributo": "WATER",
+    "nivel": 2,
+    "descricao": "FLIP: You can target up to 2 monsters on the field; return those targets to the hand."
+  },
+  "603": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This beautiful Dragon spirit harbors hidden strength."
+  },
+  "604": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "An ill-mannered field varmint that will sink its teeth into anything."
+  },
+  "605": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "A liquid life form that thrives on water."
+  },
+  "606": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "An amphibious creature with two whip-like tails."
+  },
+  "607": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Nothing escapes from this beast's massive mouth."
+  },
+  "608": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "The peacemaker among monsters."
+  },
+  "609": {
+    "atributo": "WIND",
+    "nivel": 2,
+    "descricao": "As long as this card remains face-up on the field, increase the ATK of all WIND monsters by 500 points and decrease the ATK of all EARTH monsters by 400 points."
+  },
+  "610": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A non Zombie-Type monster attacking \"Electric Lizard\" cannot attack on its following turn."
+  },
+  "611": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "FLIP: Your opponent draws 3 cards. Both players look at the cards. If there are any Spell Cards among them, discard all those Spell Card(s) to the Graveyard."
+  },
+  "612": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "Soothes the souls of others by chanting a mysterious spell."
+  },
+  "613": {
+    "atributo": "LIGHT",
+    "nivel": 7,
+    "descricao": "\"Thunder Dragon\" + \"Thunder Dragon\""
+  },
+  "614": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "This monster feeds on whatever it catches in its web."
+  },
+  "615": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A bluish starfish with a solid hide capable of fending off attacks."
+  },
+  "616": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "If this card is Normal or Flip Summoned, its original ATK and DEF are halved until the End Phase of your next turn. After that, the original ATK and DEF are doubled."
+  },
+  "617": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "\"Water Magician\" + \"Behegon\""
+  },
+  "618": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "\"Sonic Maid\" + \"Beautiful Headhuntress\""
+  },
+  "619": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''A fairy of boulders that looks like an earthenware statue. It is quite strong in terms of both attack and defense.''"
+  },
+  "620": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "This monster is formed by several serpents that break off to individually attack nearby enemies."
+  },
+  "621": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A warrior wizard adept in casting bone-chilling spells."
+  },
+  "622": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "''This monster blasts enemies with unexpected bursts of wind.''"
+  },
+  "623": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "''This monster melts its way underground to attack enemies from below.''"
+  },
+  "624": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A very agile half-fish warrior known for its relentless attacks."
+  },
+  "625": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "''This fairy protects a fountain from any who seek to muddy its waters.''"
+  },
+  "626": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A mermaid who serves as a herald to the Ocean Lord. She protects the sacred domain of Atlantis."
+  },
+  "627": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "A fast and lethal creature with very dangerous claws."
+  },
+  "628": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "As long as this card remains face-up on the field, increase the ATK of all DARK monsters by 500 points and decrease the ATK of all LIGHT monsters by 400 points."
+  },
+  "629": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''The fur on this monster rat is tough enough to repel swords.''"
+  },
+  "630": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Before the dawn of man, this lizard warrior ruled supreme."
+  },
+  "631": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A sorcerer blessed by lunar light with powers far beyond mortal comprehension."
+  },
+  "632": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A behemoth shaped by giant boulders."
+  },
+  "633": {
+    "atributo": "LIGHT",
+    "nivel": 5,
+    "descricao": "''It is said to signal that life is growing in a woman's womb.''"
+  },
+  "634": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "''A lizard warrior protected by a hide of very tough emerald scales.''"
+  },
+  "635": {
+    "atributo": "EARTH",
+    "nivel": 1,
+    "descricao": "This monster may attack your opponent's Life Points directly."
+  },
+  "636": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "With hair shaped like a crown and a body encased in bluish white flames, this bird is a formidable sight."
+  },
+  "637": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A guardian of the woods, this massive tree is believed to be immortal."
+  },
+  "638": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "Queen of the Emerald Forest and wife of the Spirit King, she lives surrounded by vivid red leaves."
+  },
+  "639": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "\"Ground Attacker Bugroth\" + \"Defender of the Sea\""
+  },
+  "640": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''A giant caterpillar that secretes an acid mist that melts anything.''"
+  },
+  "641": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "FLIP: Select 1 monster on your opponent's side of the field and switch control of it with this card. This effect cannot be activated during the Battle Phase."
+  },
+  "642": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "You can substitute this card for any 1 Fusion-Material Monster. When you do this, the other Fusion-Material Monster(s) must be the correct one(s)."
+  },
+  "643": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "This monster hides in a saucer and only appears when executing an attack."
+  },
+  "644": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "A fire-breathing snake whose speed makes it a difficult target."
+  },
+  "645": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "''A mechanized soldier created to protect royalty.''"
+  },
+  "646": {
+    "atributo": "WATER",
+    "nivel": 3,
+    "descricao": "A slime boss that is definitely tougher than it looks."
+  },
+  "647": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "This amphibian is strong on the attack, but leaves much to be desired when defending."
+  },
+  "648": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''This machine, created to lead charges into enemy territory, mows down enemies by rushing.''"
+  },
+  "649": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Confuses enemy monsters with a noise that is harsh to the ears."
+  },
+  "650": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "Attacks from the skies with a whip-like tail."
+  },
+  "651": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Activate 1 or both of these effects (simultaneously).\n● When an opponent's monster declares an attack: Target the attacking monster; change that target to Defense Position.\n● Target 1 face-up monster you control; equip this card to that target. It gains 500 ATK."
+  },
+  "652": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to \"Labyrinth Wall\". You can Tribute the equipped monster; Special Summon \"Wall Shadow\" from your Deck."
+  },
+  "653": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all Warrior monsters on the field."
+  },
+  "654": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a FIRE monster. It gains 700 ATK."
+  },
+  "656": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all monsters equipped with Equip Cards."
+  },
+  "657": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "While your LP is lower than your opponent's, the equipped monster's ATK becomes double its original ATK. While your LP is higher, the equipped monster's ATK becomes half its original ATK."
+  },
+  "658": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Target 1 face-up monster on the field; equip this card to that target. It gains 300 ATK/DEF. If it attacks, it gains ATK equal to half the ATK of the attack target, during damage calculation only."
+  },
+  "660": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all face-up Machine-Type monsters on the field."
+  },
+  "661": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Tribute 1 DARK monster with 1000 or less ATK; your opponent takes no damage until the end of the next turn after this card resolves, also, you look at your opponent's hand and all monsters they control, and if you do, destroy the monsters among them with 1500 or more ATK, then your opponent can destroy up to 3 monsters with 1500 or more ATK in their Deck."
+  },
+  "662": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all Insect monsters on the field."
+  },
+  "663": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all face-up Rock-Type monsters on the field."
+  },
+  "664": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all face-up Fish-Type monsters on the field."
+  },
+  "668": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Equip only to a LIGHT monster. It gains 700 ATK."
+  },
+  "669": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Activate this card by targeting 1 face-up monster your opponent controls; it loses 700 ATK, also it cannot attack or change its battle position. When it leaves the field, destroy this card."
+  },
+  "670": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Black Luster Soldier\". You must also Tribute monsters from your hand or field whose total Levels equal 8 or more."
+  },
+  "671": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Zera the Mant\". You must also Tribute monsters from the field or your hand whose total Levels equal 8 or more."
+  },
+  "672": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Destroy all Spell and Trap Cards your opponent controls."
+  },
+  "673": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Super War-Lion\". You must also Tribute monsters from your hand or field whose total Levels equal 7 or more."
+  },
+  "674": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Fiend's Mirror\". You must also Tribute monsters from the field or your hand whose total Levels equal 6 or more."
+  },
+  "676": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Performance of Sword\". You must also Tribute monsters whose total Level Stars equal 6 or more from the field or your hand."
+  },
+  "677": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Hungry Burger\". You must also Tribute monsters whose total Level Stars equal 6 or more from the field or your hand."
+  },
+  "679": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Skull Guardian\". You must also offer monsters whose total Level Stars equal 7 or more as a Tribute from the field or your hand."
+  },
+  "681": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "If the DEF of a monster summoned by your opponent (excluding Special Summon) is 500 points or less, the monster is destroyed."
+  },
+  "682": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "If the ATK of a monster summoned by your opponent (excluding Special Summon) is 500 points or less, the monster is destroyed."
+  },
+  "685": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Target 1 face-down Defense Position monster on the field; flip it face-up, then destroy it if its DEF is 2000 or less, or return it face-down if its DEF is more than 2000."
+  },
+  "686": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "When an opponent's monster declares an attack: Destroy the Attack Position monster your opponent controls with the highest ATK (your choice, if tied)."
+  },
+  "687": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "When a Level 2 or lower monster is Flip Summoned, destroy it. Its effects do not activate at that time."
+  },
+  "688": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "As long as this card remains face-up on the field, any effect of increasing your opponent's Life Points is changed to inflict the same amount of points in damage to your opponent's Life Points."
+  },
+  "689": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Until the End Phase, all effects that add or subtract ATK or DEF are reversed. (Additions now subtract, and subtractions now add, instead. Multiplications and divisions, including halving/doubling, are not affected.)"
+  },
+  "690": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "Activate only when your opponent activates a Spell, Trap, or Effect Monster's effect that would destroy a Trap Card(s) you control. Destroy this card instead. (If the cards that would have been destroyed are face-down, you can look at them to confirm.)"
+  },
+  "692": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Crab Turtle\". You must also offer monsters whose total Level Stars equal 8 or more as a Tribute from the field or your hand."
+  },
+  "694": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Chakra\". You must also Tribute monsters from your hand or field whose total Levels equal 7 or more."
+  },
+  "696": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Javelin Beetle\". You must also Tribute monsters from the field or your hand whose total Levels equal 8 or more."
+  },
+  "697": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Garma Sword\". You must also Tribute monsters whose total Levels equal 7 or more from the field or your hand."
+  },
+  "699": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Dokurorider\". You must also offer monsters whose total Level Stars equal 6 or more as a Tribute from the field or your hand."
+  },
+  "700": {
+    "atributo": null,
+    "nivel": null,
+    "descricao": "This card is used to Ritual Summon \"Fortress Whale\". You must also Tribute monsters from your hand or field whose total Levels equal 7 or more."
+  },
+  "707": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "\"Tainted Wisdom\" + \"Ancient Brain\""
+  },
+  "711": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "A dragon warrior of the moon armed with a crescent sword."
+  },
+  "712": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This dragon appeared from the sky and crashed to the earth."
+  },
+  "714": {
+    "atributo": "FIRE",
+    "nivel": 6,
+    "descricao": "A heavenly stallion soaring through the skies on crimson wings."
+  },
+  "001": {
+    "atributo": "LIGHT",
+    "nivel": 8,
+    "descricao": "This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale."
+  },
+  "002": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A delicate elf that lacks offense, but has a terrific defense backed by mystical power."
+  },
+  "003": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A one-eyed behemoth with thick, powerful arms made for delivering punishing blows."
+  },
+  "004": {
+    "atributo": "WIND",
+    "nivel": 3,
+    "descricao": "Much more than just a child, this dragon is gifted with untapped power."
+  },
+  "006": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A playful little fiend that lurks in the dark, waiting to attack an unwary enemy."
+  },
+  "050": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Usually found traveling in swarms, this creature's ideal environment is the forest."
+  },
+  "005": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A very elusive creature that looks like a harmless statue until it attacks."
+  },
+  "007": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "A dragon commonly found guarding mountain fortresses. Its signature attack is a sweeping dive from out of the blue."
+  },
+  "008": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "Found in humid regions, this creature attacks enemies with a lethal rain of poison spores."
+  },
+  "009": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "Powerful in groups, this animal spirit can be found in the wastelands."
+  },
+  "010": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A dragon that dwells in the depths of darkness, its vulnerability lies in its poor eyesight."
+  },
+  "011": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This Jurassic juggernaut has a spine covered in sword-like plates, and a tail to split open skulls."
+  },
+  "012": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "This card gains 500 ATK for each \"Lava Battleguard\" you control."
+  },
+  "013": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "Capable of firing cannonballs from its mouth for long-range attacks, this creature is particularly effective in mountain battles."
+  },
+  "014": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A bull monster often found in the woods, it charges enemy monsters with a pair of deadly horns."
+  },
+  "015": {
+    "atributo": "FIRE",
+    "nivel": 5,
+    "descricao": "\"Flame Manipulator\" + \"Masaki the Legendary Swordsman\""
+  },
+  "016": {
+    "atributo": "LIGHT",
+    "nivel": 2,
+    "descricao": "Once per turn: You can toss a coin and call it. If you call it right, destroy all monsters your opponent controls. If you call it wrong, destroy as many monsters you control as possible, and if you do, take damage equal to half the total ATK those destroyed monsters had while face-up on the field."
+  },
+  "017": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "A forbidden right leg sealed by magic. Whosoever breaks this seal will know infinite power."
+  },
+  "018": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "A forbidden left leg sealed by magic. Whosoever breaks this seal will know infinite power."
+  },
+  "019": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "A forbidden right arm sealed by magic. Whosoever breaks this seal will know infinite power."
+  },
+  "020": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "A forbidden left arm sealed by magic. Whosoever breaks this seal will know infinite power."
+  },
+  "021": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "If you have \"Right Leg of the Forbidden One\", \"Left Leg of the Forbidden One\", \"Right Arm of the Forbidden One\" and \"Left Arm of the Forbidden One\" in addition to this card in your hand, you win the Duel."
+  },
+  "022": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "A fiend with dark powers for confusing the enemy. Among the Fiend-Type monsters, this monster boasts considerable force.\n\n(This card is always treated as an \"Archfiend\" card.)"
+  },
+  "023": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "This face-up card on the field is returned to the owner's hand during the End Phase of your turn."
+  },
+  "024": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "A skeletal ghost that isn't strong but can mean trouble in large numbers."
+  },
+  "025": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "''A small fiend that dwells in the dark, its single horn makes it a formidable opponent.''"
+  },
+  "026": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A monster with tremendous power, it destroys enemies with a swing of its axe."
+  },
+  "027": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "What this creature lacks in size it makes up for in defense when battling in the prairie."
+  },
+  "028": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Protected by a solid body of rock, this monster throws a bone-shattering punch."
+  },
+  "029": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A tough warrior that can move smoothly on even the roughest terrain."
+  },
+  "030": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "\"Skull Servant\" + \"Battle Warrior\""
+  },
+  "031": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A vicious, fire-breathing dragon whose wicked flame corrupts the souls of its victims."
+  },
+  "032": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A powerful monster whose two heads attack as one."
+  },
+  "033": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "This club-wielding warrior battles to the end and will never surrender."
+  },
+  "034": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "This clown appears from nowhere and executes very strange moves to avoid enemy attacks."
+  },
+  "035": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "''The ultimate wizard in terms of attack and defense.''"
+  },
+  "036": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "A monster with a head of poison snakes. One look from this monster can turn an opponent to stone."
+  },
+  "037": {
+    "atributo": "WIND",
+    "nivel": 7,
+    "descricao": "\"Gaia The Fierce Knight\" + \"Curse of Dragon\""
+  },
+  "038": {
+    "atributo": "EARTH",
+    "nivel": 7,
+    "descricao": "''A knight whose horse travels faster than the wind. His battle-charge is a force to be reckoned with.''"
+  },
+  "039": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A wicked dragon that taps into dark forces to execute a powerful attack."
+  },
+  "040": {
+    "atributo": "FIRE",
+    "nivel": 3,
+    "descricao": "FLIP: Destroy all face-up \"Dragon Capture Jar\"(s) on the field. If you destroy any, change all face-up Dragon-Type monsters on the field to Attack Position."
+  },
+  "041": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "An elf who learned to wield a sword, he baffles enemies with lightning-swift attacks."
+  },
+  "042": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "Manipulates enemy attacks with the power of illusion."
+  },
+  "043": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "\"M-Warrior #1\" + \"M-Warrior #2\""
+  },
+  "044": {
+    "atributo": "LIGHT",
+    "nivel": 4,
+    "descricao": "A deadly doll gifted with mystical power, it is particularly powerful when attacking against dark forces."
+  },
+  "045": {
+    "atributo": "LIGHT",
+    "nivel": 3,
+    "descricao": "A creature that electrocutes opponents with bolts of lightning."
+  },
+  "046": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "This monster's tough hide deflects almost any attack."
+  },
+  "047": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "''Although a poor defender, this monster's sharp horn gives it an edge when attacking.''"
+  },
+  "048": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "If this card is sent from the field to the GY: Add 1 monster with 1500 or less ATK from your Deck to your hand, but you cannot activate cards, or the effects of cards, with that name for the rest of this turn. You can only use this effect of \"Sangan\" once per turn."
+  },
+  "049": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A giant ant that dwells in the jungle, it is powerful whether attacking or defending."
+  },
+  "051": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A lizard with a very tough hide and a vicious bite."
+  },
+  "052": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "A massive beetle with a tough carapace and a dangerous horn."
+  },
+  "053": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "A huge bee with exceptional strength that's particularly dangerous in a swarm."
+  },
+  "054": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A large, spherical roach that attacks its enemies by rolling over them."
+  },
+  "055": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A massive flea that feeds on the blood of its enemies."
+  },
+  "056": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "This monster cannot be Normal Summoned or Set. This card can only be Special Summoned by Tributing \"Petit Moth\" during your 2nd turn after \"Petit Moth\" has been equipped with \"Cocoon of Evolution\"."
+  },
+  "057": {
+    "atributo": "EARTH",
+    "nivel": 8,
+    "descricao": "This monster cannot be Normal Summoned or Set. This card can only be Special Summoned by Tributing \"Petit Moth\" during your 4th turn after \"Petit Moth\" has been equipped with \"Cocoon of Evolution\"."
+  },
+  "058": {
+    "atributo": "DARK",
+    "nivel": 1,
+    "descricao": "During damage calculation, if your opponent's monster attacks (Quick Effect): You can discard this card; you take no battle damage from that battle."
+  },
+  "059": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A mammoth that protects the graves of its pack and is absolutely merciless when facing grave-robbers."
+  },
+  "060": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A giant white shark with razor-sharp teeth."
+  },
+  "061": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "Dis alpha wolf yoozes his sense a smell ta find da enemy. 'ey, quit sniffin at my socks!"
+  },
+  "062": {
+    "atributo": "WIND",
+    "nivel": 4,
+    "descricao": "This human-shaped animal with wings is beautiful to watch but deadly in battle."
+  },
+  "063": {
+    "atributo": "WIND",
+    "nivel": 6,
+    "descricao": "Cannot be Normal Summoned/Set. Must first be Special Summoned with \"Elegant Egotist\"."
+  },
+  "064": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A fast and powerful axe-wielding beast-warrior."
+  },
+  "065": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A snow wolf that's beautiful to the eye, but absolutely vicious in battle."
+  },
+  "066": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A man-hunter with powerful arms that can crush boulders."
+  },
+  "067": {
+    "atributo": "EARTH",
+    "nivel": 8,
+    "descricao": "Cannot be Normal Summoned/Set. Must first be Special Summoned (from your hand) by Tributing 1 \"Petit Moth\" on your 6th turn or later after it was equipped with \"Cocoon of Evolution\"."
+  },
+  "068": {
+    "atributo": "FIRE",
+    "nivel": 5,
+    "descricao": "An axe-swinging beast-warrior with the head of a dragon."
+  },
+  "069": {
+    "atributo": "WIND",
+    "nivel": 7,
+    "descricao": "\"Time Wizard\" + \"Baby Dragon\""
+  },
+  "070": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A giant squid that drags its enemies to a watery grave."
+  },
+  "071": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "An almost invisible, semi-transparent jellyfish that drifts in the sea."
+  },
+  "072": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "You can target 1 \"Petit Moth\" you control; equip this card from your hand to that target. While equipped by this effect, the original ATK/DEF of that \"Petit Moth\" becomes the ATK/DEF of \"Cocoon of Evolution\"."
+  },
+  "073": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "A sea dragon known as the King of the Ocean, it attacks its enemies with huge tidal waves."
+  },
+  "074": {
+    "atributo": "EARTH",
+    "nivel": 3,
+    "descricao": "A giant warrior made of stone. A punch from this creature has earth-shaking results."
+  },
+  "075": {
+    "atributo": "EARTH",
+    "nivel": 2,
+    "descricao": "''A meat-eating plant that is attractive to the eye but dangerous when approached.''"
+  },
+  "076": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "''A vicious crocodile with great intelligence.''"
+  },
+  "077": {
+    "atributo": "WATER",
+    "nivel": 4,
+    "descricao": "A devious snake with a thick body that wraps around an enemy monster and squeezes the life out of it."
+  },
+  "078": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "An axe-wielding monster of tremendous strength and agility."
+  },
+  "079": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "Nothing stands in the way of this spike-covered dinosaur!"
+  },
+  "080": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Fast on its feet, this dinosaur rips enemies to shreds with its sharp claws."
+  },
+  "081": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "A powerful dragon with teeth that can grind almost anything to dust."
+  },
+  "082": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": "''A ferocious dragon with a deadly attack.''"
+  },
+  "083": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "FLIP: All Zombie-Type monsters gain 200 ATK and DEF. During each of your next 4 Standby Phases, each of those Zombie-Type monsters gains 200 more ATK and DEF. These effects last as long as this card is face-up on the field."
+  },
+  "084": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "FLIP: Select 1 Trap Card on the field and destroy it. If the selected card is Set, pick up and see the card. If it is a Trap Card, it is destroyed. If it is a Spell Card, return it to its original position."
+  },
+  "085": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "Wields the power of darkness to destroy its enemies."
+  },
+  "086": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "\"Frenzied Panda\" + \"Ryu-Kishin\""
+  },
+  "087": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "''A fire-breathing monster that dwells in the netherworld.''"
+  },
+  "088": {
+    "atributo": "DARK",
+    "nivel": 5,
+    "descricao": "A fiend guarding the treasures of the netherworld, it's most at home in the dark."
+  },
+  "089": {
+    "atributo": "WATER",
+    "nivel": 5,
+    "descricao": "Once per turn: You can Tribute 1 monster; inflict damage to your opponent equal to half the Tributed monster's ATK on the field."
+  },
+  "090": {
+    "atributo": "LIGHT",
+    "nivel": 6,
+    "descricao": "This fairy uses her mystical power to protect the weak and provide spiritual support."
+  },
+  "091": {
+    "atributo": "EARTH",
+    "nivel": 4,
+    "descricao": "Half man and half horse, this monster is known for its extreme speed."
+  },
+  "092": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": "\"Battle Ox\" + \"Mystic Horseman\""
+  },
+  "093": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "''His swiftly drawn blade delivers quick and fatal damage.''"
+  },
+  "094": {
+    "atributo": "EARTH",
+    "nivel": 5,
+    "descricao": "This weakened dragon can no longer fly, but is still a deadly force to be reckoned with."
+  },
+  "095": {
+    "atributo": "DARK",
+    "nivel": 4,
+    "descricao": "When this card is changed from Defense Position to Attack Position, return 1 monster on your opponent's side of the field to the owner's hand."
+  },
+  "096": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "This warrior blindly swings a deadly blade with devastating force."
+  },
+  "097": {
+    "atributo": "DARK",
+    "nivel": 3,
+    "descricao": "A dragon revived by sorcery. Its breath is highly corrosive."
+  },
+  "098": {
+    "atributo": "DARK",
+    "nivel": 2,
+    "descricao": "A clown revived by the powers of darkness. Its deadly dance has sent many monsters to their graves."
+  },
+  "099": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": "Gains 100 ATK/DEF while \"Castle of Dark Illusions\" is on the field. Also, during your Standby Phase, if \"Castle of Dark Illusions\" is on the field: This card gains 100 ATK/DEF. This effect activates once per turn, for four of your Standby Phases (counting this as the first). \"Castle of Dark Illusions\" must be on the field to activate and to resolve this effect. If \"Castle of Dark Illusions\" is not on the field, this ATK/DEF gain disappears and this effect resets."
+  }
+}

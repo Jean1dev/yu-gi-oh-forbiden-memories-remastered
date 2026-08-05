@@ -96,10 +96,12 @@ function ResolvedDuelResult({
   result,
   dropPool,
   grantVictoryReward,
+  cards,
 }: {
   readonly result: ConsolidatedDuelResult;
   readonly dropPool: DropPool;
   readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
+  readonly cards: readonly Card[];
 }) {
   const boundGrantReward = useMemo(() => {
     if (!grantVictoryReward) return undefined;
@@ -107,7 +109,17 @@ function ResolvedDuelResult({
       grantVictoryReward(victory, dropPool);
   }, [grantVictoryReward, dropPool]);
   const victoryRewardState = useVictoryReward(result, boundGrantReward);
-  return <DuelResult result={result} victoryRewardState={victoryRewardState} />;
+  const rewardCard =
+    victoryRewardState.status === "granted"
+      ? cards.find(({ numero }) => numero === victoryRewardState.granted.outcome.cardNumber)
+      : undefined;
+  return (
+    <DuelResult
+      result={result}
+      victoryRewardState={victoryRewardState}
+      rewardCard={rewardCard}
+    />
+  );
 }
 
 function EndedDuelResult({
@@ -115,11 +127,13 @@ function EndedDuelResult({
   resolveResult,
   dropPool,
   grantVictoryReward,
+  cards,
 }: {
   readonly session: Extract<DuelSession, { status: "ended" }>;
   readonly resolveResult?: ResolveEndedDuelResult | undefined;
   readonly dropPool: DropPool;
   readonly grantVictoryReward?: GrantVictoryRewardForVictory | undefined;
+  readonly cards: readonly Card[];
 }) {
   const viewState = useDuelResult(session, resolveResult);
   return viewState.status === "loading" ? (
@@ -129,6 +143,7 @@ function EndedDuelResult({
       result={viewState.result}
       dropPool={dropPool}
       grantVictoryReward={grantVictoryReward}
+      cards={cards}
     />
   );
 }
@@ -389,6 +404,7 @@ export function DuelScreen({
             resolveResult={effectiveResolveResult}
             dropPool={duel.context?.duelist.dropPool ?? []}
             grantVictoryReward={grantVictoryReward}
+            cards={catalogResult.status === "ready" ? catalogResult.cards : []}
           />
           <PostDuelActions duelistId={duelistId} />
         </DuelResultOverlay>

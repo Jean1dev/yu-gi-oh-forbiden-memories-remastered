@@ -116,4 +116,52 @@ describe("DuelZone", () => {
     fireEvent.click(button);
     expect(onActivate).toHaveBeenCalledOnce();
   });
+
+  it("renders CardFrame (compact) instead of the legacy image when the card is migrated", () => {
+    const migratedCard: Card = { ...card, descricao: "A powerful dragon." };
+    const zone = {
+      occupied: true,
+      card: { visible: true, card: migratedCard },
+      position: "attack_face_up",
+      hasAttacked: false,
+      hasChangedPosition: false,
+      equips: [],
+    } as unknown as PublicMonsterZone;
+
+    render(
+      <DuelZone
+        zone={zone}
+        reference={reference}
+        label="Zona de monstro Jogador 1"
+        emptyLabel="Vazio"
+        affordance="idle"
+      />,
+    );
+
+    expect(screen.getByText("ATK 1200 / DEF 900")).toBeTruthy();
+  });
+
+  it("keeps rendering the legacy image for a card without descricao (regression fallback)", () => {
+    const zone = {
+      occupied: true,
+      card: { visible: true, card },
+      position: "attack_face_up",
+      hasAttacked: false,
+      hasChangedPosition: false,
+      equips: [],
+    } as unknown as PublicMonsterZone;
+
+    render(
+      <DuelZone
+        zone={zone}
+        reference={reference}
+        label="Zona de monstro Jogador 1"
+        emptyLabel="Vazio"
+        affordance="idle"
+      />,
+    );
+
+    expect(screen.queryByText("ATK 1200 / DEF 900")).toBeNull();
+    expect(screen.getByText("1200 / 900")).toBeTruthy();
+  });
 });

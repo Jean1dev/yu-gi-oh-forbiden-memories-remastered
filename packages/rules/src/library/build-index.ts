@@ -22,13 +22,25 @@ export type LibraryCrossReferenceInput = Readonly<{
   /** `cardNumber`s the player owns (`quantity >= 1`), the boolean model (Decision 9). */
   obtainedCardNumbers: ReadonlySet<CardNumber>;
   artLookup: CardArtLookup;
+  /**
+   * Crop-art lookup (`renderizacao-cartas/F06`). Optional so callers that
+   * predate F06 keep compiling unchanged — omitting it simply leaves
+   * `LibraryEntry.cropArt` unset on every entry, the same as a card that has
+   * not been migrated.
+   */
+  cropArtLookup?: CardArtLookup;
 }>;
 
 function compareCardNumber(a: CardNumber, b: CardNumber): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function buildEntry(card: Card, obtained: boolean, artLookup: CardArtLookup): LibraryEntry {
+function buildEntry(
+  card: Card,
+  obtained: boolean,
+  artLookup: CardArtLookup,
+  cropArtLookup: CardArtLookup | undefined,
+): LibraryEntry {
   if (!obtained) {
     return Object.freeze({
       obtained: false as const,
@@ -41,6 +53,9 @@ function buildEntry(card: Card, obtained: boolean, artLookup: CardArtLookup): Li
     cardNumber: card.numero,
     card,
     art: resolveArtReference(card.numero, true, artLookup),
+    ...(cropArtLookup === undefined
+      ? {}
+      : { cropArt: resolveArtReference(card.numero, true, cropArtLookup) }),
   });
 }
 
@@ -61,7 +76,7 @@ function buildEntry(card: Card, obtained: boolean, artLookup: CardArtLookup): Li
  * `cardNumber`.
  */
 export function buildLibraryIndex(input: LibraryCrossReferenceInput): LibraryIndex {
-  const { catalog, obtainedCardNumbers, artLookup } = input;
+  const { catalog, obtainedCardNumbers, artLookup, cropArtLookup } = input;
 
   const sortedCards = [...catalog.listAll()].sort((a, b) => compareCardNumber(a.numero, b.numero));
 
@@ -70,7 +85,9 @@ export function buildLibraryIndex(input: LibraryCrossReferenceInput): LibraryInd
 
   for (const card of sortedCards) {
     catalogCardNumbers.add(card.numero);
-    entries.push(buildEntry(card, obtainedCardNumbers.has(card.numero), artLookup));
+    entries.push(
+      buildEntry(card, obtainedCardNumbers.has(card.numero), artLookup, cropArtLookup),
+    );
   }
 
   const byCardNumber = new Map<CardNumber, LibraryEntry>(

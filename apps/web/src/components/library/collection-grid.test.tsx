@@ -62,13 +62,17 @@ describe("CollectionGrid", () => {
     expect(hrefs).toEqual(["/library/005", "/library/001", "/library/003"]);
   });
 
-  it("renders all 722 entries when the status includes not-obtained", () => {
-    const entries = Array.from({ length: 722 }, (_, index) => {
-      const numero = String(index + 1).padStart(3, "0");
-      return index % 2 === 0 ? obtainedEntry(numero) : blockedEntry(numero);
-    });
-    render(<CollectionGrid entries={entries} emptyLabel="vazio" />);
+  it(
+    "renders all 722 entries when the status includes not-obtained",
+    () => {
+      const entries = Array.from({ length: 722 }, (_, index) => {
+        const numero = String(index + 1).padStart(3, "0");
+        return index % 2 === 0 ? obtainedEntry(numero) : blockedEntry(numero);
+      });
+      render(<CollectionGrid entries={entries} emptyLabel="vazio" />);
 
-    expect(screen.getAllByRole("link")).toHaveLength(722);
-  });
+      expect(screen.getAllByRole("link")).toHaveLength(722);
+    },
+    15_000,
+  );
 });

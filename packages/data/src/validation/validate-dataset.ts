@@ -13,6 +13,7 @@ export type ValidationInput = Readonly<{
   /** `JSON.parse` of `cards.json`, still untrusted. */
   rawCards: unknown;
   manifest: ArtManifest;
+  cropManifest?: ArtManifest;
   /** Decided by the adapter: this core never touches the filesystem. */
   placeholderExists: boolean;
   /** Injected so the orchestrator stays pure and reproducible. */
@@ -46,7 +47,12 @@ export function validateDataset(input: ValidationInput): ValidationOutput {
     ...checkUniqueness(reparsed.cards),
     ...classes.violations,
     ...checkTypeCoherence(reparsed.cards),
-    ...checkArtCoverage(reparsed.cards, input.manifest, input.placeholderExists),
+    ...checkArtCoverage(
+      reparsed.cards,
+      input.manifest,
+      input.placeholderExists,
+      input.cropManifest,
+    ),
   ];
 
   const report = buildValidationReport({

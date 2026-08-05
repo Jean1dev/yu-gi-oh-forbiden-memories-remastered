@@ -1,0 +1,47 @@
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-bevel-raised);
+  flex-shrink: 0;
+}
+
+.badge[data-attribute="DARK"] {
+  background: #3d2a5c;
+  color: var(--color-gold);
+}
+
+.badge[data-attribute="LIGHT"] {
+  background: var(--color-sand);
+  color: var(--color-black);
+}
+
+.badge[data-attribute="EARTH"] {
+  background: #8a5a2c;
+  color: var(--color-sand);
+}
+
+.badge[data-attribute="WATER"] {
+  background: #2a5c8a;
+  color: var(--color-white);
+}
+
+.badge[data-attribute="FIRE"] {
+  background: #8a2c2c;
+  color: var(--color-white);
+}
+
+.badge[data-attribute="WIND"] {
+  background: #2c8a5c;
+  color: var(--color-white);
+}
+
+.badge[data-attribute="DIVINE"] {
+  background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-white) 100%);
+  color: var(--color-black);
+}

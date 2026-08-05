@@ -1,4 +1,4 @@
-import { createArtResolverFromCatalog } from "@yugioh/data/art";
+import { createArtResolverFromCatalog, resolveCropArtPath } from "@yugioh/data/art";
 import {
   DomainError,
   err,
@@ -7,7 +7,7 @@ import {
   type Result,
 } from "@yugioh/shared";
 
-import { cardArtUrl } from "../card-art-url.ts";
+import { cardArtUrl, cropArtUrl } from "../card-art-url.ts";
 import { getSealedCatalog, listAllCards } from "../catalog/sealed-catalog.ts";
 import type { PasswordCatalog } from "./types.ts";
 
@@ -34,7 +34,13 @@ async function loadOnce(): Promise<Result<PasswordCatalog, DomainError>> {
       : { kind: "placeholder" };
   };
 
-  return ok({ cards, artLookup });
+  const cropArtManifest = catalog.getCropArtManifest();
+  const cropArtLookup: CardArtLookup = (cardNumber) => {
+    const path = resolveCropArtPath(cardNumber, cropArtManifest);
+    return path === undefined ? { kind: "placeholder" } : { kind: "art", path: cropArtUrl(cardNumber) };
+  };
+
+  return ok({ cards, artLookup, cropArtLookup });
 }
 
 export function getPasswordCatalog(): Promise<Result<PasswordCatalog, DomainError>> {

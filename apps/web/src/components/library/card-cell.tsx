@@ -1,6 +1,8 @@
 import type { LibraryEntry } from "@yugioh/shared";
 import Link from "next/link";
 
+import { CardFrame } from "../card-frame/card-frame.tsx";
+import { shouldUseCardFrame } from "../../lib/card-frame/should-use-card-frame.ts";
 import { CardArt } from "./card-art.tsx";
 import styles from "./card-cell.module.css";
 
@@ -42,6 +44,8 @@ export function CardCell({ entry, detailQueryString }: CardCellProps) {
   }
 
   const { card } = entry;
+  const useFrame = shouldUseCardFrame(card, entry.cropArt);
+
   return (
     <li className={styles.cell}>
       <Link
@@ -49,16 +53,24 @@ export function CardCell({ entry, detailQueryString }: CardCellProps) {
         className={styles.link}
         aria-label={`${card.nome}, número ${entry.cardNumber}, ${card.tipo}`}
       >
-        <CardArt art={entry.art} label={card.nome} />
-        <span aria-hidden="true" className={styles.name} title={card.nome}>
-          {card.nome}
-        </span>
+        {useFrame && entry.cropArt !== undefined ? (
+          <CardFrame card={card} art={entry.cropArt} size="compacto" />
+        ) : (
+          <CardArt art={entry.art} label={card.nome} />
+        )}
+        {!useFrame && (
+          <span aria-hidden="true" className={styles.name} title={card.nome}>
+            {card.nome}
+          </span>
+        )}
         <span aria-hidden="true" className={styles.number}>
           {entry.cardNumber}
         </span>
-        <span aria-hidden="true" className={styles.typeClass}>
-          {card.tipo} · {card.classe}
-        </span>
+        {!useFrame && (
+          <span aria-hidden="true" className={styles.typeClass}>
+            {card.tipo} · {card.classe}
+          </span>
+        )}
       </Link>
     </li>
   );

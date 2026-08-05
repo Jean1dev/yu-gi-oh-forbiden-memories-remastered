@@ -106,6 +106,28 @@ describe("CardDetail", () => {
     );
   });
 
+  it("renders CardFrame instead of the legacy image when the card is migrated", () => {
+    const entry: ObtainedLibraryEntry = {
+      ...obtainedEntry({
+        atributo: "LIGHT",
+        nivel: 8,
+        descricao: "This legendary dragon is a powerful engine of destruction.",
+      }),
+      cropArt: { kind: "art", path: "/cards-data/art/001.jpg" },
+    };
+
+    render(<CardDetail entry={entry} returnDestination="/library" />);
+
+    expect(screen.getByRole("img", { name: "LIGHT" })).toBeTruthy();
+  });
+
+  it("keeps rendering the legacy image for a card without cropArt (regression fallback)", () => {
+    render(<CardDetail entry={obtainedEntry()} returnDestination="/library" />);
+
+    expect(screen.queryByRole("img", { name: "LIGHT" })).toBeNull();
+    expect(screen.getByTestId("card-art-placeholder")).toBeTruthy();
+  });
+
   it("accepts only an obtained entry at its public boundary", () => {
     const blocked: LibraryEntry = {
       obtained: false,

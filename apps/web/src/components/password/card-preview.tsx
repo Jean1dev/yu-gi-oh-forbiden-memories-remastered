@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { ObtainedArtReference, PasswordResolution } from "@yugioh/shared";
 
+import { shouldUseCardFrame } from "../../lib/card-frame/should-use-card-frame.ts";
+import { CardFrame } from "../card-frame/card-frame.tsx";
 import { CardArt } from "../library/card-art.tsx";
 import { PASSWORD_MESSAGES } from "./messages.ts";
 import styles from "./password.module.css";
@@ -8,14 +10,22 @@ import styles from "./password.module.css";
 export type CardPreviewProps = Readonly<{
   resolution: Extract<PasswordResolution, { status: "resolved" }>;
   art: ObtainedArtReference;
+  cropArt?: ObtainedArtReference | undefined;
   action?: ReactNode;
 }>;
 
-export function CardPreview({ resolution, art, action }: CardPreviewProps) {
+export function CardPreview({ resolution, art, cropArt, action }: CardPreviewProps) {
   const { card, price, affordability } = resolution;
+  const useFrame = shouldUseCardFrame(card, cropArt);
   return (
     <section className={styles.preview} aria-label={`Preview de ${card.nome}`}>
-      <div className={styles.art}><CardArt art={art} label={card.nome} /></div>
+      <div className={styles.art}>
+        {useFrame && cropArt !== undefined ? (
+          <CardFrame card={card} art={cropArt} size="completo" />
+        ) : (
+          <CardArt art={art} label={card.nome} />
+        )}
+      </div>
       <div className={styles.details}>
         <p className={styles.number}>#{card.numero}</p>
         <h2>{card.nome}</h2>

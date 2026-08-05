@@ -7,7 +7,7 @@ import type { PasswordCatalogPayload } from "../../lib/password/types.ts";
 import { PasswordClient } from "./password-client.tsx";
 
 const card = { id: 1, numero: "001", nome: "Blue-eyes", img: null, classe: "Dragon", atk: 3000, def: 2500, guardiao1: "Sun", guardiao2: "Moon", password: "89 63 11 39", estrelas: 10, tipo: "monstro" } as const satisfies Card;
-const payload: PasswordCatalogPayload = { status: "ok", cards: [card], arts: { "001": { kind: "placeholder" } } };
+const payload: PasswordCatalogPayload = { status: "ok", cards: [card], arts: { "001": { kind: "placeholder" } }, cropArts: {} };
 
 describe("PasswordClient", () => {
   beforeEach(() => useWalletStore.setState({ state: { status: "ready", loaded: { origin: "server", stars: 10, effectiveStars: 10, pendingStars: 0, pendingDuelIds: [], syncedAt: "2026-07-31T00:00:00.000Z" } } }));
