@@ -6,6 +6,14 @@ export {
   createStrategyRegistry,
 } from "./strategy/create-strategy-registry.ts";
 export { passivePolicy } from "./strategy/passive-policy.ts";
+export { createDefaultStrategyRegistry } from "./strategy/create-default-strategy-registry.ts";
+export {
+  createFmBasicPolicy,
+  normalizeFmBasicParameters,
+  selectFmBasicAction,
+  type FmBasicParameters,
+  type FmBasicPolicyDependencies,
+} from "./strategy/fm-basic/index.ts";
 export type {
   AiLogger,
   StrategyContext,

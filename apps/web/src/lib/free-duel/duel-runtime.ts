@@ -1,4 +1,4 @@
-import { createAiAgent, createF01StrategyRegistry } from "@yugioh/ai";
+import { createAiAgent, createDefaultStrategyRegistry } from "@yugioh/ai";
 import {
   apply,
   buildInitializationInput,
@@ -56,7 +56,7 @@ export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
   const seedGenerator = createCryptoSeedGenerator();
   const candidateEvaluator = createAiCandidateEvaluator({ apply, getPublicDuelState });
   const aiAgent = createAiAgent({
-    registry: createF01StrategyRegistry(),
+    registry: createDefaultStrategyRegistry({ evaluateCandidate: candidateEvaluator.evaluate }),
     logger: aiLogger,
     sleep: input.sleep,
   });
