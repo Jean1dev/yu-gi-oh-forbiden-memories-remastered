@@ -17,6 +17,7 @@ import type {
   MatchOrchestrationInput,
 } from "@yugioh/shared";
 import { aiLogger } from "../logging.ts";
+import { createAiCandidateEvaluator } from "./ai-candidate-evaluator.ts";
 
 import { resolveDuelResult } from "./resolve-duel-result.ts";
 import {
@@ -53,6 +54,7 @@ function createCatalogLookup(cards: readonly Card[]): CardCatalogLookup {
 export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
   const catalog = createCatalogLookup(input.cards);
   const seedGenerator = createCryptoSeedGenerator();
+  const candidateEvaluator = createAiCandidateEvaluator({ apply, getPublicDuelState });
   const aiAgent = createAiAgent({
     registry: createF01StrategyRegistry(),
     logger: aiLogger,
@@ -82,6 +84,7 @@ export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
       closeReactionWindow,
       aiAgent,
       getPublicDuelState,
+      openAiDecisionContext: candidateEvaluator.open,
     },
     resolveResult,
   };
