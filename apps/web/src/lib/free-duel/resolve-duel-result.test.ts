@@ -9,7 +9,6 @@ import {
   type RatingEngine,
   type RatingEvaluation,
   type ReadDuelOutcome,
-  type Result,
 } from "@yugioh/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -61,7 +60,7 @@ const victory: DuelOutcome = {
   reason: "lp_depleted",
 };
 const evaluation: RatingEvaluation = {
-  grade: "official-opaque-grade",
+  grade: "S-POW",
   reward: { stars: 29, dropTier: "official-opaque-tier" },
 };
 
@@ -74,9 +73,7 @@ function dependencies(
     readOutcome,
     createSnapshot,
     ratingEngine: {
-      evaluate: vi.fn<RatingEngine["evaluate"]>(
-        async () => ok(evaluation) as Result<unknown, DomainError>,
-      ),
+      evaluate: vi.fn<RatingEngine["evaluate"]>(async () => ok(evaluation)),
     },
     minimumReward: { stars: 7, dropTier: "configured-minimum-tier" },
     cache: createDuelResultCache(),
@@ -154,7 +151,7 @@ describe("resolveDuelResult", () => {
 
   it("rejects an invalid external rating response and applies the minimum", async () => {
     const deps = dependencies();
-    deps.ratingEngine.evaluate.mockResolvedValue(ok({ grade: "", reward: { stars: -1 } }));
+    deps.ratingEngine.evaluate.mockResolvedValue(ok({ grade: "not-a-grade", reward: { stars: -1 } } as never));
     const result = await resolveDuelResult(session, deps);
     expect(result.status).toBe("victory");
     if (result.status !== "victory") throw new Error("expected victory");

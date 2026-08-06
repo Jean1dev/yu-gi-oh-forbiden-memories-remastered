@@ -14,7 +14,7 @@ const result: Extract<ConsolidatedDuelResult, { status: "victory" }> = {
   status: "victory",
   duelSessionId: "session",
   reason: "lp_depleted",
-  rating: { source: "rating_engine", grade: "A", reward: { stars: 11, dropTier: "common" } },
+  rating: { source: "rating_engine", grade: "A-POW", reward: { stars: 4, dropTier: "sa-pow" } },
 };
 const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
 
@@ -43,7 +43,9 @@ describe("grantVictoryReward", () => {
     const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 11 }));
     const granted = await grantVictoryReward(result, { playerId: "player", dropPool }, deps(apply));
     expect(granted.ok).toBe(true);
-    expect(apply).toHaveBeenCalledWith("player", "session", "001", 11);
+    // 4 is the fixture's rating stars (A-POW), not the wallet balance the RPC
+    // happens to return — the point is that the rating value is what travels.
+    expect(apply).toHaveBeenCalledWith("player", "session", "001", 4);
   });
 
   it("does not apply either reward when card selection fails", async () => {

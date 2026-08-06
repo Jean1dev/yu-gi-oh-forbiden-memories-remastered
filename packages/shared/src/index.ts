@@ -60,6 +60,7 @@ export {
   type ViolationCategory,
 } from "./card/validation-report.ts";
 export {
+  DUEL_GRADES,
   DUEL_STAT_COUNTERS,
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
@@ -124,6 +125,7 @@ export {
   DuelEndReasonSchema,
   DuelOutcomeSchema,
   MinimumRatingRewardSchema,
+  DuelGradeSchema,
   RatingEvaluationSchema,
   RatingRewardSchema,
 } from "./duel/result-schema.ts";
@@ -301,6 +303,7 @@ export {
   ZoneTypeSchema,
 } from "./duel/schema.ts";
 export {
+  FM_DROP_TIERS,
   DIFFICULTY_LEVELS,
   ROSTER_ERROR_CODES,
   type RosterErrorCode,

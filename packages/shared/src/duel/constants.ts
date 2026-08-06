@@ -61,6 +61,29 @@ export const EVENT_TYPES = [
  * and remaining life points — live in `DuelState` already and are deliberately
  * *not* mirrored here: a redundant counter can drift from the state it copies.
  */
+/**
+ * The closed scale of duel grades (rating-engine F02), from the lowest score to
+ * the highest. Single source of truth: `DuelGrade` (in `./result.ts`) derives
+ * from this array, and `GRADE_REWARDS` (in `packages/rules`) is keyed by it, so
+ * a grade added here without a reward is a compile error rather than a bug.
+ *
+ * The order matters and is not alphabetical: the Forbidden Memories score is a
+ * single axis where a low score is technical and a high score is power, so this
+ * array reads from `S-TEC` (score ≤ 9) up to `S-POW` (score ≥ 90).
+ */
+export const DUEL_GRADES = [
+  "S-TEC",
+  "A-TEC",
+  "B-TEC",
+  "C-TEC",
+  "D-TEC",
+  "D-POW",
+  "C-POW",
+  "B-POW",
+  "A-POW",
+  "S-POW",
+] as const;
+
 export const DUEL_STAT_COUNTERS = [
   "effectiveAttacks",
   "defensiveVictories",

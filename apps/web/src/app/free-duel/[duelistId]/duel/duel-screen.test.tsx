@@ -529,7 +529,7 @@ describe("DuelScreen", () => {
           reason: "lp_depleted",
           rating: {
             source: "rating_engine",
-            grade: "A",
+            grade: "A-POW",
             reward: { stars: 10, dropTier: "common" },
           },
         })}

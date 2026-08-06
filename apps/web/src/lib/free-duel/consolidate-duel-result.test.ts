@@ -6,7 +6,7 @@ import { consolidateDuelResult } from "./consolidate-duel-result.ts";
 
 const rating: ConsolidatedRating = {
   source: "rating_engine",
-  grade: "opaque-grade",
+  grade: "B-TEC",
   reward: { stars: 17, dropTier: "opaque-tier" },
 };
 

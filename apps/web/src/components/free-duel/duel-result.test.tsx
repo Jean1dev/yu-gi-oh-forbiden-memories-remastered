@@ -53,7 +53,7 @@ describe("DuelResult", () => {
           reason: "deck_out",
           rating: {
             source: "rating_engine",
-            grade: "opaque-grade",
+            grade: "B-TEC",
             reward: { stars: 31, dropTier: "opaque-tier" },
           },
         }}
@@ -67,7 +67,7 @@ describe("DuelResult", () => {
       />,
     );
     expect(screen.getByRole("heading", { name: "Vitória!" })).toBeTruthy();
-    expect(screen.getByText("Nota opaque-grade")).toBeTruthy();
+    expect(screen.getByText("Nota B-TEC")).toBeTruthy();
     expect(screen.getByText("+31 estrelas")).toBeTruthy();
   });
 
@@ -107,7 +107,7 @@ describe("DuelResult", () => {
           reason: "deck_out",
           rating: {
             source: "rating_engine",
-            grade: "A",
+            grade: "A-POW",
             reward: { stars: 10, dropTier: "common" },
           },
         }}

@@ -33,7 +33,7 @@ describe("rating policy", () => {
   });
 
   it("keeps the rating engine unavailable behind the minimum fallback", async () => {
-    const result = await unavailableRatingEngine.evaluate(baseState);
+    const result = await unavailableRatingEngine.evaluate(baseState, "P1");
 
     expect(MINIMUM_RATING_REWARD).toEqual({ stars: 0, dropTier: "common" });
     expect(result.ok).toBe(false);
