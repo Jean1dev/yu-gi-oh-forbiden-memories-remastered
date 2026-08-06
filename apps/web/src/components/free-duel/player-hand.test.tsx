@@ -41,4 +41,15 @@ describe("PlayerHand", () => {
     fireEvent.click(screen.getByRole("button", { name: "Blue Dragon" }));
     expect(onSelect).not.toHaveBeenCalled();
   });
+
+  it("renders CardFrame (compact) instead of the legacy image when the card is migrated", () => {
+    const migratedCard: Card = { ...card, descricao: "A powerful dragon." };
+    render(<PlayerHand cards={[migratedCard]} disabled={false} />);
+    expect(screen.getByText("ATK 1200 / DEF 900")).toBeTruthy();
+  });
+
+  it("keeps rendering the legacy image for a card without descricao (regression fallback)", () => {
+    render(<PlayerHand cards={[card]} disabled={false} />);
+    expect(screen.queryByText("ATK 1200 / DEF 900")).toBeNull();
+  });
 });
