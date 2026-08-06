@@ -4,10 +4,12 @@ import {
   DomainError,
   err,
   ok,
+  type CardWeightLookup,
   type ConsolidatedDuelResult,
   type DefaultCommonDropPool,
   type DropPool,
   type DropRewardOutcome,
+  type DropTierId,
   type Result,
   type VictoryRewardResult,
 } from "@yugioh/shared";
@@ -43,6 +45,19 @@ export function createGrantVictoryRewardCache(): GrantVictoryRewardCache {
 
 const defaultCache = createGrantVictoryRewardCache();
 
+/**
+ * The original's per-card chances out of 2048 for the resolved tier, as the
+ * lookup `selectDropCardNumber` expects.
+ *
+ * `undefined` when the tier carries no weights — a duelist this project
+ * invented, or the fallback common pool — which leaves the draw uniform, the
+ * same behaviour as before the weights were carried through the roster.
+ */
+function weightLookupFor(pool: DropPool, tier: DropTierId): CardWeightLookup | undefined {
+  const weights = pool.find((entry) => entry.tier === tier)?.weights;
+  return weights === undefined ? undefined : (cardNumber) => weights[cardNumber] ?? 1;
+}
+
 export async function grantVictoryReward(
   result: Extract<ConsolidatedDuelResult, { status: "victory" }>,
   context: GrantVictoryRewardContext,
@@ -57,6 +72,7 @@ export async function grantVictoryReward(
     result.rating.reward.dropTier,
     deps.defaultCommonDropPool,
     result.duelSessionId,
+    weightLookupFor(context.dropPool, result.rating.reward.dropTier),
   );
   if (!selection.ok) return selection;
   const event = VictoryRewardEventSchema.safeParse({
