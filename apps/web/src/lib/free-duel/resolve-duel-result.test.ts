@@ -18,6 +18,7 @@ import {
   resolveDuelResult,
   type DuelResultIncident,
 } from "./resolve-duel-result.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const field = {
   monsters: [
@@ -45,6 +46,7 @@ const state: DuelState = {
   turn: 1,
   phase: "end",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 const session: EndedDuelSession = {
   status: "ended",

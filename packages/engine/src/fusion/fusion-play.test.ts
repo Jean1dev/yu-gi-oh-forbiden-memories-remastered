@@ -1,6 +1,7 @@
 import type { Card, DuelState, PlayerField, PlayerState } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 import { createApply } from "../turn/apply.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function card(numero: string, nome = numero): Card {
   return {
@@ -36,6 +37,7 @@ function state(hand: readonly Card[]): DuelState {
     turn: 1,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

@@ -17,6 +17,7 @@ import {
 import { describe, expect, it, vi } from "vitest";
 import type { DuelRuntime } from "../../../../lib/free-duel/duel-runtime.ts";
 import { DuelScreen, type DuelScreenContext } from "./duel-screen.tsx";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const replace = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace }) }));
@@ -70,6 +71,7 @@ const state: DuelState = {
   turn: 1,
   phase: "main",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 const duelist: Duelist = {
   id: "seto",

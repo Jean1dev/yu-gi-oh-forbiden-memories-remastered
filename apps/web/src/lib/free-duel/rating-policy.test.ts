@@ -5,6 +5,7 @@ import {
   readDuelOutcome,
   unavailableRatingEngine,
 } from "./rating-policy.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const baseState = {
   players: {} as DuelState["players"],
@@ -13,6 +14,7 @@ const baseState = {
   turn: 1,
   phase: "main",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 } satisfies DuelState;
 
 describe("rating policy", () => {

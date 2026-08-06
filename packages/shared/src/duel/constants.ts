@@ -49,3 +49,24 @@ export const EVENT_TYPES = [
   "onDestroy",
   "onTurnEnd",
 ] as const;
+
+/**
+ * The closed vocabulary of per-player duel counters (rating-engine F01), in the
+ * order the original game's scoring table lists them. Single source of truth:
+ * `DuelStatCounter` (in `./stats.ts`) derives from this array, and
+ * `DuelStatsSchema` iterates it instead of repeating seven identical lines.
+ *
+ * These are exactly the seven parameters of the rating formula that cannot be
+ * read off the final state. The other three — turn count, remaining deck size
+ * and remaining life points — live in `DuelState` already and are deliberately
+ * *not* mirrored here: a redundant counter can drift from the state it copies.
+ */
+export const DUEL_STAT_COUNTERS = [
+  "effectiveAttacks",
+  "defensiveVictories",
+  "faceDownPlays",
+  "fusions",
+  "equips",
+  "pureMagics",
+  "triggeredTraps",
+] as const;

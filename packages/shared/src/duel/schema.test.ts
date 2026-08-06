@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Card } from "../card/types.ts";
 import { EVENT_TYPES, INITIAL_LP } from "./constants.ts";
 import { DuelEventSchema, DuelStateSchema, ZoneReferenceSchema } from "./schema.ts";
+import type { DuelStats } from "./stats.ts";
 import type { DuelState, MonsterPosition, PlayerField, PlayerState } from "./types.ts";
 
 const emptyZone = { occupied: false } as const;
@@ -43,6 +44,19 @@ function validPlayer(overrides: Partial<PlayerState> = {}): PlayerState {
   };
 }
 
+function zeroStats(overrides: Partial<DuelStats> = {}): DuelStats {
+  return {
+    effectiveAttacks: 0,
+    defensiveVictories: 0,
+    faceDownPlays: 0,
+    fusions: 0,
+    equips: 0,
+    pureMagics: 0,
+    triggeredTraps: 0,
+    ...overrides,
+  };
+}
+
 function validState(overrides: Partial<DuelState> = {}): DuelState {
   return {
     players: { P1: validPlayer(), P2: validPlayer() },
@@ -51,6 +65,7 @@ function validState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 1,
     phase: "main",
     seed: 1753617600,
+    stats: { P1: zeroStats(), P2: zeroStats() },
     ...overrides,
   };
 }

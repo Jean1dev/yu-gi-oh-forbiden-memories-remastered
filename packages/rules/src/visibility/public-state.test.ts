@@ -1,6 +1,11 @@
-import type { Card, DuelState, PlayerField } from "@yugioh/shared";
+import { DUEL_STAT_COUNTERS, type Card, type DuelStats, type DuelState, type PlayerField } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 import { getPublicDuelState } from "./public-state.ts";
+
+/** Local zeroed counters — `rules` cannot import the engine's `emptyDuelStats`. */
+function zeroStats(): DuelStats {
+  return Object.fromEntries(DUEL_STAT_COUNTERS.map((counter) => [counter, 0])) as DuelStats;
+}
 
 function card(numero: string): Card {
   return {
@@ -85,6 +90,7 @@ function duelState(): DuelState {
     turn: 2,
     phase: "main",
     seed: 123,
+    stats: { P1: zeroStats(), P2: zeroStats() },
   };
 }
 

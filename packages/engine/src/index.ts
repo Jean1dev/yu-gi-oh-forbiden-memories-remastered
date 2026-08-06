@@ -56,3 +56,4 @@ export {
   withAttackLock,
 } from "./spells/index.ts";
 export { changePosition, isFaceDown, nextPosition } from "./position/index.ts";
+export { emptyDuelStats, emptyDuelStatsByPlayer } from "./stats/index.ts";

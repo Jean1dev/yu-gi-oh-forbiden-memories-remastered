@@ -2,6 +2,7 @@ import type { DuelState, PlayerField, PlayerState } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { hasUsedHandPlay, markHandPlayUsed } from "./hand-play.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function emptyField(): PlayerField {
   const zone = { occupied: false } as const;
@@ -23,6 +24,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 1,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

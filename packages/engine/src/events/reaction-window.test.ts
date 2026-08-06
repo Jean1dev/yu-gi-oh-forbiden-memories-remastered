@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createEvent } from "./create-event.ts";
 import { closeReactionWindow, hasOpenReactionWindow, openReactionWindow } from "./reaction-window.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const emptyZone = { occupied: false } as const;
 
@@ -22,6 +23,7 @@ function emptyState(): DuelState {
     turn: 1,
     phase: "main",
     seed: 1753617600,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

@@ -10,6 +10,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { drawUpToHandSize } from "./draw-phase.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const cardArbitrary = fc.record({
   id: fc.integer({ min: 1, max: 999999 }),
@@ -41,6 +42,7 @@ function makeState(hand: readonly Card[], deck: readonly Card[]): DuelState {
     turn: 1,
     phase: "draw",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

@@ -60,6 +60,7 @@ export {
   type ViolationCategory,
 } from "./card/validation-report.ts";
 export {
+  DUEL_STAT_COUNTERS,
   EVENT_TYPES,
   INITIAL_HAND_SIZE,
   INITIAL_LP,
@@ -69,6 +70,7 @@ export {
   TOTAL_SPELL_ZONES,
   TURNS_PER_ROUND,
 } from "./duel/constants.ts";
+export type { DuelStatCounter, DuelStats, DuelStatsByPlayer } from "./duel/stats.ts";
 export type {
   AttackLock,
   DuelState,
@@ -273,6 +275,8 @@ export {
   AttackLockSchema,
   DuelEventSchema,
   DuelStateSchema,
+  DuelStatsByPlayerSchema,
+  DuelStatsSchema,
   EventTypeSchema,
   JsonValueSchema,
   MonsterPositionSchema,

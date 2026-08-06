@@ -15,6 +15,7 @@ import {
   createDuelResultCache,
   resolveDuelResult,
 } from "../src/lib/free-duel/resolve-duel-result.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const field = {
   monsters: [
@@ -42,6 +43,7 @@ const finalState: DuelState = {
   turn: 4,
   phase: "end",
   seed: 123,
+  stats: emptyDuelStatsByPlayer(),
 };
 
 function endedSession(duelSessionId: string): EndedDuelSession {
