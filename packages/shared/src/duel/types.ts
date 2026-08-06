@@ -3,6 +3,7 @@ import type { DuelOutcome } from "./outcome.ts";
 import type { ReactionWindow } from "./events.ts";
 import type { PlayerId } from "./player.ts";
 import type { DuelEvent, EventType, JsonValue, ZoneReference } from "./events.ts";
+import type { FusionResolution } from "../fusion/types.ts";
 
 export type { PlayerId } from "./player.ts";
 
@@ -72,6 +73,13 @@ export type PlayerState = Readonly<{
   handPlayUsed: boolean;
 }>;
 
+export type PendingFusion = Readonly<{
+  type: "fusion";
+  player: PlayerId;
+  resultCard: Card;
+  resolution: FusionResolution;
+}>;
+
 /**
  * The single source of truth of the duel: both players plus the global state
  * (active field spell, active player, turn, phase). 100% JSON-serializable
@@ -86,6 +94,8 @@ export type DuelState = Readonly<{
   phase: Phase;
   /** Absent = normal flow; present = engine paused awaiting external resolution. */
   pending?: ReactionWindow | undefined;
+  /** Fusion transaction awaiting its mandatory placement. */
+  pendingFusion?: PendingFusion | undefined;
   /** The seed this duel was shuffled with (F03); enables deterministic replay. */
   seed: number;
   /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */

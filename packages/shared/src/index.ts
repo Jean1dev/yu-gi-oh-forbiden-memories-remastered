@@ -14,6 +14,12 @@ export {
   type RedeemCardResponse,
 } from "./economy/redemption-schema.ts";
 export { DomainError } from "./errors.ts";
+export type {
+  FusionPairLookup,
+  FusionResolution,
+  FusionSequenceResolver,
+  FusionStep,
+} from "./fusion/index.ts";
 export {
   CANONICAL_CARD_TOTAL,
   CARD_ATTRIBUTES,
@@ -182,6 +188,9 @@ export type {
   PlayFieldSpellAction,
   PlaySpellOrTrapAction,
   ResolveAttackAction,
+  BeginFusionAction,
+  CompleteFusionAction,
+  FusionPlacement,
   SurrenderAction,
 } from "./duel/action.ts";
 export {
@@ -194,6 +203,8 @@ export {
   PlayFieldSpellActionSchema,
   PlaySpellOrTrapActionSchema,
   ResolveAttackActionSchema,
+  BeginFusionActionSchema,
+  CompleteFusionActionSchema,
   SummonMonsterActionSchema,
   SurrenderActionSchema,
 } from "./duel/action.schema.ts";

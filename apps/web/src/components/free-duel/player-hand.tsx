@@ -6,12 +6,14 @@ export function PlayerHand({
   cards,
   disabled,
   selectedIndex = null,
+  selectedIndices = [],
   drawnCount = 0,
   onSelect,
 }: {
   readonly cards: readonly Card[];
   readonly disabled: boolean;
   readonly selectedIndex?: number | null;
+  readonly selectedIndices?: readonly number[];
   readonly drawnCount?: number;
   readonly onSelect?: ((index: number) => void) | undefined;
 }) {
@@ -24,7 +26,7 @@ export function PlayerHand({
               className={styles.card}
               type="button"
               aria-label={card.nome}
-              aria-pressed={selectedIndex === index}
+              aria-pressed={selectedIndex === index || selectedIndices.includes(index)}
               data-drawn={drawnCount > 0 && index >= cards.length - drawnCount ? "true" : undefined}
               disabled={disabled}
               onClick={() => onSelect?.(index)}

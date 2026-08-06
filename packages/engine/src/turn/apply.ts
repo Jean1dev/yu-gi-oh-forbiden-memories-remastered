@@ -15,6 +15,7 @@ import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
 import { activateSpell, equipCard, playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
 import { summonMonster } from "../summon/index.ts";
+import { beginFusion, completeFusion, type FusionEngineDependencies } from "../fusion/index.ts";
 import { advancePhase } from "./advance-phase.ts";
 
 /** `undefined` when `state.phase === phase`; otherwise the `wrong_phase` error to return. */
@@ -35,17 +36,27 @@ function requirePhase(state: DuelState, phase: Phase, message: string): DomainEr
  * here rather than inside each action means no action can forget either one.
  */
 export function apply(state: DuelState, action: Action): Result<ApplyResult, DomainError> {
-  if (state.outcome !== undefined) {
-    return err(
-      new DomainError("O duelo já terminou.", "duel_already_ended", {
-        reason: state.outcome.reason,
-        winner: state.outcome.winner,
-      }),
-    );
-  }
+  return applyWithDependencies(undefined)(state, action);
+}
 
-  const result = dispatch(state, action);
-  return result.ok ? ok(stampOutcome(result.value)) : result;
+export function createApply(dependencies: FusionEngineDependencies) {
+  return applyWithDependencies(dependencies);
+}
+
+function applyWithDependencies(dependencies: FusionEngineDependencies | undefined) {
+  return (state: DuelState, action: Action): Result<ApplyResult, DomainError> => {
+    if (state.outcome !== undefined) {
+      return err(
+        new DomainError("O duelo já terminou.", "duel_already_ended", {
+          reason: state.outcome.reason,
+          winner: state.outcome.winner,
+        }),
+      );
+    }
+
+    const result = dispatch(state, action, dependencies);
+    return result.ok ? ok(stampOutcome(result.value)) : result;
+  };
 }
 
 /**
@@ -58,9 +69,24 @@ export function apply(state: DuelState, action: Action): Result<ApplyResult, Dom
  * entirely, and does not require its player to be the active one, because the
  * PRD requires it to work at any moment (F12 spec Decision 10).
  */
-function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainError> {
+function dispatch(
+  state: DuelState,
+  action: Action,
+  dependencies: FusionEngineDependencies | undefined,
+): Result<ApplyResult, DomainError> {
   if (action.type === "surrender") {
     return surrender(state, action);
+  }
+
+  if (action.type === "complete_fusion") return completeFusion(state, action);
+
+  if (state.pendingFusion !== undefined) {
+    return err(
+      new DomainError(
+        "The fusion result must be placed before another action.",
+        "fusion_placement_required",
+      ),
+    );
   }
 
   if (action.type === "resolve_attack") {
@@ -87,6 +113,10 @@ function dispatch(state: DuelState, action: Action): Result<ApplyResult, DomainE
   }
 
   switch (action.type) {
+    case "begin_fusion":
+      return dependencies === undefined
+        ? err(new DomainError("Fusion data is unavailable.", "fusion_unavailable"))
+        : beginFusion(state, action, dependencies);
     case "advance_phase":
       return ok(advancePhase(state));
     case "summon_monster": {

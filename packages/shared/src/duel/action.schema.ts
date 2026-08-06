@@ -69,6 +69,27 @@ export const SurrenderActionSchema = z.strictObject({
   player: PlayerIdSchema,
 });
 
+export const BeginFusionActionSchema = z.strictObject({
+  type: z.literal("begin_fusion"),
+  player: PlayerIdSchema,
+  handIndexes: z.array(z.number().int().min(0)).min(2).max(5),
+});
+
+export const CompleteFusionActionSchema = z.strictObject({
+  type: z.literal("complete_fusion"),
+  placement: z.discriminatedUnion("kind", [
+    z.strictObject({
+      kind: z.literal("monster"),
+      zoneIndex: ZoneIndexSchema,
+      position: MonsterPositionSchema,
+    }),
+    z.strictObject({ kind: z.literal("spell_or_trap"), zoneIndex: ZoneIndexSchema }),
+    z.strictObject({ kind: z.literal("equip"), targetZone: ZoneReferenceSchema }),
+    z.strictObject({ kind: z.literal("activate_spell") }),
+    z.strictObject({ kind: z.literal("field_spell") }),
+  ]),
+});
+
 export const ActionSchema = z.discriminatedUnion("type", [
   AdvancePhaseActionSchema,
   SummonMonsterActionSchema,
@@ -79,6 +100,8 @@ export const ActionSchema = z.discriminatedUnion("type", [
   ChangePositionActionSchema,
   DeclareAttackActionSchema,
   ResolveAttackActionSchema,
+  BeginFusionActionSchema,
+  CompleteFusionActionSchema,
   SurrenderActionSchema,
 ]);
 

@@ -26,7 +26,14 @@ export {
 } from "./combat/index.ts";
 export { checkDuelEnd, isDuelOver, stampOutcome, surrender } from "./end/index.ts";
 export { load, serialize } from "./serialization/index.ts";
-export { apply, hasUsedHandPlay, isFirstDuelTurn, markHandPlayUsed } from "./turn/index.ts";
+export {
+  apply,
+  createApply,
+  hasUsedHandPlay,
+  isFirstDuelTurn,
+  markHandPlayUsed,
+} from "./turn/index.ts";
+export { beginFusion, completeFusion, type FusionEngineDependencies } from "./fusion/index.ts";
 export {
   drawUpToHandSize,
   getDeckOutPlayer,
