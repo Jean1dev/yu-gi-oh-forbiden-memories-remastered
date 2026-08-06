@@ -95,6 +95,21 @@ I/O, com toda leitura de arquivo confinada a um adaptador fino na borda.
 | 9 | Esta feature **não cria tabela Postgres nem estrutura IndexedDB** — é dado de configuração de build/runtime, mesmo tratamento de F01/F02 (nenhum estado por jogador). | PRD §7 ("Estado por jogador" fora de escopo); F01/F02 spec §5 (precedente) | confirmada |
 | 10 | O critério de aceite "(Pendente) Os pools e probabilidades por duelista batem com o original" (PRD §9 F08) permanece **bloqueado** até os valores serem fornecidos — nenhum teste desta spec tenta satisfazê-lo com dados inventados. Um teste de placeholder documenta o estado atual (tabela vazia, pendência ativa) para que a suíte sinalize quando os valores chegarem. | PRD §9 F08 (critério explicitamente marcado "Pendente") | confirmada |
 
+> **Revisão — feature removida do repositório (rating-engine/F03).**
+> O módulo que esta spec descreve (`packages/data/src/drops/**`, `scripts/load-drop-table-from-disk.ts`,
+> `src/drops/data/drop-tables.json`) foi **excluído**. Ele nunca foi ligado: nenhum arquivo de
+> `rules`, `engine` ou `apps/web` o importava, o arquivo de dados permaneceu `[]` do início ao fim,
+> e seu tipo `DropPool` colidia de nome com o `DropPool` vivo de `packages/shared/src/duelist`.
+>
+> A pendência de dado externo que esta spec registrava foi resolvida por outro caminho: os pools de
+> drop por duelista e suas probabilidades vieram junto com os duelistas portados do original e vivem
+> em `packages/data/data/duelists/*.json`, chegando ao roster como `DropTier.weights` — chance de
+> cada carta em 2048, exatamente o que a coluna `probabilidade` desta spec pretendia guardar.
+> A validação de que todo `numero` dropável existe no catálogo passou a ser feita por
+> `validate-duelist.ts`.
+>
+> O texto abaixo fica como registro histórico do desenho que não vingou.
+
 ## 2. Alocação no Monorepo
 
 | Arquivo | Pacote | Novo/Alterado | Responsabilidade |
