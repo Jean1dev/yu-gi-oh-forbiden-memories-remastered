@@ -35,7 +35,9 @@ import { useDuelCues } from "../../../../hooks/use-duel-cues.ts";
 import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
 import { useVictoryReward } from "../../../../hooks/use-victory-reward.ts";
+import { useVictoryRewardSync } from "../../../../hooks/use-victory-reward-sync.ts";
 import type { GrantedVictoryReward } from "../../../../lib/free-duel/grant-victory-reward.ts";
+import { createGrantVictoryReward } from "../../../../lib/free-duel/victory-reward-wiring.ts";
 import { useDuelResult, type ResolveEndedDuelResult } from "../../../../hooks/use-duel-result.ts";
 import { useDuelSession, type StartDuelMatch } from "../../../../hooks/use-duel-session.ts";
 import { useSurrender } from "../../../../hooks/use-surrender.ts";
@@ -49,6 +51,14 @@ import type { ApplyAction } from "../../../../lib/free-duel/duel-session.ts";
 import { takeDuelHandoff } from "../../../../lib/free-duel/duel-handoff.ts";
 import { loadClientRoster } from "../../../../lib/free-duel/load-client-roster.ts";
 import styles from "./duel-screen.module.css";
+
+/** Stable empty list, so the reward chain's `useMemo` is not rebuilt every render. */
+const EMPTY_CARDS: readonly Card[] = [];
+
+function catalogLookupFor(cards: readonly Card[]) {
+  const byNumber = new Map(cards.map((card) => [card.numero, card]));
+  return (cardNumber: string) => byNumber.get(cardNumber);
+}
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 export type DuelScreenCatalogResult =
@@ -187,6 +197,21 @@ export function DuelScreen({
   const session = duel.session;
   const effectiveApply = duel.applyAction ?? applyAction ?? unavailableApply;
   const effectiveResolveResult = resolveResult ?? duel.resolveResult;
+  const catalogCards = catalogResult.status === "ready" ? catalogResult.cards : EMPTY_CARDS;
+  // Built once per catalog: the reward chain reaches Supabase and IndexedDB, so
+  // rebuilding it on every render would re-open a client per frame.
+  const defaultGrantVictoryReward = useMemo(
+    () => createGrantVictoryReward(catalogCards),
+    [catalogCards],
+  );
+  const effectiveGrantVictoryReward = grantVictoryReward ?? defaultGrantVictoryReward;
+  const syncCatalog = useMemo(
+    () => (catalogCards.length > 0 ? catalogLookupFor(catalogCards) : undefined),
+    [catalogCards],
+  );
+  // Drains rewards queued while offline, so a victory saved locally reaches the
+  // server without waiting for the player to open Build Deck.
+  useVictoryRewardSync(syncCatalog);
   const surrenderFlow = useSurrender({
     session,
     playerId: "P1",
@@ -403,7 +428,7 @@ export function DuelScreen({
             session={session}
             resolveResult={effectiveResolveResult}
             dropPool={duel.context?.duelist.dropPool ?? []}
-            grantVictoryReward={grantVictoryReward}
+            grantVictoryReward={effectiveGrantVictoryReward}
             cards={catalogResult.status === "ready" ? catalogResult.cards : []}
           />
           <PostDuelActions duelistId={duelistId} />

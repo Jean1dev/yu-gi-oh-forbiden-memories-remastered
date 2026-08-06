@@ -23,16 +23,27 @@ export type VictoryRewardRepository = Readonly<{
   ): Promise<Result<AppliedVictoryReward, DomainError>>;
 }>;
 
+/**
+ * Same budget as `apply_card_reward` (`supabase-repository.ts`). Without it a
+ * hung RPC never rejects, so the caller never reaches its offline fallback and
+ * the player is left staring at a spinner instead of getting the reward queued.
+ */
+const RPC_TIMEOUT_MS = 8000;
+
 export function createSupabaseVictoryRewardRepository(client: SupabaseClient): VictoryRewardRepository {
   return {
     async apply(playerId, duelId, cardNumber, stars) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), RPC_TIMEOUT_MS);
       try {
-        const { data, error } = await client.rpc("apply_victory_reward", {
-          p_player_id: playerId,
-          p_duel_id: duelId,
-          p_card_numero: cardNumber,
-          p_stars: stars,
-        });
+        const { data, error } = await client
+          .rpc("apply_victory_reward", {
+            p_player_id: playerId,
+            p_duel_id: duelId,
+            p_card_numero: cardNumber,
+            p_stars: stars,
+          })
+          .abortSignal(controller.signal);
         if (error) {
           return err(new DomainError(error.message, "victory_reward_apply_unavailable", { duelId }));
         }
@@ -56,6 +67,8 @@ export function createSupabaseVictoryRewardRepository(client: SupabaseClient): V
             cause: error instanceof Error ? error.message : "unknown",
           }),
         );
+      } finally {
+        clearTimeout(timeoutId);
       }
     },
   };
