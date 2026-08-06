@@ -1,7 +1,14 @@
-import { INITIAL_LP, type Card, type CardNumber, type InitializationInput } from "@yugioh/shared";
+import {
+  DUEL_STAT_COUNTERS,
+  INITIAL_LP,
+  type Card,
+  type CardNumber,
+  type InitializationInput,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { createMulberry32 } from "../prng/mulberry32.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 import { initDuel } from "./init-duel.ts";
 
 function makeCard(cardNumber: CardNumber): Card {
@@ -80,6 +87,16 @@ describe("initDuel", () => {
     const state = initDuel(inputWith());
 
     expect(state.pending).toBeUndefined();
+  });
+
+  it("starts both players with zeroed stats", () => {
+    const state = initDuel(inputWith());
+
+    expect(state.stats).toEqual(emptyDuelStatsByPlayer());
+    for (const counter of DUEL_STAT_COUNTERS) {
+      expect(state.stats.P1[counter]).toBe(0);
+      expect(state.stats.P2[counter]).toBe(0);
+    }
   });
 
   it("preserves the received seed in the resulting state", () => {
