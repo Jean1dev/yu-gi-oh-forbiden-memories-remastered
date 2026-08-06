@@ -14,6 +14,7 @@ import { stampOutcome, surrender } from "../end/index.ts";
 import { hasOpenReactionWindow } from "../events/index.ts";
 import { changePosition } from "../position/index.ts";
 import { activateSpell, equipCard, playFieldSpell, playSpellOrTrap } from "../spells/index.ts";
+import { accumulateStats } from "../stats/index.ts";
 import { summonMonster } from "../summon/index.ts";
 import { beginFusion, completeFusion, type FusionEngineDependencies } from "../fusion/index.ts";
 import { advancePhase } from "./advance-phase.ts";
@@ -55,7 +56,11 @@ function applyWithDependencies(dependencies: FusionEngineDependencies | undefine
     }
 
     const result = dispatch(state, action, dependencies);
-    return result.ok ? ok(stampOutcome(result.value)) : result;
+    if (!result.ok) return result;
+
+    // Counting runs before stamping so the play that ends a duel is still
+    // counted; stamping only freezes what the accumulator just recorded.
+    return ok(stampOutcome(accumulateStats(state, action, result.value)));
   };
 }
 
