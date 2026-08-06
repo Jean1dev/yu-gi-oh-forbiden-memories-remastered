@@ -152,6 +152,22 @@ generic and long — consult it for a specific question rather than reading it e
   `NodeNext`, `next/link` does not resolve.
 - `supabase start` writes a generated bundle into `supabase/.temp/`, which is excluded from
   eslint for that reason.
+- **Server code that reads a runtime-computed path only breaks on Vercel.** Anything going
+  through `lib/server/repo-root.ts` (the generated catalog, `packages/data/data/roster.json`,
+  the arts under `cards-data/`) is invisible to Next's output-file tracing, so the route needs
+  an explicit entry in `outputFileTracingIncludes` in `apps/web/next.config.mjs`. `next dev`
+  and `next start` read the real tree and never surface the omission — the symptom appears only
+  in the deploy, as a 503 from the route and whatever empty state the client falls back to.
+  Two traps inside that map, both of which have already shipped bugs:
+  - **The keys are globs, so a dynamic segment has to be escaped.** Unescaped `[duelistId]` is a
+    character class matching one letter, so `/free-duel/[duelistId]/duel` silently matches
+    nothing. Write `/free-duel/\\[duelistId\\]/duel`.
+  - **The values are relative to the app directory** (`apps/web`), not to
+    `outputFileTracingRoot`.
+
+  Verify by reading the build's own trace rather than by inspection — after `next build`, each
+  route's real payload is listed in `apps/web/.next/server/app/<route>/{page,route}.js.nft.json`.
+  An entry that contributes zero files to that list is a dead pattern.
 
 ## Current state
 

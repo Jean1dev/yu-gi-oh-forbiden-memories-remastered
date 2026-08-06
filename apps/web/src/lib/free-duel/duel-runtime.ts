@@ -1,3 +1,4 @@
+import { createAiAgent, createDefaultStrategyRegistry } from "@yugioh/ai";
 import {
   createApply,
   buildInitializationInput,
@@ -16,6 +17,8 @@ import type {
   EndedDuelSession,
   MatchOrchestrationInput,
 } from "@yugioh/shared";
+import { aiLogger } from "../logging.ts";
+import { createAiCandidateEvaluator } from "./ai-candidate-evaluator.ts";
 
 import { resolveDuelResult } from "./resolve-duel-result.ts";
 import {
@@ -23,7 +26,6 @@ import {
   readDuelOutcome,
   unavailableRatingEngine,
 } from "./rating-policy.ts";
-import { createPassiveAiAgent } from "./passive-ai-agent.ts";
 import { createCryptoSeedGenerator, generateDuelSessionId } from "./seed-generator.ts";
 import {
   createDuelSession,
@@ -62,7 +64,12 @@ export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
   );
   const apply = createApply({ resolveFusion, getCard: catalog });
   const seedGenerator = createCryptoSeedGenerator();
-  const aiAgent = createPassiveAiAgent({ sleep: input.sleep });
+  const candidateEvaluator = createAiCandidateEvaluator({ apply, getPublicDuelState });
+  const aiAgent = createAiAgent({
+    registry: createDefaultStrategyRegistry({ evaluateCandidate: candidateEvaluator.evaluate }),
+    logger: aiLogger,
+    sleep: input.sleep,
+  });
   const resolveResult: ResolveEndedDuelResult = (session) =>
     resolveDuelResult(session, {
       readOutcome: readDuelOutcome,
@@ -87,6 +94,7 @@ export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
       closeReactionWindow,
       aiAgent,
       getPublicDuelState,
+      openAiDecisionContext: candidateEvaluator.open,
     },
     resolveResult,
   };

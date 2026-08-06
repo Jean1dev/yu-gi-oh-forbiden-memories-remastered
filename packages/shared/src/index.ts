@@ -360,3 +360,9 @@ export {
   type ApplyVictoryRewardResponse,
   type EnsureWalletResponse,
 } from "./economy/wallet-schema.ts";
+export type {
+  CandidateEvaluation,
+  EvaluateAiCandidate,
+  LegalCandidate,
+  LegalCandidateFilterResult,
+} from "./ai/index.ts";

@@ -1,0 +1,91 @@
+{
+  "id": "test-duelist",
+  "name": "Duelista de Teste",
+  "difficulty": "easy",
+  "portrait": "cards-data/001.jpg",
+  "profile": {
+    "strategy": "passive",
+    "parameters": {}
+  },
+  "deck": [
+    "570",
+    "331",
+    "458",
+    "332",
+    "245",
+    "052",
+    "192",
+    "243",
+    "508",
+    "163",
+    "577",
+    "050",
+    "031",
+    "477",
+    "438",
+    "696",
+    "503",
+    "708",
+    "516",
+    "192",
+    "396",
+    "220",
+    "634",
+    "387",
+    "242",
+    "652",
+    "303",
+    "225",
+    "708",
+    "673",
+    "132",
+    "701",
+    "691",
+    "457",
+    "634",
+    "460",
+    "290",
+    "685",
+    "655",
+    "527"
+  ],
+  "dropPools": [
+    {
+      "tier": "common",
+      "entries": [
+        {
+          "cardNumber": "570",
+          "weight": 1
+        },
+        {
+          "cardNumber": "331",
+          "weight": 1
+        },
+        {
+          "cardNumber": "458",
+          "weight": 1
+        },
+        {
+          "cardNumber": "332",
+          "weight": 1
+        },
+        {
+          "cardNumber": "245",
+          "weight": 1
+        },
+        {
+          "cardNumber": "052",
+          "weight": 1
+        },
+        {
+          "cardNumber": "192",
+          "weight": 1
+        },
+        {
+          "cardNumber": "243",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

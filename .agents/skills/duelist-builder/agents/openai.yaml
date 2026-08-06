@@ -1,0 +1,4 @@
+interface:
+  display_name: "Duelist Builder"
+  short_description: "Adiciona duelistas fiéis ao Forbidden Memories"
+  default_prompt: "Use $duelist-builder para pesquisar e adicionar um novo duelista do Forbidden Memories ao jogo."

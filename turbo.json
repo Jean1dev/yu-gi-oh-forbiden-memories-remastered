@@ -36,8 +36,18 @@
       ],
       "outputs": ["generated/fusion-validation-report.json"]
     },
+    "data:build-roster": {
+      "inputs": [
+        "data/duelists/**",
+        "src/roster/derive-npc-deck.ts",
+        "src/roster/deterministic-random.ts",
+        "src/roster/duelist-source.ts",
+        "scripts/build-roster.ts"
+      ],
+      "outputs": ["data/roster.json"]
+    },
     "roster:validate": {
-      "dependsOn": ["data:validate"],
+      "dependsOn": ["data:validate", "data:build-roster"],
       "inputs": [
         "data/roster.json",
         "src/roster/**",

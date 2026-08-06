@@ -19,6 +19,7 @@ import {
   type ReadyDeck,
   type Result,
 } from "@yugioh/shared";
+import type { AiDecisionContext } from "./ai-candidate-evaluator.ts";
 
 export type BuildInitializationInput = (
   input: {
@@ -55,6 +56,9 @@ export type AdvanceCpuDependencies = Readonly<{
   closeReactionWindow: CloseReactionWindow;
   aiAgent: AiAgent;
   getPublicDuelState: GetPublicDuelState;
+  openAiDecisionContext?:
+    | ((publicState: ReturnType<GetPublicDuelState>, privateState: DuelState) => AiDecisionContext)
+    | undefined;
   cpuProfile: DifficultyProfile;
   onStep?:
     | ((step: { readonly session: DuelSession; readonly events: readonly DuelEvent[] }) => void)
@@ -202,12 +206,15 @@ export async function advanceCpuDecisions(
       return { ...current, currentDecider: "P1" };
     }
     const publicState = dependencies.getPublicDuelState(current.state, "P2");
+    const decisionContext = dependencies.openAiDecisionContext?.(publicState, current.state);
     let action: DuelAction;
     try {
       action = await dependencies.aiAgent.decide(publicState, dependencies.cpuProfile);
     } catch (error) {
       dependencies.logIncident?.({ code: "ai_unavailable", error });
       return failedSession(current, "ai_unavailable");
+    } finally {
+      decisionContext?.close();
     }
     const result = applyAndSettle(current.state, action, dependencies);
     if (!result.ok) {

@@ -9,6 +9,7 @@ Project skills live in [`.agents/skills/`](.agents/skills/) (Agent Skills standa
 | `duel-feature-prd` | Generating a PRD for a module or feature |
 | `spec-writer` | Turning a PRD feature into `spec.md` + `plan.md` |
 | `implement-feature` | Implementing from an existing `spec.md` + `plan.md` |
+| `duelist-builder` | Researching and adding a Forbidden Memories duelist end-to-end |
 
 Invoke explicitly (e.g. `/spec-writer`) or let the agent pick them from context.
 
