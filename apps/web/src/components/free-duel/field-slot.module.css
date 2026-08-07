@@ -1,0 +1,54 @@
+.slot {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 6px;
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+  cursor: pointer;
+}
+
+.slot[data-empty="true"] {
+  background: var(--color-night-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  cursor: default;
+}
+
+.slot:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.art {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.caption {
+  color: var(--text-heading);
+  font-family: var(--font-display);
+  /* Matches the rail chrome; see `duel-rail.module.css`. */
+  font-size: 9px;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.label {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-body-xs);
+  line-height: 1.1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

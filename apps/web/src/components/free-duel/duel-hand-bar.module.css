@@ -1,11 +1,10 @@
+/* Inside the board rather than under it, so it shares the board's frame; the
+   panel background the footer used to carry would double it up. */
 .bar {
   display: flex;
   flex-shrink: 0;
-  align-items: center;
-  gap: var(--space-5);
-  padding: 10px var(--space-4);
-  background: var(--surface-frame);
-  box-shadow: var(--shadow-bevel-raised);
+  align-items: flex-start;
+  gap: var(--space-4);
 }
 
 @media (max-width: 720px) {

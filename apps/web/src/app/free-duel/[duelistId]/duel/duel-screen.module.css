@@ -1,42 +1,84 @@
+/**
+ * The duel's four-column console frame: card inspector, left rail, board,
+ * right rail. The screen owns the shell only — each column's chrome lives in
+ * the component that fills it.
+ */
 .screen {
   position: relative;
-  display: flex;
-  width: min(100%, 1300px);
+  display: grid;
+  box-sizing: border-box;
   height: 100dvh;
-  min-height: 0;
-  flex-direction: row;
-  gap: var(--space-3);
-  margin: 0 auto;
+  /* On the screen rather than on `body`: a global rule would leak into every
+     other route (spec free-duel/F10, Decision 13). */
   overflow: hidden;
-  padding: var(--space-4) var(--space-5);
-}
-
-.main {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
+  grid-template-areas: "inspector rail-l board rail-r";
+  grid-template-columns: 300px 84px minmax(0, 1fr) 128px;
   gap: var(--space-3);
+  padding: var(--space-3);
 }
 
 .inspector {
   display: flex;
-  width: 200px;
-  flex: 0 0 200px;
-  flex-direction: column;
   min-height: 0;
-  overflow-y: auto;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow: auto;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  grid-area: inspector;
 }
 
-@media (max-width: 900px) {
-  .screen {
-    flex-direction: column;
-  }
+.board {
+  grid-area: board;
+}
 
-  .inspector {
-    width: 100%;
-    flex: 0 0 auto;
-  }
+.railLeft {
+  justify-content: center;
+  gap: var(--space-3);
+  grid-area: rail-l;
+}
+
+.railRight {
+  justify-content: space-between;
+  gap: 10px;
+  grid-area: rail-r;
+}
+
+/** The hand strip the board pins under the player's half. */
+.handBar {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fusion {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-body-sm);
+}
+
+.dialogLayer {
+  position: absolute;
+  z-index: 20;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  background: rgb(5 5 16 / 78%);
+}
+
+/* `SurrenderConfirmationDialog` is left untouched (spec free-duel/F10,
+   Decision 19); its panel chrome is applied from here by descendance. */
+.dialogLayer > div {
+  width: min(100% - var(--space-6), 520px);
+  padding: var(--space-5);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+.dialogLayer > div button + button {
+  margin-left: var(--space-3);
 }
 
 .title {
@@ -44,7 +86,7 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
@@ -55,8 +97,42 @@
   padding: var(--space-6);
 }
 
+/* The fixed chrome costs 512px, so it is squeezed before anything reflows. */
+@media (max-width: 1180px) {
+  .screen {
+    grid-template-columns: 232px 72px minmax(0, 1fr) 108px;
+  }
+}
+
+/* The inspector is the only column that can leave the viewport height. */
+@media (max-width: 900px) {
+  .screen {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    grid-template-areas:
+      "rail-l board rail-r"
+      "inspector inspector inspector";
+    grid-template-columns: 72px minmax(0, 1fr) 108px;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .inspector {
+    align-items: flex-start;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+
 @media (max-width: 640px) {
   .screen {
+    grid-template-areas:
+      "rail-l"
+      "board"
+      "rail-r"
+      "inspector";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     gap: var(--space-2);
     padding: var(--space-2);
   }

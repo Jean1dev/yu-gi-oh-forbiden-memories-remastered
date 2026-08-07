@@ -1,20 +1,74 @@
-.preview {
-  display: flex;
+.card {
   width: 100%;
-  flex-direction: column;
+  max-width: 190px;
   flex-shrink: 0;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  background: var(--surface-frame);
-  box-shadow: var(--shadow-bevel-raised);
+  align-self: center;
 }
 
+.meta {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+/* Press Start 2P is a wide monospace: a long card name has to be allowed to
+   break mid-word or it runs off both edges of a 300px column. */
 .name {
-  overflow: hidden;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.5;
+}
+
+.stats {
   margin: 0;
   color: var(--text-heading);
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+}
+
+.kind,
+.guardians {
+  margin: 0;
+  color: var(--color-gold);
+  font-family: var(--font-display);
   font-size: var(--text-body-sm);
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: var(--tracking-display);
+}
+
+.guardians {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+.description {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.description span {
+  color: var(--color-gold);
+}
+
+/* Laid out as a row under the board on short viewports; see the 900px
+   breakpoint in `duel-screen.module.css`. */
+@media (max-width: 900px) {
+  .card {
+    width: 128px;
+    align-self: flex-start;
+  }
+
+  .meta {
+    flex: 1;
+    text-align: left;
+  }
 }
