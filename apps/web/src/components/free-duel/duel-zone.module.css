@@ -1,7 +1,16 @@
+/* The slot itself. It owns the sunken bevel so it stays upright while the card
+   inside it can rotate into defense position. */
 .item {
-  list-style: none;
+  position: relative;
+  display: flex;
   min-width: 0;
   min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-night-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  list-style: none;
 }
 
 .button {
@@ -17,8 +26,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--surface-sunken);
-  box-shadow: var(--shadow-bevel-pressed);
   color: var(--text-muted);
   cursor: pointer;
 }
@@ -30,48 +37,73 @@
 
 .button:disabled {
   cursor: not-allowed;
-  opacity: 0.72;
+}
+
+/* A card sitting in the slot reads as an object with an edge. Declared before
+   the affordance rules so those — same specificity — replace the ring rather
+   than stack with it. */
+.button[data-occupied="true"] {
+  box-shadow: 0 0 0 2px var(--color-gold);
 }
 
 .button[data-affordance="selectable"],
 .button[data-affordance="target"] {
   color: var(--text-heading);
-  box-shadow:
-    var(--shadow-bevel-pressed),
-    0 0 0 3px var(--color-success);
+  box-shadow: 0 0 0 3px var(--color-success);
 }
 
 .button[data-affordance="target"] {
-  box-shadow:
-    var(--shadow-bevel-pressed),
-    0 0 0 3px var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger);
 }
 
 .button[data-affordance="selected"] {
-  box-shadow:
-    var(--shadow-bevel-pressed),
-    0 0 0 3px var(--color-gold);
+  box-shadow: 0 0 0 3px var(--color-gold);
 }
 
-.empty {
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  color: var(--text-muted);
+/* Brightness rather than a fourth ring: hovering must not overwrite the
+   green/red the affordance is signalling. */
+.button:hover:not(:disabled) {
+  filter: brightness(1.2);
 }
 
-.name {
-  position: absolute;
-  right: 0;
-  bottom: 1.65rem;
-  left: 0;
+/* An attack-position card fills its slot edge to edge, as in the approved
+   layout. A defense card lies on its side: it shrinks to a portrait card the
+   height of the slot and turns 90°, so the slot reads as a card placed
+   sideways rather than as a squeezed one. The rotation sits on this wrapper
+   and not on the button so the `{atk}/{def}` strip stays upright and the
+   `data-cue` scale animations keep working. */
+.card {
+  display: flex;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  padding: 0 var(--space-1);
-  background: rgb(5 5 16 / 82%);
-  color: var(--text-heading);
-  font-size: var(--text-body-xs);
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.card[data-orientation="defense"] {
+  width: auto;
+  aspect-ratio: 3 / 4;
+  transform: rotate(-90deg);
+}
+
+/* The vacant-slot marker: the same star the design system uses for card
+   levels, dimmed. Purely decorative — see the comment in `duel-zone.tsx`. */
+.empty {
+  width: 38%;
+  aspect-ratio: 1;
+  background: var(--surface-frame);
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+  opacity: 0.35;
 }
 
 .stats {
@@ -79,20 +111,14 @@
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 2px 0;
+  padding: 1px var(--space-1);
   background: var(--color-night-sunken);
   color: var(--text-heading);
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: var(--text-body-xs);
+  line-height: 1.2;
   text-align: center;
-}
-
-@media (max-width: 640px) {
-  .stats,
-  .name,
-  .empty {
-    font-size: var(--text-body-xs);
-  }
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: no-preference) {

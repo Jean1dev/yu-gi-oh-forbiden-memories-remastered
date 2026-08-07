@@ -35,5 +35,4 @@ export const DUEL_SCREEN_MESSAGES = {
   chooseTarget: "Escolha o alvo.",
   choosePositionChange: "Escolha um monstro para mudar de posicao.",
   idle: "Selecione uma carta ou escolha uma acao.",
-  exitDuel: "Sair do Duelo",
 } as const;

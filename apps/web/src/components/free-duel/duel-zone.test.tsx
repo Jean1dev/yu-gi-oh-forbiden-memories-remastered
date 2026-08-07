@@ -117,34 +117,16 @@ describe("DuelZone", () => {
     expect(onActivate).toHaveBeenCalledOnce();
   });
 
-  it("renders CardFrame (compact) instead of the legacy image when the card is migrated", () => {
-    const migratedCard: Card = { ...card, descricao: "A powerful dragon." };
+  // A board zone is a slot, not a gallery cell: it shows the crop art edge to
+  // edge plus the stats strip, whether or not the card carries a `descricao`.
+  // The full `CardFrame` renders in the inspector column instead.
+  it.each([
+    ["a migrated card", { ...card, descricao: "A powerful dragon." } as Card],
+    ["a card without descricao", card],
+  ])("fills the slot with the crop art for %s", (_label, subject) => {
     const zone = {
       occupied: true,
-      card: { visible: true, card: migratedCard },
-      position: "attack_face_up",
-      hasAttacked: false,
-      hasChangedPosition: false,
-      equips: [],
-    } as unknown as PublicMonsterZone;
-
-    render(
-      <DuelZone
-        zone={zone}
-        reference={reference}
-        label="Zona de monstro Jogador 1"
-        emptyLabel="Vazio"
-        affordance="idle"
-      />,
-    );
-
-    expect(screen.getByText("ATK 1200 / DEF 900")).toBeTruthy();
-  });
-
-  it("keeps rendering the legacy image for a card without descricao (regression fallback)", () => {
-    const zone = {
-      occupied: true,
-      card: { visible: true, card },
+      card: { visible: true, card: subject },
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
@@ -163,5 +145,61 @@ describe("DuelZone", () => {
 
     expect(screen.queryByText("ATK 1200 / DEF 900")).toBeNull();
     expect(screen.getByText("1200 / 900")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "Blue Dragon" }).getAttribute("src")).toBe(
+      "/cards-data/art/001.jpg",
+    );
+  });
+
+  it("previews a visible card when the zone is pointed at, even while disabled", () => {
+    const onInspect = vi.fn();
+    const zone = {
+      occupied: true,
+      card: { visible: true, card },
+      position: "attack_face_up",
+      hasAttacked: false,
+      hasChangedPosition: false,
+      equips: [],
+    } as unknown as PublicMonsterZone;
+
+    render(
+      <DuelZone
+        zone={zone}
+        reference={reference}
+        label="Zona de monstro Jogador 1"
+        emptyLabel="Vazio"
+        affordance="idle"
+        onInspect={onInspect}
+      />,
+    );
+
+    expect(screen.getByRole("button")).toHaveProperty("disabled", true);
+    fireEvent.pointerEnter(screen.getByRole("button").parentElement as HTMLElement);
+    expect(onInspect).toHaveBeenCalledWith(card);
+  });
+
+  it("never previews a face-down card", () => {
+    const onInspect = vi.fn();
+    const zone = {
+      occupied: true,
+      card: { visible: false },
+      position: "defense_face_down",
+      hasAttacked: false,
+      hasChangedPosition: false,
+      equips: [],
+    } as unknown as PublicMonsterZone;
+
+    render(
+      <DuelZone
+        zone={zone}
+        reference={reference}
+        label="Zona de monstro Oponente 1"
+        emptyLabel="Vazio"
+        affordance="idle"
+        onInspect={onInspect}
+      />,
+    );
+
+    fireEvent.pointerEnter(screen.getByRole("button").parentElement as HTMLElement);
+    expect(onInspect).not.toHaveBeenCalled();
   });
 });

@@ -42,14 +42,18 @@ describe("PlayerHand", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it("renders CardFrame (compact) instead of the legacy image when the card is migrated", () => {
-    const migratedCard: Card = { ...card, descricao: "A powerful dragon." };
-    render(<PlayerHand cards={[migratedCard]} disabled={false} />);
-    expect(screen.getByText("ATK 1200 / DEF 900")).toBeTruthy();
-  });
+  // 64px is too small for the full `CardFrame`; a hand card is the crop art
+  // plus its name, and selecting it fills the inspector column instead.
+  it.each([
+    ["a migrated card", { ...card, descricao: "A powerful dragon." } as Card],
+    ["a card without descricao", card],
+  ])("renders the crop art and the name for %s", (_label, subject) => {
+    render(<PlayerHand cards={[subject]} disabled={false} />);
 
-  it("keeps rendering the legacy image for a card without descricao (regression fallback)", () => {
-    render(<PlayerHand cards={[card]} disabled={false} />);
     expect(screen.queryByText("ATK 1200 / DEF 900")).toBeNull();
+    expect(screen.getByRole("img", { name: "Blue Dragon" }).getAttribute("src")).toBe(
+      "/cards-data/art/001.jpg",
+    );
+    expect(screen.getByText("Blue Dragon")).toBeTruthy();
   });
 });

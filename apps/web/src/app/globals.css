@@ -54,6 +54,12 @@
   --text-body-md: 1.25rem;
   --text-body-sm: 1.125rem;
   --text-body-xs: 1rem;
+  /* Display scale for numeric readouts (duel life points, ATK/DEF, pile
+     counts). Press Start 2P is very wide, so these run smaller than the body
+     scale despite reading as the larger type. */
+  --text-display-xl: 2rem;
+  --text-display-lg: 1.25rem;
+  --text-display-md: 1rem;
   --tracking-display: 0.05em;
   --leading-body: 1.35;
 
@@ -90,7 +96,13 @@ body {
   margin: 0;
   min-height: 100dvh;
   background:
-    repeating-linear-gradient(0deg, rgb(0 0 0 / 35%) 0px, rgb(0 0 0 / 35%) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 35%) 0px,
+      rgb(0 0 0 / 35%) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
     radial-gradient(ellipse at 50% -10%, var(--color-night-raised) 0%, transparent 60%),
     var(--surface-page);
   color: var(--text-primary);

@@ -1,0 +1,55 @@
+.rail {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.rail button {
+  all: unset;
+  box-sizing: border-box;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-1);
+  overflow: hidden;
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+  color: var(--text-heading);
+  cursor: pointer;
+  font-family: var(--font-display);
+  /* Below the type scale's floor on purpose: the rail is 84px wide and the
+     shortest label ("Passar Fase") still has to fit on two lines. */
+  font-size: 9px;
+  letter-spacing: var(--tracking-display);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.rail button:hover:not(:disabled) {
+  background: var(--hover-tint);
+  color: var(--color-black);
+}
+
+.rail button:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.rail button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.rail button[data-variant="primary"] {
+  background: var(--color-gold);
+  color: var(--color-black);
+}
+
+@media (max-width: 640px) {
+  .rail {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .rail button {
+    flex: 1;
+  }
+}

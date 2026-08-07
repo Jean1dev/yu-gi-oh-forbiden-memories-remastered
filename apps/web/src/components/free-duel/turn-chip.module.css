@@ -1,0 +1,24 @@
+.chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2) var(--space-1);
+  background: var(--color-night-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  /* Matches the rail buttons it sits under; see `duel-rail.module.css`. */
+  font-size: 9px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .chip {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+}
