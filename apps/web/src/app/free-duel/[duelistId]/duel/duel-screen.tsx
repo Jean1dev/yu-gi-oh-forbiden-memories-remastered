@@ -36,6 +36,7 @@ import { DuelResult } from "../../../../components/free-duel/duel-result.tsx";
 import { useDuelInteraction } from "../../../../hooks/use-duel-interaction.ts";
 import { useVictoryReward } from "../../../../hooks/use-victory-reward.ts";
 import { useVictoryRewardSync } from "../../../../hooks/use-victory-reward-sync.ts";
+import { buildCatalogLookup } from "../../../../lib/build-deck/catalog-lookup.ts";
 import type { GrantedVictoryReward } from "../../../../lib/free-duel/grant-victory-reward.ts";
 import { createGrantVictoryReward } from "../../../../lib/free-duel/victory-reward-wiring.ts";
 import { useDuelResult, type ResolveEndedDuelResult } from "../../../../hooks/use-duel-result.ts";
@@ -54,11 +55,6 @@ import styles from "./duel-screen.module.css";
 
 /** Stable empty list, so the reward chain's `useMemo` is not rebuilt every render. */
 const EMPTY_CARDS: readonly Card[] = [];
-
-function catalogLookupFor(cards: readonly Card[]) {
-  const byNumber = new Map(cards.map((card) => [card.numero, card]));
-  return (cardNumber: string) => byNumber.get(cardNumber);
-}
 
 export type DuelScreenContext = Readonly<{ duelist: Duelist; playerDeck: ReadyDeck }>;
 export type DuelScreenCatalogResult =
@@ -198,16 +194,19 @@ export function DuelScreen({
   const effectiveApply = duel.applyAction ?? applyAction ?? unavailableApply;
   const effectiveResolveResult = resolveResult ?? duel.resolveResult;
   const catalogCards = catalogResult.status === "ready" ? catalogResult.cards : EMPTY_CARDS;
+  // Built once per catalog and shared below, so the reward chain and the sync
+  // hook read the same lookup instead of each building their own `Map`.
+  const catalogLookup = useMemo(() => buildCatalogLookup(catalogCards), [catalogCards]);
   // Built once per catalog: the reward chain reaches Supabase and IndexedDB, so
   // rebuilding it on every render would re-open a client per frame.
   const defaultGrantVictoryReward = useMemo(
-    () => createGrantVictoryReward(catalogCards),
-    [catalogCards],
+    () => createGrantVictoryReward(catalogLookup),
+    [catalogLookup],
   );
   const effectiveGrantVictoryReward = grantVictoryReward ?? defaultGrantVictoryReward;
   const syncCatalog = useMemo(
-    () => (catalogCards.length > 0 ? catalogLookupFor(catalogCards) : undefined),
-    [catalogCards],
+    () => (catalogCards.length > 0 ? catalogLookup : undefined),
+    [catalogCards, catalogLookup],
   );
   // Drains rewards queued while offline, so a victory saved locally reaches the
   // server without waiting for the player to open Build Deck.

@@ -1,7 +1,6 @@
 import {
   DomainError,
   err,
-  type Card,
   type CardCatalogLookup,
   type ConsolidatedDuelResult,
   type DefaultCommonDropPool,
@@ -35,11 +34,6 @@ export function defaultCommonDropPoolFor(dropPool: DropPool): DefaultCommonDropP
   return dropPool.find((tier) => tier.tier === "common")?.cardNumbers ?? [];
 }
 
-function catalogFrom(cards: readonly Card[]): CardCatalogLookup {
-  const byNumber = new Map(cards.map((card) => [card.numero, card]));
-  return (cardNumber) => byNumber.get(cardNumber);
-}
-
 /**
  * Builds the browser-side reward chain and returns the function the duel screen
  * hands to the result overlay.
@@ -47,10 +41,12 @@ function catalogFrom(cards: readonly Card[]): CardCatalogLookup {
  * Everything here is I/O-bound composition — Supabase, IndexedDB, the session's
  * player id. The decisions (which card, how many stars) were already made by
  * pure code before any of this runs.
+ *
+ * Takes the catalog lookup rather than the raw card list so the duel screen can
+ * build the `Map` once and share it with `useVictoryRewardSync` instead of each
+ * consumer re-deriving its own copy.
  */
-export function createGrantVictoryReward(cards: readonly Card[]) {
-  const catalog = catalogFrom(cards);
-
+export function createGrantVictoryReward(catalog: CardCatalogLookup) {
   return async (
     result: Extract<ConsolidatedDuelResult, { status: "victory" }>,
     dropPool: DropPool,
