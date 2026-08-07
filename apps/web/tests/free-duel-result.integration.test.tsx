@@ -59,7 +59,7 @@ function createRatingEngine() {
   return {
     evaluate: vi.fn<RatingEngine["evaluate"]>(async () =>
       ok({
-        grade: "official-grade",
+        grade: "A-POW",
         reward: { stars: 25, dropTier: "official-tier" },
       }),
     ),
@@ -88,7 +88,7 @@ describe("free duel F03 to F05 result integration", () => {
     });
     render(<DuelResult result={result} />);
     expect(screen.getByRole("heading", { name: "Vitória!" })).toBeTruthy();
-    expect(screen.getByText("Nota official-grade")).toBeTruthy();
+    expect(screen.getByText("Nota A-POW")).toBeTruthy();
     expect(screen.getByText("+25 estrelas")).toBeTruthy();
     expect(ratingEngine.evaluate).toHaveBeenCalledOnce();
   });

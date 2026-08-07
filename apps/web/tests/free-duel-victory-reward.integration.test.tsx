@@ -103,7 +103,7 @@ const fixedClock: Clock = { now: () => new Date("2026-07-30T12:00:00.000Z") };
 
 function ratingEngineFor(reward: { stars: number; dropTier: string }) {
   return {
-    evaluate: vi.fn<RatingEngine["evaluate"]>(async () => ok({ grade: "A", reward })),
+    evaluate: vi.fn<RatingEngine["evaluate"]>(async () => ok({ grade: "A-POW", reward })),
   };
 }
 
