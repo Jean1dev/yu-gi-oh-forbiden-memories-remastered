@@ -293,122 +293,126 @@ export function DuelScreen({
   return (
     <main className={styles.screen}>
       <h1 className={styles.title}>Duelo</h1>
-      <DuelTopBar
-        terrainName={state.activeField?.nome ?? null}
-        phase={state.phase}
-        turn={state.turn}
-        onExit={surrenderFlow.requestConfirmation}
-      >
-        <SurrenderButton
-          available={surrenderFlow.available}
-          onClick={surrenderFlow.requestConfirmation}
-        />
-      </DuelTopBar>
-      <DuelBoard
-        view={view}
-        interactive={session.status === "in_progress" && isPlayerTurn && !duel.busy && !cues.busy}
-        zoneAffordance={interaction.affordanceFor}
-        cueFor={cues.cueFor}
-        cueForPlayer={cues.cueForPlayer}
-        onZoneActivate={interaction.onZoneActivate}
-      />
-      <DuelMessage text={messageText} tone={duel.lastRefusal ? "refusal" : "info"} />
-      {session.status === "in_progress" ? (
-        <>
-          <DuelPrompt
-            intent={interaction.intent}
-            onChoosePosition={interaction.onChoosePosition}
-            onCancel={interaction.reset}
+      <div className={styles.main}>
+        <DuelTopBar
+          terrainName={state.activeField?.nome ?? null}
+          phase={state.phase}
+          turn={state.turn}
+          onExit={surrenderFlow.requestConfirmation}
+        >
+          <SurrenderButton
+            available={surrenderFlow.available}
+            onClick={surrenderFlow.requestConfirmation}
           />
-          <DuelHandBar>
-            {pendingFusion ? (
-              <section aria-live="polite">
-                <p>Resultado: {pendingFusion.resultCard.nome}</p>
-                <ol>
-                  {pendingFusion.resolution.steps.map((step, index) => (
-                    <li key={index}>
-                      {step.accumulator} + {step.material} → {step.result ?? step.material}
-                    </li>
-                  ))}
-                </ol>
-                <button type="button" onClick={completeFusion}>
-                  Colocar fusão
-                </button>
-              </section>
-            ) : null}
-            <PlayerHand
-              cards={state.players.P1.hand}
-              disabled={!isPlayerTurn || duel.busy || cues.busy || pendingFusion !== undefined}
-              selectedIndex={selectedIndex}
-              selectedIndices={fusionIndexes}
-              drawnCount={cues.cueForPlayer("P1")?.kind === "draw" ? 1 : 0}
-              onSelect={(index) =>
-                fusionMode
-                  ? setFusionIndexes((current) =>
-                      current.includes(index)
-                        ? current.filter((value) => value !== index)
-                        : current.length < 5
-                          ? [...current, index]
-                          : current,
-                    )
-                  : interaction.onSelectHandCard(index)
-              }
+        </DuelTopBar>
+        <DuelBoard
+          view={view}
+          interactive={session.status === "in_progress" && isPlayerTurn && !duel.busy && !cues.busy}
+          zoneAffordance={interaction.affordanceFor}
+          cueFor={cues.cueFor}
+          cueForPlayer={cues.cueForPlayer}
+          onZoneActivate={interaction.onZoneActivate}
+        />
+        <DuelMessage text={messageText} tone={duel.lastRefusal ? "refusal" : "info"} />
+        {session.status === "in_progress" ? (
+          <>
+            <DuelPrompt
+              intent={interaction.intent}
+              onChoosePosition={interaction.onChoosePosition}
+              onCancel={interaction.reset}
             />
-            <div>
-              <button
-                type="button"
-                disabled={
-                  pendingFusion !== undefined ||
-                  state.phase !== "main" ||
-                  state.players.P1.handPlayUsed
+            <DuelHandBar>
+              {pendingFusion ? (
+                <section aria-live="polite">
+                  <p>Resultado: {pendingFusion.resultCard.nome}</p>
+                  <ol>
+                    {pendingFusion.resolution.steps.map((step, index) => (
+                      <li key={index}>
+                        {step.accumulator} + {step.material} → {step.result ?? step.material}
+                      </li>
+                    ))}
+                  </ol>
+                  <button type="button" onClick={completeFusion}>
+                    Colocar fusão
+                  </button>
+                </section>
+              ) : null}
+              <PlayerHand
+                cards={state.players.P1.hand}
+                disabled={!isPlayerTurn || duel.busy || cues.busy || pendingFusion !== undefined}
+                selectedIndex={selectedIndex}
+                selectedIndices={fusionIndexes}
+                drawnCount={cues.cueForPlayer("P1")?.kind === "draw" ? 1 : 0}
+                onSelect={(index) =>
+                  fusionMode
+                    ? setFusionIndexes((current) =>
+                        current.includes(index)
+                          ? current.filter((value) => value !== index)
+                          : current.length < 5
+                            ? [...current, index]
+                            : current,
+                      )
+                    : interaction.onSelectHandCard(index)
                 }
-                onClick={() => {
-                  setFusionMode((value) => !value);
-                  setFusionIndexes([]);
-                }}
-              >
-                {fusionMode ? "Cancelar fusão" : "Fundir"}
-              </button>
-              {fusionMode ? (
+              />
+              <div>
                 <button
                   type="button"
-                  disabled={fusionIndexes.length < 2}
+                  disabled={
+                    pendingFusion !== undefined ||
+                    state.phase !== "main" ||
+                    state.players.P1.handPlayUsed
+                  }
                   onClick={() => {
-                    void duel.submitAction({
-                      type: "begin_fusion",
-                      player: "P1",
-                      handIndexes: fusionIndexes,
-                    });
-                    setFusionMode(false);
+                    setFusionMode((value) => !value);
                     setFusionIndexes([]);
                   }}
                 >
-                  Confirmar fusão
+                  {fusionMode ? "Cancelar fusão" : "Fundir"}
                 </button>
-              ) : null}
-            </div>
-            <DuelActions slots={interaction.slots} onInvoke={interaction.onInvokeSlot} />
-          </DuelHandBar>
-          <DuelCardPreview card={previewCard} />
-        </>
-      ) : null}
-      <SurrenderConfirmationDialog
-        open={surrenderFlow.confirmationOpen}
-        onConfirm={surrenderFlow.confirm}
-        onCancel={surrenderFlow.cancel}
-      />
-      {session.status === "ended" ? (
-        <DuelResultOverlay>
-          <EndedDuelResult
-            session={session}
-            resolveResult={effectiveResolveResult}
-            dropPool={duel.context?.duelist.dropPool ?? []}
-            grantVictoryReward={grantVictoryReward}
-            cards={catalogResult.status === "ready" ? catalogResult.cards : []}
-          />
-          <PostDuelActions duelistId={duelistId} />
-        </DuelResultOverlay>
-      ) : null}
+                {fusionMode ? (
+                  <button
+                    type="button"
+                    disabled={fusionIndexes.length < 2}
+                    onClick={() => {
+                      void duel.submitAction({
+                        type: "begin_fusion",
+                        player: "P1",
+                        handIndexes: fusionIndexes,
+                      });
+                      setFusionMode(false);
+                      setFusionIndexes([]);
+                    }}
+                  >
+                    Confirmar fusão
+                  </button>
+                ) : null}
+              </div>
+              <DuelActions slots={interaction.slots} onInvoke={interaction.onInvokeSlot} />
+            </DuelHandBar>
+          </>
+        ) : null}
+        <SurrenderConfirmationDialog
+          open={surrenderFlow.confirmationOpen}
+          onConfirm={surrenderFlow.confirm}
+          onCancel={surrenderFlow.cancel}
+        />
+        {session.status === "ended" ? (
+          <DuelResultOverlay>
+            <EndedDuelResult
+              session={session}
+              resolveResult={effectiveResolveResult}
+              dropPool={duel.context?.duelist.dropPool ?? []}
+              grantVictoryReward={grantVictoryReward}
+              cards={catalogResult.status === "ready" ? catalogResult.cards : []}
+            />
+            <PostDuelActions duelistId={duelistId} />
+          </DuelResultOverlay>
+        ) : null}
+      </div>
+      <aside className={styles.inspector} aria-label="Carta selecionada">
+        <DuelCardPreview card={previewCard} />
+      </aside>
     </main>
   );
 }

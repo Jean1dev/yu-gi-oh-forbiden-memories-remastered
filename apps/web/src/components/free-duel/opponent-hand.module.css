@@ -1,0 +1,19 @@
+.list {
+  display: flex;
+  min-width: 0;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.item {
+  flex: 0 0 32px;
+}
+
+@media (max-width: 640px) {
+  .item {
+    flex-basis: 24px;
+  }
+}

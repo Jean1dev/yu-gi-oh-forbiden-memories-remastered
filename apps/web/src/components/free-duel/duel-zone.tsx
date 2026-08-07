@@ -27,6 +27,12 @@ function visibleStats(zone: PublicMonsterZone | PublicSpellZone): string | null 
   return `${zone.card.card.atk ?? "-"} / ${zone.card.card.def ?? "-"}`;
 }
 
+/** Defense monsters lie sideways on the field, whether face-up or face-down. */
+function monsterOrientation(zone: PublicMonsterZone | PublicSpellZone): "attack" | "defense" | undefined {
+  if (!zone.occupied || !isMonsterZone(zone)) return undefined;
+  return zone.position.startsWith("defense") ? "defense" : "attack";
+}
+
 export function DuelZone({
   zone,
   label,
@@ -37,6 +43,7 @@ export function DuelZone({
 }: DuelZoneProps) {
   const disabled = onActivate === undefined;
   const stats = visibleStats(zone);
+  const orientation = monsterOrientation(zone);
 
   let content = <span className={styles.empty}>{emptyLabel}</span>;
   let ariaLabel = `${label}, ${emptyLabel}`;
@@ -80,6 +87,7 @@ export function DuelZone({
         disabled={disabled}
         data-affordance={affordance}
         data-cue={cue}
+        data-orientation={orientation}
         onClick={onActivate}
       >
         {content}

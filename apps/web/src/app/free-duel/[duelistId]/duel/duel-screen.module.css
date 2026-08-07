@@ -1,14 +1,42 @@
 .screen {
   position: relative;
   display: flex;
-  width: min(100%, 1100px);
+  width: min(100%, 1300px);
   height: 100dvh;
   min-height: 0;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--space-3);
   margin: 0 auto;
   overflow: hidden;
   padding: var(--space-4) var(--space-5);
+}
+
+.main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.inspector {
+  display: flex;
+  width: 200px;
+  flex: 0 0 200px;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .screen {
+    flex-direction: column;
+  }
+
+  .inspector {
+    width: 100%;
+    flex: 0 0 auto;
+  }
 }
 
 .title {

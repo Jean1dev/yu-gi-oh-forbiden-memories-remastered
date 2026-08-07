@@ -4,6 +4,7 @@ import type { ZoneAffordance } from "../../lib/free-duel/duel-interaction.ts";
 import { ZONE_LABELS } from "../../lib/free-duel/duel-screen-messages.ts";
 import { DuelZone } from "./duel-zone.tsx";
 import { LpIndicator } from "./lp-indicator.tsx";
+import { OpponentHand } from "./opponent-hand.tsx";
 import styles from "./duel-side.module.css";
 
 export type DuelSideProps = Readonly<{
@@ -123,6 +124,7 @@ export function DuelSide({
         </>
       ) : (
         <>
+          {!state.hand.visible ? <OpponentHand count={state.hand.count} /> : null}
           {meta}
           {monsters}
           {spells}
