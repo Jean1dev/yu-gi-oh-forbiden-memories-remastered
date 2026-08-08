@@ -24,11 +24,23 @@ export const DropTierSchema = z
   .strictObject({
     tier: z.string().regex(DROP_TIER_PATTERN),
     cardNumbers: z.array(CardNumberSchema).min(1),
+    weights: z.record(CardNumberSchema, z.number().int().positive()).optional(),
   })
   .refine((entry) => new Set(entry.cardNumbers).size === entry.cardNumbers.length, {
     message: "drop tier cannot contain duplicate card numbers",
     path: ["cardNumbers"],
-  });
+  })
+  .refine(
+    (entry) =>
+      entry.weights === undefined ||
+      Object.keys(entry.weights).every((cardNumber) =>
+        entry.cardNumbers.includes(cardNumber as (typeof entry.cardNumbers)[number]),
+      ),
+    {
+      message: "drop tier weights can only cover card numbers listed in the tier",
+      path: ["weights"],
+    },
+  );
 
 export const DropPoolSchema = z
   .array(DropTierSchema)

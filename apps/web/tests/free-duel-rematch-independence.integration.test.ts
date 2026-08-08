@@ -6,6 +6,7 @@ import {
 } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 import { createDuelSession } from "../src/lib/free-duel/duel-session.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const input: MatchOrchestrationInput = {
   duelistId: "seto",
@@ -36,6 +37,7 @@ describe("free duel rematch independence integration", () => {
         turn: 1,
         phase: "main",
         seed: initialization.seed,
+        stats: emptyDuelStatsByPlayer(),
       }),
       seedGenerator: () => {
         seedSequence += 1;

@@ -1,6 +1,7 @@
 import {
   CARD_ATTRIBUTES,
   CARD_TYPES,
+  DUEL_STAT_COUNTERS,
   EVENT_TYPES,
   GUARDIAN_STARS,
   MAX_MONSTER_LEVEL,
@@ -17,6 +18,22 @@ import { load } from "./load.ts";
 import { serialize } from "./serialize.ts";
 
 const playerIdArbitrary = fc.constantFrom<PlayerId>("P1", "P2");
+
+/**
+ * Arbitrary duel counters (rating-engine F01). Built from `DUEL_STAT_COUNTERS`
+ * so a counter added to the vocabulary is round-tripped here without anyone
+ * remembering to extend this record.
+ */
+const duelStatsArbitrary = fc.record(
+  Object.fromEntries(
+    DUEL_STAT_COUNTERS.map((counter) => [counter, fc.integer({ min: 0, max: 999 })]),
+  ) as Record<(typeof DUEL_STAT_COUNTERS)[number], fc.Arbitrary<number>>,
+);
+
+const duelStatsByPlayerArbitrary = fc.record({
+  P1: duelStatsArbitrary,
+  P2: duelStatsArbitrary,
+});
 
 const monsterPositions: readonly MonsterPosition[] = [
   "attack_face_up",
@@ -166,12 +183,13 @@ const duelStateArbitrary = fc.record(
     turn: fc.integer({ min: 1, max: 999 }),
     phase: fc.constantFrom("draw", "main", "battle", "end"),
     seed: fc.integer({ min: 0, max: 0xffffffff }),
+    stats: duelStatsByPlayerArbitrary,
     pending: reactionWindowArbitrary,
     deckOutPlayer: playerIdArbitrary,
     attackLocks: attackLocksArbitrary,
     outcome: outcomeArbitrary,
   },
-  { requiredKeys: ["players", "activeField", "activePlayer", "turn", "phase", "seed"] },
+  { requiredKeys: ["players", "activeField", "activePlayer", "turn", "phase", "seed", "stats"] },
 );
 
 describe("round-trip idempotency (motor-duelo-1x1 F05, critério de aceite 1)", () => {

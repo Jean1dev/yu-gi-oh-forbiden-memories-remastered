@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 import { CardSchema } from "../card/schema.ts";
-import { EVENT_TYPES } from "./constants.ts";
+import { DUEL_STAT_COUNTERS, EVENT_TYPES } from "./constants.ts";
 import type { DuelEvent, EventType, JsonValue, ReactionWindow, ZoneReference } from "./events.ts";
+import type { DuelStats, DuelStatsByPlayer } from "./stats.ts";
 import type {
   AttackLock,
   DuelState,
@@ -196,6 +197,23 @@ const AttackLocksSchema = z
     message: "attackLocks must hold at most one entry per player",
   });
 
+/**
+ * Built from `DUEL_STAT_COUNTERS` rather than seven hand-written lines, so the
+ * schema cannot drift from the vocabulary. `strictObject` makes an unknown
+ * counter key an authoring error instead of data carried along silently, the
+ * same rule `CardSchema` follows.
+ */
+export const DuelStatsSchema = z.strictObject(
+  Object.fromEntries(
+    DUEL_STAT_COUNTERS.map((counter) => [counter, z.number().int().min(0)]),
+  ) as Record<(typeof DUEL_STAT_COUNTERS)[number], z.ZodNumber>,
+);
+
+export const DuelStatsByPlayerSchema = z.strictObject({
+  P1: DuelStatsSchema,
+  P2: DuelStatsSchema,
+});
+
 export const DuelStateSchema = z.strictObject({
   players: z.strictObject({
     P1: PlayerStateSchema,
@@ -208,6 +226,7 @@ export const DuelStateSchema = z.strictObject({
   pending: ReactionWindowSchema.optional(),
   pendingFusion: PendingFusionSchema.optional(),
   seed: z.number().int().min(0).max(0xffffffff),
+  stats: DuelStatsByPlayerSchema,
   deckOutPlayer: PlayerIdSchema.optional(),
   attackLocks: AttackLocksSchema.optional(),
   outcome: DuelOutcomeSchema.optional(),
@@ -306,6 +325,12 @@ const _fieldMatchesDeclaredType: PlayerField = {} as z.infer<typeof PlayerFieldS
 void _fieldMatchesDeclaredType;
 const _playerMatchesDeclaredType: PlayerState = {} as z.infer<typeof PlayerStateSchema>;
 void _playerMatchesDeclaredType;
+const _statsMatchDeclaredType: DuelStats = {} as z.infer<typeof DuelStatsSchema>;
+void _statsMatchDeclaredType;
+const _statsByPlayerMatchDeclaredType: DuelStatsByPlayer = {} as z.infer<
+  typeof DuelStatsByPlayerSchema
+>;
+void _statsByPlayerMatchDeclaredType;
 const _monsterZoneMatchesDeclaredType: MonsterZone = {} as z.infer<typeof MonsterZoneSchema>;
 void _monsterZoneMatchesDeclaredType;
 const _spellZoneMatchesDeclaredType: SpellZone = {} as z.infer<typeof SpellZoneSchema>;

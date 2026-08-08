@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 import { replaceZone } from "../field/replace-zone.ts";
 import { changePosition } from "./change-position.ts";
 import { nextPosition } from "./next-position.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const cardArbitrary = fc.record({
   id: fc.integer({ min: 1, max: 999999 }),
@@ -82,6 +83,7 @@ function makeState(card: Card, position: MonsterPosition, zoneIndex: 0 | 1 | 2 |
     turn: 5,
     phase: "battle",
     seed: 42,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

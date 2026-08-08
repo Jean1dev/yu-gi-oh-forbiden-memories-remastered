@@ -1,5 +1,6 @@
 import {
   CARD_TYPES,
+  DUEL_STAT_COUNTERS,
   GUARDIAN_STARS,
   type DuelState,
   type MonsterZone,
@@ -82,6 +83,13 @@ const playerStateArbitrary: fc.Arbitrary<PlayerState> = fc.record({
 const phaseArbitrary = fc.constantFrom<Phase>("draw", "main", "battle", "end");
 const playerIdArbitrary = fc.constantFrom<PlayerId>("P1", "P2");
 
+/** Arbitrary duel counters (rating-engine F01), derived from the vocabulary. */
+const duelStatsArbitrary = fc.record(
+  Object.fromEntries(
+    DUEL_STAT_COUNTERS.map((counter) => [counter, fc.integer({ min: 0, max: 999 })]),
+  ) as Record<(typeof DUEL_STAT_COUNTERS)[number], fc.Arbitrary<number>>,
+);
+
 const duelStateArbitrary: fc.Arbitrary<DuelState> = fc.record({
   players: fc.record({ P1: playerStateArbitrary, P2: playerStateArbitrary }),
   activeField: fc.option(cardArbitrary, { nil: null }),
@@ -89,6 +97,7 @@ const duelStateArbitrary: fc.Arbitrary<DuelState> = fc.record({
   turn: fc.integer({ min: 1, max: 50 }),
   phase: phaseArbitrary,
   seed: fc.integer({ min: 0, max: 0xffffffff }),
+  stats: fc.record({ P1: duelStatsArbitrary, P2: duelStatsArbitrary }),
 });
 
 const CYCLE: readonly Phase[] = ["draw", "main", "battle", "end"];

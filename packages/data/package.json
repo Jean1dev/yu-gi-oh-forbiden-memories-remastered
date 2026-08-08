@@ -7,8 +7,6 @@
     "./art": "./src/art/index.ts",
     "./catalog": "./src/catalog/index.ts",
     "./catalog/disk": "./scripts/load-catalog-from-disk.ts",
-    "./drops": "./src/drops/index.ts",
-    "./drops/disk": "./scripts/load-drop-table-from-disk.ts",
     "./fusion": "./src/fusion/index.ts",
     "./fusion/official": "./src/fusion/official-fusions.ts",
     "./fusion/disk": "./scripts/load-fusion-table-from-disk.ts",

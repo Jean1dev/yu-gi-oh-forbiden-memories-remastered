@@ -8,6 +8,7 @@ import {
 import { describe, expect, it } from "vitest";
 
 import { load } from "./load.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const emptyZone = { occupied: false } as const;
 
@@ -54,6 +55,7 @@ function validState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 1,
     phase: "main",
     seed: 1753617600,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

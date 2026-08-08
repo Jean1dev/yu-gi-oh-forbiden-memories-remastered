@@ -2,6 +2,7 @@ import type { DuelState, PlayerField, PlayerState } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { isFirstDuelTurn } from "./first-turn.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function emptyField(): PlayerField {
   const zone = { occupied: false } as const;
@@ -23,6 +24,7 @@ function makeState(turn: number): DuelState {
     turn,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

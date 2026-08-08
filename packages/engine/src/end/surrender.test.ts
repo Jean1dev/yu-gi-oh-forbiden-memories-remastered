@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createEvent } from "../events/index.ts";
 import { surrender } from "./surrender.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function makeCard(): Card {
   return {
@@ -41,6 +42,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 3,
     phase: "battle",
     seed: 7,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

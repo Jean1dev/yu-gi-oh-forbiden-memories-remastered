@@ -12,6 +12,7 @@ import {
   DuelScreen,
   type DuelScreenContext,
 } from "../src/app/free-duel/[duelistId]/duel/duel-screen.tsx";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn() }) }));
 
@@ -29,6 +30,7 @@ const finalState: DuelState = {
   turn: 1,
   phase: "end",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 const duelist: Duelist = {
   id: "seto",

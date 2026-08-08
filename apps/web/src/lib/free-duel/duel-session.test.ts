@@ -20,6 +20,7 @@ import {
   submitPlayerAction,
   type AdvanceCpuDependencies,
 } from "./duel-session.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const emptyField = {
   monsters: Array.from({ length: 5 }, () => ({ occupied: false })) as never,
@@ -36,6 +37,7 @@ const state = (activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"): D
   turn: 1,
   phase,
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 });
 
 /** A state the engine has frozen (motor-duelo-1x1/F12) — what actually ends a session. */

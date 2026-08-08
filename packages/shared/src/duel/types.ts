@@ -3,6 +3,7 @@ import type { DuelOutcome } from "./outcome.ts";
 import type { ReactionWindow } from "./events.ts";
 import type { PlayerId } from "./player.ts";
 import type { DuelEvent, EventType, JsonValue, ZoneReference } from "./events.ts";
+import type { DuelStatsByPlayer } from "./stats.ts";
 import type { FusionResolution } from "../fusion/types.ts";
 
 export type { PlayerId } from "./player.ts";
@@ -98,6 +99,17 @@ export type DuelState = Readonly<{
   pendingFusion?: PendingFusion | undefined;
   /** The seed this duel was shuffled with (F03); enables deterministic replay. */
   seed: number;
+  /**
+   * How each player played, in the seven terms the rating formula counts
+   * (rating-engine F01). Lives here rather than inside `PlayerState` for the
+   * same reason `turn` does: it is a dimension of the duel indexed by player,
+   * not a property of the player.
+   *
+   * Required, never optional. An optional field would force every consumer to
+   * choose between erroring and assuming zeros, and assuming zeros silently
+   * grades a duel nobody measured as the best one possible.
+   */
+  stats: DuelStatsByPlayer;
   /** Set once a player fails to complete a mandatory draw (F07); consumed by F12. */
   deckOutPlayer?: PlayerId | undefined;
   /** Absent while nobody is locked out of attacking (`docs/spells/attack-lock.md`). */

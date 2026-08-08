@@ -4,6 +4,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { Card, DuelState, PlayerField } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import { useDuelInteraction } from "./use-duel-interaction.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const card: Card = {
   id: 1,
@@ -47,6 +48,7 @@ const state: DuelState = {
   turn: 2,
   phase: "main",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 
 describe("useDuelInteraction", () => {

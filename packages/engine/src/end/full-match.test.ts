@@ -156,3 +156,101 @@ describe("full match (motor-duelo-1x1 cross-feature integration)", () => {
     if (reloaded.ok) expect(reloaded.value).toEqual(conceded);
   });
 });
+
+describe("duel statistics over a full match (rating-engine F01)", () => {
+  /**
+   * Plays the same scripted opening twice and returns both final states: the
+   * counters are part of the deterministic state, so the same seed and the
+   * same actions must reproduce them exactly.
+   */
+  function playScriptedOpening(): DuelState {
+    const initial = startDuel();
+    const attacker = initial.activePlayer;
+    const defender = attacker === "P1" ? "P2" : "P1";
+
+    // Attacker's turn: a monster in attack position.
+    const attackerSummoned = closeWindow(
+      run(initial, [
+        { type: "advance_phase" },
+        {
+          type: "summon_monster",
+          player: attacker,
+          handIndex: 0,
+          zoneIndex: 0,
+          position: "attack_face_up",
+        },
+      ]),
+    );
+
+    // Defender's turn: a monster in attack position, so the trade below counts.
+    const defenderSummoned = closeWindow(
+      run(passTurn(attackerSummoned), [
+        { type: "advance_phase" },
+        {
+          type: "summon_monster",
+          player: defender,
+          handIndex: 0,
+          zoneIndex: 0,
+          position: "attack_face_up",
+        },
+      ]),
+    );
+
+    // Attacker's next turn: trade the two monsters. Equal ATK destroys both,
+    // and the target was in attack posture, so it is an effective attack.
+    const traded = run(passTurn(defenderSummoned), [
+      { type: "advance_phase" },
+      { type: "advance_phase" },
+      { type: "declare_attack", attackerZoneIndex: 0, targetZoneIndex: 0 },
+      { type: "resolve_attack" },
+    ]);
+
+    // Defender's next turn: set a monster face down.
+    return closeWindow(
+      run(passTurn(traded), [
+        { type: "advance_phase" },
+        {
+          type: "summon_monster",
+          player: defender,
+          handIndex: 0,
+          zoneIndex: 0,
+          position: "defense_face_down",
+        },
+      ]),
+    );
+  }
+
+  it("accumulates a consistent set of counters for both players", () => {
+    const initial = startDuel();
+    const attacker = initial.activePlayer;
+    const defender = attacker === "P1" ? "P2" : "P1";
+
+    const final = playScriptedOpening();
+
+    expect(final.stats[attacker].effectiveAttacks).toBe(1);
+    expect(final.stats[defender].effectiveAttacks).toBe(0);
+    expect(final.stats[defender].faceDownPlays).toBe(1);
+    expect(final.stats[attacker].faceDownPlays).toBe(0);
+
+    // Nothing else was played, so every other counter stayed at zero.
+    for (const player of [attacker, defender] as const) {
+      expect(final.stats[player].fusions).toBe(0);
+      expect(final.stats[player].equips).toBe(0);
+      expect(final.stats[player].pureMagics).toBe(0);
+      expect(final.stats[player].triggeredTraps).toBe(0);
+    }
+  });
+
+  it("reproduces identical stats when replayed from the same seed and actions", () => {
+    expect(playScriptedOpening().stats).toEqual(playScriptedOpening().stats);
+  });
+
+  it("survives the snapshot round-trip with the counters intact", () => {
+    const final = playScriptedOpening();
+
+    const reloaded = load(serialize(final));
+
+    expect(reloaded.ok).toBe(true);
+    if (reloaded.ok) expect(reloaded.value.stats).toEqual(final.stats);
+  });
+});

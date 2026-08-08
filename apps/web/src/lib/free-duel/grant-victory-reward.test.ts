@@ -14,7 +14,7 @@ const result: Extract<ConsolidatedDuelResult, { status: "victory" }> = {
   status: "victory",
   duelSessionId: "session",
   reason: "lp_depleted",
-  rating: { source: "rating_engine", grade: "A", reward: { stars: 11, dropTier: "common" } },
+  rating: { source: "rating_engine", grade: "A-POW", reward: { stars: 4, dropTier: "sa-pow" } },
 };
 const dropPool: DropPool = [{ tier: "common", cardNumbers: ["001"] }];
 
@@ -43,7 +43,9 @@ describe("grantVictoryReward", () => {
     const apply = vi.fn(async () => ok({ applied: true, cardQuantity: 1, walletStars: 11 }));
     const granted = await grantVictoryReward(result, { playerId: "player", dropPool }, deps(apply));
     expect(granted.ok).toBe(true);
-    expect(apply).toHaveBeenCalledWith("player", "session", "001", 11);
+    // 4 is the fixture's rating stars (A-POW), not the wallet balance the RPC
+    // happens to return — the point is that the rating value is what travels.
+    expect(apply).toHaveBeenCalledWith("player", "session", "001", 4);
   });
 
   it("does not apply either reward when card selection fails", async () => {
@@ -73,5 +75,54 @@ describe("grantVictoryReward", () => {
     expect(granted).toMatchObject({ ok: false, error: { code: "malformed_victory_reward_event" } });
     expect(apply).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith("warn", "victory_reward_event_malformed", expect.any(Object));
+  });
+});
+
+describe("grantVictoryReward — drop weights", () => {
+  /** A tier where one card is overwhelmingly likelier, as the original's tables allow. */
+  const weightedPool: DropPool = [
+    {
+      tier: "sa-pow",
+      cardNumbers: ["001", "002"],
+      weights: { "001": 2047, "002": 1 },
+    },
+  ];
+
+  async function grantedCardFor(duelSessionId: string, pool: DropPool): Promise<string> {
+    const granted = await grantVictoryReward(
+      { ...result, duelSessionId },
+      { playerId: "player", dropPool: pool },
+      deps(),
+    );
+    if (!granted.ok) throw new Error(`expected a grant, got ${granted.error.code}`);
+    return granted.value.outcome.cardNumber;
+  }
+
+  it("follows the tier weights instead of drawing uniformly", async () => {
+    const draws = await Promise.all(
+      Array.from({ length: 60 }, (_, index) => grantedCardFor(`session-${String(index)}`, weightedPool)),
+    );
+
+    // 2047:1 — a uniform draw would land on "002" about half the time.
+    expect(draws.filter((cardNumber) => cardNumber === "001").length).toBeGreaterThan(50);
+  });
+
+  it("still draws from a tier that carries no weights", async () => {
+    const unweighted: DropPool = [{ tier: "sa-pow", cardNumbers: ["001", "002"] }];
+
+    const draws = await Promise.all(
+      Array.from({ length: 20 }, (_, index) => grantedCardFor(`plain-${String(index)}`, unweighted)),
+    );
+
+    expect(draws.every((cardNumber) => cardNumber === "001" || cardNumber === "002")).toBe(true);
+  });
+
+  it("is deterministic for the same session, weights or not", async () => {
+    const [first, second] = await Promise.all([
+      grantedCardFor("stable", weightedPool),
+      grantedCardFor("stable", weightedPool),
+    ]);
+
+    expect(first).toBe(second);
   });
 });
