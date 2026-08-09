@@ -21,11 +21,7 @@ import { aiLogger } from "../logging.ts";
 import { createAiCandidateEvaluator } from "./ai-candidate-evaluator.ts";
 
 import { resolveDuelResult } from "./resolve-duel-result.ts";
-import {
-  MINIMUM_RATING_REWARD,
-  readDuelOutcome,
-  unavailableRatingEngine,
-} from "./rating-policy.ts";
+import { MINIMUM_RATING_REWARD, ratingEngine, readDuelOutcome } from "./rating-policy.ts";
 import { createCryptoSeedGenerator, generateDuelSessionId } from "./seed-generator.ts";
 import {
   createDuelSession,
@@ -74,7 +70,7 @@ export function createDuelRuntime(input: CreateDuelRuntimeInput): DuelRuntime {
     resolveDuelResult(session, {
       readOutcome: readDuelOutcome,
       createSnapshot: serialize,
-      ratingEngine: unavailableRatingEngine,
+      ratingEngine,
       minimumReward: MINIMUM_RATING_REWARD,
     });
 

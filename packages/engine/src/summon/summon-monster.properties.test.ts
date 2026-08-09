@@ -10,6 +10,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { summonMonster } from "./summon-monster.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const summonableCardArbitrary = fc.record({
   id: fc.integer({ min: 1, max: 999999 }),
@@ -90,6 +91,7 @@ function makeState(
     turn: 3,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

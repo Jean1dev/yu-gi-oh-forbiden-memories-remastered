@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 
 import { declareAttack } from "./declare-attack.ts";
 import { resolveAttack } from "./resolve-attack.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -86,6 +87,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 3,
     phase: "battle",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

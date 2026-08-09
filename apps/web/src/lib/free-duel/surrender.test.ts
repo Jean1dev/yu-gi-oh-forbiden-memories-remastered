@@ -1,3 +1,4 @@
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 import { ok, type ApplyResult, type DuelSession, type DuelState } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -21,6 +22,7 @@ function duelState(activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"
     turn: 1,
     phase,
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

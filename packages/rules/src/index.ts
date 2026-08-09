@@ -86,3 +86,19 @@ export {
   resolvePasswordEntry,
   type ResolvePasswordEntryInput,
 } from "./password/index.ts";
+export {
+  BASE_SCORE,
+  GRADE_REWARDS,
+  MAX_DUEL_SCORE,
+  MIN_DUEL_SCORE,
+  SCORE_PARAMETERS,
+  WIN_TYPE_POINTS,
+  evaluateDuel,
+  gradeFromScore,
+  rewardForGrade,
+  scoreDuel,
+  type DuelScoreInput,
+  type DuelWinType,
+  type ScoreParameterName,
+  type ScoreParameterTable,
+} from "./rating/index.ts";

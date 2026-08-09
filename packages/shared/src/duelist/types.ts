@@ -14,6 +14,15 @@ export type DifficultyProfile = Readonly<{
 export type DropTier = Readonly<{
   tier: DropTierId;
   cardNumbers: readonly CardNumber[];
+  /**
+   * Each candidate's chance out of 2048, verbatim from the original game's drop
+   * tables. Keys are a subset of `cardNumbers`.
+   *
+   * Optional because a duelist this project invented has no original weights to
+   * carry (`test-duelist`); absent, the draw falls back to a uniform pick,
+   * which is what `selectDropCardNumber` already does without a lookup.
+   */
+  weights?: Readonly<Record<CardNumber, number>> | undefined;
 }>;
 
 export type DropPool = readonly DropTier[];

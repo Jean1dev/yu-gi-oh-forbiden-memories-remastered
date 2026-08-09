@@ -27,6 +27,7 @@ import {
 } from "../src/lib/free-duel/resolve-duel-result.ts";
 import type { VictoryRewardQueue } from "../src/lib/reward/victory-reward-queue.ts";
 import type { WalletCache } from "../src/lib/wallet/indexeddb-cache.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn() }) }));
 
@@ -45,6 +46,7 @@ const endedState: DuelState = {
   turn: 3,
   phase: "end",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 
 function endedSession(duelSessionId: string): Extract<DuelSession, { status: "ended" }> {
@@ -101,7 +103,7 @@ const fixedClock: Clock = { now: () => new Date("2026-07-30T12:00:00.000Z") };
 
 function ratingEngineFor(reward: { stars: number; dropTier: string }) {
   return {
-    evaluate: vi.fn<RatingEngine["evaluate"]>(async () => ok({ grade: "A", reward })),
+    evaluate: vi.fn<RatingEngine["evaluate"]>(async () => ok({ grade: "A-POW", reward })),
   };
 }
 

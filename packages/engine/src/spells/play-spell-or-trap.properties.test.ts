@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 
 import { playFieldSpell } from "./play-field-spell.ts";
 import { playSpellOrTrap } from "./play-spell-or-trap.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const baseCardArbitrary = fc.record({
   id: fc.integer({ min: 1, max: 999999 }),
@@ -71,6 +72,7 @@ function makeState(hand: readonly Card[], deck: readonly Card[], activeField: Ca
     turn: 3,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

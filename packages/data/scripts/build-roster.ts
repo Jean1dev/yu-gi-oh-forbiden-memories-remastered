@@ -3,7 +3,15 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
 
-import { DomainError, err, ok, type Duelist, type Result, type Roster } from "@yugioh/shared";
+import {
+  DomainError,
+  err,
+  ok,
+  type DropTier,
+  type Duelist,
+  type Result,
+  type Roster,
+} from "@yugioh/shared";
 
 import {
   deriveNpcDeck,
@@ -27,7 +35,7 @@ import { DuelistSourceSchema, type DuelistSource } from "../src/roster/duelist-s
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DUELISTS_DIR = join(PACKAGE_ROOT, "data", "duelists");
 const ROSTER_FILE = join(PACKAGE_ROOT, "data", "roster.json");
-const ROSTER_VERSION = "1.1.0";
+const ROSTER_VERSION = "1.2.0";
 
 async function readSource(path: string): Promise<Result<DuelistSource, DomainError>> {
   let raw: unknown;
@@ -50,6 +58,27 @@ async function readSource(path: string): Promise<Result<DuelistSource, DomainErr
       );
 }
 
+/**
+ * Turns one source pool into a roster drop tier, keeping the original's
+ * per-card chances out of `POOL_WEIGHT_TOTAL`.
+ *
+ * A card can appear more than once in the source entries; the weights are
+ * summed so the tier lists each card once with its total chance, which is what
+ * a weighted draw needs.
+ */
+export function toDropTier(pool: DuelistSource["dropPools"][number]): DropTier {
+  const weights: Record<string, number> = {};
+  for (const entry of pool.entries) {
+    weights[entry.cardNumber] = (weights[entry.cardNumber] ?? 0) + entry.weight;
+  }
+
+  return {
+    tier: pool.tier,
+    cardNumbers: Object.keys(weights) as DropTier["cardNumbers"],
+    weights,
+  };
+}
+
 export function toDuelist(source: DuelistSource): Result<Duelist, DomainError> {
   const deck =
     source.deckPool === undefined
@@ -66,13 +95,10 @@ export function toDuelist(source: DuelistSource): Result<Duelist, DomainError> {
     difficulty: source.difficulty,
     profile: source.profile,
     deck: deck.value,
-    // A drop tier carries candidates, not weights: the rarity weighting is the
-    // rating engine's job (`rules/drop-reward`), so the pool collapses to its
-    // distinct card numbers here.
-    dropPool: source.dropPools.map((pool) => ({
-      tier: pool.tier,
-      cardNumbers: [...new Set(pool.entries.map((entry) => entry.cardNumber))],
-    })),
+    // The rating engine picks the *tier* (rating-engine/F03); which card falls
+    // inside it is still a weighted draw, so the original's per-card chances
+    // out of 2048 travel with the pool instead of being dropped here.
+    dropPool: source.dropPools.map(toDropTier),
   });
 }
 
@@ -100,6 +126,17 @@ export async function buildRoster(): Promise<Result<Roster, DomainError>> {
       console.warn(
         `${source.value.id}: deck pool weighs ${String(weight)}, not ${String(POOL_WEIGHT_TOTAL)} — rolls past the end are skipped.`,
       );
+    }
+
+    // Same check for the drop tiers: the original's chances are out of 2048, so
+    // a tier that weighs anything else is a transcription slip in the source.
+    for (const pool of source.value.dropPools) {
+      const tierWeight = totalPoolWeight(pool.entries);
+      if (tierWeight !== POOL_WEIGHT_TOTAL) {
+        console.warn(
+          `${source.value.id}: drop tier "${pool.tier}" weighs ${String(tierWeight)}, not ${String(POOL_WEIGHT_TOTAL)}.`,
+        );
+      }
     }
 
     const duelist = toDuelist(source.value);

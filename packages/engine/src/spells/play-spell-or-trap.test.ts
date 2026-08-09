@@ -2,6 +2,7 @@ import type { Card, DuelState, PlayerField, PlayerState, SpellZone } from "@yugi
 import { describe, expect, it } from "vitest";
 
 import { playSpellOrTrap } from "./play-spell-or-trap.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -47,6 +48,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 3,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

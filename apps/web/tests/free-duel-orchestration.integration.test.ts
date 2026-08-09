@@ -10,6 +10,7 @@ import {
 import { describe, expect, it } from "vitest";
 import { buildMatchInput } from "../src/lib/free-duel/build-match-input.ts";
 import { advanceCpuDecisions, createDuelSession } from "../src/lib/free-duel/duel-session.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 function card(number: CardNumber): Card {
   return {
@@ -116,6 +117,7 @@ describe("free duel F01 -> F02 -> F03", () => {
       turn: 1,
       phase: "main",
       seed: 42,
+      stats: emptyDuelStatsByPlayer(),
     };
     const session = createDuelSession(input, {
       buildInitializationInput: () =>

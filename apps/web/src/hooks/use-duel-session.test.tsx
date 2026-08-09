@@ -6,6 +6,7 @@ import type { DuelRuntime } from "../lib/free-duel/duel-runtime.ts";
 import type { DuelSession, DuelState, Duelist, ReadyDeck } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import { useDuelSession, type DuelSessionContext } from "./use-duel-session.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const field = {
   monsters: Array.from({ length: 5 }, () => ({ occupied: false })) as never,
@@ -21,6 +22,7 @@ const state: DuelState = {
   turn: 1,
   phase: "main",
   seed: 1,
+  stats: emptyDuelStatsByPlayer(),
 };
 const duelist: Duelist = {
   id: "seto",

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { DUEL_GRADES } from "./constants.ts";
 import { DecisiveDuelEndReasonSchema } from "./schema.ts";
 import type { DuelOutcomeSchema } from "./schema.ts";
 import type {
@@ -28,15 +29,18 @@ export const RatingRewardSchema = z.strictObject({
 
 export const MinimumRatingRewardSchema = RatingRewardSchema;
 
+/** Closed since `rating-engine/F02`: an unknown grade is now a validation failure. */
+export const DuelGradeSchema = z.enum(DUEL_GRADES);
+
 export const RatingEvaluationSchema = z.strictObject({
-  grade: z.string().trim().min(1),
+  grade: DuelGradeSchema,
   reward: RatingRewardSchema,
 });
 
 const ConsolidatedRatingSchema = z.discriminatedUnion("source", [
   z.strictObject({
     source: z.literal("rating_engine"),
-    grade: z.string().trim().min(1),
+    grade: DuelGradeSchema,
     reward: RatingRewardSchema,
   }),
   z.strictObject({

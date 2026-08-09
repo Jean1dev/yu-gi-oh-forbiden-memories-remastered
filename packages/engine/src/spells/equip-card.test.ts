@@ -10,6 +10,7 @@ import type {
 import { describe, expect, it } from "vitest";
 
 import { equipCard } from "./equip-card.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -90,6 +91,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 3,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

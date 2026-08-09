@@ -8,6 +8,7 @@ import {
   zoneReference,
   type DuelIntent,
 } from "./duel-interaction.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const monster: Card = {
   id: 1,
@@ -80,6 +81,7 @@ function state(overrides: Partial<DuelState> = {}): DuelState {
     turn: 2,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

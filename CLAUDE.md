@@ -92,10 +92,18 @@ a `code` the UI maps to a message.
 enough. The `dev`, `build`, `test` and `typecheck` turbo tasks all depend on `data:validate`, so
 this is usually automatic.
 
-The auxiliary tables (`fusions.json`, the Guardian Star matrix, terrains, drops) are all still
-`[]` — schema and loaders exist, values do not. The combat modifiers in
-`packages/rules/src/{guardian-star,terrain,effect-system}` are deliberate neutral placeholders
+Of the auxiliary tables, **the Guardian Star matrix and the terrain↔class matrix are still empty**
+— schema and loaders exist, values do not — so the combat modifiers in
+`packages/rules/src/{guardian-star,terrain,effect-system}` remain deliberate neutral placeholders
 for PRDs that have not been written.
+
+The other two are no longer empty. `packages/data/rules-data/fusions.json` carries the real
+recipes (`fusion-system`), and the **drop tables now live per duelist** in
+`packages/data/data/duelists/*.json`, reaching `roster.json` as `DropTier.weights` — each card's
+chance out of 2048, verbatim from the original. The separate `packages/data/src/drops` module that
+`banco-de-cartas/F08` built for that data was **deleted**: nothing ever imported it, its file
+stayed `[]`, and its `DropPool` type collided by name with the live one in
+`packages/shared/src/duelist`.
 
 ### Persistence
 
@@ -146,6 +154,14 @@ generic and long — consult it for a specific question rather than reading it e
   unrelated to whatever you are changing:
   `packages/engine/src/serialization/round-trip.properties.test.ts` (`__proto__`) and
   `packages/data/src/art/resolve-art.test.ts` (`valueOf`/`toString`).
+- **`pnpm test` at the root also times out property tests under load.** Vitest's per-test limit is
+  5 s and several property suites sit close to it, so running all eight packages in parallel makes
+  `advance-phase.properties`, `check-count` and `validate-dataset` fail with
+  `Test timed out in 5000ms` on a busy machine. They pass every time per-package. A timeout there
+  is a scheduling artefact, not a counterexample — before believing one, re-run that package alone,
+  and remember a real property failure prints the shrunk counterexample instead.
+- **`packages/data`'s `test` script is `vitest run --dir src`,** so the seven `*.test.ts` files
+  under `packages/data/scripts/` never execute. Put assertions you want enforced in `src/`.
 - **React component tests opt into jsdom per file** with a `// @vitest-environment jsdom`
   docblock; the installed Vitest has no `environmentMatchGlobs`.
 - **`apps/web/tsconfig.json` overrides `moduleResolution` to `bundler`** — under the base
@@ -172,9 +188,9 @@ generic and long — consult it for a specific question rather than reading it e
 ## Current state
 
 Implemented: `banco-de-cartas` F01–F08, `build-deck` F01–F07, `library` F01–F05 (complete),
-`free-duel` F01–F10 (complete), `password` F01–F04, `motor-duelo-1x1` F01–F12 (complete), plus
-the integration shell (main menu, `/login`, `POST /api/account/bootstrap`, the
-`/cards-data/[file]` art route).
+`free-duel` F01–F10 (complete), `password` F01–F04, `motor-duelo-1x1` F01–F12 (complete),
+`rating-engine` F01–F03 (complete), plus the integration shell (main menu, `/login`,
+`POST /api/account/bootstrap`, the `/cards-data/[file]` art route).
 
 The duel engine has a full turn cycle end to end: `apply(state, action)` dispatches
 `advance_phase` (with draw built in), `summon_monster`, `play_spell_or_trap`/`play_field_spell`,
@@ -187,6 +203,15 @@ played, and finished, from the first turn to the result screen (`free-duel/F09`�
 The 25 spell cards documented in `docs/spells/` resolve through a shared effect table and a pure
 engine interpreter, including equipment bonuses, immediate effects, terrains and attack locks.
 
-Not implemented: Campanha, Online Duel, Save. `password/F05` (redemption history).
+**The reward loop is live.** Winning grades the duel with the original's formula
+(`packages/rules/src/rating`, fed by the seven counters `DuelState.stats` accumulates), pays 1–5
+stars, and draws a card from the tier that grade opens — `sa-pow`, `sa-tec` or `common` — with the
+original's per-card chances out of 2048. `apply_victory_reward` credits the wallet and the
+collection in one idempotent transaction. Two consequences worth knowing: a `TEC` grade is reached
+by *scoring low* (fusions, magics and traps all cost points, and the only non-negative bucket for
+each is "none"), and `MINIMUM_RATING_REWARD` is now only a failure policy, not the normal path.
+
+Not implemented: Campanha, Online Duel, Save. `password/F05` (redemption history). Exodia and trap
+activation, which the rating formula has entries for and the engine cannot produce.
 `DeckValidator`/`montarDeckPronto` are still a forward-declared contract with no real
 implementation.

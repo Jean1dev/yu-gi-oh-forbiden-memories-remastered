@@ -11,6 +11,7 @@ import { describe, expect, it } from "vitest";
 
 import { apply } from "../turn/apply.ts";
 import { activateSpell } from "./activate-spell.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -107,6 +108,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 3,
     phase: "main",
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...overrides,
   };
 }

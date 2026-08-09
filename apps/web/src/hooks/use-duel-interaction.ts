@@ -1,6 +1,13 @@
 "use client";
 
-import type { DuelAction, DuelState, MonsterPosition, ZoneReference } from "@yugioh/shared";
+import {
+  DUEL_STAT_COUNTERS,
+  type DuelAction,
+  type DuelState,
+  type DuelStats,
+  type MonsterPosition,
+  type ZoneReference,
+} from "@yugioh/shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   describeActionSlots,
@@ -10,6 +17,15 @@ import {
   type ActionSlotId,
   type DuelIntent,
 } from "../lib/free-duel/duel-interaction.ts";
+
+/**
+ * Zeroed counters for the placeholder state below. Built locally rather than
+ * imported from `@yugioh/engine`: this is a `"use client"` module, and only
+ * `lib/free-duel/duel-runtime.ts` may reach the engine (free-duel/F09).
+ */
+function zeroStats(): DuelStats {
+  return Object.fromEntries(DUEL_STAT_COUNTERS.map((counter) => [counter, 0])) as DuelStats;
+}
 
 const idleIntent: DuelIntent = { kind: "idle" };
 const disabledAffordances = {
@@ -139,4 +155,5 @@ const emptyDuelState: DuelState = {
   turn: 1,
   phase: "main",
   seed: 0,
+  stats: { P1: zeroStats(), P2: zeroStats() },
 };

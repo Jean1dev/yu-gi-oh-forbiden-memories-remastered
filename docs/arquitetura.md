@@ -267,9 +267,18 @@ duelar contra a CPU → ganhar carta/estrelas → liberar carta por senha. Tudo 
 
 - [ ] Regra F02 de guardiões vs rituais (ver 4.2) — corrigir critério.
 - [ ] Unificar carteira e handler `onVictory` entre `free-duel` e `password` (ver 5.3).
-- [ ] **Valores** das tabelas: drops por duelista, matriz de guardiões (10×10),
-      matriz terreno↔classe (~24 classes). — fornecidos por você.
-- [ ] Rating Engine: escala de notas + tabela nota→recompensa (free-duel F05).
-- [ ] Balanceamento: pool do deck inicial, `N` estrelas/vitória, saldo inicial, roster de
-      NPCs e pools de drop.
+- [ ] **Valores** das tabelas: matriz de guardiões (10×10), matriz terreno↔classe
+      (~24 classes). — fornecidos por você.
+- [x] ~~Rating Engine: escala de notas + tabela nota→recompensa (free-duel F05).~~ Fechado por
+      `rating-engine` F02/F03: dez notas (`S`/`A`/`B`/`C`/`D` × `POW`/`TEC`) em faixas de dez
+      pontos sobre a pontuação do original, e a tabela nota→recompensa com os star chips (1 a 5) e
+      a faixa de drop. Fórmula e coeficientes transcritos de duas fontes públicas independentes que
+      se validam por aritmética (os limites `-140`/`+139`); nada foi inventado.
+- [x] ~~Drops por duelista.~~ Vieram junto com os duelistas portados do original e vivem em
+      `packages/data/data/duelists/*.json`, chegando ao roster como `DropTier.weights` — chance de
+      cada carta em 2048. O módulo `packages/data/src/drops` que `banco-de-cartas/F08` criou para
+      hospedá-los foi removido: nunca foi ligado e seu arquivo permaneceu `[]`.
+- [x] ~~`N` estrelas/vitória.~~ Não era dado tunável: é o star chip do original, de 1 a 5 conforme
+      a nota (`rating-engine/F03`).
+- [ ] Balanceamento: pool do deck inicial, saldo inicial, roster de NPCs.
 ```

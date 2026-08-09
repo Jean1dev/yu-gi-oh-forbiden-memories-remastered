@@ -12,6 +12,7 @@ import {
 
 import { createMulberry32 } from "../prng/mulberry32.ts";
 import { shuffle } from "../prng/shuffle.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const EMPTY_MONSTER_ZONE: MonsterZone = { occupied: false };
 const EMPTY_SPELL_ZONE: SpellZone = { occupied: false };
@@ -66,5 +67,6 @@ export function initDuel(input: InitializationInput): DuelState {
     turn: 1,
     phase: "draw",
     seed: input.seed,
+    stats: emptyDuelStatsByPlayer(),
   };
 }

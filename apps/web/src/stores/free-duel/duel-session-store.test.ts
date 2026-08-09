@@ -13,6 +13,7 @@ import {
 } from "@yugioh/shared";
 import { describe, expect, it, vi } from "vitest";
 import { createDuelSessionStore } from "./duel-session-store.ts";
+import { emptyDuelStatsByPlayer } from "@yugioh/engine";
 
 const field = {
   monsters: [
@@ -42,6 +43,7 @@ function state(activePlayer: "P1" | "P2", phase: DuelState["phase"] = "main"): D
     turn: 1,
     phase,
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
   };
 }
 

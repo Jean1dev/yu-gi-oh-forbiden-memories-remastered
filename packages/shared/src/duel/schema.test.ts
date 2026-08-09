@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import type { Card } from "../card/types.ts";
-import { EVENT_TYPES, INITIAL_LP } from "./constants.ts";
-import { DuelEventSchema, DuelStateSchema, ZoneReferenceSchema } from "./schema.ts";
+import { DUEL_STAT_COUNTERS, EVENT_TYPES, INITIAL_LP } from "./constants.ts";
+import {
+  DuelEventSchema,
+  DuelStateSchema,
+  DuelStatsSchema,
+  ZoneReferenceSchema,
+} from "./schema.ts";
+import type { DuelStats } from "./stats.ts";
 import type { DuelState, MonsterPosition, PlayerField, PlayerState } from "./types.ts";
 
 const emptyZone = { occupied: false } as const;
@@ -43,6 +49,19 @@ function validPlayer(overrides: Partial<PlayerState> = {}): PlayerState {
   };
 }
 
+function zeroStats(overrides: Partial<DuelStats> = {}): DuelStats {
+  return {
+    effectiveAttacks: 0,
+    defensiveVictories: 0,
+    faceDownPlays: 0,
+    fusions: 0,
+    equips: 0,
+    pureMagics: 0,
+    triggeredTraps: 0,
+    ...overrides,
+  };
+}
+
 function validState(overrides: Partial<DuelState> = {}): DuelState {
   return {
     players: { P1: validPlayer(), P2: validPlayer() },
@@ -51,6 +70,7 @@ function validState(overrides: Partial<DuelState> = {}): DuelState {
     turn: 1,
     phase: "main",
     seed: 1753617600,
+    stats: { P1: zeroStats(), P2: zeroStats() },
     ...overrides,
   };
 }
@@ -401,5 +421,52 @@ describe("ZoneReferenceSchema", () => {
     expect(
       ZoneReferenceSchema.safeParse({ player: "P2", zoneType: "spell", index: 4 }).success,
     ).toBe(true);
+  });
+});
+
+describe("DuelStatsSchema (rating-engine F01)", () => {
+  it("accepts the zeroed counters", () => {
+    expect(DuelStatsSchema.safeParse(zeroStats()).success).toBe(true);
+  });
+
+  it("rejects a negative counter", () => {
+    expect(DuelStatsSchema.safeParse(zeroStats({ fusions: -1 })).success).toBe(false);
+  });
+
+  it("rejects a fractional counter", () => {
+    expect(DuelStatsSchema.safeParse(zeroStats({ effectiveAttacks: 1.5 })).success).toBe(false);
+  });
+
+  it("rejects an unknown counter key", () => {
+    expect(DuelStatsSchema.safeParse({ ...zeroStats(), ritualSummons: 0 }).success).toBe(false);
+  });
+
+  it("rejects a missing counter", () => {
+    const incomplete = Object.fromEntries(
+      Object.entries(zeroStats()).filter(([counter]) => counter !== "triggeredTraps"),
+    );
+
+    expect(DuelStatsSchema.safeParse(incomplete).success).toBe(false);
+  });
+
+  it("covers exactly the seven counters of DUEL_STAT_COUNTERS", () => {
+    expect(Object.keys(zeroStats())).toEqual([...DUEL_STAT_COUNTERS]);
+    expect(DUEL_STAT_COUNTERS).toHaveLength(7);
+  });
+
+  it("rejects a state without stats", () => {
+    const stateWithoutStats = Object.fromEntries(
+      Object.entries(validState()).filter(([key]) => key !== "stats"),
+    );
+
+    expect(DuelStateSchema.safeParse(stateWithoutStats).success).toBe(false);
+  });
+
+  it("accepts a state whose counters have grown", () => {
+    const state = validState({
+      stats: { P1: zeroStats({ fusions: 3, equips: 12 }), P2: zeroStats({ pureMagics: 40 }) },
+    });
+
+    expect(DuelStateSchema.safeParse(state).success).toBe(true);
   });
 });

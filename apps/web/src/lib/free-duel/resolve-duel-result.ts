@@ -8,12 +8,16 @@ import {
   type CreateDuelSnapshot,
   type EndedDuelSession,
   type MinimumRatingReward,
+  type PlayerId,
   type RatingEngine,
   type ReadDuelOutcome,
 } from "@yugioh/shared";
 
 import { log } from "../logging.ts";
 import { consolidateDuelResult } from "./consolidate-duel-result.ts";
+
+/** The side the local player always occupies in an offline Free Duel. */
+const HUMAN_PLAYER: PlayerId = "P1";
 
 export type DuelResultIncident =
   | Readonly<{
@@ -87,7 +91,8 @@ async function resolveVictoryRating({
 }) {
   try {
     const snapshot = dependencies.createSnapshot(session.finalState);
-    const evaluated = await dependencies.ratingEngine.evaluate(snapshot);
+    // Always the human player: this branch only runs when P1 won (below).
+    const evaluated = await dependencies.ratingEngine.evaluate(snapshot, HUMAN_PLAYER);
     if (evaluated.ok) {
       const parsed = RatingEvaluationSchema.safeParse(evaluated.value);
       if (parsed.success) {
@@ -177,7 +182,7 @@ export async function resolveDuelResult(
     return result;
   }
 
-  const isVictory = outcome.data.status === "decisive" && outcome.data.winner === "P1";
+  const isVictory = outcome.data.status === "decisive" && outcome.data.winner === HUMAN_PLAYER;
   const rating = isVictory
     ? await resolveVictoryRating({
         session,

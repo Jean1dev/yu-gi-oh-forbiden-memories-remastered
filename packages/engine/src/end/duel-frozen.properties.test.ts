@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { apply } from "../turn/apply.ts";
 import { checkDuelEnd } from "./check-duel-end.ts";
 import { stampOutcome } from "./stamp-outcome.ts";
+import { emptyDuelStatsByPlayer } from "../stats/empty-stats.ts";
 
 const playerIdArbitrary = fc.constantFrom("P1" as const, "P2" as const);
 const zoneIndexArbitrary = fc.constantFrom(0, 1, 2, 3, 4).map((i) => i as 0 | 1 | 2 | 3 | 4);
@@ -103,6 +104,7 @@ function buildState(
     turn: parts.turn,
     phase: parts.phase,
     seed: 1,
+    stats: emptyDuelStatsByPlayer(),
     ...(parts.deckOutPlayer === undefined ? {} : { deckOutPlayer: parts.deckOutPlayer }),
     ...(outcome === undefined ? {} : { outcome }),
   };

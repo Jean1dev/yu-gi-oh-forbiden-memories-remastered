@@ -9,7 +9,7 @@ const victory: ConsolidatedDuelResult = {
   status: "victory",
   duelSessionId: "session",
   reason: "lp_depleted",
-  rating: { source: "rating_engine", grade: "A", reward: { stars: 4, dropTier: "common" } },
+  rating: { source: "rating_engine", grade: "A-POW", reward: { stars: 4, dropTier: "sa-pow" } },
 };
 
 describe("useVictoryReward", () => {
