@@ -157,7 +157,12 @@ describe("checkDuelEnd", () => {
         const outcome = checkDuelEnd(buildState(parts));
 
         if (outcome === undefined) return;
-        expect(outcome.winner).not.toBe(outcome.loser);
+        if (outcome.status === "draw") {
+          expect(outcome.winner).toBeNull();
+          expect(outcome.loser).toBeNull();
+        } else {
+          expect(outcome.winner).not.toBe(outcome.loser);
+        }
       }),
     );
   });
