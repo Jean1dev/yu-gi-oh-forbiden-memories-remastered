@@ -3,7 +3,11 @@ import type { DuelEvent, EventType, PlayerId, ZoneReference } from "@yugioh/shar
 import { describe, expect, it } from "vitest";
 import { MAX_CUE_QUEUE, toCues } from "./duel-cues.ts";
 
-const zone = (player: PlayerId, index = 0): ZoneReference => ({ player, zoneType: "monster", index: index as never });
+const zone = (player: PlayerId, index = 0): ZoneReference => ({
+  player,
+  zoneType: "monster",
+  index: index as never,
+});
 
 function event(type: EventType, overrides: Partial<DuelEvent> = {}): DuelEvent {
   return {
@@ -18,13 +22,15 @@ function event(type: EventType, overrides: Partial<DuelEvent> = {}): DuelEvent {
 
 describe("duel cues", () => {
   it("maps draw, placement, attack, damage and destruction events", () => {
-    expect(toCues([event("onDraw", { originPlayer: "P2" })])).toEqual([{ kind: "draw", player: "P2" }]);
+    expect(toCues([event("onDraw", { originPlayer: "P2" })])).toEqual([
+      { kind: "draw", player: "P2" },
+    ]);
     expect(toCues([event("onSummon", { involvedZones: [zone("P1", 1)] })])).toEqual([
       { kind: "place", zone: zone("P1", 1) },
     ]);
-    expect(toCues([event("onAttackDeclared", { involvedZones: [zone("P1", 2), zone("P2", 3)] })])).toEqual([
-      { kind: "attack", zone: zone("P1", 2), target: zone("P2", 3) },
-    ]);
+    expect(
+      toCues([event("onAttackDeclared", { involvedZones: [zone("P1", 2), zone("P2", 3)] })]),
+    ).toEqual([{ kind: "attack", zone: zone("P1", 2), target: zone("P2", 3) }]);
     expect(toCues([event("onDamage", { context: { toPlayer: "P2", amount: 1200 } })])).toEqual([
       { kind: "damage", player: "P2", amount: 1200 },
     ]);
@@ -42,7 +48,10 @@ describe("duel cues", () => {
         event("onTurnEnd"),
         event("onDraw", { originPlayer: "P1" }),
       ]),
-    ).toEqual([{ kind: "place", zone: zone("P1", 0) }, { kind: "draw", player: "P1" }]);
+    ).toEqual([
+      { kind: "place", zone: zone("P1", 0) },
+      { kind: "draw", player: "P1" },
+    ]);
   });
 
   it("does not animate healing as damage", () => {
@@ -53,6 +62,25 @@ describe("duel cues", () => {
         }),
       ]),
     ).toEqual([]);
+  });
+
+  it("presents trap activation before its consumption", () => {
+    const trapZone = { ...zone("P2", 1), zoneType: "spell" as const };
+    expect(
+      toCues([
+        event("onFlip", {
+          involvedZones: [trapZone],
+          context: { cause: "trap_activation", by: "687" },
+        }),
+        event("onDestroy", {
+          involvedZones: [trapZone],
+          context: { cause: "trap_consumed", by: "687" },
+        }),
+      ]),
+    ).toEqual([
+      { kind: "place", zone: trapZone },
+      { kind: "destroy", zone: trapZone },
+    ]);
   });
 
   it("limits the queue", () => {
@@ -84,11 +112,16 @@ describe("duel cues", () => {
               fc.record({
                 player: fc.constantFrom("P1" as const, "P2" as const),
                 zoneType: fc.constantFrom("monster" as const, "spell" as const),
-                index: fc.integer({ min: 0, max: 4 }).map((index) => index as ZoneReference["index"]),
+                index: fc
+                  .integer({ min: 0, max: 4 })
+                  .map((index) => index as ZoneReference["index"]),
               }),
               { maxLength: 3 },
             ),
-            context: fc.dictionary(fc.string(), fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null))),
+            context: fc.dictionary(
+              fc.string(),
+              fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null)),
+            ),
           }),
           { maxLength: 80 },
         ),

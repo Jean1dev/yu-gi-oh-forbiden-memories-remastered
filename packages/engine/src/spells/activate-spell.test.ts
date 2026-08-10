@@ -58,6 +58,12 @@ const raigeki = magic("337", "Raigeki");
 const dianKeto = magic("342", "Dian Keto the Cure Master");
 const swordsOfRevealingLight = magic("348", "Swords of Revealing Light");
 const featherDuster = magic("672", "Harpie's Feather Duster");
+const goblinFan = makeCard({ numero: "687", nome: "Goblin Fan", tipo: "armadilha" });
+const badReaction = makeCard({
+  numero: "688",
+  nome: "Bad Reaction to Simochi",
+  tipo: "armadilha",
+});
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 const emptySpellZone: SpellZone = { occupied: false };
@@ -101,6 +107,20 @@ function fieldWithSpells(cards: readonly Card[]): PlayerField {
     return card === undefined ? emptySpellZone : { occupied: true as const, card, faceUp: true };
   });
   return { ...emptyField(), spells: spells as unknown as PlayerField["spells"] };
+}
+
+function fieldWithTrap(card: Card): PlayerField {
+  const field = emptyField();
+  return {
+    ...field,
+    spells: [
+      { occupied: true, card, faceUp: false },
+      emptySpellZone,
+      emptySpellZone,
+      emptySpellZone,
+      emptySpellZone,
+    ],
+  };
 }
 
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -286,6 +306,40 @@ describe("activateSpell — remocao de magias", () => {
 });
 
 describe("activateSpell — life points", () => {
+  it("Goblin Fan reflete dano de efeito ao lancador", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithTrap(goblinFan) }),
+      },
+    });
+
+    const { state: next, events } = activate(insectArmor, state);
+
+    expect(next.players.P1.lp).toBe(7500);
+    expect(next.players.P2.lp).toBe(8000);
+    expect(next.players.P2.field.spells[0]).toEqual({ occupied: false });
+    expect(events.map((event) => event.type)).toEqual(["onSet", "onFlip", "onDestroy", "onDamage"]);
+  });
+
+  it("Bad Reaction converte cura do oponente em dano", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithTrap(badReaction) }),
+      },
+    });
+
+    const { state: next, events } = activate(dianKeto, state);
+
+    expect(next.players.P1.lp).toBe(7000);
+    expect(next.players.P2.lp).toBe(8000);
+    expect(events.at(-1)).toMatchObject({
+      type: "onDamage",
+      context: { toPlayer: "P1", amount: 1000, kind: "effect_damage" },
+    });
+  });
+
   it("Insect Armor with Laser Cannon tira 500 LP do oponente", () => {
     const { state: next, events } = activate(insectArmor, makeState());
 

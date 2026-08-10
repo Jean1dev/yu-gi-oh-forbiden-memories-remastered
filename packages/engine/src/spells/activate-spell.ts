@@ -6,12 +6,15 @@ import {
   spellPlayMode,
   type ActivateSpellAction,
   type ApplyResult,
+  type DuelEvent,
   type DuelState,
   type Result,
+  type SpellEffect,
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
+import { consumeMatchingTrap } from "../traps/index.ts";
 import { resolveOneShotEffect } from "./effects/resolve-one-shot.ts";
 import { getOpponent } from "./opponent.ts";
 
@@ -74,7 +77,36 @@ export function activateSpell(
     },
   };
 
-  const resolved = resolveOneShotEffect(consumedState, card, effect, state.activePlayer);
+  let stateBeforeResolution = consumedState;
+  let effectToResolve: SpellEffect = effect;
+  const trapEvents: DuelEvent[] = [];
+  if (effect.type === "life_points") {
+    const trapOwner = getOpponent(state.activePlayer);
+    const consumedTrap = consumeMatchingTrap(
+      consumedState,
+      trapOwner,
+      (trapEffect) =>
+        (trapEffect.type === "reflect_effect_damage" &&
+          effect.delta < 0 &&
+          effect.side === "opponent") ||
+        (trapEffect.type === "invert_effect_heal" && effect.delta > 0 && effect.side === "caster"),
+    );
+    if (consumedTrap !== undefined) {
+      stateBeforeResolution = consumedTrap.state;
+      trapEvents.push(...consumedTrap.events);
+      effectToResolve =
+        consumedTrap.effect.type === "reflect_effect_damage"
+          ? { ...effect, side: "caster" }
+          : { ...effect, delta: -effect.delta };
+    }
+  }
+
+  const resolved = resolveOneShotEffect(
+    stateBeforeResolution,
+    card,
+    effectToResolve,
+    state.activePlayer,
+  );
   const stateAfterHandPlay = markHandPlayUsed(resolved.state, state.activePlayer);
 
   const activation = createEvent({
@@ -93,5 +125,5 @@ export function activateSpell(
     throw new Error("Unreachable: apply already guaranteed no reaction window is open.");
   }
 
-  return ok({ state: opened.value, events: [activation, ...resolved.events] });
+  return ok({ state: opened.value, events: [activation, ...trapEvents, ...resolved.events] });
 }

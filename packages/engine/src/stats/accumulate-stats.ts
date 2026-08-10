@@ -34,8 +34,7 @@ function sameZone(left: ZoneReference, right: ZoneReference): boolean {
 function destroyedZone(events: readonly DuelEvent[], target: ZoneReference): boolean {
   return events.some(
     (event) =>
-      event.type === "onDestroy" &&
-      event.involvedZones.some((zone) => sameZone(zone, target)),
+      event.type === "onDestroy" && event.involvedZones.some((zone) => sameZone(zone, target)),
   );
 }
 
@@ -50,6 +49,7 @@ function destroyedZone(events: readonly DuelEvent[], target: ZoneReference): boo
  * earlier read is faithful.
  */
 function combatIncrement(preState: DuelState, events: readonly DuelEvent[]): Increment {
+  if (events.some((event) => event.context.cause === "trap_activation")) return undefined;
   const pending = preState.pending;
   if (pending?.event.type !== "onAttackDeclared") return undefined;
 
@@ -95,9 +95,7 @@ function incrementFor(preState: DuelState, action: Action, result: ApplyResult):
       // Only traps go face down; magic and equip cards enter face up
       // (`spells/play-spell-or-trap.ts`), so only a trap is a face-down play.
       const card = preState.players[active].hand[action.handIndex];
-      return card?.tipo === "armadilha"
-        ? { player: active, counter: "faceDownPlays" }
-        : undefined;
+      return card?.tipo === "armadilha" ? { player: active, counter: "faceDownPlays" } : undefined;
     }
     case "equip_card":
       return { player: active, counter: "equips" };
@@ -133,20 +131,23 @@ export function accumulateStats(
   action: Action,
   result: ApplyResult,
 ): ApplyResult {
-  const increment = incrementFor(preState, action, result);
-  if (increment === undefined) return result;
+  const increments: Exclude<Increment, undefined>[] = [];
+  const actionIncrement = incrementFor(preState, action, result);
+  if (actionIncrement !== undefined) increments.push(actionIncrement);
+  for (const event of result.events) {
+    const zone = event.involvedZones[0];
+    if (event.context.cause === "trap_activation" && zone !== undefined) {
+      increments.push({ player: zone.player, counter: "triggeredTraps" });
+    }
+  }
 
-  const { player, counter } = increment;
-  const current = result.state.stats[player];
-
-  return {
-    ...result,
-    state: {
-      ...result.state,
-      stats: {
-        ...result.state.stats,
-        [player]: { ...current, [counter]: current[counter] + 1 },
-      },
-    },
-  };
+  let stats = result.state.stats;
+  for (const { player, counter } of increments) {
+    const current = stats[player];
+    stats = {
+      ...stats,
+      [player]: { ...current, [counter]: current[counter] + 1 },
+    };
+  }
+  return increments.length === 0 ? result : { ...result, state: { ...result.state, stats } };
 }
