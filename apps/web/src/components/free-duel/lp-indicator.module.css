@@ -1,20 +1,69 @@
-.indicator {
+.panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-frame);
+  box-shadow: var(--shadow-bevel-raised);
+}
+
+/* Both players face the terrain slot between them, so each panel's type hangs
+   off its inner edge. */
+.name,
+.value {
   margin: 0;
-  color: var(--text-primary);
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel[data-side="opponent"] .name,
+.panel[data-side="opponent"] .value {
+  text-align: left;
+}
+
+.name {
+  color: var(--text-heading);
   font-family: var(--font-display);
-  font-size: 0.85rem;
-  text-shadow: 2px 2px 0 var(--color-black);
+  /* Below the type scale's floor: the panel is chrome around the LP number,
+     and a full step up would push the duelist's name onto a second line. */
+  font-size: 9px;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
 }
 
 .value {
-  color: var(--text-heading);
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  line-height: 1.1;
+  text-shadow: 2px 2px 0 var(--color-black);
+}
+
+.track {
+  display: block;
+  height: 8px;
+  background: var(--color-night-sunken);
+  box-shadow: var(--shadow-bevel-pressed);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--color-gold);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .indicator[data-cue="damage"] {
+  .panel[data-cue="damage"] {
     animation: lp-damage 400ms steps(2, end);
-    color: var(--text-danger);
   }
+}
+
+.panel[data-cue="damage"] .value {
+  color: var(--text-danger);
 }
 
 @keyframes lp-damage {

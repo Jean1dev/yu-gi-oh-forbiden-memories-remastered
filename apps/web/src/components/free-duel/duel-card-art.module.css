@@ -8,6 +8,13 @@
   color: var(--text-muted);
 }
 
+/* A card lying in a board zone takes the zone's shape, not its own. */
+.frame[data-fill="true"] {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
 .image {
   display: block;
   width: 100%;

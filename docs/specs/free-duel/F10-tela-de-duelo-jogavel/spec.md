@@ -100,12 +100,12 @@ abaixo são fronteiras declaradas, não escolha de recorte:
 | 3 | **Máquina de interação pura, sem React**, em `apps/web/src/lib/free-duel/duel-interaction.ts`: `reduceIntent`, `describeAffordances`, `describeActionSlots`, `zoneAffordance`. Testável em ambiente **node**, sem jsdom. O hook `use-duel-interaction.ts` é uma casca fina de `useState` sobre ela. | plano aprovado; `arquitetura.md` §7 ("UI não contém regra") | confirmada |
 | 4 | **Invocação nas 4 posições reconciliada com os dois botões do protótipo:** **Invocar** abre um seletor com `Ataque`, `Ataque (virada)`, `Defesa`, `Defesa (virada)`; **Definir** é o atalho clássico do FM direto para `defense_face_down`. O protótipo é mock estático e seus botões não refletem o conjunto real de ações. | plano aprovado; PRD F10 Capabilities | confirmada |
 | 5 | **Magia/armadilha pode ser colocada** na fileira de trás (sem efeito), consumindo a jogada da mão do turno — é o que o motor já faz. **`play_field_spell` fica fora de escopo**, documentado e não implementado. | plano aprovado; F09 Decisão 14 | confirmada |
-| 6 | **Slots de ação sempre três**, para o chrome não pular de tamanho entre estados; slots indisponíveis ficam **desabilitados, não ausentes**. | plano aprovado; PRD F10 critério 7 | confirmada |
+| 6 | **Slots de ação sempre três**, para o chrome não pular de tamanho entre estados; slots indisponíveis ficam **desabilitados, não ausentes**. **Revisada 2026-08-07:** os três slots continuam existindo e `describeActionSlots` não muda, mas o terceiro (`advance_phase`) é renderizado como o botão de fim de turno no trilho direito, e `DuelActions` recebe os outros dois. Renderizar `advance_phase` nos dois lugares duplicaria o nome acessível `Passar Fase`. | plano aprovado; PRD F10 critério 7 | revisada |
 | 7 | **Animações: o estado é aplicado na hora; as cues são overlays decorativos indexados por zona.** Nada fica enfileirado *atrás* de uma animação, então o estado do React e a fila de cues **não podem dessincronizar**. A fila é derivada dos eventos do motor por uma função pura (`toCues`) e drenada por uma cadeia de `setTimeout`. | plano aprovado; PRD F10 Capabilities | confirmada |
 | 8 | **`prefers-reduced-motion` zera as durações**: a fila drena em um tick, `busy` **nunca** fica verdadeiro e nenhum `@keyframes` roda (ficam dentro de `@media (prefers-reduced-motion: no-preference)`). | plano aprovado; PRD F10 Error Handling; `estetica-visual.md` §2.2 | confirmada |
 | 9 | **`window.matchMedia` não existe no jsdom desta versão** — todo uso é guardado por `typeof window.matchMedia === "function"`, com o caminho sem `matchMedia` equivalendo a "movimento não reduzido". | código existente (jsdom 30); convenções de teste do repo | confirmada |
 | 10 | **Sem biblioteca de animação.** O repositório não tem nenhuma e a stack travada não prevê uma: as transições são `@keyframes` declarados nos CSS Modules dos próprios componentes. | inventário de dependências de `apps/web`; auto-aceite: tecnologia nova fora da stack | confirmada |
-| 11 | **Estilo por CSS Modules ao lado de cada componente + custom properties de `apps/web/src/app/globals.css`.** Não há Tailwind, `clsx` nem `cn()` neste repositório; o componente representativo a imitar é `components/library/card-cell.tsx` + `card-cell.module.css`. **Nenhum token novo é acrescentado a `globals.css`** — o protótipo mapeia inteiro nos tokens existentes. | inventário do repositório; auto-aceite: padrão existente | confirmada |
+| 11 | **Estilo por CSS Modules ao lado de cada componente + custom properties de `apps/web/src/app/globals.css`.** Não há Tailwind, `clsx` nem `cn()` neste repositório; o componente representativo a imitar é `components/library/card-cell.tsx` + `card-cell.module.css`. **Revisada 2026-08-07:** o protótipo aprovado usa uma escala *display* que o repositório não tinha, então `--text-display-xl/lg/md` foram acrescentados a `globals.css`. Nenhum outro token novo. | inventário do repositório; auto-aceite: padrão existente | revisada |
 | 12 | **Mapeamento dos tokens do protótipo para os do repositório:** `--color-bg-sunken`→`--color-night-sunken`, `--color-green`→`--color-success`, `--color-red-dark`→`--color-danger-dark`, `--color-cream`→`--color-sand`. Superfícies e relevos vêm de `--surface-sunken`/`--surface-frame` + `--shadow-bevel-pressed`/`--shadow-bevel-raised`. | protótipo `Duel Screen.html`; `globals.css` | confirmada |
 | 13 | **Nada de `overflow: hidden` no `body`.** O protótipo faz isso, mas a regra vazaria para todas as rotas do app. A tela usa `.screen { height: 100dvh; overflow: hidden }` + `min-height: 0` nos filhos flex, que dá o mesmo resultado sem efeito global. | plano aprovado; `globals.css` (o `body` é compartilhado) | confirmada |
 | 14 | **Cada zona é um `<li>` contendo um `<button type="button">` com `all: unset; box-sizing: border-box`** — visual idêntico ao `.duel-zone` do protótipo, mas com alvo real de teclado; `disabled` tira do tab order. Como `all: unset` também apaga o `outline`, cada módulo **redeclara `:focus-visible`** com o outline branco obrigatório. | plano aprovado; `globals.css` (`:focus-visible`); `estetica-visual.md` §2.2 | confirmada |
@@ -115,8 +115,8 @@ abaixo são fronteiras declaradas, não escolha de recorte:
 | 18 | **`declare_attack` encadeia `resolve_attack` no mesmo despacho** (F09, Decisão 2): uma intenção do jogador = um dispatch, e a tela recebe declaração + revelação + dano + destruição como **um lote ordenado** de eventos, que vira uma sequência ordenada de cues. | spec F09 Decisão 2 | confirmada |
 | 19 | **`SurrenderButton`, `SurrenderConfirmationDialog`, `DuelResult`, `PostDuelActions`, `CardDropReward`, `StarsRewardBadge` e `OrchestrationFailureNotice` ficam intactos.** São estilizados **por descendência** a partir dos CSS Modules dos contêineres que F10 cria, sem alterar seus arquivos — o que preserva as suítes de F04/F05/F06/F07/F08 que os consultam por nome acessível. | plano aprovado; suítes existentes | confirmada |
 | 20 | **Dois nomes acessíveis são preservados de propósito** ao reescrever os componentes: cartas da mão expõem `aria-label={card.nome}` e o `LpIndicator` mantém o nó de texto `{lp} LP`. São as duas asserções de `duel-screen.test.tsx` e de `surrender.integration.test.tsx` que sobrevivem à troca do inglês pelo português; as que afirmam `heading "Duel"`, `/Monster zone/` e `/Spell zone/` **quebram por desenho** e são reescritas. | plano aprovado; `duel-screen.test.tsx` atual | confirmada |
-| 21 | **A saída pelo chrome (`◀ Sair do Duelo`) é um botão que aciona a confirmação de rendição de F04**, não uma navegação. `SurrenderButton` continua montado (é o alvo `name: "Render-se"` da integração de F04) e o guarda de saída de F04 segue cobrindo links e histórico. | plano aprovado; `use-surrender.ts`; `duel-exit-guard.ts` | confirmada |
-| 22 | **Contagem da mão e do deck do oponente são exibidas** ao lado do LP, em uma linha discreta. É uma **extensão deliberada** do protótipo (que é mock estático e não mostra nenhuma das duas), exigida pelo critério "a mão como contagem" e útil porque deck zerado é condição de derrota. | PRD F10 critério 2; Fase 0.3 (deck zerado = derrota) | confirmada |
+| 21 | **A saída pelo chrome (`◀ Sair do Duelo`) é um botão que aciona a confirmação de rendição de F04**, não uma navegação. `SurrenderButton` continua montado (é o alvo `name: "Render-se"` da integração de F04) e o guarda de saída de F04 segue cobrindo links e histórico. **Revisada 2026-08-07:** o protótipo aprovado não tem barra superior, e os dois controles chamavam a mesma função — `◀ Sair do Duelo` deixou de existir e o `SurrenderButton` do trilho esquerdo virou a única porta para a confirmação. `duel-exit-guard.ts` fica intacto. | plano aprovado; `use-surrender.ts`; `duel-exit-guard.ts` | revisada |
+| 22 | **Contagem da mão e do deck do oponente são exibidas** ao lado do LP, em uma linha discreta. É uma **extensão deliberada** do protótipo (que é mock estático e não mostra nenhuma das duas), exigida pelo critério "a mão como contagem" e útil porque deck zerado é condição de derrota. **Revisada 2026-08-07:** as duas continuam expostas, em lugares melhores — as contagens de deck viraram as pilhas `Deck Op.`/`Meu Deck` do trilho direito, e a mão do oponente virou a faixa de cartas viradas no topo do tabuleiro, cujo `aria-label` carrega a contagem. | PRD F10 critério 2; Fase 0.3 (deck zerado = derrota) | revisada |
 | 23 | **A cue de destruição pisca numa zona já vazia.** O motor **não modela cemitério** — cartas destruídas simplesmente somem da zona. Isso é correto por construção, não é bug a contornar. | plano aprovado; `packages/engine/src/combat/resolve-attack.ts`; PRD F10 Nota de fidelidade | confirmada |
 | 24 | **Nenhuma tabela Postgres, migração, RPC, IndexedDB ou fila offline** é criada ou alterada. A sessão vive em memória (F03 Decisão 15) e nenhuma economia é tocada (F06/F07 desligadas por F09). | precedente F03/F09; PRD §9 F10 | confirmada |
 | 25 | **O plano tem 6 fases**, acima do teto de 5 do skill para complexidade "complexa". Divergência **autorizada e aprovada pelo usuário**, espelhando o fatiamento de F09: cada fase é verificável isoladamente e corresponde a um commit (puro → chrome → controles → integração → animação → fim de duelo). | plano aprovado; divergência explícita do SKILL Passo 4 | confirmada |
@@ -142,7 +142,13 @@ alterados**.
 | `apps/web/src/hooks/use-duel-cues.test.ts` | web | novo | Temporização com timers falsos; caminho de movimento reduzido (jsdom) |
 | `apps/web/src/hooks/use-auto-advance-phase.ts` | web | **novo (correção 2026-08-02)** | Dispara `advance_phase` sozinho nas fases Compra/Fim após 1000ms (configurável), cancelando o timer se a fase mudar ou o jogador deixar de ser o decisor antes disso |
 | `apps/web/src/hooks/use-auto-advance-phase.test.ts` | web | **novo (correção 2026-08-02)** | Timers falsos: dispara em draw/end após o delay, nunca em main/battle, cancela quando fica inativo |
-| `apps/web/src/components/free-duel/duel-top-bar.tsx` (+ `.module.css`, `.test.tsx`) | web | novo | Terreno / Fase / Turno / rendição / `◀ Sair do Duelo` |
+| ~~`apps/web/src/components/free-duel/duel-top-bar.tsx`~~ (+ `.module.css`, `.test.tsx`) | web | **removido 2026-08-07** | O protótipo aprovado não tem barra superior: Terreno → `field-slot.tsx`, Fase/Turno → `turn-chip.tsx`, saída → `SurrenderButton` no trilho |
+| `apps/web/src/components/free-duel/duel-rail.tsx` (+ `.module.css`) | web | **novo 2026-08-07** | Casca dos dois trilhos; estiliza os botões que hospeda por descendência |
+| `apps/web/src/components/free-duel/turn-chip.tsx` (+ `.module.css`, `.test.tsx`) | web | **novo 2026-08-07** | `Turno: {n}` / `Fase: {rótulo}` no trilho esquerdo |
+| `apps/web/src/components/free-duel/deck-pile.tsx` (+ `.module.css`) | web | **novo 2026-08-07** | Contador de deck restante (`Deck Op.` / `Meu Deck`) no trilho direito |
+| `apps/web/src/components/free-duel/duel-lp-bar.tsx` (+ `.module.css`, `.test.tsx`) | web | **novo 2026-08-07** | A faixa entre as duas metades: LP / terreno / LP |
+| `apps/web/src/components/free-duel/field-slot.tsx` (+ `.module.css`, `.test.tsx`) | web | **novo 2026-08-07** | Slot de terreno no centro da barra de LP; inspecionável |
+| `apps/web/public/card-back.jpg` | web | **novo 2026-08-07** | O verso real das cartas; `public/` porque a rota `cards-data/[file]` só responde a `NNN.jpg` |
 | `apps/web/src/components/free-duel/duel-card-art.tsx` (+ `.module.css`) | web | novo | Arte por `numero` com fallback em erro, no molde de `library/card-art.tsx` |
 | `apps/web/src/components/free-duel/duel-zone.tsx` (+ `.module.css`, `.test.tsx`) | web | novo | Uma zona: arte, faixa `{atk}/{def}`, `Vazio`/`—`, afordância, cue |
 | `apps/web/src/components/free-duel/duel-side.tsx` (+ `.module.css`) | web | novo | Um lado do campo: LP + contagens + fileira de monstros + backrow (espelhado) |
@@ -342,55 +348,87 @@ autoridade.
 
 ### Layout e fidelidade visual
 
+> **Revisão 2026-08-07.** Esta seção descrevia o protótipo `Duel Screen v1` (barra superior + dois
+> lados espelhados + rodapé de mão). O protótipo aprovado passou a ser o `Duel Screen` de quatro
+> colunas, e o layout abaixo é o que está implementado. O texto anterior fica registrado no
+> histórico do arquivo.
+
 Estrutura fiel ao protótipo `Duel Screen`, com os tokens do repositório (Decisão 12):
 
-- **`main.duel-screen`** — `max-width: 1100px; margin: 0 auto; padding: 16px 20px; height: 100dvh;
-  display: flex; flex-direction: column; gap: 12px; overflow: hidden`.
-- **`header.duel-topbar`** — flex row `space-between`, `padding: 10px 16px`,
-  `background: var(--surface-frame)`, `box-shadow: var(--shadow-bevel-raised)`,
-  `font-family: var(--font-display)`, `font-size: var(--text-body-sm)`, `color: var(--text-heading)`.
-  Conteúdo: `Terreno: {nome|Nenhum}` · `Fase: {rótulo}` · `Turno: {n}`, e à direita o controle de
-  rendição e `◀ Sair do Duelo` (`font-family: var(--font-body)`, `font-size: var(--text-body-md)`,
-  sublinhado).
-- **`section.duel-side`** — `flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0;
-  justify-content: center`. Oponente: LP → monstros → backrow. Jogador: **espelhado** (backrow →
-  monstros → LP).
-- **`.duel-row`** — `list-style: none; margin: 0; padding: 0; display: grid;
-  grid-template-columns: repeat(5, 1fr); gap: 8px; flex: 1; min-height: 0`; `.backrow { flex: .7 }`.
-- **`.duel-zone`** — `background: var(--surface-sunken); box-shadow: var(--shadow-bevel-pressed);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: relative; overflow: hidden`; a arte usa `width: 100%; height: 100%; object-fit: cover`.
-  `.zone-stats` é uma faixa absoluta no rodapé com `background: var(--color-night-sunken)`,
-  `color: var(--text-heading)`, `font-family: var(--font-body)`, `font-size: var(--text-body-sm)`,
-  `text-align: center`, `padding: 2px 0`, mostrando `{atk}/{def}`. `.zone-empty` usa
-  `font-family: var(--font-body)`, `font-size: var(--text-body-sm)`, `color: var(--text-muted)`, com o
-  texto `Vazio` nas zonas de monstro e `—` na backrow.
-- **`footer.duel-hand-bar`** — `flex-shrink: 0; display: flex; align-items: center; gap: 20px;
-  padding: 10px 16px; background: var(--surface-frame); box-shadow: var(--shadow-bevel-raised)`.
-  Dentro: `ul.duel-hand` (`display: flex; gap: 8px; flex: 1; overflow-x: auto`) de
-  `button.hand-card` (`all: unset; box-sizing: border-box; width: 64px; flex-shrink: 0;
-  cursor: pointer; box-shadow: var(--shadow-bevel-raised)`; a arte com
-  `width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block`; a selecionada com
-  `box-shadow: 0 0 0 3px var(--color-success)`), seguido de `div.duel-actions` com os três botões.
-- **`.duel-preview`** — overlay fixo em `bottom: 96px; left: 50%; transform: translateX(-50%)`,
-  `background: var(--surface-frame)`, `box-shadow: var(--shadow-bevel-raised)`, `padding: 12px`,
-  `z-index: 5`, em coluna, com arte de 120px em `aspect-ratio: 3/4` e o nome da carta. Aparece
-  enquanto houver carta selecionada.
-- **Botões** — `primary`: `background: var(--color-gold); color: var(--color-black)`; `secondary`:
-  `background: var(--surface-frame); color: var(--text-heading)`; ambos com
-  `box-shadow: var(--shadow-bevel-raised)`, `min-height: 44px`, `padding: 0 1rem`,
-  `text-transform: uppercase`, `letter-spacing: .05em`, `font-family: var(--font-body)`,
-  `font-size: 1.25rem`; `disabled` com `opacity: .4`. A variante `danger` (rendição) usa
-  `background: var(--color-danger-dark); color: var(--color-sand)`.
-- **`LpIndicator`** — `<p aria-label="{label} pontos de vida">` com
-  `font-family: var(--font-display)`, `font-size: .85rem`, `color: var(--text-primary)`, e o valor em
-  `color: var(--text-heading)`, preservando o nó de texto `{lp} LP` (Decisão 20).
+- **`main` (`duel-screen.module.css` `.screen`)** — `height: 100dvh; overflow: hidden;
+  padding: var(--space-3); display: grid; gap: var(--space-3);
+  grid-template-columns: 300px 84px minmax(0, 1fr) 128px;
+  grid-template-areas: "inspector rail-l board rail-r"`. **Não há barra superior**: Terreno migrou
+  para o slot central da barra de LP, Fase/Turno para o chip do trilho esquerdo, e `◀ Sair do Duelo`
+  foi absorvido pelo `SurrenderButton` do trilho (Decisão 21, revisada).
+- **`aside.inspector`** — coluna de 300px, `background: var(--surface-sunken)`,
+  `box-shadow: var(--shadow-bevel-pressed)`, `padding: var(--space-4)`, `overflow: auto`. Contém o
+  `CardFrame` completo (`max-width: 190px`, centralizado) e, abaixo, nome (`<h2>`, `--font-display`,
+  `--text-display-md`, `overflow-wrap: anywhere`), `{atk} / {def}` (`--text-display-md`),
+  `{atributo} / {classe}` (ou só a classe quando a carta não foi enriquecida), a linha de Guardian
+  Stars e `Efeito: {descricao}` — esta última ausente, não vazia, quando `descricao` é nula.
+- **`DuelRail`** — os dois trilhos compartilham `.rail` (flex coluna) e estilizam **por
+  descendência** todo `button` descendente: `all: unset`, `min-height: 44px`,
+  `background: var(--surface-frame)`, `box-shadow: var(--shadow-bevel-raised)`, `--font-display` a
+  9px, maiúsculas, com `[data-variant="primary"]` em `var(--color-gold)`. Esquerdo: `SurrenderButton`
+  → alternância de fusão → `TurnChip` (`Turno: {n}` / `Fase: {rótulo}`). Direito: `DeckPile` do
+  oponente → botão de fim de turno → `DeckPile` do jogador. **Sem pilhas de cemitério e sem C-POW**:
+  o motor não modela nem um nem outro (Decisão 23), e nenhum número é inventado na tela.
+- **`section.board`** — `flex: 1; display: flex; flex-direction: column; gap: 10px;
+  padding: var(--space-3); background: var(--surface-sunken);
+  box-shadow: var(--shadow-bevel-pressed)`. Filhos, nesta ordem: faixa da mão do oponente (40px de
+  cartas viradas) → lado do oponente → `DuelLpBar` → lado do jogador → `DuelMessage` + `DuelPrompt` →
+  faixa da mão do jogador com `DuelActions`. Só os dois lados crescem (`flex: 1`); todo o resto é
+  `flex-shrink: 0`.
+- **`section.side`** — `flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0`,
+  **igual para os dois jogadores**: fileira de monstros em cima, backrow embaixo. O espelhamento
+  anterior colocava as magias do jogador acima dos próprios monstros.
+- **`.row`** — `display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; flex: 1;
+  min-height: 0`. As duas fileiras de um lado têm a mesma altura (o antigo `.backrow { flex: .7 }`
+  foi aposentado).
+- **Zona** — o `<li>` é o slot (`background: var(--color-night-sunken)`,
+  `box-shadow: var(--shadow-bevel-pressed)`, `overflow: hidden`) e o `<button>` interno é
+  transparente e ocupa 100%×100%. Vazia: a estrela decorativa (`width: 38%; aspect-ratio: 1;
+  clip-path` de 10 pontos; `opacity: .35`), `aria-hidden` — os rótulos `Vazio`/`-` vivem no
+  `aria-label` do botão. Ocupada: `DuelCardArt crop fill` (a arte recortada preenchendo o slot) com
+  `box-shadow: 0 0 0 2px var(--color-gold)` no botão, e `.stats` como faixa absoluta no rodapé
+  (`--font-body`, `--text-body-xs`) mostrando `{atk} / {def}`. **A zona não mostra o nome da carta**
+  — ele está no `aria-label` e no inspetor; uma segunda faixa deixaria o slot com mais moldura do
+  que figura. **`CardFrame` não entra em zona nem na mão**: é uma pilha vertical de altura fixa que
+  não comprime; ele é o conteúdo do inspetor.
+- **Posição de defesa** — a rotação fica num invólucro `.card` interno, não no botão: em ataque ele
+  preenche o slot, em defesa vira `width: auto; aspect-ratio: 3/4; transform: rotate(-90deg)`, ou
+  seja, uma carta em pé deitada de lado. Com isso a faixa `{atk}/{def}` continua na horizontal e as
+  animações `data-cue` (que usam `transform: scale`) não brigam com a rotação.
+- **`DuelLpBar`** — `display: grid; grid-template-columns: minmax(0,1fr) 78px minmax(0,1fr);
+  gap: 10px; height: 84px` (altura fixa: a arte do terreno cresceria e comeria as fileiras). Nas
+  pontas o `LpIndicator`, no meio o `FieldSlot`.
+- **`LpIndicator`** — painel `background: var(--surface-frame)`,
+  `box-shadow: var(--shadow-bevel-raised)`, com nome do duelista (`--font-display`, 9px, maiúsculas),
+  o valor em `--text-display-md`/`var(--color-gold)` e uma barra de vida
+  (`lp / INITIAL_LP`, limitada a 100%). Mantém `aria-label="{papel} pontos de vida"` e o nó de texto
+  `{lp} LP` (Decisão 20); o nome visível é uma prop separada justamente para não colidir com esse
+  rótulo. Os dois painéis se espelham em torno do slot de terreno.
+- **`FieldSlot`** — `background: var(--surface-frame)`, `box-shadow: var(--shadow-bevel-raised)`, com
+  a arte do terreno e o nome embaixo. Em 78px só o nome cabe, então "Terreno" sobrevive no
+  `aria-label` (`Terreno: {nome}`); sem terreno ativo é uma caixa afundada com `Terreno` / `Nenhum`.
+- **Mão** — `button.hand-card` de 64px com a arte recortada em `aspect-ratio: 3/4` e o nome numa
+  faixa, selecionada com `box-shadow: 0 0 0 3px var(--color-success)`. A mão do oponente é a mesma
+  faixa em 28px, sempre virada.
+- **Carta virada** — `apps/web/public/card-back.jpg`, o verso real, em vez do padrão de CSS anterior;
+  o padrão continua como fallback de `onError`.
+- **Botões de ação** — `primary`: `background: var(--color-gold); color: var(--color-black)`;
+  `secondary`: `background: var(--surface-frame); color: var(--text-heading)`; ambos com
+  `box-shadow: var(--shadow-bevel-raised)`, `min-height: 44px`, `text-transform: uppercase`.
+- **Sobreposições** — `.dialogLayer` (rendição) e `DuelResultOverlay` são `position: absolute` dentro
+  de `.screen`, que é `position: relative`; a moldura do diálogo de rendição vem por descendência
+  (`.dialogLayer > div`), sem tocar no componente (Decisão 19).
 
-**Responsividade 320–1920px** (`arquitetura.md` §7; ADR-004): as cinco colunas se mantêm em todas as
-larguras (as zonas encolhem), a barra superior quebra em duas linhas abaixo de 640px, a fonte da faixa
-`{atk}/{def}` cai para `--text-body-xs`, e os espaçamentos passam de `--space-4` para `--space-2`. A
-altura é distribuída por `flex`, com `min-height: 0` em cada filho, de modo que nenhuma viewport
-produz rolagem vertical.
+**Responsividade 320–1920px** (`arquitetura.md` §7; ADR-004): as cinco colunas de zona se mantêm em
+todas as larguras. Até 1180px o cromo fixo encolhe (`232px 72px 1fr 108px`); abaixo de 900px o
+inspetor desce para uma faixa horizontal sob o tabuleiro; abaixo de 640px os trilhos viram barras
+horizontais e a tela empilha `rail-l / board / rail-r / inspector`. A altura é distribuída por
+`flex`, com `min-height: 0` em cada filho.
 
 ### Eventos
 
@@ -639,7 +677,8 @@ Nenhum arquivo de dados é criado ou alterado. As artes continuam vindo de `card
 `app/cards-data/[file]/route.ts`, endereçadas por `cardArtUrl(numero) → "/cards-data/NNN.jpg"`
 (`apps/web/src/lib/card-art-url.ts`), o único lugar onde essa URL é escrita.
 
-**Tokens de estilo:** nenhum token novo em `apps/web/src/app/globals.css` (Decisão 11). Todo o
+**Tokens de estilo:** apenas `--text-display-xl/lg/md` foram acrescentados a
+`apps/web/src/app/globals.css` (Decisão 11, revisada 2026-08-07). Todo o resto do
 protótipo é expressável com os tokens já publicados: superfícies (`--surface-page/raised/sunken/frame`),
 texto (`--text-primary/heading/muted/danger/success`), paleta (`--color-gold/panel/night/night-sunken/
 sand/stone/danger/danger-dark/success`), relevos (`--shadow-bevel-raised/pressed`), tipografia
@@ -755,20 +794,23 @@ Vitest 4.1.10; ambiente **node** por padrão, com os testes de React optando por
   travessao`; `uma zona ocupada e visivel mostra atk e def`; `uma zona do oponente virada para baixo
   nao expoe nome, atk nem def` (alimentada com `card.visible === false`); `uma zona sem onActivate
   renderiza o botao desabilitado e fora do tab order`; `a afordancia vira o atributo data-affordance`.
-- `duel-board.test.tsx`: `renderiza 10 zonas de monstro e 10 de magia/armadilha`; `o lado do jogador
-  aparece espelhado em relacao ao do oponente`; `os rotulos das zonas estao em portugues`.
+- `duel-board.test.tsx`: `renderiza 10 zonas de monstro e 10 de magia/armadilha`; `os rotulos das
+  zonas estao em portugues`; `nao expoe nome nem atributos de carta virada do oponente`.
+- `duel-side.test.tsx` (**novo 2026-08-07**): `a fileira de monstros vem antes da backrow para os
+  dois jogadores` — a regressão do espelhamento.
+- `duel-card-art.test.tsx` (**novo 2026-08-07**): `carta virada mostra o verso real`; `cai no padrao
+  antigo quando o verso nao carrega`.
+- `duel-lp-bar.test.tsx`, `field-slot.test.tsx`, `turn-chip.test.tsx` (**novos 2026-08-07**): cobrem
+  o que saiu de `duel-top-bar.test.tsx` mais a barra de vida limitada a 100%.
 - `player-hand.test.tsx`: `cada carta da mao expoe o nome como rotulo acessivel` (Decisão 20); `a
   carta selecionada recebe o atributo de selecao`; `a mao desabilitada nao aceita clique`.
 - `duel-actions.test.tsx`: `renderiza exatamente tres botoes em todos os estados`; `um slot sem
   afordancia fica desabilitado em vez de sumir`.
 - `duel-prompt.test.tsx`: `o seletor oferece as quatro posicoes em portugues`; `escolher uma posicao
   chama o callback com a posicao correspondente`.
-- `duel-top-bar.test.tsx`: `mostra o nome do terreno ativo`; `mostra Nenhum quando nao ha terreno`;
-  `o rotulo da fase esta em portugues`; `o controle de saida aciona a confirmacao`.
-
 **`duel-screen.test.tsx`** (jsdom, reescrito):
 
-- `a tela renderiza a barra superior, os dois campos, os LP e a mao sem rolagem`
+- `a tela renderiza os dois campos, os LP e a mao sem rolagem`
 - `o LP do oponente continua legivel como texto` — preserva `{lp} LP` (Decisão 20)
 - `a mao e as zonas ficam desabilitadas enquanto o decisor e P2` e o banner de vez do oponente aparece
 - `uma recusa do motor exibe a linha de aviso e mantem o tabuleiro` — a view não muda

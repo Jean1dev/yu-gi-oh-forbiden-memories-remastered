@@ -21,3 +21,14 @@ export function cardArtUrl(cardNumber: CardNumber): string {
 export function cropArtUrl(cardNumber: CardNumber): string {
   return `/cards-data/art/${cardNumber}.jpg`;
 }
+
+/**
+ * The face-down card back, served statically from `apps/web/public/`.
+ *
+ * Not `cards-data/` like the arts: that route only answers to `NNN.jpg`
+ * (`app/cards-data/[file]/route.ts`), and this is UI chrome rather than
+ * dataset content anyway. `public/` is also copied into the deployment output
+ * by Next itself, so unlike the arts it needs no `outputFileTracingIncludes`
+ * entry.
+ */
+export const CARD_BACK_URL = "/card-back.jpg";

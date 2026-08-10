@@ -2,7 +2,13 @@ import type { ActionSlot, ActionSlotId } from "../../lib/free-duel/duel-interact
 import styles from "./duel-actions.module.css";
 
 export type DuelActionsProps = Readonly<{
-  slots: readonly [ActionSlot, ActionSlot, ActionSlot];
+  /**
+   * Not the full slot tuple: the duel screen renders `advance_phase` as the
+   * end-of-turn button in the right rail, so this bar receives whatever is
+   * left. The invariant that a slot is disabled rather than absent is
+   * unchanged.
+   */
+  slots: readonly ActionSlot[];
   onInvoke: (id: ActionSlotId) => void;
 }>;
 

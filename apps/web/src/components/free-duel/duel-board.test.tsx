@@ -95,8 +95,11 @@ describe("DuelBoard", () => {
 
   it("does not expose hidden opponent card name or stats", () => {
     render(<DuelBoard view={view()} />);
-    expect(screen.getByText("Blue Dragon")).toBeTruthy();
+    // The board zone carries the name in its accessible name, not in a visible
+    // strip; only the player's own face-up card is named at all.
+    expect(screen.getByLabelText("Zona de monstro Jogador 1, Blue Dragon")).toBeTruthy();
     expect(screen.getByText("1200 / 900")).toBeTruthy();
     expect(screen.queryByLabelText(/Zona de monstro Oponente 1, Blue Dragon/)).toBeNull();
+    expect(screen.getByLabelText("Zona de monstro Oponente 1, Carta virada")).toBeTruthy();
   });
 });
