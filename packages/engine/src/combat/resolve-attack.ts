@@ -17,6 +17,7 @@ import { replaceZone } from "../field/replace-zone.ts";
 import { isFaceDown } from "../position/next-position.ts";
 import { equipCombatProviders } from "../spells/effects/index.ts";
 import { getOpponent } from "../spells/opponent.ts";
+import { consumeMatchingTrap } from "../traps/index.ts";
 import { calculateEffectiveAtkDef } from "./calculate-effective-atk-def.ts";
 import { resolveCombatTable } from "./resolve-combat-table.ts";
 
@@ -79,6 +80,44 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
     throw new Error(
       "Unreachable: nothing can vacate the attacker's zone between declare and resolve.",
     );
+  }
+
+  const targetBeforeTrap =
+    targetZoneRef === undefined
+      ? undefined
+      : workingState.players[opponentPlayer].field.monsters[targetZoneRef.index];
+  const attackerBeforeTrap = calculateEffectiveAtkDef(
+    attackerZone.card,
+    {
+      activeField: workingState.activeField,
+      opponent: targetBeforeTrap?.occupied ? targetBeforeTrap.card : null,
+    },
+    equipCombatProviders(attackerZone),
+  );
+  const consumedTrap = consumeMatchingTrap(
+    workingState,
+    opponentPlayer,
+    (effect) =>
+      effect.type === "destroy_attacker" &&
+      (effect.maxAtk === null || attackerBeforeTrap.atk <= effect.maxAtk),
+  );
+  if (consumedTrap !== undefined) {
+    workingState = withMonsterZone(consumedTrap.state, attackerPlayer, attackerZoneRef.index, {
+      occupied: false,
+    });
+    return ok({
+      state: workingState,
+      events: [
+        ...consumedTrap.events,
+        createEvent({
+          type: "onDestroy",
+          originPlayer: opponentPlayer,
+          involvedCards: [attackerZone.card],
+          involvedZones: [attackerZoneRef],
+          context: { cause: "trap_effect", by: consumedTrap.card.numero },
+        }),
+      ],
+    });
   }
 
   let defenderZone: typeof attackerZone | undefined;
