@@ -13,6 +13,7 @@ import { createEvent, openReactionWindow } from "../events/index.ts";
 import { replaceZone } from "../field/replace-zone.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
 import { getOpponent } from "./opponent.ts";
+import { consumeMatchingTrap } from "../traps/index.ts";
 
 /**
  * Attaches an equip card from the active player's hand to one of their own
@@ -87,14 +88,23 @@ export function equipCard(
     );
   }
 
+  const opponent = getOpponent(state.activePlayer);
+  const trap = consumeMatchingTrap(state, opponent, (effect) => effect.type === "reverse_equip");
+  const workingState = trap?.state ?? state;
   const nextHand = player.hand.filter((_, index) => index !== action.handIndex);
-  const equippedZone = { ...hostZone, equips: [...hostZone.equips, card] };
+  const equippedZone = {
+    ...hostZone,
+    equips: [
+      ...hostZone.equips,
+      { card, polarity: trap === undefined ? ("normal" as const) : ("reversed" as const) },
+    ],
+  };
   const nextMonsters = replaceZone(player.field.monsters, targetZone.index, equippedZone);
 
   const equippedState: DuelState = {
-    ...state,
+    ...workingState,
     players: {
-      ...state.players,
+      ...workingState.players,
       [state.activePlayer]: {
         ...player,
         hand: nextHand,
@@ -113,10 +123,10 @@ export function equipCard(
     context: { target: "equip", host: hostZone.card.numero },
   });
 
-  const opened = openReactionWindow(stateAfterHandPlay, event, getOpponent(state.activePlayer));
+  const opened = openReactionWindow(stateAfterHandPlay, event, opponent);
   if (!opened.ok) {
     throw new Error("Unreachable: apply already guaranteed no reaction window is open.");
   }
 
-  return ok({ state: opened.value, events: [event] });
+  return ok({ state: opened.value, events: [event, ...(trap?.events ?? [])] });
 }

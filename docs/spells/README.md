@@ -36,7 +36,7 @@ que este diretório faz.
 Incluído: as 25 cartas listadas acima, a ação de equipar, a ação de ativar uma mágica de efeito
 imediato, e o filtro que restringe `play_field_spell` aos seis terrenos reais.
 
-Fora de escopo: armadilhas (nenhuma das 10 tem efeito aqui), as outras 42 cartas `magica`/
+Fora de escopo desta documentação: armadilhas (implementadas em `docs/traps/`), as outras 42 cartas `magica`/
 `equipamento` sem entrada na tabela (continuam inertes), fusões, Guardian Stars, e a matriz
 terreno×classe (ver [`terrains.md`](./terrains.md)).
 

@@ -48,7 +48,7 @@ export function calculateEffectiveAtkDef(
   const equipment = providers.equipment(monster);
 
   return {
-    atk: baseAtk + guardian.atk + terrain.atk + equipment.atk,
-    def: baseDef + guardian.def + terrain.def + equipment.def,
+    atk: Math.max(0, baseAtk + guardian.atk + terrain.atk + equipment.atk),
+    def: Math.max(0, baseDef + guardian.def + terrain.def + equipment.def),
   };
 }

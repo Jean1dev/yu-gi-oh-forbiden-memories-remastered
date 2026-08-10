@@ -33,6 +33,12 @@ export const MonsterPositionSchema = z.enum([
   "defense_face_down",
 ]);
 
+export const EquipPolaritySchema = z.enum(["normal", "reversed"]);
+export const EquipAttachmentSchema = z.strictObject({
+  card: CardSchema,
+  polarity: EquipPolaritySchema,
+});
+
 export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
   z.strictObject({ occupied: z.literal(false) }),
   z.strictObject({
@@ -41,7 +47,7 @@ export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
-    equips: z.array(CardSchema),
+    equips: z.array(EquipAttachmentSchema),
   }),
 ]);
 
@@ -250,7 +256,7 @@ export const PublicMonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
-    equips: z.array(CardSchema),
+    equips: z.array(EquipAttachmentSchema),
   }),
 ]);
 

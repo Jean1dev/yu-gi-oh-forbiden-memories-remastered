@@ -181,6 +181,7 @@ export type {
   ZoneReference,
   ZoneType,
 } from "./duel/events.ts";
+export type { EquipAttachment, EquipPolarity } from "./duel/types.ts";
 export type { ApplyResult } from "./duel/apply-result.ts";
 export type {
   Action,
@@ -212,6 +213,7 @@ export {
   SummonMonsterActionSchema,
   SurrenderActionSchema,
 } from "./duel/action.schema.ts";
+export { EquipAttachmentSchema, EquipPolaritySchema } from "./duel/schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
 export {
   CardClassFilterSchema,

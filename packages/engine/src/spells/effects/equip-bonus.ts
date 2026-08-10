@@ -3,6 +3,7 @@ import {
   matchesClassFilter,
   type Card,
   type EffectiveAtkDef,
+  type EquipAttachment,
   type MonsterZone,
 } from "@yugioh/shared";
 
@@ -24,13 +25,22 @@ type OccupiedMonsterZone = Extract<MonsterZone, { occupied: true }>;
  * call, so the card's base `atk`/`def` are never overwritten
  * (`docs/arquitetura.md` §3.1).
  */
-export function sumEquipBonuses(host: Card, equips: readonly Card[]): EffectiveAtkDef {
+export function sumEquipBonuses(
+  host: Card,
+  equips: readonly (EquipAttachment | Card)[],
+): EffectiveAtkDef {
   return equips.reduce<EffectiveAtkDef>(
-    (total, equip) => {
-      const effect = getSpellEffect(equip.numero);
+    (total, candidate) => {
+      const attachment: EquipAttachment =
+        "card" in candidate ? candidate : { card: candidate, polarity: "normal" };
+      const effect = getSpellEffect(attachment.card.numero);
       if (effect?.type !== "equip_buff") return total;
       if (!matchesClassFilter(host, effect.requires)) return total;
-      return { atk: total.atk + effect.atk, def: total.def + effect.def };
+      const polarity = attachment.polarity === "reversed" ? -1 : 1;
+      return {
+        atk: total.atk + effect.atk * polarity,
+        def: total.def + effect.def * polarity,
+      };
     },
     { atk: 0, def: 0 },
   );

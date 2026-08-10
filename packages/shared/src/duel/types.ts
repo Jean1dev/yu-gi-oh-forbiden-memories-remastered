@@ -8,6 +8,11 @@ import type { FusionResolution } from "../fusion/types.ts";
 
 export type { PlayerId } from "./player.ts";
 
+export type EquipPolarity = "normal" | "reversed";
+
+/** One equip attached to a monster without mutating the canonical card. */
+export type EquipAttachment = Readonly<{ card: Card; polarity: EquipPolarity }>;
+
 /** The current phase of the turn. */
 export type Phase = "draw" | "main" | "battle" | "end";
 
@@ -37,7 +42,7 @@ export type MonsterZone =
        * Living on the zone rather than in a spell zone is what makes the
        * equips vanish with a destroyed host, with no cleanup code.
        */
-      equips: readonly Card[];
+      equips: readonly EquipAttachment[];
     }>;
 
 /**
@@ -140,7 +145,7 @@ export type PublicMonsterZone =
        * by an explicit action the opponent witnessed, and hiding it would let
        * a player bluff a buff that the combat table then applies anyway.
        */
-      equips: readonly Card[];
+      equips: readonly EquipAttachment[];
     }>;
 
 export type PublicSpellZone =

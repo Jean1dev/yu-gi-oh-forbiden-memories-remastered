@@ -56,4 +56,5 @@ export {
   withAttackLock,
 } from "./spells/index.ts";
 export { changePosition, isFaceDown, nextPosition } from "./position/index.ts";
+export { consumeMatchingTrap, type ConsumedTrap } from "./traps/index.ts";
 export { accumulateStats, emptyDuelStats, emptyDuelStatsByPlayer } from "./stats/index.ts";

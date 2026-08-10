@@ -96,6 +96,15 @@ describe("sumEquipBonuses — restricao de classe", () => {
 });
 
 describe("sumEquipBonuses — acumulo e casos de borda", () => {
+  it("subtracts a reversed equip and keeps the canonical card unchanged", () => {
+    const host = makeCard({ classe: "Warrior", atk: 300, def: 200 });
+    expect(sumEquipBonuses(host, [{ card: axeOfDespair, polarity: "reversed" }])).toEqual({
+      atk: -1000,
+      def: -1000,
+    });
+    expect(host).toMatchObject({ atk: 300, def: 200 });
+  });
+
   it("dois equipamentos no mesmo monstro acumulam os bonus", () => {
     expect(
       sumEquipBonuses(makeCard({ classe: "Warrior" }), [legendarySword, axeOfDespair]),
@@ -142,7 +151,7 @@ describe("equipCombatProviders", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
-      equips,
+      equips: equips.map((card) => ({ card, polarity: "normal" })),
     };
   }
 

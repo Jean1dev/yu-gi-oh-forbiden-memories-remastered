@@ -26,9 +26,7 @@ export type DuelStatCounter = (typeof DUEL_STAT_COUNTERS)[number];
  *   result card is placed as.
  * - `equips` — equip magic cards played.
  * - `pureMagics` — effect magic and field magic activated.
- * - `triggeredTraps` — traps triggered. Permanently 0: the engine has no trap
- *   activation yet. That is the true count of a duel in which no trap fired,
- *   not a placeholder — the formula already scores that case (spec Decision 6).
+ * - `triggeredTraps` — traps automatically triggered and consumed by the engine.
  */
 export type DuelStats = Readonly<Record<DuelStatCounter, number>>;
 

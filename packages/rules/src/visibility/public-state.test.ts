@@ -1,4 +1,10 @@
-import { DUEL_STAT_COUNTERS, type Card, type DuelStats, type DuelState, type PlayerField } from "@yugioh/shared";
+import {
+  DUEL_STAT_COUNTERS,
+  type Card,
+  type DuelStats,
+  type DuelState,
+  type PlayerField,
+} from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 import { getPublicDuelState } from "./public-state.ts";
 
@@ -170,7 +176,10 @@ describe("public duel state", () => {
           ...state.players.P2,
           field: {
             ...opponentField,
-            monsters: [{ ...hostZone, equips: [equip] }, ...rest] as PlayerField["monsters"],
+            monsters: [
+              { ...hostZone, equips: [{ card: equip, polarity: "normal" }] },
+              ...rest,
+            ] as PlayerField["monsters"],
           },
         },
       },
@@ -181,7 +190,7 @@ describe("public duel state", () => {
 
     // The host itself stays hidden — only the equipment is public.
     expect(zone.card).toEqual({ visible: false });
-    expect(zone.equips).toEqual([equip]);
+    expect(zone.equips).toEqual([{ card: equip, polarity: "normal" }]);
   });
 
   it("repassa attackLocks para os dois pontos de vista", () => {

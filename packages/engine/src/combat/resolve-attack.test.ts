@@ -349,7 +349,13 @@ describe("resolveAttack — bonus de equipamento", () => {
     const base = fieldWithMonster(card, position);
     const [zone, ...rest] = base.monsters;
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    return { ...base, monsters: [{ ...zone, equips }, ...rest] as PlayerField["monsters"] };
+    return {
+      ...base,
+      monsters: [
+        { ...zone, equips: equips.map((card) => ({ card, polarity: "normal" as const })) },
+        ...rest,
+      ] as PlayerField["monsters"],
+    };
   }
 
   it("o equipamento do atacante decide um combate que o ATK base perderia", () => {
@@ -468,7 +474,7 @@ describe("resolveAttack — bonus de equipamento", () => {
     if (!result.ok) return;
     const zone = result.value.state.players.P1.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([legendarySword]);
+    expect(zone.equips).toEqual([{ card: legendarySword, polarity: "normal" }]);
     expect(zone.card.atk).toBe(1200);
   });
 });

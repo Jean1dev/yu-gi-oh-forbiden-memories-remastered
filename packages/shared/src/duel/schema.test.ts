@@ -357,7 +357,10 @@ describe("MonsterZoneSchema equips", () => {
   });
 
   it("aceita uma zona ocupada com equips vazio e com equipamentos anexados", () => {
-    for (const equips of [[], [validCard({ numero: "301", tipo: "equipamento" })]]) {
+    for (const equips of [
+      [],
+      [{ card: validCard({ numero: "301", tipo: "equipamento" }), polarity: "normal" }],
+    ]) {
       const state = stateWithP1Field({
         monsters: [occupiedZone(equips), emptyZone, emptyZone, emptyZone, emptyZone],
         spells: [emptyZone, emptyZone, emptyZone, emptyZone, emptyZone],

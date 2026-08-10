@@ -66,7 +66,14 @@ function monsterZone(
   card: Card,
   position: MonsterPosition = "attack_face_up",
 ): Extract<MonsterZone, { occupied: true }> {
-  return { occupied: true, card, position, hasAttacked: false, hasChangedPosition: false, equips: [] };
+  return {
+    occupied: true,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
 }
 
 function emptyField(): PlayerField {
@@ -236,7 +243,13 @@ describe("activateSpell — destruicao de monstros", () => {
 
 describe("activateSpell — remocao de magias", () => {
   it("Harpie's Feather Duster limpa as cinco zonas de magia do oponente e nenhuma do lancador", () => {
-    const trap = makeCard({ numero: "700", classe: "Trap", tipo: "armadilha", atk: null, def: null });
+    const trap = makeCard({
+      numero: "700",
+      classe: "Trap",
+      tipo: "armadilha",
+      atk: null,
+      def: null,
+    });
     const state = makeState({
       players: {
         P1: makePlayer({ field: fieldWithSpells([trap]) }),
@@ -251,7 +264,10 @@ describe("activateSpell — remocao de magias", () => {
   });
 
   it("nao afeta o terreno ativo nem os equipamentos anexados a monstros", () => {
-    const equippedZone: MonsterZone = { ...monsterZone(warrior), equips: [swordOfDarkDestruction] };
+    const equippedZone: MonsterZone = {
+      ...monsterZone(warrior),
+      equips: [{ card: swordOfDarkDestruction, polarity: "normal" }],
+    };
     const state = makeState({
       activeField: magic("334", "Umi"),
       players: {
@@ -265,7 +281,7 @@ describe("activateSpell — remocao de magias", () => {
     expect(next.activeField?.numero).toBe("334");
     const zone = next.players.P2.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([swordOfDarkDestruction]);
+    expect(zone.equips).toEqual([{ card: swordOfDarkDestruction, polarity: "normal" }]);
   });
 });
 
