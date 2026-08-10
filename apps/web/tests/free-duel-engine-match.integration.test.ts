@@ -1,7 +1,9 @@
 import { getSealedCatalog, listAllCards } from "../src/lib/catalog/sealed-catalog.ts";
+import { loadRoster } from "@yugioh/data/roster";
 import { buildReadyDeck, groupIntoComposition } from "@yugioh/rules";
-import type { Card, DuelSession, Duelist, ReadyDeck } from "@yugioh/shared";
+import type { Card, DuelAction, DuelSession, Duelist, ReadyDeck } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
+import rawRoster from "../../../packages/data/data/roster.json" with { type: "json" };
 import { advanceCpuDecisions, submitPlayerAction } from "../src/lib/free-duel/duel-session.ts";
 import { createDuelRuntime, type DuelRuntime } from "../src/lib/free-duel/duel-runtime.ts";
 
@@ -153,5 +155,100 @@ describe("free duel with real engine", () => {
         winner: "P2",
       });
     }
+  });
+
+  it("runs Nitemare through a real CPU turn with a summon and attack", async () => {
+    const catalog = await getSealedCatalog();
+    expect(catalog.ok).toBe(true);
+    if (!catalog.ok) return;
+
+    const loaded = loadRoster(rawRoster, (number) => catalog.value.getByNumero(number));
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const nitemare = loaded.value.duelists.find((duelist) => duelist.id === "nitemare");
+    expect(nitemare).toBeDefined();
+    if (nitemare === undefined) return;
+
+    const cards = listAllCards(catalog.value);
+    const weakMonsters = cards
+      .filter((card) => card.tipo === "monstro" || card.tipo === "ritual")
+      .sort((left, right) => (left.atk ?? 0) - (right.atk ?? 0))
+      .slice(0, 14);
+    const playerNumbers = weakMonsters
+      .flatMap((card) => [card.numero, card.numero, card.numero])
+      .slice(0, 40);
+    const playerDeck = buildReadyDeck({
+      composition: groupIntoComposition(playerNumbers),
+      catalog: (number) => catalog.value.getByNumero(number),
+    });
+    expect(playerDeck.ok).toBe(true);
+    if (!playerDeck.ok) return;
+
+    const cpuSteps: Array<Readonly<{ events: readonly { type: string }[] }>> = [];
+    const incidents: string[] = [];
+    const runtime = createDuelRuntime({ cards, sleep: async () => undefined });
+    const dependencies = {
+      ...runtime.advanceDependencies,
+      cpuProfile: nitemare.profile,
+      onStep: (step: { readonly events: readonly { type: string }[] }) => cpuSteps.push(step),
+      logIncident: ({ code }: { readonly code: string }) => incidents.push(code),
+    };
+    const started = runtime.start(
+      {
+        duelistId: nitemare.id,
+        playerComposition: playerDeck.value.composition,
+        cpuComposition: groupIntoComposition(nitemare.deck),
+        seed: 2,
+      },
+      nitemare,
+    );
+    expect(started).toMatchObject({ status: "in_progress", currentDecider: "P2" });
+    if (started.status !== "in_progress") return;
+
+    let session = await advanceCpuDecisions(started, dependencies);
+    expect(session).toMatchObject({ status: "in_progress", currentDecider: "P1" });
+    if (session.status !== "in_progress") return;
+
+    const playerActions: readonly DuelAction[] = [
+      { type: "advance_phase" as const },
+      {
+        type: "summon_monster" as const,
+        player: "P1" as const,
+        handIndex: session.state.players.P1.hand.findIndex(
+          (card) => card.tipo === "monstro" || card.tipo === "ritual",
+        ),
+        zoneIndex: 0,
+        position: "attack_face_up" as const,
+      },
+      { type: "advance_phase" as const },
+      { type: "advance_phase" as const },
+      { type: "advance_phase" as const },
+    ];
+    for (const action of playerActions) {
+      if (session.status !== "in_progress") break;
+      const applied = await submitPlayerAction(session, action, dependencies);
+      expect(applied.refusal).toBeUndefined();
+      session = applied.session;
+    }
+
+    expect(session).toMatchObject({ status: "in_progress", currentDecider: "P1" });
+    expect(incidents).toEqual([]);
+    expect(cpuSteps.length).toBeGreaterThan(0);
+    expect(cpuSteps.length).toBeLessThan(100);
+    const eventTypes = cpuSteps.flatMap((step) => step.events.map((event) => event.type));
+    expect(eventTypes).toContain("onSummon");
+    expect(eventTypes).toContain("onAttackDeclared");
+
+    if (session.status !== "in_progress") return;
+    const ended = await submitPlayerAction(
+      session,
+      { type: "surrender", player: "P1" },
+      dependencies,
+    );
+    expect(ended.refusal).toBeUndefined();
+    expect(ended.session).toMatchObject({
+      status: "ended",
+      finalState: { outcome: { reason: "surrender", winner: "P2" } },
+    });
   });
 });
