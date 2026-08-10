@@ -228,6 +228,12 @@ export {
   type SpellEffect,
   type SpellPlayMode,
 } from "./duel/spell-effects/index.ts";
+export {
+  TRAP_EFFECTS,
+  TrapEffectSchema,
+  getTrapEffect,
+  type TrapEffect,
+} from "./duel/trap-effects/index.ts";
 export type {
   CardRewardEvent,
   Collection,
