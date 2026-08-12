@@ -83,9 +83,9 @@ perderia sua única carta memorável.
 
 36 monstros e 4 mágicas. Maior ataque do deck: **1200** (Baby Dragon, cópia única).
 
-**As mágicas dele também são inertes aqui.** `Red Medicine` (+500 LP) e `Hinotama` (500 de dano)
-não estão na `SPELL_EFFECTS` — o motor as aceita numa zona e elas não fazem nada
-(`docs/spells/README.md`). São 4 das 40 cartas.
+**As mágicas dele funcionam** desde `spells/F02`: `Red Medicine` cura 500 LP e `Hinotama` tira 100
+do oponente — os números do jogo original, não os do TCG (`docs/spells/life-points.md`). São 4 das
+40 cartas, e nenhuma decide um duelo sozinha contra 8000 de LP.
 
 ## Pools de drop
 

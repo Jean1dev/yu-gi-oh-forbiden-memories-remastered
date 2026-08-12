@@ -105,6 +105,14 @@ chance out of 2048, verbatim from the original. The separate `packages/data/src/
 stayed `[]`, and its `DropPool` type collided by name with the live one in
 `packages/shared/src/duelist`.
 
+**The original game's own data is one script away.** `packages/data/scripts/fm-gamedata-database.ts`
+downloads and caches `sg4e/YGOFM-gamedata` (a datamine verified against emulator dumps) as a
+SQLite file read through Node 24's built-in `node:sqlite` — no dependency, cached under
+`packages/data/.cache/` (gitignored). Its `cardId` **is** this project's `numero`, so joining is
+free. Three scripts read it: `extract-fm-duelist.ts` (drop/deck pools), `extract-fm-equip-compatibility.ts`
+(equip lists) and `backfill-fm-enrichment.ts` (attributes and card text). Reach for it before
+authoring any card fact by hand.
+
 ### Persistence
 
 Three tables (`collections`, `active_decks`, `reward_ledger`), all RLS `select`-own only. Every
@@ -189,7 +197,7 @@ generic and long — consult it for a specific question rather than reading it e
 
 Implemented: `banco-de-cartas` F01–F08, `build-deck` F01–F07, `library` F01–F05 (complete),
 `free-duel` F01–F10 (complete), `password` F01–F04, `motor-duelo-1x1` F01–F12 (complete),
-`rating-engine` F01–F03 (complete), plus the integration shell (main menu, `/login`,
+`rating-engine` F01–F03 (complete), `spells` F01–F02 (complete), plus the integration shell (main menu, `/login`,
 `POST /api/account/bootstrap`, the `/cards-data/[file]` art route).
 
 The duel engine has a full turn cycle end to end: `apply(state, action)` dispatches
@@ -200,8 +208,29 @@ piercing). Once life points hit 0, a deck runs out, or a player surrenders, `mot
 freezes the state with a winner/loser (or draw) and refuses any further action — a duel can be
 played, and finished, from the first turn to the result screen (`free-duel/F09`–`F10`).
 
-The 25 spell cards documented in `docs/spells/` resolve through a shared effect table and a pure
-engine interpreter, including equipment bonuses, immediate effects, terrains and attack locks.
+**All 67 magic/equip cards do something** (`docs/spells/`, `spells/F01`–`F02`): they resolve
+through a shared effect table and a pure engine interpreter — equip bonuses, mass destruction,
+life-point swings, terrains, attack locks, stat curses and the one targeted card. Only the 10
+traps and the 24 ritual cards are still inert, and neither has an activation mechanic in the
+engine.
+
+The rules are the **original Forbidden Memories'**, not the modern TCG's, and they are *extracted*
+rather than authored: `sg4e/YGOFM-gamedata` — already downloaded by `extract-fm-duelist.ts` for
+the drop pools — carries every card's in-game text plus `equipinfo`, the 4041 pairs saying which
+monsters each equip accepts. Three consequences that will look like bugs if you don't know them:
+
+- **Equip compatibility follows no rule you can infer.** It is a per-card curated list, so Harpie
+  Lady (a `Winged Beast`) legally takes Book of Secret Arts. The table lives in
+  `packages/shared/src/duel/spell-effects/equip-compatibility.ts` and is **generated** — re-run
+  `pnpm --filter @yugioh/data data:extract-fm-equips` instead of editing it. Every equip grants
+  +500/+500; only Megamorph doubles.
+- **The numbers are not the TCG's.** Sparks burns 50 (not 200), Dian Keto heals 5000 (not 1000),
+  and Spellbinding Circle hits *every* enemy monster instead of one target. `descricao` in
+  `cards-data/enriquecimento-ygoprodeck.json` was replaced with the original's text so the card
+  frame agrees with the resolution.
+- **`MonsterZone.curseLevels` counts levels, not points.** One level is `POWER_PER_LEVEL` (500),
+  the conversion Megamorph's own "by 2 levels" text pins down. It rides in the `equipment` modifier
+  slot, so `ModifierProviders` still has three slots.
 
 **The reward loop is live.** Winning grades the duel with the original's formula
 (`packages/rules/src/rating`, fed by the seven counters `DuelState.stats` accumulates), pays 1–5

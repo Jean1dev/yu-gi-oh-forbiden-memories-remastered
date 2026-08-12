@@ -78,11 +78,11 @@ monstros.
 
 34 monstros e 6 mágicas. Maior ataque do deck: **500** (Shadow Specter, Larvae Moth, Tomozaurus).
 
-**As duas mágicas dela são inertes neste projeto.** `Mooyan Curry` (+200 LP) e `Hinotama`
-(500 de dano) não estão na `SPELL_EFFECTS` (`packages/shared/src/duel/spell-effects/table.ts`) —
-o motor as aceita numa zona de magia e elas não fazem nada, que é o comportamento declarado para
-carta sem efeito especificado (`docs/spells/README.md`). São 6 das 40 cartas dela: na prática o
-deck joga como 34 monstros e 6 cartas mortas, o que reforça o papel de oponente inicial.
+**As mágicas dela funcionam** desde `spells/F02`, mas mal se notam: `Mooyan Curry` cura 200 LP e
+`Hinotama` tira 100 do oponente, os números do jogo original
+(`docs/spells/life-points.md`). São 6 das 40 cartas dela, e contra 8000 de LP o efeito somado é
+ruído — o deck continua jogando como 34 monstros fracos, o que reforça o papel de oponente
+inicial.
 
 ## Pools de drop
 

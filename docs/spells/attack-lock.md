@@ -11,6 +11,10 @@
 
 O oponente não pode declarar ataque durante os três turnos seguintes dele.
 
+A carta faz **duas** coisas — "Enemy monsters are revealed **and** your opponent cannot attack for
+three turns" — e por isso sua entrada na tabela é uma `sequence`. A revelação é a outra metade, em
+[`reveal.md`](./reveal.md) §4; este arquivo cobre só a trava.
+
 ## 2. Novo campo de estado
 
 ```ts
@@ -77,4 +81,4 @@ desabilitar o botão "Atacar" enquanto a trava vale.
 | Cenário | Código |
 | --- | --- |
 | Declarar ataque com a trava ativa | `attack_locked_by_effect` |
-| Demais | idênticas às de [`destruction.md`](./destruction.md) §3 |
+| Demais | idênticas às de [`destruction.md`](./destruction.md) §4 |

@@ -132,6 +132,12 @@ depende apenas de `shared`, e a UI precisa consultar o modo de jogo da carta sem
 O registry reativo futuro continua pertencendo a `packages/rules`; a tabela atual descreve efeitos
 deterministicos resolvidos pela transicao `apply(state, action)`.
 
+Pela mesma razao, `equip-compatibility.ts` — os 4041 pares equipamento/hospedeiro que o jogo
+original declara — tambem vive em `shared`, apesar de ser dado gerado e nao schema. `packages/data`
+seria a casa natural, mas `sumEquipBonuses` roda em `engine`, que nao pode importar `data`, e
+`apply` tem dois parametros e nenhum ponto de injecao. O arquivo e gerado por
+`packages/data/scripts/extract-fm-equip-compatibility.ts` a partir do datamine do jogo.
+
 Com 722 cartas, isso evita que cada armadilha vire um ramo dentro do combate. — pilar
 "efeitos por eventos".
 
