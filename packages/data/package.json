@@ -28,6 +28,7 @@
     "data:test-duelist": "node scripts/generate-test-duelist.ts",
     "data:extract-fm-duelist": "node scripts/extract-fm-duelist.ts",
     "data:extract-fm-equips": "node scripts/extract-fm-equip-compatibility.ts",
+    "data:backfill-fm-enrichment": "node scripts/backfill-fm-enrichment.ts",
     "data:build-roster": "node scripts/build-roster.ts",
     "data:validate": "node scripts/validate-cards.ts",
     "data:validate-fusions": "node scripts/validate-fusions.ts",
