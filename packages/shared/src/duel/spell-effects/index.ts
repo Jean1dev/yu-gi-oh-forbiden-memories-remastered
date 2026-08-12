@@ -1,4 +1,9 @@
 export { matchesClassFilter } from "./class-filter.ts";
+export {
+  equipCardNumbers,
+  equipCompatibleHosts,
+  isEquipCompatible,
+} from "./equip-compatibility.ts";
 export { spellPlayMode } from "./play-mode.ts";
 export {
   CardClassFilterSchema,
