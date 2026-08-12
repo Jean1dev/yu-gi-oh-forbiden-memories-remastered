@@ -38,6 +38,21 @@ export type MonsterZone =
        * equips vanish with a destroyed host, with no cleanup code.
        */
       equips: readonly Card[];
+      /**
+       * How many levels a curse has taken off this monster (349 Spellbinding
+       * Circle, 669 Shadow Spell). Absent means none, which is why the field
+       * is optional: every `MonsterZone` fixture predating `spells/F02` keeps
+       * compiling, the same allowance `Card.atributo` got.
+       *
+       * Counted in *levels* rather than in ATK/DEF because that is the unit
+       * the original game's cards are written in, and it makes 655
+       * Cursebreaker literal — "sets them at level 0". The delta is derived at
+       * combat time through `POWER_PER_LEVEL`, never stored.
+       *
+       * Lives on the zone for the same reason `equips` does: it vanishes with
+       * a destroyed host, with no cleanup code.
+       */
+      curseLevels?: number | undefined;
     }>;
 
 /**
@@ -141,6 +156,8 @@ export type PublicMonsterZone =
        * a player bluff a buff that the combat table then applies anyway.
        */
       equips: readonly Card[];
+      /** Visible for the same reason `equips` is — combat applies it either way. */
+      curseLevels?: number | undefined;
     }>;
 
 export type PublicSpellZone =

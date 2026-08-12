@@ -11,7 +11,7 @@ import type { ModifierProviders } from "./calculate-effective-atk-def.ts";
  * third parameter through which real providers could be injected today.
  *
  * The **equipment** slot is no longer neutral in combat: `resolveAttack` now
- * composes this bundle through `equipCombatProviders`
+ * composes this bundle through `zoneCombatProviders`
  * (`packages/engine/src/spells/effects/equip-bonus.ts`), which closes over the
  * zone's attached equips at construction time — the answer to the pendency
  * this comment used to describe, and the reason it needs no extra parameter.

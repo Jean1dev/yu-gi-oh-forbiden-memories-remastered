@@ -253,8 +253,10 @@ describe("playSpellOrTrap — cartas que pertencem a outra acao", () => {
       code: "spell_requires_activation",
     },
     {
-      name: "recusa Sword of Dark Destruction com spell_requires_activation, apesar de ser equipamento",
-      card: makeCard({ numero: "302", classe: "Equip", tipo: "equipamento" }),
+      // 320 e `tipo: "magica"` como Forest, mas resolve na hora: e a tabela
+      // que decide o roteamento, nunca o `tipo` sozinho.
+      name: "recusa Stop Defense com spell_requires_activation, apesar de ser magica como um terreno",
+      card: makeCard({ numero: "320", nome: "Stop Defense" }),
       code: "spell_requires_activation",
     },
   ];

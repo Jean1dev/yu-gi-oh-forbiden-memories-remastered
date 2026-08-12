@@ -30,9 +30,9 @@ export type PlaySpellOrTrapAction = Readonly<{
  * monsters (`docs/spells/equip-buffs.md`).
  *
  * The bonus is never carried here and never stored on the zone: it is derived
- * at combat time from the equip's entry in `SPELL_EFFECTS` and the host's
- * `classe`, so an equip whose class restriction the host fails contributes 0
- * without the action being refused.
+ * at combat time from the equip's entry in `SPELL_EFFECTS` and the original
+ * game's compatibility list, so an equip attached to a host it does not accept
+ * contributes 0 without the action being refused.
  */
 export type EquipCardAction = Readonly<{
   type: "equip_card";
@@ -48,8 +48,18 @@ export type EquipCardAction = Readonly<{
  * Separate from `PlaySpellOrTrapAction`, whose required `zoneIndex` would be
  * permanently ignored here, so each action keeps a single-valued
  * postcondition.
+ *
+ * `targetZone` is required exactly when `requiresSpellTarget` says so, which
+ * today is only 320 Stop Defense — "Forces **an** opponent's monster card
+ * positioned for defense into the attack position". Optional rather than a
+ * separate action because every other guard, every event and the whole
+ * consumption path are identical; only the resolution reads the zone.
  */
-export type ActivateSpellAction = Readonly<{ type: "activate_spell"; handIndex: number }>;
+export type ActivateSpellAction = Readonly<{
+  type: "activate_spell";
+  handIndex: number;
+  targetZone?: ZoneReference | undefined;
+}>;
 
 /** Plays a field-spell card from hand, replacing the single `activeField` slot (motor-duelo-1x1 F09). */
 export type PlayFieldSpellAction = Readonly<{
