@@ -28,7 +28,7 @@ describe("roster integration", () => {
     // Not an exact list: the roster grows by dropping a source file into
     // `data/duelists/`, and a new duelist must not fail this test.
     expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
-      expect.arrayContaining(["jono", "nitemare", "teana", "test-duelist"]),
+      expect.arrayContaining(["forest-mage", "jono", "nitemare", "teana", "test-duelist"]),
     );
     for (const duelist of result.value.duelists) {
       expect(duelist.deck).toHaveLength(40);
@@ -36,7 +36,7 @@ describe("roster integration", () => {
     }
   });
 
-  it.each(["teana", "jono", "nitemare"])(
+  it.each(["teana", "jono", "nitemare", "forest-mage"])(
     "derives a legal deck for the duelist ported from the original game (%s)",
     async (duelistId) => {
       const result = await loadWithRealCatalog(ROSTER_FILE);

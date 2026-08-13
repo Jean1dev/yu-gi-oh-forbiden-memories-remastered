@@ -57,3 +57,4 @@ documento registra por que aquela foi escolhida.
 - [Teana](teana.md) — fácil, a primeira oponente do jogo
 - [Jono](jono.md) — fácil, contraparte egípcia do Joey
 - [Nitemare](nitemare.md) — difícil, chefe final com um pool composto só por monstros
+- [Forest Mage](forest-mage.md) — média, Mage Soldier que joga o próprio terreno `Forest`

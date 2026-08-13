@@ -251,4 +251,81 @@ describe("free duel with real engine", () => {
       finalState: { outcome: { reason: "surrender", winner: "P2" } },
     });
   });
+
+  it("plays Forest Mage to an engine-decided finish, terrain included", async () => {
+    const catalog = await getSealedCatalog();
+    expect(catalog.ok).toBe(true);
+    if (!catalog.ok) return;
+
+    const loaded = loadRoster(rawRoster, (number) => catalog.value.getByNumero(number));
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const forestMage = loaded.value.duelists.find((duelist) => duelist.id === "forest-mage");
+    expect(forestMage).toBeDefined();
+    if (forestMage === undefined) return;
+
+    // The 14 weakest monsters, three copies each: a deliberately losing deck, so
+    // the duel reaches an engine-decided outcome instead of a surrender.
+    const cards = listAllCards(catalog.value);
+    const weakMonsters = cards
+      .filter((card) => card.tipo === "monstro" || card.tipo === "ritual")
+      .sort((left, right) => (left.atk ?? 0) - (right.atk ?? 0))
+      .slice(0, 14);
+    const playerDeck = buildReadyDeck({
+      composition: groupIntoComposition(
+        weakMonsters.flatMap((card) => [card.numero, card.numero, card.numero]).slice(0, 40),
+      ),
+      catalog: (number) => catalog.value.getByNumero(number),
+    });
+    expect(playerDeck.ok).toBe(true);
+    if (!playerDeck.ok) return;
+
+    const cpuSteps: Array<Readonly<{ events: readonly { type: string }[] }>> = [];
+    const incidents: string[] = [];
+    const runtime = createDuelRuntime({ cards, sleep: async () => undefined });
+    const dependencies = {
+      ...runtime.advanceDependencies,
+      cpuProfile: forestMage.profile,
+      onStep: (step: { readonly events: readonly { type: string }[] }) => cpuSteps.push(step),
+      logIncident: ({ code }: { readonly code: string }) => incidents.push(code),
+    };
+    const started = runtime.start(
+      {
+        duelistId: forestMage.id,
+        playerComposition: playerDeck.value.composition,
+        cpuComposition: groupIntoComposition(forestMage.deck),
+        seed: 28,
+      },
+      forestMage,
+    );
+    expect(started).toMatchObject({ status: "in_progress" });
+    if (started.status !== "in_progress") return;
+
+    // The player only ever passes, so every decision under test is the CPU's.
+    let session: DuelSession = started;
+    let terrain: string | undefined;
+    for (let index = 0; index < 30 && session.status === "in_progress"; index += 1) {
+      const applied = await submitPlayerAction(session, { type: "advance_phase" }, dependencies);
+      expect(applied.refusal).toBeUndefined();
+      session = applied.session;
+      if (session.status === "in_progress") {
+        terrain = session.state.activeField?.numero ?? terrain;
+      }
+    }
+
+    expect(incidents).toEqual([]);
+    expect(cpuSteps.length).toBeGreaterThan(0);
+    expect(cpuSteps.length).toBeLessThan(100);
+    const eventTypes = cpuSteps.flatMap((step) => step.events.map((event) => event.type));
+    expect(eventTypes).toContain("onSummon");
+    expect(eventTypes).toContain("onAttackDeclared");
+    // `playsFieldSpells: true` is what separates this profile from Nitemare's:
+    // once the CPU cannot summon, it plays the Forest terrain it is named for.
+    expect(terrain).toBe("330");
+
+    expect(session).toMatchObject({
+      status: "ended",
+      finalState: { outcome: { status: "decisive", winner: "P2", reason: "lp_depleted" } },
+    });
+  });
 });
