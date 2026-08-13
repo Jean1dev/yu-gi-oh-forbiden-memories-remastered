@@ -331,7 +331,11 @@ describe("resolveAttack", () => {
 });
 
 describe("resolveAttack — bonus de equipamento", () => {
-  /** Legendary Sword: +500/+500 restricted to Warrior. */
+  /**
+   * Legendary Sword: +500/+500 on any of the 63 monsters the original game
+   * lists for it. 012 Swamp Battleguard is one of them; 002 Mystical Elf is
+   * not.
+   */
   const legendarySword = makeCard({
     numero: "301",
     nome: "Legendary Sword",
@@ -354,7 +358,7 @@ describe("resolveAttack — bonus de equipamento", () => {
 
   it("o equipamento do atacante decide um combate que o ATK base perderia", () => {
     // 1200 base < 1500 defender; +500 from Legendary Sword makes it 1700.
-    const attacker = makeCard({ numero: "010", classe: "Warrior", atk: 1200 });
+    const attacker = makeCard({ numero: "012", classe: "Warrior", atk: 1200 });
     const defender = makeCard({ numero: "002", classe: "Dragon", atk: 1500 });
     const declared = declaredState(
       makeState({
@@ -380,7 +384,7 @@ describe("resolveAttack — bonus de equipamento", () => {
 
   it("o equipamento do defensor tambem entra no calculo", () => {
     const attacker = makeCard({ numero: "010", classe: "Dragon", atk: 1600 });
-    const defender = makeCard({ numero: "002", classe: "Warrior", atk: 1400 });
+    const defender = makeCard({ numero: "012", classe: "Warrior", atk: 1400 });
     const declared = declaredState(
       makeState({
         players: {

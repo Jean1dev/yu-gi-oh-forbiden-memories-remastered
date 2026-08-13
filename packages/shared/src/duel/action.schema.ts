@@ -38,6 +38,8 @@ export const EquipCardActionSchema = z.strictObject({
 export const ActivateSpellActionSchema = z.strictObject({
   type: z.literal("activate_spell"),
   handIndex: z.number().int().min(0),
+  /** Only the targeted effects carry one; `activateSpell` refuses a stray zone. */
+  targetZone: ZoneReferenceSchema.optional(),
 });
 
 export const PlayFieldSpellActionSchema = z.strictObject({

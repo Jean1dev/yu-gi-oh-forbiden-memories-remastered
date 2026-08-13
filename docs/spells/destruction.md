@@ -1,31 +1,44 @@
 # Destruição de Monstros
 
-> Cartas: 302, 329, 336, 337
-> Efeito: `destroy_monsters` — ver [`README.md`](./README.md) §3
+> Cartas: 329, 336, 337, 653, 656, 660, 661, 662, 663, 664
+> Efeitos: `destroy_monsters` e `destroy_by_atk` — ver [`README.md`](./README.md) §3
 
-Quatro cartas que varrem monstros do campo. Todas resolvem imediatamente e saem de jogo.
+Dez cartas que varrem monstros do campo. Todas resolvem imediatamente e saem de jogo.
 
 ## 1. As cartas
 
-| Nº | Nome | Lado | Filtro | `tipo` no dataset |
-| --- | --- | --- | --- | --- |
-| 302 | Sword of Dark Destruction | oponente | `classe: "Warrior"` | `equipamento` |
-| 329 | Dragon Capture Jar | ambos | `classe: "Dragon"` | `magica` |
-| 336 | Dark Hole | ambos | qualquer | `magica` |
-| 337 | Raigeki | oponente | qualquer | `magica` |
+| Nº | Nome | Lado | Filtro |
+| --- | --- | --- | --- |
+| 329 | Dragon Capture Jar | oponente | `classe: "Dragon"` |
+| 336 | Dark Hole | ambos | qualquer |
+| 337 | Raigeki | oponente | qualquer |
+| 653 | Warrior Elimination | oponente | `classe: "Warrior"` |
+| 656 | Eternal Rest | **ambos** | `classe: "Zombie"` |
+| 660 | Stain Storm | oponente | `classe: "Machine"` |
+| 662 | Eradicating Aerosol | oponente | `classe: "Insect"` |
+| 663 | Breath of Light | oponente | `classe: "Rock"` |
+| 664 | Eternal Draught | oponente | `classe: "Fish"` |
+| 661 | Crush Card | oponente | ATK ≥ 1500 (`destroy_by_atk`) |
 
-**302 é uma divergência do FM** (lá é um equipamento de +500 ATK / −500 DEF em Fiend/Zombie) e,
-apesar de ser `tipo: "equipamento"` no dataset, é roteada por `activate_spell`. O `tipo` do
-dataset não decide o roteamento — a tabela decide. Ver [`README.md`](./README.md) §7.
+O lado sai do texto do jogo original: quando ele nomeia o dono ("Destroys all **opponent** Dragon
+monsters", "an **opponent's** Machine monsters"), é `opponent`. Só duas cartas não nomeiam, e por
+isso alcançam os dois lados — 336 Dark Hole ("Sucks up **every card in play** on the field!") e
+656 Eternal Rest ("Eliminates **all** Zombie creatures").
 
-**329 também diverge:** no FM original o Dragon Capture Jar vira todos os dragões para defesa, não
-os destrói.
+**656 não destrói monstros equipados**, apesar do que o texto do TCG diz. No jogo original ele é
+uma carta anti-Zombie, e é essa a regra aqui ([`README.md`](./README.md) §7).
 
-**"Ambos" em 329 e 336 é intencional.** A descrição não nomeia dono, então o efeito alcança os
-dois jogadores — inclusive os monstros do próprio lançador. Dark Hole limpando o campo inteiro é,
-aliás, o comportamento correto do FM.
+## 2. `destroy_by_atk` e o ATK que conta
 
-## 2. Comportamento
+661 Crush Card — "Opponent monsters in play with attack factors of **1500 or more** are
+eliminated" — é a única carta que filtra por número em vez de classe, e o limite é **inclusivo**.
+
+A comparação é contra o **ATK impresso** da carta, não contra o efetivo: um monstro que só passa
+de 1500 por causa de um equipamento não é destruído. É a leitura literal de "attack factor", e
+evita que a resolução de uma magia dependa dos provedores de combate. Um monstro sem ATK aplicável
+lê como 0, a mesma convenção de `calculateEffectiveAtkDef`.
+
+## 3. Comportamento
 
 **Ação:** `activate_spell { handIndex }`. Consome a jogada da mão do turno. A carta é removida da
 mão e **não ocupa zona nenhuma** — resolve e sai de jogo. Não há cemitério em `DuelState`.
@@ -47,7 +60,7 @@ Um evento por zona, nunca um agregado — `duel-cues.ts` monta a animação a pa
 Uma carta que não destrói nada (campo vazio, ou nenhum monstro casando com o filtro) é uma jogada
 **legal**: gasta a jogada do turno, emite só o `onSet`, e não é erro.
 
-## 3. Recusas
+## 4. Recusas
 
 | Cenário | Código |
 | --- | --- |

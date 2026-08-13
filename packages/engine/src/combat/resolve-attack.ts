@@ -15,7 +15,7 @@ import {
 import { closeReactionWindow, createEvent } from "../events/index.ts";
 import { replaceZone } from "../field/replace-zone.ts";
 import { isFaceDown } from "../position/next-position.ts";
-import { equipCombatProviders } from "../spells/effects/index.ts";
+import { zoneCombatProviders } from "../spells/effects/index.ts";
 import { getOpponent } from "../spells/opponent.ts";
 import { calculateEffectiveAtkDef } from "./calculate-effective-atk-def.ts";
 import { resolveCombatTable } from "./resolve-combat-table.ts";
@@ -124,7 +124,7 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
   const attackerEffective = calculateEffectiveAtkDef(
     attackerZone.card,
     { activeField: workingState.activeField, opponent: defenderCard ?? null },
-    equipCombatProviders(attackerZone),
+    zoneCombatProviders(attackerZone),
   );
   const defenderEffective =
     defenderZone === undefined
@@ -132,7 +132,7 @@ export function resolveAttack(state: DuelState): Result<ApplyResult, DomainError
       : calculateEffectiveAtkDef(
           defenderZone.card,
           { activeField: workingState.activeField, opponent: attackerZone.card },
-          equipCombatProviders(defenderZone),
+          zoneCombatProviders(defenderZone),
         );
 
   const combatResult = resolveCombatTable({

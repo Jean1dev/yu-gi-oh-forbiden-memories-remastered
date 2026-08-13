@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import type { CardClassFilter, EffectSide, EffectTargets, SpellEffect } from "./types.ts";
+import type {
+  AtomicSpellEffect,
+  CardClassFilter,
+  EffectSide,
+  EffectTargets,
+  SpellEffect,
+} from "./types.ts";
 
 export const EffectSideSchema = z.enum(["caster", "opponent", "both"]);
 
@@ -14,16 +20,30 @@ export const EffectTargetsSchema = z.strictObject({
   filter: CardClassFilterSchema,
 });
 
-export const SpellEffectSchema = z.discriminatedUnion("type", [
+export const AtomicSpellEffectSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("equip_buff"),
+    /** Signed, so an equip that trades defence for offence stays representable. */
     atk: z.number().int(),
     def: z.number().int(),
-    requires: CardClassFilterSchema,
   }),
   z.strictObject({ type: z.literal("destroy_monsters"), targets: EffectTargetsSchema }),
   z.strictObject({ type: z.literal("destroy_spells"), targets: EffectTargetsSchema }),
+  z.strictObject({
+    type: z.literal("destroy_by_atk"),
+    targets: EffectTargetsSchema,
+    /** Inclusive: 661 Crush Card reads "1500 or more". */
+    minAtk: z.number().int().min(0),
+  }),
   z.strictObject({ type: z.literal("force_attack_position"), targets: EffectTargetsSchema }),
+  z.strictObject({ type: z.literal("reveal_face_down"), targets: EffectTargetsSchema }),
+  z.strictObject({
+    type: z.literal("stat_curse"),
+    targets: EffectTargetsSchema,
+    /** In the original game's own units; one level is `POWER_PER_LEVEL`. */
+    levels: z.number().int().min(1),
+  }),
+  z.strictObject({ type: z.literal("cleanse_curses"), side: EffectSideSchema }),
   z.strictObject({
     type: z.literal("life_points"),
     side: EffectSideSchema,
@@ -38,6 +58,15 @@ export const SpellEffectSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("terrain") }),
 ]);
 
+export const SpellEffectSchema = z.union([
+  AtomicSpellEffectSchema,
+  z.strictObject({
+    type: z.literal("sequence"),
+    /** Two or more: a one-element sequence is just the atomic effect. */
+    effects: z.array(AtomicSpellEffectSchema).min(2),
+  }),
+]);
+
 /**
  * Locks the schemas and the declared types together: if one changes without
  * the other, the typecheck breaks here instead of silently drifting (same
@@ -45,6 +74,8 @@ export const SpellEffectSchema = z.discriminatedUnion("type", [
  */
 const _effectMatchesDeclaredType: SpellEffect = {} as z.infer<typeof SpellEffectSchema>;
 void _effectMatchesDeclaredType;
+const _atomicMatchesDeclaredType: AtomicSpellEffect = {} as z.infer<typeof AtomicSpellEffectSchema>;
+void _atomicMatchesDeclaredType;
 const _filterMatchesDeclaredType: CardClassFilter = {} as z.infer<typeof CardClassFilterSchema>;
 void _filterMatchesDeclaredType;
 const _targetsMatchesDeclaredType: EffectTargets = {} as z.infer<typeof EffectTargetsSchema>;

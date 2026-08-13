@@ -42,6 +42,8 @@ export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
     equips: z.array(CardSchema),
+    /** Absent means uncursed; `0` is the same thing and stays representable. */
+    curseLevels: z.number().int().min(0).optional(),
   }),
 ]);
 
@@ -251,6 +253,8 @@ export const PublicMonsterZoneSchema = z.discriminatedUnion("occupied", [
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
     equips: z.array(CardSchema),
+    /** Public: the opponent can read a curse off the field, same as an equip. */
+    curseLevels: z.number().int().min(0).optional(),
   }),
 ]);
 

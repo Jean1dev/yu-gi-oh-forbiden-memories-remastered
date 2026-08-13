@@ -37,4 +37,4 @@ Campo de magias vazio é jogada legal: gasta o turno, emite só o `onSet`.
 
 ## 3. Recusas
 
-Idênticas às de [`destruction.md`](./destruction.md) §3.
+Idênticas às de [`destruction.md`](./destruction.md) §4.

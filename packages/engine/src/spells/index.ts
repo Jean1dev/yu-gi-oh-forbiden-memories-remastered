@@ -1,7 +1,7 @@
 export { activateSpell } from "./activate-spell.ts";
 export {
   attackLockUntilTurn,
-  equipCombatProviders,
+  zoneCombatProviders,
   isAttackLocked,
   playersForSide,
   resolveOneShotEffect,

@@ -3,17 +3,82 @@ import {
   err,
   getSpellEffect,
   ok,
+  requiresSpellTarget,
   spellPlayMode,
   type ActivateSpellAction,
   type ApplyResult,
   type DuelState,
+  type PlayerId,
   type Result,
+  type SpellEffect,
+  type ZoneReference,
 } from "@yugioh/shared";
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
+import { playersForSide } from "./effects/players-for-side.ts";
 import { resolveOneShotEffect } from "./effects/resolve-one-shot.ts";
 import { getOpponent } from "./opponent.ts";
+
+/**
+ * Checks the caster's chosen zone against what the effect can reach, before
+ * anything is consumed.
+ *
+ * Only 320 Stop Defense targets today, and its text names three conditions:
+ * the zone holds a monster ("an opponent's monster card"), it belongs to a
+ * side the effect reaches, and it is defending ("positioned for defense").
+ * Each gets its own refusal code, so the UI can say which one failed.
+ */
+function checkSpellTarget(
+  state: DuelState,
+  effect: SpellEffect,
+  caster: PlayerId,
+  targetZone: ZoneReference | undefined,
+): DomainError | undefined {
+  if (!requiresSpellTarget(effect)) {
+    return targetZone === undefined
+      ? undefined
+      : new DomainError("This card's effect takes no target.", "spell_target_not_allowed", {
+          targetZone,
+        });
+  }
+
+  if (targetZone === undefined) {
+    return new DomainError("This card's effect needs a target.", "spell_requires_target", {});
+  }
+  if (targetZone.zoneType !== "monster") {
+    return new DomainError(
+      "The target zone is not a monster zone.",
+      "spell_target_not_monster_zone",
+      { targetZone },
+    );
+  }
+
+  // `effect.targets` is the only reachable shape here: `requiresSpellTarget`
+  // is true exactly for `force_attack_position`.
+  const reachable =
+    effect.type === "force_attack_position" &&
+    playersForSide(effect.targets.side, caster).includes(targetZone.player);
+  if (!reachable) {
+    return new DomainError("The target zone is out of this effect's reach.", "spell_target_out_of_reach", {
+      targetZone,
+    });
+  }
+
+  const zone = state.players[targetZone.player].field.monsters[targetZone.index];
+  if (!zone.occupied) {
+    return new DomainError("The target zone is empty.", "spell_target_zone_empty", { targetZone });
+  }
+  if (zone.position !== "defense_face_up" && zone.position !== "defense_face_down") {
+    return new DomainError(
+      "The target monster is not in a defense position.",
+      "spell_target_not_defending",
+      { targetZone },
+    );
+  }
+
+  return undefined;
+}
 
 /**
  * Plays a card whose effect resolves immediately (`docs/spells/README.md` §4).
@@ -63,6 +128,11 @@ export function activateSpell(
     );
   }
 
+  const badTarget = checkSpellTarget(state, effect, state.activePlayer, action.targetZone);
+  if (badTarget !== undefined) {
+    return err(badTarget);
+  }
+
   const consumedState: DuelState = {
     ...state,
     players: {
@@ -74,7 +144,13 @@ export function activateSpell(
     },
   };
 
-  const resolved = resolveOneShotEffect(consumedState, card, effect, state.activePlayer);
+  const resolved = resolveOneShotEffect(
+    consumedState,
+    card,
+    effect,
+    state.activePlayer,
+    action.targetZone,
+  );
   const stateAfterHandPlay = markHandPlayUsed(resolved.state, state.activePlayer);
 
   const activation = createEvent({

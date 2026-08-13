@@ -44,6 +44,8 @@ const equip: Card = {
 };
 const forest: Card = { ...spell, id: 4, numero: "330", nome: "Forest" };
 const raigeki: Card = { ...spell, id: 5, numero: "337", nome: "Raigeki" };
+/** The one card that asks the caster to pick a monster before it resolves. */
+const stopDefense: Card = { ...spell, id: 6, numero: "320", nome: "Stop Defense" };
 
 function emptyField(): PlayerField {
   return {
@@ -69,7 +71,7 @@ function state(overrides: Partial<DuelState> = {}): DuelState {
     players: {
       P1: {
         lp: 8000,
-        hand: [monster, spell, equip, forest, raigeki],
+        hand: [monster, spell, equip, forest, raigeki, stopDefense],
         deck: [],
         field: emptyField(),
         handPlayUsed: false,
@@ -322,6 +324,88 @@ describe("duel interaction reducer", () => {
         state(),
       ).intent,
     ).toEqual({ kind: "idle" });
+  });
+});
+
+describe("magia com alvo unico", () => {
+  const STOP_DEFENSE_INDEX = 5;
+  const defendingZone = zoneReference("P2", "monster", 0);
+
+  /** P2 has one defending monster; P1 has one attacking, which is not a legal target. */
+  function stateWithDefender(): DuelState {
+    const withDefender = withMonster(state(), defendingZone, monster, {
+      position: "defense_face_up",
+    });
+    return withMonster(withDefender, zoneReference("P1", "monster", 0));
+  }
+
+  it("Ativar leva a escolha de alvo em vez de despachar direto", () => {
+    const intent: DuelIntent = { kind: "card_selected", handIndex: STOP_DEFENSE_INDEX };
+    const base = stateWithDefender();
+
+    const choosing = reduceIntent(intent, { type: "invoke_slot", id: "activate" }, base);
+
+    expect(choosing.intent).toEqual({
+      kind: "choosing_spell_target",
+      handIndex: STOP_DEFENSE_INDEX,
+    });
+    expect(choosing.action).toBeUndefined();
+  });
+
+  it("escolher a zona emite activate_spell com targetZone", () => {
+    const base = stateWithDefender();
+    const intent: DuelIntent = { kind: "choosing_spell_target", handIndex: STOP_DEFENSE_INDEX };
+
+    expect(reduceIntent(intent, { type: "activate_zone", reference: defendingZone }, base).action).toEqual(
+      { type: "activate_spell", handIndex: STOP_DEFENSE_INDEX, targetZone: defendingZone },
+    );
+  });
+
+  it("ignora uma zona que o motor recusaria", () => {
+    const base = stateWithDefender();
+    const intent: DuelIntent = { kind: "choosing_spell_target", handIndex: STOP_DEFENSE_INDEX };
+
+    for (const reference of [
+      zoneReference("P1", "monster", 0), // fora do alcance do efeito
+      zoneReference("P2", "monster", 1), // vazia
+      zoneReference("P2", "spell", 0), // nao e zona de monstro
+    ]) {
+      const result = reduceIntent(intent, { type: "activate_zone", reference }, base);
+      expect(result.action).toBeUndefined();
+      expect(result.intent).toEqual(intent);
+    }
+  });
+
+  it("destaca como alvo so a zona legal", () => {
+    const base = stateWithDefender();
+    const intent: DuelIntent = { kind: "choosing_spell_target", handIndex: STOP_DEFENSE_INDEX };
+
+    expect(zoneAffordance(base, intent, defendingZone)).toBe("target");
+    expect(zoneAffordance(base, intent, zoneReference("P2", "monster", 1))).toBe("idle");
+    expect(zoneAffordance(base, intent, zoneReference("P1", "monster", 0))).toBe("idle");
+  });
+
+  it("desabilita Ativar quando nao ha nenhum monstro em defesa para atingir", () => {
+    // Um campo com monstros, mas todos em ataque: a carta nao tem alvo legal.
+    const base = withMonster(state(), zoneReference("P2", "monster", 0));
+    const intent: DuelIntent = { kind: "card_selected", handIndex: STOP_DEFENSE_INDEX };
+    const affordances = describeAffordances({ state: base, isPlayerTurn: true, busy: false, intent });
+
+    expect(affordances.canActivateSpell).toBe(false);
+    expect(describeActionSlots({ intent, state: base }, affordances)[0]).toMatchObject({
+      id: "activate",
+      disabled: true,
+    });
+  });
+
+  it("Raigeki continua despachando direto, sem passo de alvo", () => {
+    const intent: DuelIntent = { kind: "card_selected", handIndex: 4 };
+    const base = stateWithDefender();
+
+    expect(reduceIntent(intent, { type: "invoke_slot", id: "activate" }, base)).toEqual({
+      intent: { kind: "idle" },
+      action: { type: "activate_spell", handIndex: 4 },
+    });
   });
 });
 
