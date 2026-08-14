@@ -6,6 +6,7 @@ import type {
   PlayerField,
   PlayerState,
   SpellZone,
+  ZoneReference,
 } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
@@ -43,20 +44,17 @@ const swordOfDarkDestruction = makeCard({
   def: null,
   tipo: "equipamento",
 });
-const insectArmor = makeCard({
-  numero: "306",
-  nome: "Insect Armor with Laser Cannon",
-  classe: "Equip",
-  atk: null,
-  def: null,
-  tipo: "equipamento",
-});
 const stopDefense = magic("320", "Stop Defense");
 const dragonCaptureJar = magic("329", "Dragon Capture Jar");
 const darkHole = magic("336", "Dark Hole");
 const raigeki = magic("337", "Raigeki");
 const dianKeto = magic("342", "Dian Keto the Cure Master");
+const ookazi = magic("346", "Ookazi");
 const swordsOfRevealingLight = magic("348", "Swords of Revealing Light");
+const darkPiercingLight = magic("350", "Dark-piercing Light");
+const warriorElimination = magic("653", "Warrior Elimination");
+const cursebreaker = magic("655", "Cursebreaker");
+const crushCard = magic("661", "Crush Card");
 const featherDuster = magic("672", "Harpie's Feather Duster");
 const goblinFan = makeCard({ numero: "687", nome: "Goblin Fan", tipo: "armadilha" });
 const badReaction = makeCard({
@@ -64,6 +62,8 @@ const badReaction = makeCard({
   nome: "Bad Reaction to Simochi",
   tipo: "armadilha",
 });
+const shadowSpell = magic("669", "Shadow Spell");
+const spellbindingCircle = magic("349", "Spellbinding Circle");
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 const emptySpellZone: SpellZone = { occupied: false };
@@ -141,7 +141,7 @@ function makeState(overrides: Partial<DuelState> = {}): DuelState {
 }
 
 /** Activates `card` from P1's hand, asserting success, and returns the result. */
-function activate(card: Card, state: DuelState) {
+function activate(card: Card, state: DuelState, targetZone?: ZoneReference) {
   const withCard: DuelState = {
     ...state,
     players: {
@@ -149,9 +149,31 @@ function activate(card: Card, state: DuelState) {
       P1: { ...state.players.P1, hand: [card, ...state.players.P1.hand] },
     },
   };
-  const result = activateSpell(withCard, { type: "activate_spell", handIndex: 0 });
+  const result = activateSpell(withCard, {
+    type: "activate_spell",
+    handIndex: 0,
+    ...(targetZone === undefined ? {} : { targetZone }),
+  });
   if (!result.ok) throw new Error(`Expected activateSpell to succeed, got ${result.error.code}`);
   return result.value;
+}
+
+/** Activates `card` from P1's hand expecting a refusal, and returns the error code. */
+function activateExpectingError(card: Card, state: DuelState, targetZone?: ZoneReference): string {
+  const withCard: DuelState = {
+    ...state,
+    players: {
+      ...state.players,
+      P1: { ...state.players.P1, hand: [card, ...state.players.P1.hand] },
+    },
+  };
+  const result = activateSpell(withCard, {
+    type: "activate_spell",
+    handIndex: 0,
+    ...(targetZone === undefined ? {} : { targetZone }),
+  });
+  if (result.ok) throw new Error("Expected activateSpell to fail");
+  return result.error.code;
 }
 
 const warrior = makeCard({ numero: "010", nome: "Warrior A", classe: "Warrior" });
@@ -187,7 +209,9 @@ describe("activateSpell — destruicao de monstros", () => {
     expect(next.players.P2.field.monsters.every((zone) => !zone.occupied)).toBe(true);
   });
 
-  it("Dragon Capture Jar destroi apenas monstros da classe Dragon dos dois lados", () => {
+  it("Dragon Capture Jar destroi so os Dragons do oponente", () => {
+    // "Destroys all opponent Dragon monsters on the playfield!" — o texto
+    // nomeia o dono, entao o lado do lancador fica intacto.
     const state = makeState({
       players: {
         P1: makePlayer({ field: fieldWithMonsters([monsterZone(dragon), monsterZone(warrior)]) }),
@@ -197,13 +221,13 @@ describe("activateSpell — destruicao de monstros", () => {
 
     const { state: next } = activate(dragonCaptureJar, state);
 
-    expect(next.players.P1.field.monsters[0]).toEqual({ occupied: false });
+    expect(next.players.P1.field.monsters[0].occupied).toBe(true);
     expect(next.players.P1.field.monsters[1].occupied).toBe(true);
     expect(next.players.P2.field.monsters[0].occupied).toBe(true);
     expect(next.players.P2.field.monsters[1]).toEqual({ occupied: false });
   });
 
-  it("Sword of Dark Destruction destroi so os Warriors do oponente", () => {
+  it("Warrior Elimination destroi so os Warriors do oponente", () => {
     const state = makeState({
       players: {
         P1: makePlayer({ field: fieldWithMonsters([monsterZone(warrior)]) }),
@@ -211,7 +235,24 @@ describe("activateSpell — destruicao de monstros", () => {
       },
     });
 
-    const { state: next } = activate(swordOfDarkDestruction, state);
+    const { state: next } = activate(warriorElimination, state);
+
+    expect(next.players.P1.field.monsters[0].occupied).toBe(true);
+    expect(next.players.P2.field.monsters[0]).toEqual({ occupied: false });
+    expect(next.players.P2.field.monsters[1].occupied).toBe(true);
+  });
+
+  it("Crush Card elimina os monstros do oponente com ATK a partir de 1500", () => {
+    const strong = makeCard({ numero: "013", nome: "Strong", classe: "Fiend", atk: 1500 });
+    const weak = makeCard({ numero: "014", nome: "Weak", classe: "Fiend", atk: 1499 });
+    const state = makeState({
+      players: {
+        P1: makePlayer({ field: fieldWithMonsters([monsterZone(strong)]) }),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(strong), monsterZone(weak)]) }),
+      },
+    });
+
+    const { state: next } = activate(crushCard, state);
 
     expect(next.players.P1.field.monsters[0].occupied).toBe(true);
     expect(next.players.P2.field.monsters[0]).toEqual({ occupied: false });
@@ -314,7 +355,7 @@ describe("activateSpell — life points", () => {
       },
     });
 
-    const { state: next, events } = activate(insectArmor, state);
+    const { state: next, events } = activate(ookazi, state);
 
     expect(next.players.P1.lp).toBe(7500);
     expect(next.players.P2.lp).toBe(8000);
@@ -332,16 +373,16 @@ describe("activateSpell — life points", () => {
 
     const { state: next, events } = activate(dianKeto, state);
 
-    expect(next.players.P1.lp).toBe(7000);
+    expect(next.players.P1.lp).toBe(3000);
     expect(next.players.P2.lp).toBe(8000);
     expect(events.at(-1)).toMatchObject({
       type: "onDamage",
-      context: { toPlayer: "P1", amount: 1000, kind: "effect_damage" },
+      context: { toPlayer: "P1", amount: 5000, kind: "effect_damage" },
     });
   });
 
-  it("Insect Armor with Laser Cannon tira 500 LP do oponente", () => {
-    const { state: next, events } = activate(insectArmor, makeState());
+  it("Ookazi tira 500 LP do oponente", () => {
+    const { state: next, events } = activate(ookazi, makeState());
 
     expect(next.players.P2.lp).toBe(7500);
     expect(next.players.P1.lp).toBe(8000);
@@ -353,15 +394,16 @@ describe("activateSpell — life points", () => {
     );
   });
 
-  it("Dian Keto soma 1000 LP ao lancador e emite onDamage com kind effect_heal", () => {
+  it("Dian Keto soma 5000 LP ao lancador e emite onDamage com kind effect_heal", () => {
+    // Cinco mil, nao mil: "A mystical power that increases Life Points by 5000!"
     const { state: next, events } = activate(dianKeto, makeState());
 
-    expect(next.players.P1.lp).toBe(9000);
+    expect(next.players.P1.lp).toBe(13000);
     expect(next.players.P2.lp).toBe(8000);
     expect(events).toContainEqual(
       expect.objectContaining({
         type: "onDamage",
-        context: { toPlayer: "P1", amount: 1000, kind: "effect_heal" },
+        context: { toPlayer: "P1", amount: 5000, kind: "effect_heal" },
       }),
     );
   });
@@ -372,7 +414,7 @@ describe("activateSpell — life points", () => {
     });
     const withCard: DuelState = {
       ...state,
-      players: { ...state.players, P1: { ...state.players.P1, hand: [insectArmor] } },
+      players: { ...state.players, P1: { ...state.players.P1, hand: [ookazi] } },
     };
 
     const result = apply(withCard, { type: "activate_spell", handIndex: 0 });
@@ -390,44 +432,185 @@ describe("activateSpell — life points", () => {
 });
 
 describe("activateSpell — Stop Defense", () => {
-  it("vira para ataque todo monstro em defesa dos dois lados, revelando os virados", () => {
-    const state = makeState({
-      players: {
-        P1: makePlayer({
-          field: fieldWithMonsters([
-            monsterZone(warrior, "defense_face_down"),
-            monsterZone(dragon, "attack_face_up"),
-          ]),
-        }),
-        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua, "defense_face_up")]) }),
-      },
-    });
-
-    const { state: next, events } = activate(stopDefense, state);
-
-    expect(next.players.P1.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
-    expect(next.players.P1.field.monsters[1]).toMatchObject({ position: "attack_face_up" });
-    expect(next.players.P2.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
-
-    // Only the face-down monster produces an onFlip; both produce onPositionChange.
-    expect(events.filter((event) => event.type === "onFlip")).toHaveLength(1);
-    expect(events.filter((event) => event.type === "onPositionChange")).toHaveLength(2);
+  const opponentZone = (index: 0 | 1): ZoneReference => ({
+    player: "P2",
+    zoneType: "monster",
+    index,
   });
 
-  it("Stop Defense nao consome a mudanca de posicao do turno", () => {
+  it("vira para ataque o monstro escolhido, e so ele", () => {
+    // "Forces AN opponent's monster card positioned for defense into the
+    // attack position" — alvo unico, escolhido pelo lancador.
     const state = makeState({
       players: {
-        P1: makePlayer({ field: fieldWithMonsters([monsterZone(warrior, "defense_face_up")]) }),
-        P2: makePlayer(),
+        P1: makePlayer(),
+        P2: makePlayer({
+          field: fieldWithMonsters([
+            monsterZone(aqua, "defense_face_up"),
+            monsterZone(dragon, "defense_face_up"),
+          ]),
+        }),
       },
     });
 
-    const { state: next } = activate(stopDefense, state);
+    const { state: next, events } = activate(stopDefense, state, opponentZone(0));
 
-    expect(next.players.P1.field.monsters[0]).toMatchObject({
+    expect(next.players.P2.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
+    expect(next.players.P2.field.monsters[1]).toMatchObject({ position: "defense_face_up" });
+    expect(events.filter((event) => event.type === "onPositionChange")).toHaveLength(1);
+  });
+
+  it("revela o alvo virado para baixo, emitindo onFlip antes de onPositionChange", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua, "defense_face_down")]) }),
+      },
+    });
+
+    const { state: next, events } = activate(stopDefense, state, opponentZone(0));
+
+    expect(next.players.P2.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
+    const kinds = events.map((event) => event.type);
+    expect(kinds.indexOf("onFlip")).toBeLessThan(kinds.indexOf("onPositionChange"));
+  });
+
+  it("nao consome a mudanca de posicao do turno do dono", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(warrior, "defense_face_up")]) }),
+      },
+    });
+
+    const { state: next } = activate(stopDefense, state, opponentZone(0));
+
+    expect(next.players.P2.field.monsters[0]).toMatchObject({
       hasChangedPosition: false,
       hasAttacked: false,
     });
+  });
+
+  it("recusa sem alvo, com alvo fora de alcance, vazio ou ja em ataque", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer({ field: fieldWithMonsters([monsterZone(warrior, "defense_face_up")]) }),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua, "attack_face_up")]) }),
+      },
+    });
+
+    expect(activateExpectingError(stopDefense, state)).toBe("spell_requires_target");
+    expect(
+      activateExpectingError(stopDefense, state, { player: "P1", zoneType: "monster", index: 0 }),
+    ).toBe("spell_target_out_of_reach");
+    expect(activateExpectingError(stopDefense, state, opponentZone(1))).toBe(
+      "spell_target_zone_empty",
+    );
+    expect(activateExpectingError(stopDefense, state, opponentZone(0))).toBe(
+      "spell_target_not_defending",
+    );
+  });
+
+  it("recusa um alvo numa carta que nao alveja nada", () => {
+    expect(
+      activateExpectingError(raigeki, makeState(), { player: "P2", zoneType: "monster", index: 0 }),
+    ).toBe("spell_target_not_allowed");
+  });
+});
+
+describe("activateSpell — revelacao", () => {
+  it("Dark-piercing Light vira para cima os monstros escondidos dos dois lados, sem mudar a postura", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer({ field: fieldWithMonsters([monsterZone(warrior, "defense_face_down")]) }),
+        P2: makePlayer({
+          field: fieldWithMonsters([
+            monsterZone(aqua, "attack_face_down"),
+            monsterZone(dragon, "attack_face_up"),
+          ]),
+        }),
+      },
+    });
+
+    const { state: next, events } = activate(darkPiercingLight, state);
+
+    // A postura sobrevive: quem defendia continua defendendo.
+    expect(next.players.P1.field.monsters[0]).toMatchObject({ position: "defense_face_up" });
+    expect(next.players.P2.field.monsters[0]).toMatchObject({ position: "attack_face_up" });
+    expect(events.filter((event) => event.type === "onFlip")).toHaveLength(2);
+    expect(events.filter((event) => event.type === "onPositionChange")).toEqual([]);
+  });
+
+  it("Swords of Revealing Light revela e depois trava, nessa ordem", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua, "defense_face_down")]) }),
+      },
+    });
+
+    const { state: next, events } = activate(swordsOfRevealingLight, state);
+
+    expect(next.players.P2.field.monsters[0]).toMatchObject({ position: "defense_face_up" });
+    expect(events.some((event) => event.type === "onFlip")).toBe(true);
+    expect(next.attackLocks).toEqual([{ player: "P2", untilTurn: 9 }]);
+  });
+});
+
+describe("activateSpell — maldicao", () => {
+  it("Spellbinding Circle tira um level e Shadow Spell dois, so do oponente", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer({ field: fieldWithMonsters([monsterZone(warrior)]) }),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua), monsterZone(dragon)]) }),
+      },
+    });
+
+    const afterCircle = activate(spellbindingCircle, state).state;
+    expect(afterCircle.players.P2.field.monsters[0]).toMatchObject({ curseLevels: 1 });
+    expect(afterCircle.players.P2.field.monsters[1]).toMatchObject({ curseLevels: 1 });
+    expect(afterCircle.players.P1.field.monsters[0]).not.toMatchObject({ curseLevels: 1 });
+
+    // A segunda ativacao precisa da janela fechada e da jogada da mao livre,
+    // que na partida real viriam do orquestrador e do turno seguinte.
+    const afterShadow = activate(shadowSpell, {
+      ...afterCircle,
+      pending: undefined,
+      players: {
+        ...afterCircle.players,
+        P1: { ...afterCircle.players.P1, handPlayUsed: false },
+      },
+    }).state;
+    expect(afterShadow.players.P2.field.monsters[0]).toMatchObject({ curseLevels: 3 });
+  });
+
+  it("Cursebreaker zera a maldicao dos dois lados", () => {
+    const cursed: MonsterZone = { ...monsterZone(aqua), curseLevels: 2 };
+    const state = makeState({
+      players: {
+        P1: makePlayer({ field: fieldWithMonsters([{ ...monsterZone(warrior), curseLevels: 1 }]) }),
+        P2: makePlayer({ field: fieldWithMonsters([cursed]) }),
+      },
+    });
+
+    const { state: next } = activate(cursebreaker, state);
+
+    expect(next.players.P1.field.monsters[0]).toMatchObject({ curseLevels: 0 });
+    expect(next.players.P2.field.monsters[0]).toMatchObject({ curseLevels: 0 });
+  });
+
+  it("a maldicao nao emite evento — e estado que o combate le", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithMonsters([monsterZone(aqua)]) }),
+      },
+    });
+
+    const { events } = activate(shadowSpell, state);
+
+    // Apenas o onSet da ativacao.
+    expect(events.map((event) => event.type)).toEqual(["onSet"]);
   });
 });
 

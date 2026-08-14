@@ -97,4 +97,64 @@ describe("generateCandidates", () => {
   it("returns only advance when the requested hand is hidden", () => {
     expect(generateCandidates(state([]), "P1")).toEqual([{ type: "advance_phase" }]);
   });
+
+  describe("magia com alvo unico", () => {
+    const stopDefense: Card = {
+      ...card(320),
+      numero: "320",
+      nome: "Stop Defense",
+      classe: "Magic",
+      atk: null,
+      def: null,
+      tipo: "magica",
+    };
+
+    const defending = (position: "defense_face_up" | "attack_face_up"): PublicMonsterZone => ({
+      occupied: true,
+      card: { visible: true, card: card(1) },
+      position,
+      hasAttacked: false,
+      hasChangedPosition: false,
+      equips: [],
+    });
+
+    function opponentField(
+      ...zones: readonly PublicMonsterZone[]
+    ): PublicPlayerState["field"]["monsters"] {
+      const monsters = emptyMonsters().map((zone, index) => zones[index] ?? zone);
+      return monsters as unknown as PublicPlayerState["field"]["monsters"];
+    }
+
+    it("gera um candidato por zona legal do oponente, como o braco de equipamento faz", () => {
+      const actions = generateCandidates(
+        state(
+          [stopDefense],
+          opponentField(defending("defense_face_up"), defending("defense_face_up")),
+        ),
+        "P2",
+      );
+
+      expect(actions.filter((action) => action.type === "activate_spell")).toEqual([
+        {
+          type: "activate_spell",
+          handIndex: 0,
+          targetZone: { player: "P1", zoneType: "monster", index: 0 },
+        },
+        {
+          type: "activate_spell",
+          handIndex: 0,
+          targetZone: { player: "P1", zoneType: "monster", index: 1 },
+        },
+      ]);
+    });
+
+    it("nao propoe a carta quando nao ha monstro em defesa para atingir", () => {
+      const actions = generateCandidates(
+        state([stopDefense], opponentField(defending("attack_face_up"))),
+        "P2",
+      );
+
+      expect(actions.filter((action) => action.type === "activate_spell")).toEqual([]);
+    });
+  });
 });

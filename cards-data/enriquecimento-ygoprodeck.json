@@ -1007,252 +1007,252 @@
   "301": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a Warrior monster. It gains 300 ATK/DEF."
+    "descricao": "A sword that brings out the best in warriors. It cannot be used by servants of the dark."
   },
   "302": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a DARK monster. It gains 400 ATK and loses 200 DEF."
+    "descricao": "Dark forces increase the power of Warriors!"
   },
   "303": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase the ATK and DEF of a Fiend-Type monster equipped with this card by 300 points."
+    "descricao": "Dark forces increase the power of Fiends and other monsters of the Dark!"
   },
   "304": {
     "atributo": null,
     "nivel": null,
-    "descricao": "(This card is always treated as an \"Archfiend\" card.)\nThe equipped monster gains 1000 ATK. When this card is sent from the field to the Graveyard: You can Tribute 1 monster; place this card on the top of your Deck."
+    "descricao": "Fiends and Beast-Warriors can constantly use their maximum strength!"
   },
   "305": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to an Insect monster. It gains 300 ATK/DEF."
+    "descricao": "Arms Insects with a powerful laser!"
   },
   "306": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to an Insect monster. It gains 700 ATK."
+    "descricao": "Allows Insects to fire an intense blast of fire!"
   },
   "307": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A LIGHT monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+    "descricao": "Increases the power of elves with mystical light!"
   },
   "308": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A Beast-Type monster equipped with this card increases its ATK and DEF by 300 points."
+    "descricao": "Increases the power of Beasts and other fanged monsters!"
   },
   "309": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A WATER monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+    "descricao": "Boosts the power of shelled monsters! Said to have no effect on those without shells."
   },
   "310": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A Plant-Type monster equipped with this card increases its ATK and DEF by 300 points."
+    "descricao": "Vile microbes boost the power of Plants in the woods!"
   },
   "311": {
     "atributo": null,
     "nivel": null,
-    "descricao": "The equipped monster gains 500 ATK. When this card is sent from the field to the Graveyard: Inflict 500 damage to your opponent."
+    "descricao": "This pendant grants extra power to Dark sorcerers!"
   },
   "312": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A Fairy-Type monster equipped with this card increases its ATK and DEF by 300 points."
+    "descricao": "Silver bow and arrow enhances the power of Fairies."
   },
   "313": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase the DEF of a monster equipped with this card by 800 points. When this card is sent from the field to the Graveyard, if you pay 500 Life Points, this card returns to the top of your Deck."
+    "descricao": "Increases the power of horned creatures! Has no effect on Dark monsters."
   },
   "314": {
     "atributo": null,
     "nivel": null,
-    "descricao": "The equipped monster gains 700 ATK and DEF. When this card is sent from the field to the Graveyard: Return it to the top of the Deck."
+    "descricao": "Increases the power of Dark monsters with horns!"
   },
   "315": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A Dragon-Type monster equipped with this card increases its ATK and DEF by 300 points."
+    "descricao": "A legendary treasure that increases the power of dragons."
   },
   "316": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase the ATK and DEF of a Thunder-Type monster equipped with this card by 300 points."
+    "descricao": "A whip for paralyzing enemies. Increases power when equipped with female creatures."
   },
   "317": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to \"Harpie Lady\" or \"Harpie Lady Sisters\". It gains 500 ATK."
+    "descricao": "Increases the power of female monsters by changing their attitudes."
   },
   "318": {
     "atributo": null,
     "nivel": null,
-    "descricao": "If \"Harpie Lady\" is on the field: Special Summon 1 \"Harpie Lady\" or \"Harpie Lady Sisters\" from your hand or Deck."
+    "descricao": "Creates two doppelgangers of Harpy Lady for three-pronged attacks!"
   },
   "319": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a Beast-Warrior-Type monster. It gains 300 ATK and DEF."
+    "descricao": "Moonlight increases the power of Beasts!"
   },
   "320": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Select 1 Defense Position monster on your opponent's side of the field and change it to Attack Position."
+    "descricao": "Forces an opponent's monster card positioned for defense into the attack position."
   },
   "321": {
     "atributo": null,
     "nivel": null,
-    "descricao": "The equipped monster gains 700 ATK. When this card is sent from the field to the Graveyard: You can pay 500 LP; place this card on the top of your Deck."
+    "descricao": "Diabolic forces act to increase the power of female and Dark monsters!"
   },
   "322": {
     "atributo": null,
     "nivel": null,
-    "descricao": "(This card is not treated as a \"Crystal\" card.)\r\nEquip only to a Zombie monster. It gains 300 ATK/DEF."
+    "descricao": "Mystic forces from the crystal increase the power of Zombies."
   },
   "323": {
     "atributo": null,
     "nivel": null,
-    "descricao": "A Spellcaster-Type monster equipped with this card increases its ATK and DEF by 300 points."
+    "descricao": "A magic book for increasing the power of magic-users. It cannot be used by bad-hearted sorcerers."
   },
   "324": {
     "atributo": null,
     "nivel": null,
-    "descricao": "An EARTH monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points."
+    "descricao": "Increases the power of Thunder, Rock, and Pyro monsters."
   },
   "325": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a Machine monster. It gains 300 ATK/DEF."
+    "descricao": "A manufacturing facility that tunes up all Machine monsters."
   },
   "326": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a Dinosaur monster. It gains 300 ATK/DEF."
+    "descricao": "Absorbs the sun's energy to increase the power of Dinosaurs!"
   },
   "327": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase the ATK and DEF of a Winged Beast-Type monster equipped with this card by 300 points."
+    "descricao": "The winds provide support to increase the power of Winged Beasts and other flying monsters!"
   },
   "328": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to an Aqua monster. It gains 300 ATK/DEF."
+    "descricao": "Poseidon's Strength is shared to boost the power of Aqua, Fish, and Sea Serpent monsters!"
   },
   "329": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Change all face-up Dragon-Type monsters on the field to Defense Position, also they cannot change their battle positions."
+    "descricao": "Destroys all opponent Dragon monsters on the playfield!"
   },
   "330": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Insect, Beast, Plant, and Beast-Warrior monsters on the field gain 200 ATK/DEF."
+    "descricao": "Changes the field in favor of Beast-Warrior, Insect, Plant, and Beast monsters!"
   },
   "331": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Dinosaur, Zombie, and Rock monsters on the field gain 200 ATK/DEF."
+    "descricao": "Changes the field in favor of Zombie, Dinosaur and Rock monsters!"
   },
   "332": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Dragon, Winged Beast, and Thunder monsters on the field gain 200 ATK/DEF."
+    "descricao": "Changes the field in favor of Dragon, Winged Beast, and Thunder monsters!"
   },
   "333": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Warrior and Beast-Warrior monsters on the field gain 200 ATK/DEF."
+    "descricao": "Changes the field to meadow land in favor of Warrior and Beast-Warrior monsters!"
   },
   "334": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Fish, Sea Serpent, Thunder, and Aqua monsters on the field gain 200 ATK/DEF, also all Machine and Pyro monsters on the field lose 200 ATK/DEF."
+    "descricao": "Changes the field in favor of Aqua and Thunder monsters, but unfavorable to Machine and Pyro monsters!"
   },
   "335": {
     "atributo": null,
     "nivel": null,
-    "descricao": "All Fiend and Spellcaster monsters on the field gain 200 ATK/DEF, also all Fairy monsters on the field lose 200 ATK/DEF."
+    "descricao": "Changes the field in favor of Magic-User and Fiend monsters, but unfavorable to Fairy monsters!"
   },
   "336": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all monsters on the field."
+    "descricao": "Sucks up every card in play on the field!"
   },
   "337": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all monsters your opponent controls."
+    "descricao": "Destroys every opposing monster with a stroke of lightning!"
   },
   "338": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Choose 1 player; that player gains 200 Life Points."
+    "descricao": "A delicious beef curry increases Life Points by 200!"
   },
   "339": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase your Life Points by 500 points."
+    "descricao": "A magic potion that increases Life Points by 500!"
   },
   "340": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase your Life Points by 600 points."
+    "descricao": "A goblin's herb that increases Life Points by 1000!"
   },
   "341": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase your Life Points by 800 points."
+    "descricao": "A fairy potion that increases Life Points by 2000!"
   },
   "342": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Increase your Life Points by 1000 points."
+    "descricao": "A mystical power that increases Life Points by 5000!"
   },
   "343": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Inflict 200 points of damage to your opponent's Life Points."
+    "descricao": "A shower of sparks inflicts 50 points of damage to your opponent's Life Points!!"
   },
   "344": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Inflict 500 damage to your opponent."
+    "descricao": "A fireball inflicts 100 points of damage to your opponent's Life Points!!"
   },
   "345": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Inflict 600 points of damage to your opponent's Life Points."
+    "descricao": "Flames inflict 200 points of damage to your opponent's Life Points!!"
   },
   "346": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Inflict 800 damage to your opponent."
+    "descricao": "Flames inflict 500 points of damage to your opponent's Life Points!"
   },
   "347": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Inflict 1000 points of damage to your opponent's Life Points and 500 points of damage to your Life Points."
+    "descricao": "An inferno inflicts 1000 points of damage to your opponent's Life Points!"
   },
   "348": {
     "atributo": null,
     "nivel": null,
-    "descricao": "After this card's activation, it remains on the field, but you must destroy it during the End Phase of your opponent's 3rd turn. When this card is activated: If your opponent controls a face-down monster, flip all monsters they control face-up. While this card is face-up on the field, your opponent's monsters cannot declare an attack."
+    "descricao": "Enemy monsters are revealed and your opponent cannot attack for three turns."
   },
   "349": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Activate this card by targeting 1 monster your opponent controls; it cannot attack or change its battle position. When that monster is destroyed, destroy this card."
+    "descricao": "A curse reduces the power of all enemy monsters!"
   },
   "350": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Flip all face-down monsters on your opponent's side of the field face-up."
+    "descricao": "A dazzling light reveals all monsters on the playing field."
   },
   "351": {
     "atributo": "DARK",
@@ -1279,6 +1279,11 @@
     "nivel": 5,
     "descricao": "Made of mysterious metal, this monster is a doomsday machine from the edge of the universe."
   },
+  "356": {
+    "atributo": "EARTH",
+    "nivel": 7,
+    "descricao": null
+  },
   "357": {
     "atributo": "FIRE",
     "nivel": 5,
@@ -1294,6 +1299,11 @@
     "nivel": 3,
     "descricao": "A pair of friendly skeletons, lean and fat, that travel with extreme difficulty."
   },
+  "360": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": null
+  },
   "361": {
     "atributo": "WATER",
     "nivel": 4,
@@ -1308,6 +1318,16 @@
     "atributo": "LIGHT",
     "nivel": 4,
     "descricao": "This flying monster is known for delivering happiness to all."
+  },
+  "364": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": null
+  },
+  "365": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": null
   },
   "366": {
     "atributo": "EARTH",
@@ -1349,6 +1369,11 @@
     "nivel": 7,
     "descricao": "During damage calculation in your opponent's turn, if this card is being attacked: You can target the attacking monster; make that target's ATK 0 during damage calculation only (this is a Quick Effect). This effect can only be used once while this card is face-up on the field."
   },
+  "374": {
+    "atributo": "DARK",
+    "nivel": 11,
+    "descricao": null
+  },
   "375": {
     "atributo": "EARTH",
     "nivel": 5,
@@ -1373,6 +1398,11 @@
     "atributo": "DARK",
     "nivel": 4,
     "descricao": "A genie of the lamp that is at the beck and call of its master."
+  },
+  "380": {
+    "atributo": "LIGHT",
+    "nivel": 12,
+    "descricao": null
   },
   "381": {
     "atributo": "WATER",
@@ -2727,72 +2757,72 @@
   "651": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Activate 1 or both of these effects (simultaneously).\n● When an opponent's monster declares an attack: Target the attacking monster; change that target to Defense Position.\n● Target 1 face-up monster you control; equip this card to that target. It gains 500 ATK."
+    "descricao": "A boomerang featuring the effects of two cards: the Legendary Sword and the Sword of Dark Destruction."
   },
   "652": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to \"Labyrinth Wall\". You can Tribute the equipped monster; Special Summon \"Wall Shadow\" from your Deck."
+    "descricao": "A card for boosting the power of the Labyrinth Wall."
   },
   "653": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all Warrior monsters on the field."
+    "descricao": "Destroys all opponent Warrior cards played on the field."
   },
   "654": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a FIRE monster. It gains 700 ATK."
+    "descricao": "Increases the strength of those who control the power of Salamandra."
   },
   "656": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all monsters equipped with Equip Cards."
+    "descricao": "Eliminates all Zombie creatures."
   },
   "657": {
     "atributo": null,
     "nivel": null,
-    "descricao": "While your LP is lower than your opponent's, the equipped monster's ATK becomes double its original ATK. While your LP is higher, the equipped monster's ATK becomes half its original ATK."
+    "descricao": "A card that increases the power of any selected monster by 2 levels."
   },
   "658": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Target 1 face-up monster on the field; equip this card to that target. It gains 300 ATK/DEF. If it attacks, it gains ATK equal to half the ATK of the attack target, during damage calculation only."
+    "descricao": "A card that changes any selected monster to a Machine monster."
   },
   "660": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all face-up Machine-Type monsters on the field."
+    "descricao": "Acid rain destroys an opponent's Machine monsters."
   },
   "661": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Tribute 1 DARK monster with 1000 or less ATK; your opponent takes no damage until the end of the next turn after this card resolves, also, you look at your opponent's hand and all monsters they control, and if you do, destroy the monsters among them with 1500 or more ATK, then your opponent can destroy up to 3 monsters with 1500 or more ATK in their Deck."
+    "descricao": "Opponent monsters in play with attack factors of 1500 or more are eliminated."
   },
   "662": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all Insect monsters on the field."
+    "descricao": "An insecticide for wiping out an opponent's Insect monsters that are currently in play."
   },
   "663": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all face-up Rock-Type monsters on the field."
+    "descricao": "A magic wind that reduces to rubble an opponent's Rock monsters that are currently in play."
   },
   "664": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all face-up Fish-Type monsters on the field."
+    "descricao": "A blast of heat dries up and eliminates an opponent's Fish monsters that are currently in play."
   },
   "668": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Equip only to a LIGHT monster. It gains 700 ATK."
+    "descricao": "A glaring light that increases the power of all monsters."
   },
   "669": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Activate this card by targeting 1 face-up monster your opponent controls; it loses 700 ATK, also it cannot attack or change its battle position. When it leaves the field, destroy this card."
+    "descricao": "Decreases an opponent's in-play monsters by two levels."
   },
   "670": {
     "atributo": null,
@@ -2807,7 +2837,7 @@
   "672": {
     "atributo": null,
     "nivel": null,
-    "descricao": "Destroy all Spell and Trap Cards your opponent controls."
+    "descricao": "Destroys all opponent Magic cards that are in play."
   },
   "673": {
     "atributo": null,
@@ -2904,10 +2934,55 @@
     "nivel": null,
     "descricao": "This card is used to Ritual Summon \"Fortress Whale\". You must also Tribute monsters from your hand or field whose total Levels equal 7 or more."
   },
+  "701": {
+    "atributo": "EARTH",
+    "nivel": 6,
+    "descricao": null
+  },
+  "702": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": null
+  },
+  "703": {
+    "atributo": "EARTH",
+    "nivel": 8,
+    "descricao": null
+  },
+  "704": {
+    "atributo": "LIGHT",
+    "nivel": 7,
+    "descricao": null
+  },
+  "705": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": null
+  },
+  "706": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": null
+  },
   "707": {
     "atributo": "DARK",
     "nivel": 7,
     "descricao": "\"Tainted Wisdom\" + \"Ancient Brain\""
+  },
+  "708": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": null
+  },
+  "709": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": null
+  },
+  "710": {
+    "atributo": "WATER",
+    "nivel": 8,
+    "descricao": null
   },
   "711": {
     "atributo": "DARK",
@@ -2919,10 +2994,50 @@
     "nivel": 6,
     "descricao": "This dragon appeared from the sky and crashed to the earth."
   },
+  "713": {
+    "atributo": "FIRE",
+    "nivel": 8,
+    "descricao": null
+  },
   "714": {
     "atributo": "FIRE",
     "nivel": 6,
     "descricao": "A heavenly stallion soaring through the skies on crimson wings."
+  },
+  "715": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": null
+  },
+  "716": {
+    "atributo": "DARK",
+    "nivel": 7,
+    "descricao": null
+  },
+  "717": {
+    "atributo": "EARTH",
+    "nivel": 8,
+    "descricao": null
+  },
+  "718": {
+    "atributo": "WATER",
+    "nivel": 7,
+    "descricao": null
+  },
+  "719": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": null
+  },
+  "720": {
+    "atributo": "DARK",
+    "nivel": 6,
+    "descricao": null
+  },
+  "722": {
+    "atributo": "DARK",
+    "nivel": 8,
+    "descricao": null
   },
   "001": {
     "atributo": "LIGHT",

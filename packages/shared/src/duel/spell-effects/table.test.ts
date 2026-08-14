@@ -2,37 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import type { Card } from "../../card/types.ts";
 import { matchesClassFilter } from "./class-filter.ts";
+import { equipCardNumbers } from "./equip-compatibility.ts";
 import { spellPlayMode } from "./play-mode.ts";
 import { SpellEffectSchema } from "./schema.ts";
-import { SPELL_EFFECTS, getSpellEffect } from "./table.ts";
+import { SPELL_EFFECTS, getSpellEffect, requiresSpellTarget } from "./table.ts";
 
-/** The 25 cards specified in `docs/spells/`, in the order the source list gives them. */
-const SPECIFIED_CARDS = [
-  "301",
-  "302",
-  "303",
-  "304",
-  "305",
-  "306",
-  "307",
-  "308",
-  "311",
-  "314",
-  "315",
-  "320",
-  "329",
-  "330",
-  "331",
-  "332",
-  "333",
-  "334",
-  "335",
-  "336",
-  "337",
-  "342",
-  "348",
-  "657",
-  "672",
+/**
+ * The dataset's 33 `magica` cards. The 34 `equipamento` ones are not repeated
+ * here — they are cross-checked against the extracted compatibility table
+ * instead, which is an independent source.
+ */
+const MAGIC_CARDS = [
+  "320", "329", "330", "331", "332", "333", "334", "335", "336", "337",
+  "338", "339", "340", "341", "342", "343", "344", "345", "346", "347",
+  "348", "349", "350", "653", "655", "656", "660", "661", "662", "663",
+  "664", "669", "672",
 ];
 
 const TERRAIN_CARDS = ["330", "331", "332", "333", "334", "335"];
@@ -56,8 +40,10 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 }
 
 describe("SPELL_EFFECTS", () => {
-  it("a tabela cobre exatamente as 25 cartas especificadas", () => {
-    expect(Object.keys(SPELL_EFFECTS).sort()).toEqual([...SPECIFIED_CARDS].sort());
+  it("cobre exatamente as 67 cartas de magia e equipamento do dataset", () => {
+    expect(Object.keys(SPELL_EFFECTS).sort()).toEqual(
+      [...MAGIC_CARDS, ...equipCardNumbers()].sort(),
+    );
   });
 
   it("todo efeito da tabela satisfaz SpellEffectSchema", () => {
@@ -75,57 +61,95 @@ describe("SPELL_EFFECTS", () => {
     expect(terrains.sort()).toEqual(TERRAIN_CARDS);
   });
 
-  it("as dez cartas de equipamento carregam o buff e a restricao de classe corretos", () => {
-    expect(SPELL_EFFECTS["301"]).toEqual({
-      type: "equip_buff",
-      atk: 500,
-      def: 500,
-      requires: { kind: "classe", classe: "Warrior" },
-    });
-    expect(SPELL_EFFECTS["304"]).toEqual({
-      type: "equip_buff",
-      atk: 1000,
-      def: 1000,
-      requires: { kind: "any" },
-    });
-    expect(SPELL_EFFECTS["305"]).toEqual({
-      type: "equip_buff",
-      atk: 0,
-      def: 500,
-      requires: { kind: "any" },
-    });
-    expect(SPELL_EFFECTS["657"]).toEqual({
-      type: "equip_buff",
-      atk: 1000,
-      def: 0,
-      requires: { kind: "any" },
+  it("as cartas equip_buff sao exatamente as que tem lista de compatibilidade", () => {
+    // As duas tabelas descrevem o mesmo conjunto por caminhos independentes:
+    // esta e autorada, a de compatibilidade e extraida do `equipinfo`. Uma
+    // divergencia aqui significa que uma das duas ficou para tras.
+    const buffs = Object.entries(SPELL_EFFECTS)
+      .filter(([, effect]) => effect.type === "equip_buff")
+      .map(([numero]) => numero)
+      .sort();
+
+    expect(buffs).toEqual([...equipCardNumbers()].sort());
+  });
+
+  it("todo equipamento da +500/+500, e so Megamorph dobra", () => {
+    for (const [numero, effect] of Object.entries(SPELL_EFFECTS)) {
+      if (effect.type !== "equip_buff") continue;
+      const expected = numero === "657" ? 1000 : 500;
+      expect({ numero, atk: effect.atk, def: effect.def }).toEqual({
+        numero,
+        atk: expected,
+        def: expected,
+      });
+    }
+  });
+
+  it("302 e 306 sao equipamentos, nao efeitos imediatos", () => {
+    // O texto do jogo original descreve as duas como power-up; o `tipo` do
+    // dataset nunca decidiu o roteamento, a tabela decide.
+    expect(SPELL_EFFECTS["302"]).toMatchObject({ type: "equip_buff" });
+    expect(SPELL_EFFECTS["306"]).toMatchObject({ type: "equip_buff" });
+  });
+
+  it("segue os numeros do jogo original nas cartas de life points", () => {
+    expect(SPELL_EFFECTS["343"]).toEqual({ type: "life_points", side: "opponent", delta: -50 });
+    expect(SPELL_EFFECTS["341"]).toEqual({ type: "life_points", side: "caster", delta: 2000 });
+    expect(SPELL_EFFECTS["342"]).toEqual({ type: "life_points", side: "caster", delta: 5000 });
+  });
+
+  it("so alcanca os dois jogadores quando o texto nao nomeia o dono", () => {
+    expect(SPELL_EFFECTS["336"]).toMatchObject({ targets: { side: "both" } }); // "every card in play"
+    expect(SPELL_EFFECTS["656"]).toMatchObject({ targets: { side: "both" } }); // "all Zombie creatures"
+    expect(SPELL_EFFECTS["350"]).toMatchObject({ targets: { side: "both" } }); // "all monsters on the field"
+    expect(SPELL_EFFECTS["329"]).toMatchObject({ targets: { side: "opponent" } }); // "all opponent Dragon"
+    expect(SPELL_EFFECTS["337"]).toMatchObject({ targets: { side: "opponent" } }); // "every opposing monster"
+    expect(SPELL_EFFECTS["320"]).toMatchObject({ targets: { side: "opponent" } }); // "an opponent's monster"
+  });
+
+  it("a maldicao conta em levels, com Shadow Spell no dobro de Spellbinding Circle", () => {
+    expect(SPELL_EFFECTS["349"]).toMatchObject({ type: "stat_curse", levels: 1 });
+    expect(SPELL_EFFECTS["669"]).toMatchObject({ type: "stat_curse", levels: 2 });
+    expect(SPELL_EFFECTS["655"]).toEqual({ type: "cleanse_curses", side: "both" });
+  });
+
+  it("348 revela e trava, nessa ordem", () => {
+    expect(SPELL_EFFECTS["348"]).toEqual({
+      type: "sequence",
+      effects: [
+        { type: "reveal_face_down", targets: { side: "opponent", filter: { kind: "any" } } },
+        { type: "attack_lock", side: "opponent", turns: 3 },
+      ],
     });
   });
 
-  it("Dark Energy aponta para Fiend e Elf's Light para Spellcaster, ja que o dataset nao tem atributo", () => {
-    expect(SPELL_EFFECTS["303"]).toMatchObject({
-      requires: { kind: "classe", classe: "Fiend" },
+  it("661 destroi por ATK a partir de 1500", () => {
+    expect(SPELL_EFFECTS["661"]).toEqual({
+      type: "destroy_by_atk",
+      targets: { side: "opponent", filter: { kind: "any" } },
+      minAtk: 1500,
     });
-    expect(SPELL_EFFECTS["307"]).toMatchObject({
-      requires: { kind: "classe", classe: "Spellcaster" },
-    });
+  });
+});
+
+describe("requiresSpellTarget", () => {
+  it("so 320 Stop Defense pede alvo", () => {
+    const targeted = Object.entries(SPELL_EFFECTS)
+      .filter(([, effect]) => requiresSpellTarget(effect))
+      .map(([numero]) => numero);
+
+    expect(targeted).toEqual(["320"]);
   });
 
-  it("os efeitos sem dono explicito alcancam os dois jogadores", () => {
-    expect(SPELL_EFFECTS["320"]).toMatchObject({ targets: { side: "both" } });
-    expect(SPELL_EFFECTS["329"]).toMatchObject({ targets: { side: "both" } });
-    expect(SPELL_EFFECTS["336"]).toMatchObject({ targets: { side: "both" } });
-    expect(SPELL_EFFECTS["302"]).toMatchObject({ targets: { side: "opponent" } });
-    expect(SPELL_EFFECTS["337"]).toMatchObject({ targets: { side: "opponent" } });
-  });
-
-  it("306 tira e 342 devolve life points, com o sinal em delta", () => {
-    expect(SPELL_EFFECTS["306"]).toEqual({ type: "life_points", side: "opponent", delta: -500 });
-    expect(SPELL_EFFECTS["342"]).toEqual({ type: "life_points", side: "caster", delta: 1000 });
-  });
-
-  it("348 trava o oponente por tres turnos", () => {
-    expect(SPELL_EFFECTS["348"]).toEqual({ type: "attack_lock", side: "opponent", turns: 3 });
+  it("nenhuma sequence esconde um efeito que pediria alvo", () => {
+    // Um efeito alvejavel dentro de uma sequence nao teria como perguntar:
+    // `activateSpell` le o alvo do topo do efeito, nao de dentro dele.
+    for (const [numero, effect] of Object.entries(SPELL_EFFECTS)) {
+      if (effect.type !== "sequence") continue;
+      for (const inner of effect.effects) {
+        expect({ numero, targeted: requiresSpellTarget(inner) }).toEqual({ numero, targeted: false });
+      }
+    }
   });
 });
 
@@ -158,13 +182,18 @@ describe("spellPlayMode", () => {
     expect(spellPlayMode(makeCard({ numero: "030" }))).toBe("place");
   });
 
-  it("classifica 302 e 306 como efeito imediato apesar de serem tipo equipamento", () => {
-    expect(spellPlayMode(makeCard({ numero: "302", tipo: "equipamento" }))).toBe("one_shot");
-    expect(spellPlayMode(makeCard({ numero: "306", tipo: "equipamento" }))).toBe("one_shot");
+  it("classifica uma sequence como efeito imediato", () => {
+    expect(spellPlayMode(makeCard({ numero: "348" }))).toBe("one_shot");
   });
 
   it("classifica uma armadilha sem entrada na tabela como posicionamento inerte", () => {
     expect(spellPlayMode(makeCard({ numero: "700", tipo: "armadilha", classe: "Trap" }))).toBe(
+      "place",
+    );
+  });
+
+  it("classifica um ritual sem entrada na tabela como posicionamento inerte", () => {
+    expect(spellPlayMode(makeCard({ numero: "665", tipo: "ritual", classe: "Ritual" }))).toBe(
       "place",
     );
   });

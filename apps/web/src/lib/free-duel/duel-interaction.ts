@@ -7,7 +7,7 @@ import type {
   ZoneIndex,
   ZoneReference,
 } from "@yugioh/shared";
-import { spellPlayMode } from "@yugioh/shared";
+import { getSpellEffect, requiresSpellTarget, spellPlayMode } from "@yugioh/shared";
 
 const PLAYER: PlayerId = "P1";
 const OPPONENT: PlayerId = "P2";
@@ -22,6 +22,12 @@ export type DuelIntent =
   | Readonly<{ kind: "choosing_zone"; handIndex: number }>
   | Readonly<{ kind: "choosing_position"; handIndex: number; zoneIndex: ZoneIndex }>
   | Readonly<{ kind: "choosing_equip_target"; handIndex: number }>
+  /**
+   * The caster is picking the monster a targeted spell will hit. Only 320 Stop
+   * Defense reaches this today; `requiresSpellTarget` is what routes into it,
+   * so a future targeted card needs no change here.
+   */
+  | Readonly<{ kind: "choosing_spell_target"; handIndex: number }>
   | Readonly<{ kind: "choosing_attacker" }>
   | Readonly<{ kind: "choosing_target"; attackerZoneIndex: ZoneIndex }>
   | Readonly<{ kind: "choosing_flip" }>;
@@ -89,6 +95,7 @@ function selectedHandIndex(intent: DuelIntent): number | undefined {
     case "choosing_zone":
     case "choosing_position":
     case "choosing_equip_target":
+    case "choosing_spell_target":
       return intent.handIndex;
     default:
       return undefined;
@@ -119,6 +126,45 @@ function canUseHand(state: DuelState): boolean {
 
 function hasOpponentMonsters(state: DuelState): boolean {
   return state.players[OPPONENT].field.monsters.some((zone) => zone.occupied);
+}
+
+/** Whether `card` asks the caster to pick a monster before it resolves. */
+function needsSpellTarget(card: Card): boolean {
+  const effect = getSpellEffect(card.numero);
+  return effect !== undefined && requiresSpellTarget(effect);
+}
+
+/**
+ * Whether `reference` is a zone the targeted spell may hit — the same three
+ * conditions `activateSpell` enforces, so the UI never offers a zone the
+ * engine would refuse.
+ *
+ * Kept in step with the engine by reading the effect's own `targets.side`
+ * rather than hardcoding the opponent. `apps/web` may not import
+ * `@yugioh/engine` (`scripts/check-duel-engine-boundary.mjs`), so the side
+ * expansion is repeated here rather than shared.
+ */
+function isLegalSpellTarget(state: DuelState, card: Card, reference: ZoneReference): boolean {
+  const effect = getSpellEffect(card.numero);
+  if (effect?.type !== "force_attack_position" || reference.zoneType !== "monster") return false;
+
+  const reachable =
+    effect.targets.side === "both" ||
+    (effect.targets.side === "opponent" ? reference.player === OPPONENT : reference.player === PLAYER);
+  if (!reachable) return false;
+
+  const zone = state.players[reference.player].field.monsters[reference.index];
+  return zone.occupied && (zone.position === "defense_face_up" || zone.position === "defense_face_down");
+}
+
+/** Whether any zone at all satisfies {@link isLegalSpellTarget}. */
+function hasLegalSpellTarget(state: DuelState, card: Card): boolean {
+  const players: readonly PlayerId[] = [PLAYER, OPPONENT];
+  return players.some((player) =>
+    state.players[player].field.monsters.some((_, index) =>
+      isZoneIndex(index) ? isLegalSpellTarget(state, card, { player, zoneType: "monster", index }) : false,
+    ),
+  );
 }
 
 function attackerIsReady(state: DuelState, index: ZoneIndex): boolean {
@@ -170,7 +216,13 @@ export function describeAffordances(input: Readonly<{
     card !== undefined &&
     spellPlayMode(card) === "equip" &&
     state.players[PLAYER].field.monsters.some((zone) => zone.occupied);
-  const canActivateSpell = canPlayFromHand && card !== undefined && spellPlayMode(card) === "one_shot";
+  // A targeted spell with nothing to target is not activatable: the engine
+  // would refuse it with `spell_requires_target` after the click.
+  const canActivateSpell =
+    canPlayFromHand &&
+    card !== undefined &&
+    spellPlayMode(card) === "one_shot" &&
+    (!needsSpellTarget(card) || hasLegalSpellTarget(state, card));
   const canPlayTerrain = canPlayFromHand && card !== undefined && spellPlayMode(card) === "terrain";
   const battleActionsAvailable = canAct && state.phase === "battle" && state.activePlayer === PLAYER;
   const canAttack =
@@ -200,6 +252,7 @@ export function describeActionSlots(
     intent.kind === "choosing_zone" ||
     intent.kind === "choosing_position" ||
     intent.kind === "choosing_equip_target" ||
+    intent.kind === "choosing_spell_target" ||
     intent.kind === "choosing_attacker" ||
     intent.kind === "choosing_target" ||
     intent.kind === "choosing_flip"
@@ -307,10 +360,15 @@ export function reduceIntent(
         return intent.kind === "card_selected" && affordances.canEquip
           ? { intent: { kind: "choosing_equip_target", handIndex: intent.handIndex } }
           : { intent };
-      case "activate":
-        return intent.kind === "card_selected" && affordances.canActivateSpell
-          ? { intent: idleIntent, action: { type: "activate_spell", handIndex: intent.handIndex } }
-          : { intent };
+      case "activate": {
+        if (intent.kind !== "card_selected" || !affordances.canActivateSpell) return { intent };
+        const selected = state.players[PLAYER].hand[intent.handIndex];
+        // A targeted card takes one more step: the caster picks the monster
+        // before anything is dispatched.
+        return selected !== undefined && needsSpellTarget(selected)
+          ? { intent: { kind: "choosing_spell_target", handIndex: intent.handIndex } }
+          : { intent: idleIntent, action: { type: "activate_spell", handIndex: intent.handIndex } };
+      }
       case "place_terrain":
         return intent.kind === "card_selected" && affordances.canPlayTerrain
           ? { intent: idleIntent, action: { type: "play_field_spell", handIndex: intent.handIndex } }
@@ -353,6 +411,19 @@ export function reduceIntent(
           ? {
               intent: idleIntent,
               action: { type: "equip_card", handIndex: intent.handIndex, targetZone: reference },
+            }
+          : { intent };
+      }
+      case "choosing_spell_target": {
+        const selected = state.players[PLAYER].hand[intent.handIndex];
+        return selected !== undefined && isLegalSpellTarget(state, selected, reference)
+          ? {
+              intent: idleIntent,
+              action: {
+                type: "activate_spell",
+                handIndex: intent.handIndex,
+                targetZone: reference,
+              },
             }
           : { intent };
       }
@@ -433,6 +504,13 @@ export function zoneAffordance(
         ? state.players[PLAYER].field.monsters[reference.index]
         : undefined;
     return zone?.occupied ? "target" : "idle";
+  }
+
+  if (intent.kind === "choosing_spell_target") {
+    const selected = state.players[PLAYER].hand[intent.handIndex];
+    return selected !== undefined && isLegalSpellTarget(state, selected, reference)
+      ? "target"
+      : "idle";
   }
 
   if (intent.kind === "choosing_target") {

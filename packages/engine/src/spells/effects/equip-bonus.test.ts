@@ -1,7 +1,7 @@
 import type { Card, MonsterZone } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
-import { equipCombatProviders, sumEquipBonuses } from "./equip-bonus.ts";
+import { cursePenalty, sumEquipBonuses, zoneCombatProviders } from "./equip-bonus.ts";
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -28,94 +28,58 @@ function equip(numero: string, nome: string): Card {
 
 const legendarySword = equip("301", "Legendary Sword");
 const darkEnergy = equip("303", "Dark Energy");
-const axeOfDespair = equip("304", "Axe of Despair");
-const laserCannonArmor = equip("305", "Laser Cannon Armor");
-const elfsLight = equip("307", "Elf's Light");
-const beastFangs = equip("308", "Beast Fangs");
-const blackPendant = equip("311", "Black Pendant");
-const hornOfTheUnicorn = equip("314", "Horn of the Unicorn");
+const bookOfSecretArts = equip("323", "Book of Secret Arts");
 const dragonTreasure = equip("315", "Dragon Treasure");
 const megamorph = equip("657", "Megamorph");
 
-describe("sumEquipBonuses — equipamentos sem restricao", () => {
-  it("Axe of Despair soma +1000 ATK e +1000 DEF a qualquer hospedeiro", () => {
-    for (const classe of ["Warrior", "Dragon", "Aqua", "Zombie"]) {
-      expect(sumEquipBonuses(makeCard({ classe }), [axeOfDespair])).toEqual({
-        atk: 1000,
-        def: 1000,
-      });
+// Real monsters, with the compatibility the original game actually declares.
+const blueEyes = makeCard({ numero: "001", nome: "Blue-eyes White Dragon", classe: "Dragon" });
+const swampBattleguard = makeCard({ numero: "012", nome: "Swamp Battleguard", classe: "Warrior" });
+const mysticalElf = makeCard({ numero: "002", nome: "Mystical Elf", classe: "Spellcaster" });
+const harpieLady = makeCard({ numero: "062", nome: "Harpie Lady", classe: "Winged Beast" });
+
+describe("sumEquipBonuses", () => {
+  it("soma +500/+500 num hospedeiro que o jogo original aceita", () => {
+    expect(sumEquipBonuses(swampBattleguard, [legendarySword])).toEqual({ atk: 500, def: 500 });
+    expect(sumEquipBonuses(blueEyes, [dragonTreasure])).toEqual({ atk: 500, def: 500 });
+  });
+
+  it("Megamorph dobra, e aceita qualquer monstro", () => {
+    for (const host of [blueEyes, swampBattleguard, mysticalElf, harpieLady]) {
+      expect(sumEquipBonuses(host, [megamorph])).toEqual({ atk: 1000, def: 1000 });
     }
   });
 
-  it("Black Pendant soma +500/+500 e Horn of the Unicorn +700/+700", () => {
-    expect(sumEquipBonuses(makeCard(), [blackPendant])).toEqual({ atk: 500, def: 500 });
-    expect(sumEquipBonuses(makeCard(), [hornOfTheUnicorn])).toEqual({ atk: 700, def: 700 });
+  it("nao soma nada num hospedeiro fora da lista, e a jogada continua valida", () => {
+    expect(sumEquipBonuses(blueEyes, [legendarySword])).toEqual({ atk: 0, def: 0 });
+    expect(sumEquipBonuses(mysticalElf, [darkEnergy])).toEqual({ atk: 0, def: 0 });
   });
 
-  it("Megamorph soma apenas ATK e Laser Cannon Armor apenas DEF", () => {
-    expect(sumEquipBonuses(makeCard(), [megamorph])).toEqual({ atk: 1000, def: 0 });
-    expect(sumEquipBonuses(makeCard(), [laserCannonArmor])).toEqual({ atk: 0, def: 500 });
-  });
-});
-
-describe("sumEquipBonuses — restricao de classe", () => {
-  const restricted: readonly [Card, string][] = [
-    [legendarySword, "Warrior"],
-    [darkEnergy, "Fiend"],
-    [elfsLight, "Spellcaster"],
-    [beastFangs, "Beast"],
-    [dragonTreasure, "Dragon"],
-  ];
-
-  for (const [card, classe] of restricted) {
-    it(`${card.nome} soma +500/+500 em um hospedeiro da classe ${classe}`, () => {
-      expect(sumEquipBonuses(makeCard({ classe }), [card])).toEqual({ atk: 500, def: 500 });
-    });
-  }
-
-  it("Dark Energy nao soma nada a um hospedeiro que nao seja da classe Fiend", () => {
-    expect(sumEquipBonuses(makeCard({ classe: "Warrior" }), [darkEnergy])).toEqual({
-      atk: 0,
-      def: 0,
-    });
+  it("a compatibilidade nao segue a classe: Harpie Lady e Winged Beast e aceita Book of Secret Arts", () => {
+    expect(sumEquipBonuses(harpieLady, [bookOfSecretArts])).toEqual({ atk: 500, def: 500 });
+    // E Blue-eyes, que tampouco e Spellcaster, nao aceita.
+    expect(sumEquipBonuses(blueEyes, [bookOfSecretArts])).toEqual({ atk: 0, def: 0 });
   });
 
-  it("Legendary Sword nao soma nada em um Dragon, e a jogada continua valida", () => {
-    expect(sumEquipBonuses(makeCard({ classe: "Dragon" }), [legendarySword])).toEqual({
-      atk: 0,
-      def: 0,
-    });
-  });
-
-  it("Beast-Warrior nao conta como Beast — a comparacao de classe e exata", () => {
-    expect(sumEquipBonuses(makeCard({ classe: "Beast-Warrior" }), [beastFangs])).toEqual({
-      atk: 0,
-      def: 0,
-    });
-  });
-});
-
-describe("sumEquipBonuses — acumulo e casos de borda", () => {
   it("subtracts a reversed equip and keeps the canonical card unchanged", () => {
-    const host = makeCard({ classe: "Warrior", atk: 300, def: 200 });
-    expect(sumEquipBonuses(host, [{ card: axeOfDespair, polarity: "reversed" }])).toEqual({
+    const host = { ...swampBattleguard, atk: 300, def: 200 };
+    expect(sumEquipBonuses(host, [{ card: megamorph, polarity: "reversed" }])).toEqual({
       atk: -1000,
       def: -1000,
     });
     expect(host).toMatchObject({ atk: 300, def: 200 });
   });
-
   it("dois equipamentos no mesmo monstro acumulam os bonus", () => {
-    expect(
-      sumEquipBonuses(makeCard({ classe: "Warrior" }), [legendarySword, axeOfDespair]),
-    ).toEqual({ atk: 1500, def: 1500 });
+    expect(sumEquipBonuses(blueEyes, [dragonTreasure, megamorph])).toEqual({
+      atk: 1500,
+      def: 1500,
+    });
   });
 
-  it("soma so os elegiveis quando um dos equipamentos nao casa com a classe", () => {
-    const host = makeCard({ classe: "Dragon" });
-    expect(sumEquipBonuses(host, [legendarySword, dragonTreasure, megamorph])).toEqual({
+  it("soma so os elegiveis quando um dos equipamentos nao aceita o hospedeiro", () => {
+    expect(sumEquipBonuses(blueEyes, [legendarySword, dragonTreasure, megamorph])).toEqual({
       atk: 1500,
-      def: 500,
+      def: 1500,
     });
   });
 
@@ -125,25 +89,37 @@ describe("sumEquipBonuses — acumulo e casos de borda", () => {
 
   it("ignora uma carta anexada que nao seja um equipamento de buff", () => {
     const raigeki = makeCard({ numero: "337", nome: "Raigeki", classe: "Magic", tipo: "magica" });
-    const unknown = makeCard({ numero: "030", nome: "Sem efeito", tipo: "equipamento" });
-    expect(sumEquipBonuses(makeCard(), [raigeki, unknown])).toEqual({ atk: 0, def: 0 });
+    const trap = makeCard({ numero: "683", nome: "Bear Trap", classe: "Trap", tipo: "armadilha" });
+    expect(sumEquipBonuses(swampBattleguard, [raigeki, trap])).toEqual({ atk: 0, def: 0 });
   });
 
   it("nao altera o hospedeiro nem a lista de equipamentos", () => {
-    const host = makeCard({ classe: "Warrior" });
     const equips = [legendarySword];
-    const snapshot = JSON.parse(JSON.stringify({ host, equips })) as unknown;
+    const snapshot = JSON.parse(JSON.stringify({ swampBattleguard, equips })) as unknown;
 
-    sumEquipBonuses(host, equips);
+    sumEquipBonuses(swampBattleguard, equips);
 
-    expect(JSON.parse(JSON.stringify({ host, equips }))).toEqual(snapshot);
+    expect(JSON.parse(JSON.stringify({ swampBattleguard, equips }))).toEqual(snapshot);
   });
 });
 
-describe("equipCombatProviders", () => {
+describe("cursePenalty", () => {
+  it("tira 500 por level, nos dois eixos", () => {
+    expect(cursePenalty(1)).toEqual({ atk: -500, def: -500 });
+    expect(cursePenalty(2)).toEqual({ atk: -1000, def: -1000 });
+  });
+
+  it("uma zona sem maldicao nao tira nada", () => {
+    expect(cursePenalty(undefined)).toEqual({ atk: 0, def: 0 });
+    expect(cursePenalty(0)).toEqual({ atk: 0, def: 0 });
+  });
+});
+
+describe("zoneCombatProviders", () => {
   function occupiedZone(
     host: Card,
     equips: readonly Card[],
+    curseLevels?: number,
   ): Extract<MonsterZone, { occupied: true }> {
     return {
       occupied: true,
@@ -152,22 +128,34 @@ describe("equipCombatProviders", () => {
       hasAttacked: false,
       hasChangedPosition: false,
       equips: equips.map((card) => ({ card, polarity: "normal" })),
+      ...(curseLevels === undefined ? {} : { curseLevels }),
     };
   }
 
   it("mantem guardiao e terreno neutros e liga apenas o slot de equipamento", () => {
-    const host = makeCard({ classe: "Warrior" });
-    const providers = equipCombatProviders(occupiedZone(host, [legendarySword]));
+    const providers = zoneCombatProviders(occupiedZone(swampBattleguard, [legendarySword]));
 
-    expect(providers.guardian(host, null)).toEqual({ atk: 0, def: 0 });
-    expect(providers.terrain(host, null)).toEqual({ atk: 0, def: 0 });
-    expect(providers.equipment(host)).toEqual({ atk: 500, def: 500 });
+    expect(providers.guardian(swampBattleguard, null)).toEqual({ atk: 0, def: 0 });
+    expect(providers.terrain(swampBattleguard, null)).toEqual({ atk: 0, def: 0 });
+    expect(providers.equipment(swampBattleguard)).toEqual({ atk: 500, def: 500 });
   });
 
-  it("uma zona sem equipamentos devolve modificador zero nos tres slots", () => {
-    const host = makeCard();
-    const providers = equipCombatProviders(occupiedZone(host, []));
+  it("uma zona sem equipamentos nem maldicao devolve modificador zero", () => {
+    const providers = zoneCombatProviders(occupiedZone(makeCard(), []));
 
-    expect(providers.equipment(host)).toEqual({ atk: 0, def: 0 });
+    expect(providers.equipment(makeCard())).toEqual({ atk: 0, def: 0 });
+  });
+
+  it("a maldicao entra no mesmo slot e se compensa com o equipamento", () => {
+    // Shadow Spell (2 levels) num monstro com Legendary Sword: -1000 +500.
+    const providers = zoneCombatProviders(occupiedZone(swampBattleguard, [legendarySword], 2));
+
+    expect(providers.equipment(swampBattleguard)).toEqual({ atk: -500, def: -500 });
+  });
+
+  it("a maldicao sozinha derruba o monstro sem piso", () => {
+    const providers = zoneCombatProviders(occupiedZone(swampBattleguard, [], 3));
+
+    expect(providers.equipment(swampBattleguard)).toEqual({ atk: -1500, def: -1500 });
   });
 });

@@ -45,7 +45,7 @@ export {
   activateSpell,
   attackLockUntilTurn,
   equipCard,
-  equipCombatProviders,
+  zoneCombatProviders,
   getOpponent,
   isAttackLocked,
   playFieldSpell,

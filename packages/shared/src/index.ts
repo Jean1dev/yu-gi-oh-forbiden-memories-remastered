@@ -216,14 +216,21 @@ export {
 export { EquipAttachmentSchema, EquipPolaritySchema } from "./duel/schema.ts";
 export type { SummonMonsterAction } from "./duel/summon-monster-action.ts";
 export {
+  AtomicSpellEffectSchema,
   CardClassFilterSchema,
   EffectSideSchema,
   EffectTargetsSchema,
+  POWER_PER_LEVEL,
   SPELL_EFFECTS,
   SpellEffectSchema,
+  equipCardNumbers,
+  equipCompatibleHosts,
   getSpellEffect,
+  isEquipCompatible,
   matchesClassFilter,
+  requiresSpellTarget,
   spellPlayMode,
+  type AtomicSpellEffect,
   type CardClassFilter,
   type EffectSide,
   type EffectTargets,

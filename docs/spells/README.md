@@ -3,42 +3,55 @@
 > Pacotes-alvo: `packages/shared` (vocabulário + tabela), `packages/engine` (interpretador),
 > `apps/web` (roteamento de intenção)
 
-Este diretório especifica o efeito concreto de **25 cartas** — 10 equipamentos de buff, 9 mágicas
-de efeito imediato e 6 terrenos. Cada família de efeito tem seu próprio arquivo; este README
-contém o que é comum a todas: a decisão de arquitetura, o vocabulário de efeitos, a tabela de
-roteamento de ações e as decisões transversais.
+Este diretório especifica o efeito concreto das **67 cartas `magica`/`equipamento`** do dataset —
+34 equipamentos, 27 mágicas de efeito imediato e 6 terrenos. Cada família de efeito tem seu
+próprio arquivo; este README contém o que é comum a todas: a decisão de arquitetura, o vocabulário
+de efeitos, a tabela de roteamento de ações e as decisões transversais.
 
 | Arquivo | Cartas |
 | --- | --- |
-| [`equip-buffs.md`](./equip-buffs.md) | 301, 303, 304, 305, 307, 308, 311, 314, 315, 657 |
-| [`destruction.md`](./destruction.md) | 302, 329, 336, 337 |
+| [`equip-buffs.md`](./equip-buffs.md) | os 34 equipamentos |
+| [`destruction.md`](./destruction.md) | 329, 336, 337, 653, 656, 660, 661, 662, 663, 664 |
 | [`spell-removal.md`](./spell-removal.md) | 672 |
-| [`life-points.md`](./life-points.md) | 306, 342 |
+| [`life-points.md`](./life-points.md) | 338, 339, 340, 341, 342, 343, 344, 345, 346, 347 |
+| [`stat-curse.md`](./stat-curse.md) | 349, 655, 669 |
+| [`reveal.md`](./reveal.md) | 350, e a primeira metade de 348 |
 | [`position-control.md`](./position-control.md) | 320 |
 | [`attack-lock.md`](./attack-lock.md) | 348 |
 | [`terrains.md`](./terrains.md) | 330, 331, 332, 333, 334, 335 |
+
+Fora de escopo, e ainda inertes: as **10 armadilhas** e as **24 cartas de ritual**, que não têm
+mecânica de ativação nenhuma no motor.
 
 ---
 
 ## 1. Contexto
 
-O motor de duelo está completo (`motor-duelo-1x1` F01–F12), mas nenhuma carta faz nada.
-`playSpellOrTrap` apenas estaciona a carta numa zona de magia, `playFieldSpell` só troca
-`activeField`, e os três provedores de modificador de combate (`guardian`, `terrain`, `equipment`)
-são placeholders que retornam `{ atk: 0, def: 0 }`.
+`spells/F01` especificou 25 cartas contra o texto do TCG, porque o dataset não ajudava: as 722
+cartas são registros `nome + password + preço`, sem texto de efeito e sem identificador de efeito,
+e a semântica parecia ter de ser autorada à mão.
 
-O dataset também não ajuda: as 722 cartas são registros `nome + password + preço`, sem texto de
-efeito e sem identificador de efeito. **A semântica de cada carta precisa ser autorada**, e é isso
-que este diretório faz.
+**`spells/F02` descobriu que ela pode ser extraída.** `packages/data/scripts/extract-fm-duelist.ts`
+já baixava `sg4e/YGOFM-gamedata` — um datamine do jogo original verificado contra dumps de memória
+de emulador — para as pools de duelista. O mesmo repositório publica, no mesmo `cardId` que este
+projeto usa como `numero`:
+
+| Tabela | O que resolve |
+| --- | --- |
+| `cardinfo` | o texto **do jogo original** das 722 cartas, e o atributo/nível de cada monstro |
+| `equipinfo` | 4041 pares: a compatibilidade exata de cada um dos 34 equipamentos |
+
+Por isso o Forbidden Memories passou a ser a regra normativa, e as 25 cartas de F01 foram
+realinhadas junto com as outras 42 (ver §7).
 
 ### Fronteiras
 
-Incluído: as 25 cartas listadas acima, a ação de equipar, a ação de ativar uma mágica de efeito
-imediato, e o filtro que restringe `play_field_spell` aos seis terrenos reais.
+Incluído: as 67 cartas `magica`/`equipamento`, a ação de equipar, a ação de ativar uma mágica de
+efeito imediato (com ou sem alvo), e o filtro que restringe `play_field_spell` aos seis terrenos
+reais.
 
-Fora de escopo desta documentação: armadilhas (implementadas em `docs/traps/`), as outras 42 cartas `magica`/
-`equipamento` sem entrada na tabela (continuam inertes), fusões, Guardian Stars, e a matriz
-terreno×classe (ver [`terrains.md`](./terrains.md)).
+Fora de escopo desta documentação: armadilhas (implementadas em `docs/traps/`), as 24 cartas de ritual, fusões, Guardian
+Stars, e a matriz terreno×classe (ver [`terrains.md`](./terrains.md)).
 
 ---
 
@@ -80,8 +93,8 @@ mas `engine` também não pode importar `data`.
 
 ## 3. O vocabulário de efeitos
 
-Sete variantes cobrem as 25 cartas. **Nenhuma é específica de uma carta** — o que muda entre
-Legendary Sword e Dragon Treasure é o filtro de classe, não o código.
+Onze variantes atômicas cobrem as 67 cartas. **Nenhuma é específica de uma carta** — o que muda
+entre Warrior Elimination e Stain Storm é o filtro de classe, não o código.
 
 ```ts
 type EffectSide = "caster" | "opponent" | "both";
@@ -92,27 +105,49 @@ type CardClassFilter =
 
 type EffectTargets = Readonly<{ side: EffectSide; filter: CardClassFilter }>;
 
-type SpellEffect =
-  | Readonly<{ type: "equip_buff"; atk: number; def: number; requires: CardClassFilter }>
+const POWER_PER_LEVEL = 500;
+
+type AtomicSpellEffect =
+  | Readonly<{ type: "equip_buff"; atk: number; def: number }>
   | Readonly<{ type: "destroy_monsters"; targets: EffectTargets }>
   | Readonly<{ type: "destroy_spells"; targets: EffectTargets }>
+  | Readonly<{ type: "destroy_by_atk"; targets: EffectTargets; minAtk: number }>
   | Readonly<{ type: "force_attack_position"; targets: EffectTargets }>
+  | Readonly<{ type: "reveal_face_down"; targets: EffectTargets }>
+  | Readonly<{ type: "stat_curse"; targets: EffectTargets; levels: number }>
+  | Readonly<{ type: "cleanse_curses"; side: EffectSide }>
   | Readonly<{ type: "life_points"; side: EffectSide; delta: number }>
   | Readonly<{ type: "attack_lock"; side: EffectSide; turns: number }>
   | Readonly<{ type: "terrain" }>;
+
+type SpellEffect =
+  | AtomicSpellEffect
+  | Readonly<{ type: "sequence"; effects: readonly AtomicSpellEffect[] }>;
 ```
 
-Duas escolhas de forma que valem registro:
+Quatro escolhas de forma que valem registro:
 
-- `life_points` e `attack_lock` recebem um `side` puro, **não** `EffectTargets`. Um filtro de
-  classe não significa nada num efeito de jogador, e a disciplina do repositório é tornar estados
-  ilegais irrepresentáveis (mesmo motivo do union de `MonsterZone`).
+- **`equip_buff` não carrega restrição.** Quais monstros aceitam um equipamento é uma lista curada
+  carta a carta pelo jogo original, e mora em `equip-compatibility.ts`, gerada a partir do
+  `equipinfo` (ver [`equip-buffs.md`](./equip-buffs.md) §2).
+- `life_points`, `attack_lock` e `cleanse_curses` recebem um `side` puro, **não** `EffectTargets`.
+  Um filtro de classe não significa nada num efeito que alcança um jogador em vez de uma carta, e
+  a disciplina do repositório é tornar estados ilegais irrepresentáveis (mesmo motivo do union de
+  `MonsterZone`).
+- **`sequence` carrega `AtomicSpellEffect`, não `SpellEffect`.** A união fica não recursiva e o
+  `z.discriminatedUnion` continua direto, sem `z.lazy`; uma sequence de sequences não compraria
+  nada. Só 348 precisa dela — "revela **e** trava".
 - `terrain` não carrega payload. A matriz terreno×classe ainda é `[]` em `packages/data`, então
   `TerrainModifierProvider` continua neutro; a variante existe apenas para tornar uma carta
   reconhecível como alvo legal de `play_field_spell` (ver [`terrains.md`](./terrains.md)).
 
-`equip_buff` reusa `CardClassFilter` no campo `requires`, para que `matchesClassFilter` seja
-escrito uma vez e sirva tanto ao bônus de equipamento quanto às varreduras de destruição.
+### `POWER_PER_LEVEL`, e como ele foi descoberto
+
+O texto de **657 Megamorph** no jogo original é *"A card that increases the power of any selected
+monster by 2 levels"*, e Megamorph é o único equipamento que dá +1000/+1000 em vez de +500/+500.
+Isso fixa **1 level = 500 ATK/DEF**, e é essa conversão que decodifica sozinha as três cartas de
+maldição: 669 Shadow Spell *"decreases an opponent's in-play monsters by two levels"* (−1000), 349
+Spellbinding Circle (uma level, −500) e 655 Cursebreaker *"sets them at level 0"*.
 
 ### Consulta
 
@@ -129,15 +164,13 @@ sozinho.
 
 | Carta | Ação correta | Resultado | Ocupa zona? |
 | --- | --- | --- | --- |
-| `tipo: "armadilha"` | `play_spell_or_trap` | face-baixo na zona escolhida | sim (inalterado) |
-| `magica`/`equipamento` **sem entrada na tabela** | `play_spell_or_trap` | face-cima, inerte | sim (inalterado) |
-| `equip_buff` (10 cartas) | `equip_card` | empilhado em `MonsterZone.equips` do hospedeiro | **não** |
+| `tipo: "armadilha"` ou `"ritual"` | `play_spell_or_trap` | face-baixo/face-cima, inerte | sim (inalterado) |
+| `equip_buff` (34 cartas) | `equip_card` | empilhado em `MonsterZone.equips` do hospedeiro | **não** |
 | `terrain` (6 cartas) | `play_field_spell` | substitui `activeField` | n/a |
-| efeito imediato (9 cartas) | `activate_spell` | resolve e sai de jogo | **não** |
+| efeito imediato (27 cartas) | `activate_spell` | resolve e sai de jogo | **não** |
 
-O fallback "sem entrada na tabela ⇒ posicionamento inerte" é deliberado: mantém as outras 42
-cartas de magia/equipamento jogáveis exatamente como hoje, e é o que torna esta feature quase
-livre de regressão.
+O fallback "sem entrada na tabela ⇒ posicionamento inerte" continua existindo, mas agora só
+alcança as 10 armadilhas e as 24 cartas de ritual.
 
 ### Recusas de roteamento
 
@@ -149,6 +182,26 @@ livre de regressão.
 | `equip_card` | qualquer coisa que não seja `equip_buff` | `invalid_equip_card_type` |
 | `activate_spell` | qualquer coisa sem efeito imediato | `invalid_activation_card_type` |
 | `play_field_spell` | qualquer coisa que não seja `terrain` | `invalid_field_spell_card_type` |
+
+### Efeitos com alvo
+
+`ActivateSpellAction` carrega um `targetZone` **opcional**, exigido exatamente quando
+`requiresSpellTarget(effect)` diz que sim — hoje, só 320 Stop Defense. Opcional em vez de uma
+ação separada porque todas as outras guardas, todos os eventos e todo o caminho de consumo são
+idênticos; só a resolução lê a zona.
+
+| Cenário | Código |
+| --- | --- |
+| Efeito com alvo, sem `targetZone` | `spell_requires_target` |
+| Efeito sem alvo, com `targetZone` | `spell_target_not_allowed` |
+| `targetZone` não é zona de monstro | `spell_target_not_monster_zone` |
+| `targetZone` num lado que o efeito não alcança | `spell_target_out_of_reach` |
+| `targetZone` vazia | `spell_target_zone_empty` |
+| Alvo não está em defesa | `spell_target_not_defending` |
+
+`apps/web` refaz essas mesmas condições em `isLegalSpellTarget` para nunca oferecer uma zona que
+o motor recusaria, e o AI enumera uma jogada por zona legal — a duplicação existe porque
+`apps/web` não pode importar `@yugioh/engine` (`scripts/check-duel-engine-boundary.mjs`).
 
 ### `activate_spell` separada de `play_spell_or_trap`
 
@@ -194,7 +247,7 @@ Isso não é preferência de estilo. Quatro razões, todas verificáveis no repo
    letal encerrar o duelo na mesma transição, sem fiação extra.
 
 **Consequência a assumir:** a janela aberta por uma magia é **informativa** — publica "isto já
-aconteceu", igual ao `onSet` de uma carta posicionada. Nenhuma das 25 cartas tem mecânica de
+aconteceu", igual ao `onSet` de uma carta posicionada. Nenhuma das 67 cartas tem mecânica de
 chain/counter, então nada se perde. Quando o efeito é letal, o estado devolvido carrega `outcome`
 e `pending` ao mesmo tempo; isso é inerte, porque `apply` recusa tudo com `outcome` presente.
 
@@ -227,30 +280,53 @@ de `amount` mudaria silenciosamente para todos os consumidores existentes.
 | --- | --- |
 | destruição de monstro/magia | um `onDestroy` **por zona**, com `context: { cause: "spell", by: <numero> }` |
 | mudança de LP | `onDamage` com `{ toPlayer, amount, kind }` |
-| troca forçada de posição | `onFlip` (se estava virado) + `onPositionChange` por monstro |
+| troca forçada de posição | `onFlip` (se estava virado) + `onPositionChange`, no alvo escolhido |
+| revelação | só `onFlip`, por monstro que estava virado — a postura não muda |
 | equipar | `onSet` com `context: { target: "equip" }` |
 | trava de ataque | nenhum evento — é estado lido por `declareAttack` |
+| maldição e sua remoção | nenhum evento — é estado lido pelos provedores de combate |
 
 Um `onDestroy` por zona, e não um em lote: `duel-cues.ts` monta a cue a partir de
 `involvedZones[0]`, então um evento agregado animaria apenas uma destruição.
 
 ---
 
-## 7. Divergências do Forbidden Memories original
+## 7. A fonte normativa: o jogo original
 
-As descrições das 25 cartas foram fornecidas pelo autor do projeto e são a especificação
-normativa. Quatro delas divergem do jogo original, e a divergência é intencional:
+A regra de cada carta é o **texto do Forbidden Memories**, lido da tabela `cardinfo` de
+`sg4e/YGOFM-gamedata` (ver §1). Onde o TCG discorda, o original vence, e
+`cards-data/enriquecimento-ygoprodeck.json` carrega o texto correspondente para o quadro de carta
+concordar com o que a carta faz.
 
-| Carta | Neste projeto | No FM original |
+Foi essa troca de fonte que reverteu as quatro divergências que `spells/F01` havia registrado como
+intencionais, mais quatro números que estavam no valor do TCG:
+
+| Carta | Em F01 (texto TCG) | Agora (jogo original) |
 | --- | --- | --- |
-| 302 Sword of Dark Destruction | destrói todos os Warrior do oponente | equipamento, +500 ATK / −500 DEF em Fiend/Zombie |
-| 306 Insect Armor with Laser Cannon | tira 500 LP do oponente | equipamento, buff em Insect |
-| 320 Stop Defense | todo monstro em defesa **dos dois lados** vira ataque | um monstro do oponente vira ataque |
-| 329 Dragon Capture Jar | destrói todo Dragon **dos dois lados** | vira todos os dragões para defesa |
+| 302 Sword of Dark Destruction | destruía todos os Warrior do oponente | equipamento +500/+500 |
+| 306 Insect Armor with Laser Cannon | tirava 500 LP do oponente | equipamento +500/+500 |
+| 320 Stop Defense | todo monstro em defesa dos dois lados | **um** monstro do oponente, escolhido |
+| 329 Dragon Capture Jar | destruía todo Dragon dos dois lados | destrói os Dragon **do oponente** |
+| 304 Axe of Despair | +1000/+1000 | +500/+500 |
+| 305 Laser Cannon Armor | +0/+500 | +500/+500 |
+| 314 Horn of the Unicorn | +700/+700 | +500/+500 |
+| 342 Dian Keto the Cure Master | +1000 LP | **+5000 LP** |
 
-302 e 306 são `tipo: "equipamento"` no dataset mas têm efeito imediato aqui; por isso são roteadas
-por `activate_spell`, não por `equip_card`. O `tipo` do dataset **não** decide o roteamento — a
-tabela decide.
+A linha de queima também é bem mais baixa que a do TCG: Sparks tira 50 (não 200), Hinotama 100,
+Final Flame 200, Ookazi 500. E Soul of the Pure cura 2000 (não 800).
+
+### O `tipo` do dataset nunca decide o roteamento
+
+302 e 306 voltaram a ser equipamentos, mas isso é coincidência: o dataset não distingue 337
+Raigeki de 330 Forest — as duas são `tipo: "magica"`, `classe: "Magic"` — então a tabela é o único
+discriminador possível, e continua sendo ela quem decide.
+
+### Regra de lado
+
+Quando o texto do jogo nomeia o dono ("an opponent's Machine monsters", "all opponent Dragon
+monsters"), o efeito é `opponent`. Quando não nomeia ("Sucks up every card in play", "Eliminates
+all Zombie creatures", "reveals all monsters on the playing field"), alcança `both` — inclusive os
+monstros do próprio lançador.
 
 **Regra geral de escopo:** quando a descrição diz "todos os monstros" sem nomear o dono, o efeito
 alcança **os dois jogadores** (320, 329, 336). Só 302 e 337 dizem explicitamente "do oponente".

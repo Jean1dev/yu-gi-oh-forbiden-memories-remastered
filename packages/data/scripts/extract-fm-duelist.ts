@@ -4,7 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
 
-import { DomainError, err, ok, type CardNumber, type Result } from "@yugioh/shared";
+import { DomainError, err, ok, type Result } from "@yugioh/shared";
 
 import {
   DuelistSourceSchema,
@@ -12,16 +12,12 @@ import {
   type DuelistPoolEntry,
   type DuelistSource,
 } from "../src/roster/duelist-source.ts";
+import { ensureDatabase, toCardNumber } from "./fm-gamedata-database.ts";
 
 /**
  * Pulls one duelist's weighted pools out of the original game's data and
- * writes `data/duelists/<id>.json`.
- *
- * The upstream source is `sg4e/YGOFM-gamedata`, a datamine verified against
- * emulator memory dumps, distributed as a single SQLite file. Node 24 reads it
- * with the built-in `node:sqlite`, so this adds no dependency. The database is
- * cached under `.cache/` (gitignored) — extraction is a rare, manual step, and
- * re-downloading 868 KB per duelist would be rude to a volunteer project.
+ * writes `data/duelists/<id>.json`. The source database and its cache are
+ * handled by `fm-gamedata-database.ts`.
  *
  * Only the pools are extracted. `difficulty`, `portrait`, `profile` and
  * `deckSeed` are balancing decisions this project makes, so a re-extraction
@@ -33,11 +29,7 @@ import {
  */
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const CACHE_DIR = join(PACKAGE_ROOT, ".cache");
-const DATABASE_FILE = join(CACHE_DIR, "fm-sqlite3.db");
 const DUELISTS_DIR = join(PACKAGE_ROOT, "data", "duelists");
-const DATABASE_URL =
-  "https://raw.githubusercontent.com/sg4e/YGOFM-gamedata/master/sqlite/fm-sqlite3.db";
 
 /** The original game's pool types, mapped to the drop tiers the roster speaks. */
 const DROP_POOL_TIERS: ReadonlyArray<readonly [poolType: string, tier: string]> = [
@@ -52,43 +44,6 @@ const DECK_POOL_TYPE = "Deck";
 const DEFAULT_DECK_SEED = 20260805;
 
 type DuelistRow = Readonly<{ DuelistId: number; Duelist: string; HandSize: number }>;
-
-function toCardNumber(cardId: number): CardNumber {
-  return String(cardId).padStart(3, "0");
-}
-
-async function ensureDatabase(): Promise<Result<string, DomainError>> {
-  try {
-    await readFile(DATABASE_FILE);
-    return ok(DATABASE_FILE);
-  } catch {
-    // Not cached yet — fall through to the download.
-  }
-
-  try {
-    const response = await fetch(DATABASE_URL);
-    if (!response.ok) {
-      return err(
-        new DomainError(
-          "Could not download the Forbidden Memories database.",
-          "source_unavailable",
-          {
-            status: response.status,
-          },
-        ),
-      );
-    }
-    await mkdir(CACHE_DIR, { recursive: true });
-    await writeFile(DATABASE_FILE, Buffer.from(await response.arrayBuffer()));
-    return ok(DATABASE_FILE);
-  } catch (error) {
-    return err(
-      new DomainError("Could not download the Forbidden Memories database.", "source_unavailable", {
-        error: String(error),
-      }),
-    );
-  }
-}
 
 function findDuelist(
   database: DatabaseSync,
