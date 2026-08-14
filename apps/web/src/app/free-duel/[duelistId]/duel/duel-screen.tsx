@@ -234,11 +234,16 @@ export function DuelScreen({
   });
   const selectedIndex = selectedHandIndex(interaction.intent);
   const previewCard = selectedCard(activeState, interaction.intent);
-  const messageText = duel.lastRefusal
-    ? getRefusalMessage(duel.lastRefusal)
-    : session.status === "in_progress" && !isPlayerTurn
-      ? DUEL_SCREEN_MESSAGES.opponentTurn
-      : null;
+  // The trap announcement outranks the refusal and the "vez do oponente" idle
+  // line: it is the only moment the fired card is nameable at all, and it lasts
+  // one cue.
+  const messageText = cues.revealedCardName
+    ? DUEL_SCREEN_MESSAGES.trapActivated(cues.revealedCardName)
+    : duel.lastRefusal
+      ? getRefusalMessage(duel.lastRefusal)
+      : session.status === "in_progress" && !isPlayerTurn
+        ? DUEL_SCREEN_MESSAGES.opponentTurn
+        : null;
 
   useAutoAdvancePhase({
     phase: session.status === "in_progress" ? session.state.phase : null,
@@ -388,7 +393,10 @@ export function DuelScreen({
         onInspect={setInspectedCard}
       >
         <div className={styles.handBar}>
-          <DuelMessage text={messageText} tone={duel.lastRefusal ? "refusal" : "info"} />
+          <DuelMessage
+            text={messageText}
+            tone={duel.lastRefusal && !cues.revealedCardName ? "refusal" : "info"}
+          />
           {inProgress ? (
             <>
               <DuelPrompt

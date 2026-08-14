@@ -78,8 +78,14 @@ describe("additive composition (motor-duelo-1x1/F04, critério de aceite 1)", ()
           const result = calculateEffectiveAtkDef(monster, context, providers);
 
           expect(result).toEqual({
-            atk: (monster.atk ?? 0) + guardianDelta.atk + terrainDelta.atk + equipmentDelta.atk,
-            def: (monster.def ?? 0) + guardianDelta.def + terrainDelta.def + equipmentDelta.def,
+            atk: Math.max(
+              0,
+              (monster.atk ?? 0) + guardianDelta.atk + terrainDelta.atk + equipmentDelta.atk,
+            ),
+            def: Math.max(
+              0,
+              (monster.def ?? 0) + guardianDelta.def + terrainDelta.def + equipmentDelta.def,
+            ),
           });
         },
       ),

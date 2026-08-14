@@ -1,4 +1,4 @@
-import type { Card, MonsterZone } from "@yugioh/shared";
+import type { Card, EquipAttachment, MonsterZone } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 
 import { cursePenalty, sumEquipBonuses, zoneCombatProviders } from "./equip-bonus.ts";
@@ -26,6 +26,11 @@ function equip(numero: string, nome: string): Card {
   return makeCard({ numero, nome, classe: "Equip", atk: null, def: null, tipo: "equipamento" });
 }
 
+/** The default attachment: `sumEquipBonuses` takes polarity, never a bare card. */
+function attached(...cards: readonly Card[]): readonly EquipAttachment[] {
+  return cards.map((card) => ({ card, polarity: "normal" }));
+}
+
 const legendarySword = equip("301", "Legendary Sword");
 const darkEnergy = equip("303", "Dark Energy");
 const bookOfSecretArts = equip("323", "Book of Secret Arts");
@@ -40,36 +45,44 @@ const harpieLady = makeCard({ numero: "062", nome: "Harpie Lady", classe: "Winge
 
 describe("sumEquipBonuses", () => {
   it("soma +500/+500 num hospedeiro que o jogo original aceita", () => {
-    expect(sumEquipBonuses(swampBattleguard, [legendarySword])).toEqual({ atk: 500, def: 500 });
-    expect(sumEquipBonuses(blueEyes, [dragonTreasure])).toEqual({ atk: 500, def: 500 });
+    expect(sumEquipBonuses(swampBattleguard, attached(legendarySword))).toEqual({ atk: 500, def: 500 });
+    expect(sumEquipBonuses(blueEyes, attached(dragonTreasure))).toEqual({ atk: 500, def: 500 });
   });
 
   it("Megamorph dobra, e aceita qualquer monstro", () => {
     for (const host of [blueEyes, swampBattleguard, mysticalElf, harpieLady]) {
-      expect(sumEquipBonuses(host, [megamorph])).toEqual({ atk: 1000, def: 1000 });
+      expect(sumEquipBonuses(host, attached(megamorph))).toEqual({ atk: 1000, def: 1000 });
     }
   });
 
   it("nao soma nada num hospedeiro fora da lista, e a jogada continua valida", () => {
-    expect(sumEquipBonuses(blueEyes, [legendarySword])).toEqual({ atk: 0, def: 0 });
-    expect(sumEquipBonuses(mysticalElf, [darkEnergy])).toEqual({ atk: 0, def: 0 });
+    expect(sumEquipBonuses(blueEyes, attached(legendarySword))).toEqual({ atk: 0, def: 0 });
+    expect(sumEquipBonuses(mysticalElf, attached(darkEnergy))).toEqual({ atk: 0, def: 0 });
   });
 
   it("a compatibilidade nao segue a classe: Harpie Lady e Winged Beast e aceita Book of Secret Arts", () => {
-    expect(sumEquipBonuses(harpieLady, [bookOfSecretArts])).toEqual({ atk: 500, def: 500 });
+    expect(sumEquipBonuses(harpieLady, attached(bookOfSecretArts))).toEqual({ atk: 500, def: 500 });
     // E Blue-eyes, que tampouco e Spellcaster, nao aceita.
-    expect(sumEquipBonuses(blueEyes, [bookOfSecretArts])).toEqual({ atk: 0, def: 0 });
+    expect(sumEquipBonuses(blueEyes, attached(bookOfSecretArts))).toEqual({ atk: 0, def: 0 });
   });
 
+  it("subtracts a reversed equip and keeps the canonical card unchanged", () => {
+    const host = { ...swampBattleguard, atk: 300, def: 200 };
+    expect(sumEquipBonuses(host, [{ card: megamorph, polarity: "reversed" }])).toEqual({
+      atk: -1000,
+      def: -1000,
+    });
+    expect(host).toMatchObject({ atk: 300, def: 200 });
+  });
   it("dois equipamentos no mesmo monstro acumulam os bonus", () => {
-    expect(sumEquipBonuses(blueEyes, [dragonTreasure, megamorph])).toEqual({
+    expect(sumEquipBonuses(blueEyes, attached(dragonTreasure, megamorph))).toEqual({
       atk: 1500,
       def: 1500,
     });
   });
 
   it("soma so os elegiveis quando um dos equipamentos nao aceita o hospedeiro", () => {
-    expect(sumEquipBonuses(blueEyes, [legendarySword, dragonTreasure, megamorph])).toEqual({
+    expect(sumEquipBonuses(blueEyes, attached(legendarySword, dragonTreasure, megamorph))).toEqual({
       atk: 1500,
       def: 1500,
     });
@@ -82,11 +95,11 @@ describe("sumEquipBonuses", () => {
   it("ignora uma carta anexada que nao seja um equipamento de buff", () => {
     const raigeki = makeCard({ numero: "337", nome: "Raigeki", classe: "Magic", tipo: "magica" });
     const trap = makeCard({ numero: "683", nome: "Bear Trap", classe: "Trap", tipo: "armadilha" });
-    expect(sumEquipBonuses(swampBattleguard, [raigeki, trap])).toEqual({ atk: 0, def: 0 });
+    expect(sumEquipBonuses(swampBattleguard, attached(raigeki, trap))).toEqual({ atk: 0, def: 0 });
   });
 
   it("nao altera o hospedeiro nem a lista de equipamentos", () => {
-    const equips = [legendarySword];
+    const equips = attached(legendarySword);
     const snapshot = JSON.parse(JSON.stringify({ swampBattleguard, equips })) as unknown;
 
     sumEquipBonuses(swampBattleguard, equips);
@@ -119,7 +132,7 @@ describe("zoneCombatProviders", () => {
       position: "attack_face_up",
       hasAttacked: false,
       hasChangedPosition: false,
-      equips,
+      equips: equips.map((card) => ({ card, polarity: "normal" })),
       ...(curseLevels === undefined ? {} : { curseLevels }),
     };
   }
@@ -145,7 +158,8 @@ describe("zoneCombatProviders", () => {
     expect(providers.equipment(swampBattleguard)).toEqual({ atk: -500, def: -500 });
   });
 
-  it("a maldicao sozinha derruba o monstro sem piso", () => {
+  // O piso em 0 e de `calculateEffectiveAtkDef`; o provider devolve o delta cru.
+  it("a maldicao sozinha devolve um delta negativo, sem piso", () => {
     const providers = zoneCombatProviders(occupiedZone(swampBattleguard, [], 3));
 
     expect(providers.equipment(swampBattleguard)).toEqual({ atk: -1500, def: -1500 });

@@ -126,6 +126,12 @@
     animation: zone-place 300ms ease-out;
   }
 
+  /* The trap's slot is already empty here, so the pulse only says "from this
+     zone" — the card's name comes from the announcement above the hand. */
+  .button[data-cue="reveal"] {
+    animation: zone-reveal 900ms ease-out;
+  }
+
   .button[data-cue="attack"] {
     animation: zone-attack 450ms steps(3, end);
   }
@@ -142,6 +148,18 @@
 
   to {
     transform: scale(1);
+  }
+}
+
+@keyframes zone-reveal {
+  0%,
+  100% {
+    filter: none;
+  }
+
+  25%,
+  75% {
+    filter: brightness(1.8);
   }
 }
 

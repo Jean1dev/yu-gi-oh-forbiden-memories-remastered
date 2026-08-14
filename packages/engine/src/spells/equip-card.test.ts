@@ -108,6 +108,44 @@ function stateWithEquipInHand(equip: Card = legendarySword(), host: MonsterZone 
 }
 
 describe("equipCard — success", () => {
+  it("consumes Reverse Trap and attaches only the triggering equip as reversed", () => {
+    const equip = legendarySword();
+    const reverseTrap = makeCard({
+      numero: "689",
+      nome: "Reverse Trap",
+      classe: "Trap",
+      atk: null,
+      def: null,
+      tipo: "armadilha",
+    });
+    const opponentField: PlayerField = {
+      ...emptyField(),
+      spells: [
+        { occupied: true, card: reverseTrap, faceUp: false },
+        emptySpellZone,
+        emptySpellZone,
+        emptySpellZone,
+        emptySpellZone,
+      ],
+    };
+    const state = makeState({
+      players: {
+        P1: makePlayer({ hand: [equip], field: fieldWithMonster() }),
+        P2: makePlayer({ field: opponentField }),
+      },
+    });
+
+    const result = equipCard(state, { type: "equip_card", handIndex: 0, targetZone: ownMonster });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const zone = result.value.state.players.P1.field.monsters[0];
+    if (!zone.occupied) throw new Error("expected an occupied zone");
+    expect(zone.equips).toEqual([{ card: equip, polarity: "reversed" }]);
+    expect(result.value.state.players.P2.field.spells[0]).toEqual({ occupied: false });
+    expect(result.value.events.map(({ type }) => type)).toEqual(["onSet", "onFlip", "onDestroy"]);
+  });
+
   it("anexa o equipamento ao monstro escolhido e remove a carta da mao", () => {
     const equip = legendarySword();
     const state = stateWithEquipInHand(equip);
@@ -119,7 +157,7 @@ describe("equipCard — success", () => {
 
     const zone = result.value.state.players.P1.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([equip]);
+    expect(zone.equips).toEqual([{ card: equip, polarity: "normal" }]);
     expect(result.value.state.players.P1.hand).toEqual([]);
   });
 
@@ -174,7 +212,10 @@ describe("equipCard — success", () => {
       def: null,
       tipo: "equipamento",
     });
-    const state = stateWithEquipInHand(second, occupiedZone({ equips: [first] }));
+    const state = stateWithEquipInHand(
+      second,
+      occupiedZone({ equips: [{ card: first, polarity: "normal" }] }),
+    );
 
     const result = equipCard(state, { type: "equip_card", handIndex: 0, targetZone: ownMonster });
 
@@ -182,7 +223,10 @@ describe("equipCard — success", () => {
     if (!result.ok) return;
     const zone = result.value.state.players.P1.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([first, second]);
+    expect(zone.equips).toEqual([
+      { card: first, polarity: "normal" },
+      { card: second, polarity: "normal" },
+    ]);
   });
 
   it("aceita equipar um hospedeiro que nao satisfaz a restricao de classe", () => {

@@ -50,10 +50,11 @@ navegador) e expandidos uma vez na carga do módulo para `Set`.
 **Ação:** `equip_card { handIndex, targetZone }`. O jogador ativo escolhe **um monstro seu** já em
 campo. Consome a jogada da mão do turno.
 
-**Anexação:** a carta é removida da mão e empilhada em `MonsterZone.equips` do hospedeiro. Ela
+**Anexação:** a carta é removida da mão e empilhada em `MonsterZone.equips` como um anexo de
+polaridade `normal` (ou `reversed` quando 689 Reverse Trap dispara). Ela
 **não ocupa zona de magia** — equipamentos vivem no monstro, não na fileira de trás.
 
-**Bônus derivado, nunca armazenado.** O `equips` guarda as cartas; o delta é recalculado a cada
+**Bônus derivado, nunca armazenado.** O `equips` guarda carta + polaridade; o delta é recalculado a cada
 `resolveAttack` a partir da entrada da tabela e da lista de compatibilidade. O `atk`/`def` base da
 carta nunca é sobrescrito (`docs/arquitetura.md` §3.1).
 
@@ -63,7 +64,8 @@ equipamento não é removido. O jogo original recusa a jogada; aqui ela passa co
 modelar como recusa exigiria que a UI conhecesse a lista antes de deixar o jogador escolher — uma
 decisão consciente, registrada aqui para não ser "consertada" por engano.
 
-**Acúmulo:** vários equipamentos no mesmo monstro somam, sem teto. `Math.max` nenhum —
+**Acúmulo:** vários equipamentos no mesmo monstro somam com sua polaridade. O resultado efetivo
+tem piso zero desde `traps/F01`; não há teto —
 `calculateEffectiveAtkDef` não faz clamp (`motor-duelo-1x1/F04` spec Decisão 7).
 
 **Destruição:** quando o hospedeiro sai do campo (combate, 336, 337, 329, 653…), a zona vira

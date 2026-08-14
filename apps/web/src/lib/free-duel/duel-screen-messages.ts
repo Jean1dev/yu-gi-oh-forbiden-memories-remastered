@@ -28,6 +28,7 @@ export const DUEL_SCREEN_MESSAGES = {
   phase: "Fase",
   turn: "Turno",
   opponentTurn: "Vez do oponente...",
+  trapActivated: (cardName: string) => `Armadilha ativada: ${cardName}!`,
   chooseZone: "Escolha uma zona para a magia/armadilha.",
   choosePosition: "Escolha a posicao.",
   chooseEquipTarget: "Escolha um monstro para equipar.",

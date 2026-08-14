@@ -56,6 +56,12 @@ const warriorElimination = magic("653", "Warrior Elimination");
 const cursebreaker = magic("655", "Cursebreaker");
 const crushCard = magic("661", "Crush Card");
 const featherDuster = magic("672", "Harpie's Feather Duster");
+const goblinFan = makeCard({ numero: "687", nome: "Goblin Fan", tipo: "armadilha" });
+const badReaction = makeCard({
+  numero: "688",
+  nome: "Bad Reaction to Simochi",
+  tipo: "armadilha",
+});
 const shadowSpell = magic("669", "Shadow Spell");
 const spellbindingCircle = magic("349", "Spellbinding Circle");
 
@@ -66,7 +72,14 @@ function monsterZone(
   card: Card,
   position: MonsterPosition = "attack_face_up",
 ): Extract<MonsterZone, { occupied: true }> {
-  return { occupied: true, card, position, hasAttacked: false, hasChangedPosition: false, equips: [] };
+  return {
+    occupied: true,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
 }
 
 function emptyField(): PlayerField {
@@ -94,6 +107,20 @@ function fieldWithSpells(cards: readonly Card[]): PlayerField {
     return card === undefined ? emptySpellZone : { occupied: true as const, card, faceUp: true };
   });
   return { ...emptyField(), spells: spells as unknown as PlayerField["spells"] };
+}
+
+function fieldWithTrap(card: Card): PlayerField {
+  const field = emptyField();
+  return {
+    ...field,
+    spells: [
+      { occupied: true, card, faceUp: false },
+      emptySpellZone,
+      emptySpellZone,
+      emptySpellZone,
+      emptySpellZone,
+    ],
+  };
 }
 
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
@@ -277,7 +304,13 @@ describe("activateSpell — destruicao de monstros", () => {
 
 describe("activateSpell — remocao de magias", () => {
   it("Harpie's Feather Duster limpa as cinco zonas de magia do oponente e nenhuma do lancador", () => {
-    const trap = makeCard({ numero: "700", classe: "Trap", tipo: "armadilha", atk: null, def: null });
+    const trap = makeCard({
+      numero: "700",
+      classe: "Trap",
+      tipo: "armadilha",
+      atk: null,
+      def: null,
+    });
     const state = makeState({
       players: {
         P1: makePlayer({ field: fieldWithSpells([trap]) }),
@@ -292,7 +325,10 @@ describe("activateSpell — remocao de magias", () => {
   });
 
   it("nao afeta o terreno ativo nem os equipamentos anexados a monstros", () => {
-    const equippedZone: MonsterZone = { ...monsterZone(warrior), equips: [swordOfDarkDestruction] };
+    const equippedZone: MonsterZone = {
+      ...monsterZone(warrior),
+      equips: [{ card: swordOfDarkDestruction, polarity: "normal" }],
+    };
     const state = makeState({
       activeField: magic("334", "Umi"),
       players: {
@@ -306,11 +342,45 @@ describe("activateSpell — remocao de magias", () => {
     expect(next.activeField?.numero).toBe("334");
     const zone = next.players.P2.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([swordOfDarkDestruction]);
+    expect(zone.equips).toEqual([{ card: swordOfDarkDestruction, polarity: "normal" }]);
   });
 });
 
 describe("activateSpell — life points", () => {
+  it("Goblin Fan reflete dano de efeito ao lancador", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithTrap(goblinFan) }),
+      },
+    });
+
+    const { state: next, events } = activate(ookazi, state);
+
+    expect(next.players.P1.lp).toBe(7500);
+    expect(next.players.P2.lp).toBe(8000);
+    expect(next.players.P2.field.spells[0]).toEqual({ occupied: false });
+    expect(events.map((event) => event.type)).toEqual(["onSet", "onFlip", "onDestroy", "onDamage"]);
+  });
+
+  it("Bad Reaction converte cura do oponente em dano", () => {
+    const state = makeState({
+      players: {
+        P1: makePlayer(),
+        P2: makePlayer({ field: fieldWithTrap(badReaction) }),
+      },
+    });
+
+    const { state: next, events } = activate(dianKeto, state);
+
+    expect(next.players.P1.lp).toBe(3000);
+    expect(next.players.P2.lp).toBe(8000);
+    expect(events.at(-1)).toMatchObject({
+      type: "onDamage",
+      context: { toPlayer: "P1", amount: 5000, kind: "effect_damage" },
+    });
+  });
+
   it("Ookazi tira 500 LP do oponente", () => {
     const { state: next, events } = activate(ookazi, makeState());
 

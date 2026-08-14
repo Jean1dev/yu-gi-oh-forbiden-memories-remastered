@@ -7,6 +7,7 @@ import {
   spellPlayMode,
   type ActivateSpellAction,
   type ApplyResult,
+  type DuelEvent,
   type DuelState,
   type PlayerId,
   type Result,
@@ -16,6 +17,11 @@ import {
 
 import { createEvent, openReactionWindow } from "../events/index.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
+import { consumeMatchingTrap } from "../traps/index.ts";
+import {
+  firstLifePointsAtom,
+  rewriteFirstLifePointsAtom,
+} from "./effects/life-points-atom.ts";
 import { playersForSide } from "./effects/players-for-side.ts";
 import { resolveOneShotEffect } from "./effects/resolve-one-shot.ts";
 import { getOpponent } from "./opponent.ts";
@@ -144,10 +150,37 @@ export function activateSpell(
     },
   };
 
+  let stateBeforeResolution = consumedState;
+  let effectToResolve: SpellEffect = effect;
+  const trapEvents: DuelEvent[] = [];
+  const lifePoints = firstLifePointsAtom(effect);
+  if (lifePoints !== undefined) {
+    const trapOwner = getOpponent(state.activePlayer);
+    const consumedTrap = consumeMatchingTrap(
+      consumedState,
+      trapOwner,
+      (trapEffect) =>
+        (trapEffect.type === "reflect_effect_damage" &&
+          lifePoints.delta < 0 &&
+          lifePoints.side === "opponent") ||
+        (trapEffect.type === "invert_effect_heal" &&
+          lifePoints.delta > 0 &&
+          lifePoints.side === "caster"),
+    );
+    if (consumedTrap !== undefined) {
+      const reflects = consumedTrap.effect.type === "reflect_effect_damage";
+      stateBeforeResolution = consumedTrap.state;
+      trapEvents.push(...consumedTrap.events);
+      effectToResolve = rewriteFirstLifePointsAtom(effect, (atom) =>
+        reflects ? { ...atom, side: "caster" } : { ...atom, delta: -atom.delta },
+      );
+    }
+  }
+
   const resolved = resolveOneShotEffect(
-    consumedState,
+    stateBeforeResolution,
     card,
-    effect,
+    effectToResolve,
     state.activePlayer,
     action.targetZone,
   );
@@ -169,5 +202,5 @@ export function activateSpell(
     throw new Error("Unreachable: apply already guaranteed no reaction window is open.");
   }
 
-  return ok({ state: opened.value, events: [activation, ...resolved.events] });
+  return ok({ state: opened.value, events: [activation, ...trapEvents, ...resolved.events] });
 }

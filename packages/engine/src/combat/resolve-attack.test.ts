@@ -30,6 +30,10 @@ function makeCard(overrides: Partial<Card> = {}): Card {
   };
 }
 
+function makeTrap(numero: string): Card {
+  return makeCard({ id: Number(numero), numero, nome: `Trap ${numero}`, tipo: "armadilha" });
+}
+
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
 function occupiedZone(card: Card, position: MonsterPosition): MonsterZone {
@@ -75,6 +79,14 @@ function fieldWithMonster(card: Card, position: MonsterPosition): PlayerField {
   };
 }
 
+function fieldWithTrap(card: Card, zoneIndex = 0): PlayerField {
+  const field = emptyField();
+  const spells = field.spells.map((zone, index) =>
+    index === zoneIndex ? { occupied: true as const, card, faceUp: false } : zone,
+  ) as unknown as PlayerField["spells"];
+  return { ...field, spells };
+}
+
 function makePlayer(overrides: Partial<PlayerState> = {}): PlayerState {
   return { lp: 8000, hand: [], deck: [], field: emptyField(), handPlayUsed: false, ...overrides };
 }
@@ -104,6 +116,88 @@ function declaredState(state: DuelState, targetZoneIndex?: 0 | 1 | 2 | 3 | 4): D
 }
 
 describe("resolveAttack", () => {
+  it.each([
+    ["681", 500],
+    ["682", 1000],
+    ["683", 1500],
+    ["684", 2000],
+    ["685", 3000],
+    ["686", 4000],
+  ])("ativa a trap %s no limite de ATK efetivo", (trapNumber, atk) => {
+    const attacker = makeCard({ atk });
+    const trapField = fieldWithTrap(makeTrap(trapNumber));
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(attacker, "attack_face_up") }),
+          P2: makePlayer({ field: trapField }),
+        },
+      }),
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.players.P1.field.monsters[0]).toEqual({ occupied: false });
+      expect(result.value.state.players.P2.field.spells[0]).toEqual({ occupied: false });
+      expect(result.value.events.map((event) => event.type)).toEqual([
+        "onFlip",
+        "onDestroy",
+        "onDestroy",
+      ]);
+      expect(result.value.state.players.P2.lp).toBe(8000);
+    }
+  });
+
+  it.each([
+    ["681", 501],
+    ["682", 1001],
+    ["683", 1501],
+    ["684", 2001],
+    ["685", 3001],
+  ])("nao ativa a trap %s acima do limite", (trapNumber, atk) => {
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(makeCard({ atk }), "attack_face_up") }),
+          P2: makePlayer({ field: fieldWithTrap(makeTrap(trapNumber)) }),
+        },
+      }),
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.players.P1.field.monsters[0].occupied).toBe(true);
+      expect(result.value.state.players.P2.field.spells[0].occupied).toBe(true);
+    }
+  });
+
+  it("usa o primeiro indice compativel e ignora uma trap anterior incompativel", () => {
+    const field = fieldWithTrap(makeTrap("681"), 0);
+    const spells = field.spells.map((zone, index) =>
+      index === 1 ? { occupied: true as const, card: makeTrap("683"), faceUp: false } : zone,
+    ) as unknown as PlayerField["spells"];
+    const declared = declaredState(
+      makeState({
+        players: {
+          P1: makePlayer({ field: fieldWithMonster(makeCard({ atk: 1200 }), "attack_face_up") }),
+          P2: makePlayer({ field: { ...field, spells } }),
+        },
+      }),
+    );
+
+    const result = resolveAttack(declared);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.state.players.P2.field.spells[0].occupied).toBe(true);
+      expect(result.value.state.players.P2.field.spells[1]).toEqual({ occupied: false });
+    }
+  });
+
   it("revela um defensor face-baixo antes de resolver e emite onFlip", () => {
     const attacker = makeCard({ numero: "001", atk: 1500 });
     const defender = makeCard({ numero: "002", atk: 1000, def: 800 });
@@ -353,7 +447,13 @@ describe("resolveAttack — bonus de equipamento", () => {
     const base = fieldWithMonster(card, position);
     const [zone, ...rest] = base.monsters;
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    return { ...base, monsters: [{ ...zone, equips }, ...rest] as PlayerField["monsters"] };
+    return {
+      ...base,
+      monsters: [
+        { ...zone, equips: equips.map((card) => ({ card, polarity: "normal" as const })) },
+        ...rest,
+      ] as PlayerField["monsters"],
+    };
   }
 
   it("o equipamento do atacante decide um combate que o ATK base perderia", () => {
@@ -472,7 +572,7 @@ describe("resolveAttack — bonus de equipamento", () => {
     if (!result.ok) return;
     const zone = result.value.state.players.P1.field.monsters[0];
     if (!zone.occupied) throw new Error("expected an occupied zone");
-    expect(zone.equips).toEqual([legendarySword]);
+    expect(zone.equips).toEqual([{ card: legendarySword, polarity: "normal" }]);
     expect(zone.card.atk).toBe(1200);
   });
 });

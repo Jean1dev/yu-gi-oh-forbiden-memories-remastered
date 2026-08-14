@@ -35,7 +35,14 @@ function makeCard(overrides: Partial<Card> = {}): Card {
 const emptyMonsterZone: MonsterZone = { occupied: false };
 
 function occupiedZone(card: Card, position: MonsterPosition): MonsterZone {
-  return { occupied: true, card, position, hasAttacked: false, hasChangedPosition: false, equips: [] };
+  return {
+    occupied: true,
+    card,
+    position,
+    hasAttacked: false,
+    hasChangedPosition: false,
+    equips: [],
+  };
 }
 
 function emptyField(): PlayerField {
@@ -376,23 +383,44 @@ describe("accumulateStats — neutral cases", () => {
 
     const accumulated = accumulateStats(
       state,
-      { type: "equip_card", handIndex: 0, targetZone: { player: "P1", zoneType: "monster", index: 0 } },
+      {
+        type: "equip_card",
+        handIndex: 0,
+        targetZone: { player: "P1", zoneType: "monster", index: 0 },
+      },
       result,
     );
 
     expect(accumulated.events).toBe(result.events);
   });
 
-  it("never leaves triggeredTraps above zero", () => {
-    const trap = makeCard({ numero: "300", tipo: "armadilha", classe: "Magic" });
-    const state = makeState({ players: { P1: makePlayer({ hand: [trap] }), P2: makePlayer() } });
+  it("counts a trap activation in addition to the action counter", () => {
+    const state = makeState();
+    const result: ApplyResult = {
+      state,
+      events: [
+        {
+          type: "onFlip",
+          originPlayer: "P2",
+          involvedCards: [],
+          involvedZones: [{ player: "P2", zoneType: "spell", index: 0 }],
+          context: { cause: "trap_activation" },
+        },
+      ],
+    };
 
-    const stats = statsAfter(state, { type: "play_spell_or_trap", handIndex: 0, zoneIndex: 0 });
+    const accumulated = accumulateStats(
+      state,
+      {
+        type: "equip_card",
+        handIndex: 0,
+        targetZone: { player: "P1", zoneType: "monster", index: 0 },
+      },
+      result,
+    );
 
-    // The engine has no trap activation; setting one is a face-down play, not
-    // a triggered trap (spec Decision 6).
-    expect(stats.P1.triggeredTraps).toBe(0);
-    expect(stats.P2.triggeredTraps).toBe(0);
+    expect(accumulated.state.stats.P1.equips).toBe(1);
+    expect(accumulated.state.stats.P2.triggeredTraps).toBe(1);
   });
 
   it("does not count a complete_fusion with no pending fusion on the previous state", () => {

@@ -50,7 +50,7 @@ Incluído: as 67 cartas `magica`/`equipamento`, a ação de equipar, a ação de
 efeito imediato (com ou sem alvo), e o filtro que restringe `play_field_spell` aos seis terrenos
 reais.
 
-Fora de escopo: armadilhas (nenhuma das 10 tem efeito), as 24 cartas de ritual, fusões, Guardian
+Fora de escopo desta documentação: armadilhas (implementadas em `docs/traps/`), as 24 cartas de ritual, fusões, Guardian
 Stars, e a matriz terreno×classe (ver [`terrains.md`](./terrains.md)).
 
 ---

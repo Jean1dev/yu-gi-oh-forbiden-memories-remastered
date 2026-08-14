@@ -42,23 +42,25 @@ const monsterPositions: readonly MonsterPosition[] = [
   "defense_face_down",
 ];
 
-const cardArbitrary = fc.record({
-  id: fc.integer({ min: 1, max: 999999 }),
-  numero: fc.integer({ min: 1, max: 999 }).map((n) => String(n).padStart(3, "0")),
-  nome: fc.string({ minLength: 1, maxLength: 20 }),
-  img: fc.constant(null),
-  classe: fc.string({ minLength: 1, maxLength: 20 }),
-  atk: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
-  def: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
-  guardiao1: fc.option(fc.constantFrom(...GUARDIAN_STARS), { nil: null }),
-  guardiao2: fc.option(fc.constantFrom(...GUARDIAN_STARS), { nil: null }),
-  password: fc.constant(null),
-  estrelas: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
-  tipo: fc.constantFrom(...CARD_TYPES),
-  atributo: fc.option(fc.constantFrom(...CARD_ATTRIBUTES), { nil: null }),
-  nivel: fc.option(fc.integer({ min: MIN_MONSTER_LEVEL, max: MAX_MONSTER_LEVEL }), { nil: null }),
-  descricao: fc.option(fc.string({ minLength: 1, maxLength: 40 }), { nil: null }),
-}).map((card) => (card.tipo === "monstro" ? card : { ...card, nivel: null }));
+const cardArbitrary = fc
+  .record({
+    id: fc.integer({ min: 1, max: 999999 }),
+    numero: fc.integer({ min: 1, max: 999 }).map((n) => String(n).padStart(3, "0")),
+    nome: fc.string({ minLength: 1, maxLength: 20 }),
+    img: fc.constant(null),
+    classe: fc.string({ minLength: 1, maxLength: 20 }),
+    atk: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
+    def: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
+    guardiao1: fc.option(fc.constantFrom(...GUARDIAN_STARS), { nil: null }),
+    guardiao2: fc.option(fc.constantFrom(...GUARDIAN_STARS), { nil: null }),
+    password: fc.constant(null),
+    estrelas: fc.option(fc.integer({ min: 0, max: 999999 }), { nil: null }),
+    tipo: fc.constantFrom(...CARD_TYPES),
+    atributo: fc.option(fc.constantFrom(...CARD_ATTRIBUTES), { nil: null }),
+    nivel: fc.option(fc.integer({ min: MIN_MONSTER_LEVEL, max: MAX_MONSTER_LEVEL }), { nil: null }),
+    descricao: fc.option(fc.string({ minLength: 1, maxLength: 40 }), { nil: null }),
+  })
+  .map((card) => (card.tipo === "monstro" ? card : { ...card, nivel: null }));
 
 const emptyMonsterZone: MonsterZone = { occupied: false };
 const emptySpellZone: SpellZone = { occupied: false };
@@ -71,7 +73,10 @@ const monsterZoneArbitrary = fc.oneof(
     position: fc.constantFrom(...monsterPositions),
     hasAttacked: fc.boolean(),
     hasChangedPosition: fc.boolean(),
-    equips: fc.array(cardArbitrary, { maxLength: 2 }),
+    equips: fc.array(
+      fc.record({ card: cardArbitrary, polarity: fc.constantFrom("normal", "reversed") }),
+      { maxLength: 2 },
+    ),
   }),
 );
 

@@ -33,6 +33,12 @@ export const MonsterPositionSchema = z.enum([
   "defense_face_down",
 ]);
 
+export const EquipPolaritySchema = z.enum(["normal", "reversed"]);
+export const EquipAttachmentSchema = z.strictObject({
+  card: CardSchema,
+  polarity: EquipPolaritySchema,
+});
+
 export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
   z.strictObject({ occupied: z.literal(false) }),
   z.strictObject({
@@ -41,7 +47,7 @@ export const MonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
-    equips: z.array(CardSchema),
+    equips: z.array(EquipAttachmentSchema),
     /** Absent means uncursed; `0` is the same thing and stays representable. */
     curseLevels: z.number().int().min(0).optional(),
   }),
@@ -252,7 +258,7 @@ export const PublicMonsterZoneSchema = z.discriminatedUnion("occupied", [
     position: MonsterPositionSchema,
     hasAttacked: z.boolean(),
     hasChangedPosition: z.boolean(),
-    equips: z.array(CardSchema),
+    equips: z.array(EquipAttachmentSchema),
     /** Public: the opponent can read a curse off the field, same as an equip. */
     curseLevels: z.number().int().min(0).optional(),
   }),

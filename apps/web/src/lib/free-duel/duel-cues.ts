@@ -5,6 +5,7 @@ export const MAX_CUE_QUEUE = 24;
 export type DuelCue =
   | Readonly<{ kind: "draw"; player: PlayerId }>
   | Readonly<{ kind: "place"; zone: ZoneReference }>
+  | Readonly<{ kind: "reveal"; zone: ZoneReference; cardName: string }>
   | Readonly<{ kind: "attack"; zone: ZoneReference; target?: ZoneReference | undefined }>
   | Readonly<{ kind: "damage"; player: PlayerId; amount: number }>
   | Readonly<{ kind: "destroy"; zone: ZoneReference }>;
@@ -12,6 +13,7 @@ export type DuelCue =
 export const CUE_DURATIONS_MS: Readonly<Record<DuelCue["kind"], number>> = {
   draw: 250,
   place: 300,
+  reveal: 900,
   attack: 450,
   damage: 400,
   destroy: 300,
@@ -33,7 +35,16 @@ function cueFromEvent(event: DuelEvent): DuelCue | undefined {
     case "onSet":
     case "onFlip": {
       const zone = event.involvedZones[0];
-      return zone ? { kind: "place", zone } : undefined;
+      if (!zone) return undefined;
+      // A trap fires and leaves its zone in the same transition, so by the time
+      // this cue plays the slot is already empty and a bare `place` flash would
+      // point at nothing. The card only exists in the event, so the cue carries
+      // its name — that is the player's one chance to see which trap went off.
+      const card = event.involvedCards[0];
+      if (event.context.cause === "trap_activation" && card) {
+        return { kind: "reveal", zone, cardName: card.nome };
+      }
+      return { kind: "place", zone };
     }
     case "onAttackDeclared": {
       const zone = event.involvedZones[0];
