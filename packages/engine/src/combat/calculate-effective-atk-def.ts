@@ -29,9 +29,12 @@ export type ModifierProviders = Readonly<{
  * Composes a monster's effective ATK/DEF: base (from the card schema) plus
  * the Guardian Star, terrain and equipment deltas, added term by term
  * (motor-duelo-1x1/F04, critério de aceite 1). Pure and total: `null` base
- * `atk`/`def` reads as `0` (spec Decision 6), no result clamp (spec Decision
- * 7 — revisit once real modifier tables exist), and neither `monster`,
- * `context` nor `providers` is ever mutated. Never throws on its own path;
+ * `atk`/`def` reads as `0` (spec Decision 6), the composed result is floored
+ * at 0 — spec Decision 7 left it unclamped, and `traps/F01` revisited that
+ * once 669 Shadow Spell could curse a monster below its own power — and
+ * neither `monster`, `context` nor `providers` is ever mutated. The floor
+ * applies to the sum only: a provider may still return a negative delta.
+ * Never throws on its own path;
  * if an injected provider throws, that exception propagates unchanged to
  * the caller (F11).
  */

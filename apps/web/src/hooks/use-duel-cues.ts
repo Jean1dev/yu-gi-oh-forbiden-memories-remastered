@@ -16,6 +16,7 @@ function prefersReducedMotion(): boolean {
 function cueMatchesZone(cue: DuelCue, reference: ZoneReference): boolean {
   switch (cue.kind) {
     case "place":
+    case "reveal":
     case "attack":
     case "destroy":
       return sameZone(cue.zone, reference);
@@ -31,6 +32,7 @@ function cueMatchesPlayer(cue: DuelCue, player: PlayerId): boolean {
     case "damage":
       return cue.player === player;
     case "place":
+    case "reveal":
     case "attack":
     case "destroy":
       return cue.zone.player === player;
@@ -72,6 +74,8 @@ export function useDuelCues() {
       cueFor: (reference: ZoneReference) =>
         active && cueMatchesZone(active, reference) ? active.kind : undefined,
       cueForPlayer: (player: PlayerId) => (active && cueMatchesPlayer(active, player) ? active : undefined),
+      /** The trap currently firing, by name — the zone that held it is already empty. */
+      revealedCardName: active?.kind === "reveal" ? active.cardName : null,
       busy: !reducedMotion && (active !== null || queue.length > 0),
     }),
     [active, clear, enqueue, queue.length, reducedMotion],

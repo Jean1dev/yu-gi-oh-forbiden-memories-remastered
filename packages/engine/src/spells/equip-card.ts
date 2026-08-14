@@ -101,6 +101,10 @@ export function equipCard(
   };
   const nextMonsters = replaceZone(player.field.monsters, targetZone.index, equippedZone);
 
+  // Spreads the *pre-trap* `player` over the post-trap `workingState.players`.
+  // Safe only because `consumeMatchingTrap` was asked for `opponent`, so it can
+  // never have touched the active player's entry — the day a trap fires on its
+  // own owner's field, this has to read `workingState.players[activePlayer]`.
   const equippedState: DuelState = {
     ...workingState,
     players: {

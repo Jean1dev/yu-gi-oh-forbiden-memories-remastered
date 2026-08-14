@@ -56,7 +56,7 @@ const parameters = {
 };
 
 describe("selectSpell traps", () => {
-  it.each(["681", "682", "683", "684", "685", "686", "687", "688", "689", "690"])(
+  it.each(["681", "682", "683", "684", "685", "686", "687", "688", "689"])(
     "sets specified trap %s",
     (numero) => {
       const state = stateWithHand([trap(numero)]);
@@ -68,6 +68,31 @@ describe("selectSpell traps", () => {
       expect(selectSpell(state, [candidate], parameters)).toBe(candidate);
     },
   );
+
+  it("skips 690 Fake Trap, which no trigger can ever match", () => {
+    const state = stateWithHand([trap("690")]);
+    const candidate: LegalCandidate = {
+      action: { type: "play_spell_or_trap", handIndex: 0, zoneIndex: 0 },
+      resultingState: state,
+    };
+
+    expect(selectSpell(state, [candidate], parameters)).toBeUndefined();
+  });
+
+  it("spends the hand play on the real card behind a Fake Trap", () => {
+    const ookazi = { ...trap("346"), nome: "Ookazi", classe: "Magic", tipo: "magica" as const };
+    const state = stateWithHand([trap("690"), ookazi]);
+    const fake: LegalCandidate = {
+      action: { type: "play_spell_or_trap", handIndex: 0, zoneIndex: 0 },
+      resultingState: state,
+    };
+    const burn: LegalCandidate = {
+      action: { type: "activate_spell", handIndex: 1 },
+      resultingState: state,
+    };
+
+    expect(selectSpell(state, [fake, burn], parameters)).toBe(burn);
+  });
 
   it("keeps summon above trap in the policy hierarchy", () => {
     const state = stateWithHand([trap("681")]);

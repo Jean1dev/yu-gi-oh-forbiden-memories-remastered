@@ -18,6 +18,10 @@ import {
 import { createEvent, openReactionWindow } from "../events/index.ts";
 import { hasUsedHandPlay, markHandPlayUsed } from "../turn/hand-play.ts";
 import { consumeMatchingTrap } from "../traps/index.ts";
+import {
+  firstLifePointsAtom,
+  rewriteFirstLifePointsAtom,
+} from "./effects/life-points-atom.ts";
 import { playersForSide } from "./effects/players-for-side.ts";
 import { resolveOneShotEffect } from "./effects/resolve-one-shot.ts";
 import { getOpponent } from "./opponent.ts";
@@ -149,24 +153,27 @@ export function activateSpell(
   let stateBeforeResolution = consumedState;
   let effectToResolve: SpellEffect = effect;
   const trapEvents: DuelEvent[] = [];
-  if (effect.type === "life_points") {
+  const lifePoints = firstLifePointsAtom(effect);
+  if (lifePoints !== undefined) {
     const trapOwner = getOpponent(state.activePlayer);
     const consumedTrap = consumeMatchingTrap(
       consumedState,
       trapOwner,
       (trapEffect) =>
         (trapEffect.type === "reflect_effect_damage" &&
-          effect.delta < 0 &&
-          effect.side === "opponent") ||
-        (trapEffect.type === "invert_effect_heal" && effect.delta > 0 && effect.side === "caster"),
+          lifePoints.delta < 0 &&
+          lifePoints.side === "opponent") ||
+        (trapEffect.type === "invert_effect_heal" &&
+          lifePoints.delta > 0 &&
+          lifePoints.side === "caster"),
     );
     if (consumedTrap !== undefined) {
+      const reflects = consumedTrap.effect.type === "reflect_effect_damage";
       stateBeforeResolution = consumedTrap.state;
       trapEvents.push(...consumedTrap.events);
-      effectToResolve =
-        consumedTrap.effect.type === "reflect_effect_damage"
-          ? { ...effect, side: "caster" }
-          : { ...effect, delta: -effect.delta };
+      effectToResolve = rewriteFirstLifePointsAtom(effect, (atom) =>
+        reflects ? { ...atom, side: "caster" } : { ...atom, delta: -atom.delta },
+      );
     }
   }
 

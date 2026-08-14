@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import type { DuelEvent, EventType, PlayerId, ZoneReference } from "@yugioh/shared";
+import type { Card, DuelEvent, EventType, PlayerId, ZoneReference } from "@yugioh/shared";
 import { describe, expect, it } from "vitest";
 import { MAX_CUE_QUEUE, toCues } from "./duel-cues.ts";
 
@@ -64,22 +64,32 @@ describe("duel cues", () => {
     ).toEqual([]);
   });
 
-  it("presents trap activation before its consumption", () => {
+  it("names the trap it activates, since its zone is already empty", () => {
     const trapZone = { ...zone("P2", 1), zoneType: "spell" as const };
+    const goblinFan = { numero: "687", nome: "Goblin Fan" } as Card;
     expect(
       toCues([
         event("onFlip", {
           involvedZones: [trapZone],
+          involvedCards: [goblinFan],
           context: { cause: "trap_activation", by: "687" },
         }),
         event("onDestroy", {
           involvedZones: [trapZone],
+          involvedCards: [goblinFan],
           context: { cause: "trap_consumed", by: "687" },
         }),
       ]),
     ).toEqual([
-      { kind: "place", zone: trapZone },
+      { kind: "reveal", zone: trapZone, cardName: "Goblin Fan" },
       { kind: "destroy", zone: trapZone },
+    ]);
+  });
+
+  it("cai de volta em place quando o flip nao e ativacao de armadilha", () => {
+    const monsterZone = zone("P1", 2);
+    expect(toCues([event("onFlip", { involvedZones: [monsterZone] })])).toEqual([
+      { kind: "place", zone: monsterZone },
     ]);
   });
 

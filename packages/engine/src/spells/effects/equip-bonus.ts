@@ -22,8 +22,13 @@ type OccupiedMonsterZone = Extract<MonsterZone, { occupied: true }>;
  * which monsters each equip may be attached to, and Harpie Lady is a
  * `Winged Beast` that legally takes Book of Secret Arts. An incompatible host
  * contributes 0 — a legal play, not an error, and the card is not removed.
- * Bonuses stack additively with no cap, matching `calculateEffectiveAtkDef`,
- * which does not clamp.
+ * Bonuses stack additively with no cap; the sum may well come out negative,
+ * and it is `calculateEffectiveAtkDef` that floors the final power at 0.
+ *
+ * Takes `EquipAttachment`, never a bare `Card`: 686 Reverse Trap flips an
+ * equip's sign, so the polarity travels with the attachment and a caller that
+ * still holds raw cards has to say which polarity it means rather than have
+ * `normal` assumed for it.
  *
  * Derived, never stored: the delta is recomputed from `SPELL_EFFECTS` on every
  * call, so the card's base `atk`/`def` are never overwritten
@@ -31,12 +36,10 @@ type OccupiedMonsterZone = Extract<MonsterZone, { occupied: true }>;
  */
 export function sumEquipBonuses(
   host: Card,
-  equips: readonly (EquipAttachment | Card)[],
+  equips: readonly EquipAttachment[],
 ): EffectiveAtkDef {
   return equips.reduce<EffectiveAtkDef>(
-    (total, candidate) => {
-      const attachment: EquipAttachment =
-        "card" in candidate ? candidate : { card: candidate, polarity: "normal" };
+    (total, attachment) => {
       const effect = getSpellEffect(attachment.card.numero);
       if (effect?.type !== "equip_buff") return total;
       if (!isEquipCompatible(attachment.card.numero, host.numero)) return total;
@@ -55,9 +58,10 @@ export function sumEquipBonuses(
  * 669 Shadow Spell). Stored in levels and converted here, so 655 Cursebreaker
  * only has to zero a counter (`docs/spells/stat-curse.md` §3).
  *
- * Not floored: a monster cursed below zero keeps a negative effective ATK,
- * exactly as `calculateEffectiveAtkDef` already allows, and the combat table
- * compares the numbers as they are.
+ * Returned unfloored, as a delta: a curse deeper than the monster's own power
+ * yields a modifier more negative than the base, and it is
+ * `calculateEffectiveAtkDef` that clamps the composed result at 0 before the
+ * combat table ever sees it.
  */
 export function cursePenalty(curseLevels: number | undefined): EffectiveAtkDef {
   const levels = curseLevels ?? 0;

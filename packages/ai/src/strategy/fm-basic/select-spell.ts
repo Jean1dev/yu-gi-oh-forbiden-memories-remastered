@@ -25,9 +25,12 @@ export function selectSpell(
     const card = state.players.P2.hand.visible
       ? state.players.P2.hand.cards[action.handIndex]
       : undefined;
-    return (
-      card !== undefined &&
-      (getSpellEffect(card.numero) !== undefined || getTrapEffect(card.numero) !== undefined)
-    );
+    if (card === undefined) return false;
+    if (getSpellEffect(card.numero) !== undefined) return true;
+    // 690 Fake Trap matches no trigger by design (`docs/traps/fake-trap.md`),
+    // and setting it still burns the turn's single hand play — so the CPU skips
+    // it and keeps looking for a card that can actually do something.
+    const trap = getTrapEffect(card.numero);
+    return trap !== undefined && trap.type !== "decoy";
   });
 }
