@@ -105,7 +105,7 @@ Delimitadas pela Seção 7 do PRD (Fora de Escopo) e pelos blocos Consumes das f
 | 11 | **`id` de duelista duplicado**: em runtime, preserva a primeira ocorrência, oculta as seguintes e registra a inconsistência; no script de build, o duplicado gera exit code diferente de zero. Runtime prioriza o jogador nunca ver tela quebrada; CI prioriza pegar o erro de autoria antes do release. | PRD F01 Error Handling; precedente `banco-de-cartas` F01 (colisão como falha de autoria) | confirmada |
 | 12 | Se o **catálogo de cartas não estiver disponível**, a tela **não exibe roster não validado** — bloqueia com mensagem e oferece nova tentativa. Exibir duelistas sem validar violaria o critério de integridade do PRD §4 ("100% dos oponentes referenciam decks válidos"). | PRD §4 Métricas; ADR-003 §6 (dados inválidos falham antes de serem servidos) | confirmada |
 | 13 | O cache local do roster guarda o **último snapshot já validado** (não o arquivo bruto), em IndexedDB, invalidado por `versao` + `hash` do bundle. Guardar o bruto obrigaria a revalidar sem catálogo disponível — exatamente o cenário de falha. | `arquitetura.md` §5.4; PRD F01 Error Handling | confirmada |
-| 14 | Os **retratos dos duelistas não existem no repositório** (`cards-data/` só tem artes de carta). O roster declara `retrato` como caminho relativo de asset; ausência resolve em **placeholder**, sem ocultar o duelista — mesmo tratamento que arte de carta faltante em `banco-de-cartas` F04. | `arquitetura.md` §4.1 ("faltas → placeholder"); auto-aceite: dado externo pendente | pendente — aguarda asset |
+| 14 | **Revisão 2026-08-14:** duelistas reais têm retrato próprio gerado em pixel art de PS1, versionado em `apps/web/public/duelists/<id>.png` e declarado como `duelists/<id>.png`. Novos duelistas precisam entregar o asset no mesmo commit; arte de carta não é retrato. Ausência em runtime ainda resolve em **placeholder**, sem ocultar o duelista. `test-duelist` permanece isento por ser fixture jogável, não personagem do FM. | ajuste direto solicitado; `arquitetura.md` §4.1 ("faltas → placeholder") | confirmada |
 | 15 | F01 **não introduz store global de estado** (Zustand vs `useReducer`+context segue em aberto em `arquitetura.md` §7). A seleção é estado efêmero local do componente, e o handoff para F02/F03 é por **parâmetro de rota**. A decisão de store fica para F03, que é quem tem estado de runtime de duelo. | `arquitetura.md` §7 (decisão em aberto); auto-aceite: aplicar default consistente com os guidelines | **a confirmar** — reavaliar em F03 |
 | 16 | A tela de seleção é **Client Component** sob uma rota fina de App Router, porque precisa funcionar offline lendo o bundle cacheado pelo service worker e o snapshot de IndexedDB. | ADR-004; `arquitetura.md` §7 (PWA) | confirmada |
 | 17 | A rota de destino da confirmação (`/free-duel/[duelistaId]/preparar`) é **de F02**; F01 apenas navega para ela passando o `duelistaId`. F01 não renderiza nada dessa etapa. | PRD F01 Experience ("confirma para prosseguir à preparação (F02/F03)") | confirmada |
@@ -503,9 +503,10 @@ O que F01 **provê**, conforme PRD F01 Provides:
   `classe` nem qualquer outro campo.
 - **`Carta` e `NumeroCarta`** — schema da Fase 0 (12 campos), já definidos em
   `packages/shared/src/carta/` pela spec de `banco-de-cartas` F01. F01 reusa sem estender.
-- **Manifesto de assets para os retratos** — banco-de-cartas F04 resolve artes de carta; o
-  retrato de duelista é asset novo e ainda inexistente (Decisão 14). Até existir manifesto de
-  retratos, a resolução é por caminho declarado + placeholder.
+- **Assets de retrato** — desde a revisão da Decisão 14, duelistas reais usam
+  `apps/web/public/duelists/<id>.png`; o caminho público continua declarado no roster e a UI mantém
+  placeholder apenas como fallback de runtime. Não há manifesto separado: existência e convenção
+  são verificadas por teste de integração da aplicação web.
 - **Bundle versionado com `version` + `hash`** — banco-de-cartas F09/F10. F01 declara o roster
   como **entrada** do bundle e usa `version` + `hash` como chave de invalidação do cache local.
   Enquanto o bundle não existir, o interino é servir `roster.json` como asset estático da app,

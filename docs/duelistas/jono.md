@@ -7,7 +7,7 @@
 | Id no jogo original | 3 (`JONO_1`) |
 | Mão no original | 5 cartas |
 | Dificuldade | `easy` |
-| Retrato | `cards-data/art/004.jpg` (Baby Dragon, a carta-assinatura dele) |
+| Retrato | `duelists/jono.png` (pixel art PS1 gerada para o projeto) |
 | Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20261019` |
 
@@ -21,6 +21,14 @@ em meia dúzia — mas igualmente fraco: o único monstro acima de 700 de ataque
 O que faz Jono valer a pena não é o deck, é o **pool de drop**: 52 cartas no tier comum, incluindo
 `Yamatano Dragon Scroll`, `Kunai with Chain`, `Left Arm of the Forbidden One`, `Time Wizard` e
 `Man-eater Bug`. É o primeiro oponente do jogo que compensa farmar.
+
+## Retrato
+
+Gerado com `imagegen` em duas variantes e selecionado por identidade, leitura em miniatura e margem
+de corte. Descrição específica: jovem egípcio de cabelo loiro espetado, olhos castanhos, pele
+bronzeada, sorriso confiante e túnica azul-violeta, em pátio egípcio. Direção comum: pixel art de
+PS1, busto central 4:3, sem texto, logo, marca-d'água ou transparência. Referência visual: a
+aparência de Jono em *Forbidden Memories* e sua contraparte Joey Wheeler.
 
 ## Pool de deck
 

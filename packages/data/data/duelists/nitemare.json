@@ -4,7 +4,7 @@
   "fmDuelistId": 38,
   "handSize": 20,
   "difficulty": "hard",
-  "portrait": "cards-data/art/001.jpg",
+  "portrait": "duelists/nitemare.png",
   "profile": {
     "strategy": "fm-basic",
     "parameters": {

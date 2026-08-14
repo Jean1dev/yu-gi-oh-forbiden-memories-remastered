@@ -7,7 +7,7 @@
 | Id no jogo original | 38 (`NITEMARE`) |
 | Mão no original | 20 cartas |
 | Dificuldade | `hard` |
-| Retrato | `cards-data/art/001.jpg` (Blue-eyes White Dragon, arte temática do pool) |
+| Retrato | `duelists/nitemare.png` (pixel art PS1 gerada para o projeto) |
 | Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20260805` |
 
@@ -18,9 +18,13 @@ DarkNite. O papel de encontro final e o pool formado exclusivamente por monstros
 a dificuldade `hard`: todas as 70 entradas são monstros, 22 delas têm pelo menos 2500 ATK e o teto
 é Blue-eyes Ultimate Dragon com 4500 ATK.
 
-O projeto ainda não possui retratos próprios dos duelistas. A arte de Blue-eyes White Dragon é
-usada como placeholder temático porque existe no acervo, faz parte do pool e aparece três vezes na
-amostra canônica. Ela não pretende representar o rosto de Nitemare.
+## Retrato
+
+Gerado com `imagegen` em duas variantes e selecionado por identidade, leitura em miniatura e margem
+de corte. Descrição específica: entidade feiticeira antiga de rosto lavanda angular, olhos
+vermelhos, coroa orgânica violeta e manto negro, em um domínio de sombras. Direção comum: pixel art
+de PS1, busto central 4:3, sem texto, logo, marca-d'água ou transparência. Referências visuais: a
+forma verdadeira Card Majin de *Forbidden Memories* e o mugshot original do jogo.
 
 ## Pool de deck
 

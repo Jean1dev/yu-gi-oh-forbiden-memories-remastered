@@ -31,6 +31,10 @@
   background: var(--surface-sunken);
 }
 
+.portrait {
+  image-rendering: pixelated;
+}
+
 .placeholder {
   display: grid;
   place-items: center;

@@ -44,13 +44,25 @@ documento registra por que aquela foi escolhida.
 | `fmDuelistId` | extraído | Id do duelista no jogo original — a chave da extração |
 | `handSize` | extraído | Mão no original. **Registrado por fidelidade; o motor distribui mão fixa** |
 | `difficulty` | autorado | `easy` / `medium` / `hard`, exibido antes da escolha |
-| `portrait` | autorado | Caminho de arte; ausente cai em placeholder neutro |
+| `portrait` | autorado | `duelists/<id>.png`, gerado em pixel art PS1 e versionado em `apps/web/public/duelists/` |
 | `profile` | autorado | `{ strategy, parameters }` — semântica pertence a `packages/ai` |
 | `deckSeed` | autorado | Seed da derivação |
 | `deckPool` | extraído | Pool ponderado (peso em 2048) |
 | `dropPools` | extraído | `common` ← BCD, `sa-pow` ← SAPow, `sa-tec` ← SATec |
 
 `deckPool`/`dropPools` são sobrescritos a cada extração; todo o resto é preservado.
+
+## Retratos
+
+Cada duelista real precisa de retrato próprio. O `duelist-builder` gera duas variantes com
+`imagegen`, escolhe a melhor após inspeção visual e grava o PNG em
+`apps/web/public/duelists/<id>.png`. A composição é um busto central seguro para corte 4:3, em
+pixel art de PS1, sem texto, logo, marca-d'água ou transparência. Arte de carta e placeholder não
+contam como entrega; o fallback da UI existe apenas para arquivo ausente ou corrompido em runtime.
+
+O documento do personagem registra a descrição específica usada no prompt e as referências
+visuais consultadas. O `test-duelist`, que é uma fixture jogável e não um personagem do FM, é a
+única exceção.
 
 ## Duelistas documentados
 

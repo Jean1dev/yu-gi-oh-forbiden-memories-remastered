@@ -4,7 +4,7 @@
   "fmDuelistId": 23,
   "handSize": 14,
   "difficulty": "medium",
-  "portrait": "cards-data/art/330.jpg",
+  "portrait": "duelists/forest-mage.png",
   "profile": {
     "strategy": "fm-basic",
     "parameters": {
