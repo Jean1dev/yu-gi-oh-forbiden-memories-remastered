@@ -4,7 +4,7 @@
   "fmDuelistId": 2,
   "handSize": 5,
   "difficulty": "easy",
-  "portrait": "cards-data/art/395.jpg",
+  "portrait": "duelists/teana.png",
   "profile": {
     "strategy": "fm-basic",
     "parameters": {

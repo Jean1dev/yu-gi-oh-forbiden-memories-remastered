@@ -1,4 +1,4 @@
 interface:
   display_name: "Duelist Builder"
-  short_description: "Adiciona duelistas fiéis ao Forbidden Memories"
-  default_prompt: "Use $duelist-builder para pesquisar e adicionar um novo duelista do Forbidden Memories ao jogo."
+  short_description: "Adiciona duelistas do FM com retrato prÃ³prio"
+  default_prompt: "Use $duelist-builder para pesquisar e adicionar um novo duelista do Forbidden Memories ao jogo, incluindo seu retrato em pixel art de PS1."

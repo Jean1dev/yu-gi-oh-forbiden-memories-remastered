@@ -7,7 +7,7 @@
 | Id no jogo original | 23 (`Forest Mage`) |
 | Mão no original | 14 cartas |
 | Dificuldade | `medium` |
-| Retrato | `cards-data/art/330.jpg` (Forest, a carta que dá nome ao duelista) |
+| Retrato | `duelists/forest-mage.png` (pixel art PS1 gerada para o projeto) |
 | Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20260805` |
 
@@ -23,9 +23,13 @@ amostra é 2100 e a média dos monstros é 1228 — acima dos oponentes iniciais
 341, Jono 389, ambos com teto abaixo de 1300) e bem abaixo do chefe final (Nitemare, média 2434
 com 40 monstros acima de 1800).
 
-O projeto ainda não possui retratos próprios dos duelistas. A arte de `Forest` é usada como
-placeholder temático porque existe no acervo, é a carta homônima do duelista e aparece três vezes
-na amostra canônica. Ela não pretende representar o rosto de Forest Mage.
+## Retrato
+
+Gerado com `imagegen` em duas variantes e selecionado por identidade, leitura em miniatura e margem
+de corte. Descrição específica: Mage Soldier egípcio adulto, rosto severo, barba curta, capuz verde
+e manto cerimonial com motivos de folhas, diante do Forest Shrine. Direção comum: pixel art de PS1,
+busto central 4:3, sem texto, logo, marca-d'água ou transparência. Referências visuais: Forest Mage,
+o grupo dos Mages e o Forest Shrine em *Forbidden Memories*.
 
 ## Pool de deck
 

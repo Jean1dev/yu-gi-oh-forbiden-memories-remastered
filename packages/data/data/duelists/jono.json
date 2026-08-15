@@ -4,7 +4,7 @@
   "fmDuelistId": 3,
   "handSize": 5,
   "difficulty": "easy",
-  "portrait": "cards-data/art/004.jpg",
+  "portrait": "duelists/jono.png",
   "profile": {
     "strategy": "fm-basic",
     "parameters": {

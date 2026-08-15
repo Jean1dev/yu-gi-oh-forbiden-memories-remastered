@@ -4,7 +4,7 @@
     {
       "id": "forest-mage",
       "name": "Forest Mage",
-      "portrait": "cards-data/art/330.jpg",
+      "portrait": "duelists/forest-mage.png",
       "difficulty": "medium",
       "profile": {
         "strategy": "fm-basic",
@@ -602,7 +602,7 @@
     {
       "id": "jono",
       "name": "Jono",
-      "portrait": "cards-data/art/004.jpg",
+      "portrait": "duelists/jono.png",
       "difficulty": "easy",
       "profile": {
         "strategy": "fm-basic",
@@ -1014,7 +1014,7 @@
     {
       "id": "nitemare",
       "name": "Nitemare",
-      "portrait": "cards-data/art/001.jpg",
+      "portrait": "duelists/nitemare.png",
       "difficulty": "hard",
       "profile": {
         "strategy": "fm-basic",
@@ -1468,7 +1468,7 @@
     {
       "id": "teana",
       "name": "Teana",
-      "portrait": "cards-data/art/395.jpg",
+      "portrait": "duelists/teana.png",
       "difficulty": "easy",
       "profile": {
         "strategy": "fm-basic",

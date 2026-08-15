@@ -7,7 +7,7 @@
 | Id no jogo original | 2 (`TEANA_1`) |
 | Mão no original | 5 cartas |
 | Dificuldade | `easy` |
-| Retrato | `cards-data/art/395.jpg` (Dancing Elf, uma das cartas dela) |
+| Retrato | `duelists/teana.png` (pixel art PS1 gerada para o projeto) |
 | Estratégia da IA | `fm-basic` — ver [Perfil de IA](#perfil-de-ia) |
 | Seed do deck | `20260817` |
 
@@ -17,6 +17,14 @@ Contraparte egípcia da Téa Gardner e uma das três primeiras oponentes do Free
 ao lado de Simon Muran e Jono. É, junto com eles, **a duelista mais fraca do jogo**: o pool dela
 não tem uma única carta acima de 500 de ataque, não tem equipamento e não tem nada que force uma
 fusão. Existe para ensinar o jogo, e é assim que ela deve se comportar aqui.
+
+## Retrato
+
+Gerado com `imagegen` em duas variantes e selecionado por identidade, leitura em miniatura e margem
+de corte. Descrição específica: jovem egípcia, olhos azuis, cabelo castanho longo, vestido branco,
+adornos dourados discretos e expressão amistosa, em pátio de templo ao entardecer. Direção comum:
+pixel art de PS1, busto central 4:3, sem texto, logo, marca-d'água ou transparência. Referência
+visual: a aparência de Teana em *Forbidden Memories* e sua contraparte Téa Gardner.
 
 ## Pool de deck
 

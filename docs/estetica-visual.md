@@ -101,7 +101,9 @@ A tela de duelo precisa comunicar visualmente os estados de regra já definidos 
       **reusar assets ripados do original**, o que se estende às artes de fundo).
 - [ ] **Feedback de terreno/Guardião** depende das tabelas classe↔terreno e Guardião×Guardião ainda
       inexistentes (`docs/arquitetura.md §4.3`).
-- [ ] **Retratos de duelistas** (Campanha/Free Duel): fonte de arte a definir.
+- [x] **Retratos de duelistas** (Campanha/Free Duel): artes próprias geradas em pixel art de PS1,
+      versionadas em `apps/web/public/duelists/`; cada novo personagem recebe seu retrato pelo
+      fluxo `duelist-builder` e mantém placeholder apenas como fallback de runtime.
 - [ ] **Placeholder de arte ausente:** definir o design do placeholder padrão.
 
 ## 5. Referências
