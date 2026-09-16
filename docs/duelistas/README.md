@@ -69,4 +69,5 @@ visuais consultadas. O `test-duelist`, que é uma fixture jogável e não um per
 - [Teana](teana.md) — fácil, a primeira oponente do jogo
 - [Jono](jono.md) — fácil, contraparte egípcia do Joey
 - [Nitemare](nitemare.md) — difícil, chefe final com um pool composto só por monstros
+- [Seto 3rd](seto-3rd.md) — difícil, terceiro encontro com Seto, monstros fortes e suporte de remoção
 - [Forest Mage](forest-mage.md) — média, Mage Soldier que joga o próprio terreno `Forest`
