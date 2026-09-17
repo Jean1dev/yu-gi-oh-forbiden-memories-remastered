@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,6 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import { loadCatalogFromDisk } from "../scripts/load-catalog-from-disk.ts";
 import { runRosterValidation } from "../scripts/validate-roster.ts";
+import { toDuelist } from "../scripts/build-roster.ts";
+import { DuelistSourceSchema } from "../src/roster/duelist-source.ts";
 import { loadRoster } from "../src/roster/index.ts";
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -28,7 +31,14 @@ describe("roster integration", () => {
     // Not an exact list: the roster grows by dropping a source file into
     // `data/duelists/`, and a new duelist must not fail this test.
     expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
-      expect.arrayContaining(["forest-mage", "jono", "nitemare", "teana", "test-duelist"]),
+      expect.arrayContaining([
+        "forest-mage",
+        "jono",
+        "nitemare",
+        "seto-3rd",
+        "teana",
+        "test-duelist",
+      ]),
     );
     for (const duelist of result.value.duelists) {
       expect(duelist.deck).toHaveLength(40);
@@ -36,7 +46,7 @@ describe("roster integration", () => {
     }
   });
 
-  it.each(["teana", "jono", "nitemare", "forest-mage"])(
+  it.each(["teana", "jono", "nitemare", "forest-mage", "seto-3rd"])(
     "derives a legal deck for the duelist ported from the original game (%s)",
     async (duelistId) => {
       const result = await loadWithRealCatalog(ROSTER_FILE);
@@ -54,6 +64,56 @@ describe("roster integration", () => {
       expect(duelist?.dropPool.map((tier) => tier.tier)).toEqual(["common", "sa-pow", "sa-tec"]);
     },
   );
+
+  it("preserves Seto 3rd's original pools and reproduces its committed deck", async () => {
+    const source = DuelistSourceSchema.parse(
+      JSON.parse(await readFile(resolve(PACKAGE_ROOT, "data/duelists/seto-3rd.json"), "utf8")),
+    );
+    expect(source).toMatchObject({
+      id: "seto-3rd",
+      name: "Seto 3rd",
+      fmDuelistId: 36,
+      handSize: 20,
+      difficulty: "hard",
+      deckSeed: 20260805,
+    });
+    // SHA-256 of JSON-serialized {cardNumber, weight} entries ordered by CardId,
+    // independently queried from sg4e/YGOFM-gamedata, Duelist=36.
+    const originalPools = [
+      {
+        entries: source.deckPool ?? [],
+        count: 63,
+        hash: "247f895aa1f61233e7af9367c41d4419a8214a488fd44376fd0f423fbc0f7b3f",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "common")?.entries ?? [],
+        count: 70,
+        hash: "dc3c5387912b7956fd9c705fd5ad346a53d567d1f4337400945fc5fac9a93d3a",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-pow")?.entries ?? [],
+        count: 83,
+        hash: "63f69f257fc67da4a88085c4f14cd8d379eb764149620a41d06bf691d271ffa8",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
+        count: 99,
+        hash: "e44599c38aaa7aab25aed217256333a3e79630044f53e622567e206102ccfe94",
+      },
+    ];
+    for (const pool of originalPools) {
+      expect(pool.entries).toHaveLength(pool.count);
+      expect(pool.entries.reduce((total, entry) => total + entry.weight, 0)).toBe(2048);
+      expect(createHash("sha256").update(JSON.stringify(pool.entries)).digest("hex")).toBe(
+        pool.hash,
+      );
+    }
+    const roster = await loadWithRealCatalog(ROSTER_FILE);
+    expect(roster.ok).toBe(true);
+    if (!roster.ok) return;
+    const committed = roster.value.duelists.find((duelist) => duelist.id === source.id);
+    expect(toDuelist(source)).toEqual({ ok: true, value: committed });
+  });
 
   it("accepts a fixture whose cards exist in the canonical catalog", async () => {
     const result = await loadWithRealCatalog(VALID_FIXTURE);

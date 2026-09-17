@@ -1,0 +1,1297 @@
+{
+  "id": "seto-3rd",
+  "name": "Seto 3rd",
+  "fmDuelistId": 36,
+  "handSize": 20,
+  "difficulty": "hard",
+  "portrait": "duelists/seto-3rd.png",
+  "profile": {
+    "strategy": "fm-basic",
+    "parameters": {
+      "aggression": 0.5,
+      "playsSpells": true,
+      "playsFieldSpells": false,
+      "defensiveThreshold": 0
+    }
+  },
+  "deckSeed": 20260805,
+  "deckPool": [
+    {
+      "cardNumber": "001",
+      "weight": 120
+    },
+    {
+      "cardNumber": "022",
+      "weight": 16
+    },
+    {
+      "cardNumber": "035",
+      "weight": 32
+    },
+    {
+      "cardNumber": "037",
+      "weight": 32
+    },
+    {
+      "cardNumber": "038",
+      "weight": 24
+    },
+    {
+      "cardNumber": "063",
+      "weight": 24
+    },
+    {
+      "cardNumber": "069",
+      "weight": 24
+    },
+    {
+      "cardNumber": "079",
+      "weight": 16
+    },
+    {
+      "cardNumber": "082",
+      "weight": 24
+    },
+    {
+      "cardNumber": "084",
+      "weight": 16
+    },
+    {
+      "cardNumber": "085",
+      "weight": 16
+    },
+    {
+      "cardNumber": "087",
+      "weight": 16
+    },
+    {
+      "cardNumber": "088",
+      "weight": 16
+    },
+    {
+      "cardNumber": "090",
+      "weight": 16
+    },
+    {
+      "cardNumber": "092",
+      "weight": 16
+    },
+    {
+      "cardNumber": "099",
+      "weight": 16
+    },
+    {
+      "cardNumber": "204",
+      "weight": 16
+    },
+    {
+      "cardNumber": "217",
+      "weight": 48
+    },
+    {
+      "cardNumber": "223",
+      "weight": 16
+    },
+    {
+      "cardNumber": "337",
+      "weight": 120
+    },
+    {
+      "cardNumber": "358",
+      "weight": 32
+    },
+    {
+      "cardNumber": "369",
+      "weight": 32
+    },
+    {
+      "cardNumber": "370",
+      "weight": 32
+    },
+    {
+      "cardNumber": "371",
+      "weight": 24
+    },
+    {
+      "cardNumber": "372",
+      "weight": 24
+    },
+    {
+      "cardNumber": "373",
+      "weight": 24
+    },
+    {
+      "cardNumber": "374",
+      "weight": 64
+    },
+    {
+      "cardNumber": "378",
+      "weight": 16
+    },
+    {
+      "cardNumber": "380",
+      "weight": 80
+    },
+    {
+      "cardNumber": "385",
+      "weight": 24
+    },
+    {
+      "cardNumber": "386",
+      "weight": 24
+    },
+    {
+      "cardNumber": "390",
+      "weight": 32
+    },
+    {
+      "cardNumber": "391",
+      "weight": 24
+    },
+    {
+      "cardNumber": "392",
+      "weight": 48
+    },
+    {
+      "cardNumber": "401",
+      "weight": 24
+    },
+    {
+      "cardNumber": "407",
+      "weight": 24
+    },
+    {
+      "cardNumber": "426",
+      "weight": 24
+    },
+    {
+      "cardNumber": "427",
+      "weight": 24
+    },
+    {
+      "cardNumber": "442",
+      "weight": 24
+    },
+    {
+      "cardNumber": "453",
+      "weight": 24
+    },
+    {
+      "cardNumber": "465",
+      "weight": 16
+    },
+    {
+      "cardNumber": "467",
+      "weight": 16
+    },
+    {
+      "cardNumber": "471",
+      "weight": 24
+    },
+    {
+      "cardNumber": "472",
+      "weight": 16
+    },
+    {
+      "cardNumber": "500",
+      "weight": 24
+    },
+    {
+      "cardNumber": "509",
+      "weight": 24
+    },
+    {
+      "cardNumber": "522",
+      "weight": 16
+    },
+    {
+      "cardNumber": "526",
+      "weight": 16
+    },
+    {
+      "cardNumber": "529",
+      "weight": 16
+    },
+    {
+      "cardNumber": "531",
+      "weight": 16
+    },
+    {
+      "cardNumber": "564",
+      "weight": 24
+    },
+    {
+      "cardNumber": "571",
+      "weight": 16
+    },
+    {
+      "cardNumber": "572",
+      "weight": 16
+    },
+    {
+      "cardNumber": "594",
+      "weight": 16
+    },
+    {
+      "cardNumber": "613",
+      "weight": 24
+    },
+    {
+      "cardNumber": "627",
+      "weight": 16
+    },
+    {
+      "cardNumber": "645",
+      "weight": 24
+    },
+    {
+      "cardNumber": "650",
+      "weight": 16
+    },
+    {
+      "cardNumber": "669",
+      "weight": 120
+    },
+    {
+      "cardNumber": "672",
+      "weight": 160
+    },
+    {
+      "cardNumber": "686",
+      "weight": 120
+    },
+    {
+      "cardNumber": "712",
+      "weight": 16
+    },
+    {
+      "cardNumber": "713",
+      "weight": 48
+    }
+  ],
+  "dropPools": [
+    {
+      "tier": "common",
+      "entries": [
+        {
+          "cardNumber": "006",
+          "weight": 32
+        },
+        {
+          "cardNumber": "020",
+          "weight": 6
+        },
+        {
+          "cardNumber": "025",
+          "weight": 32
+        },
+        {
+          "cardNumber": "048",
+          "weight": 32
+        },
+        {
+          "cardNumber": "079",
+          "weight": 24
+        },
+        {
+          "cardNumber": "083",
+          "weight": 32
+        },
+        {
+          "cardNumber": "084",
+          "weight": 32
+        },
+        {
+          "cardNumber": "085",
+          "weight": 22
+        },
+        {
+          "cardNumber": "086",
+          "weight": 32
+        },
+        {
+          "cardNumber": "087",
+          "weight": 32
+        },
+        {
+          "cardNumber": "088",
+          "weight": 32
+        },
+        {
+          "cardNumber": "090",
+          "weight": 22
+        },
+        {
+          "cardNumber": "095",
+          "weight": 32
+        },
+        {
+          "cardNumber": "099",
+          "weight": 24
+        },
+        {
+          "cardNumber": "103",
+          "weight": 32
+        },
+        {
+          "cardNumber": "119",
+          "weight": 32
+        },
+        {
+          "cardNumber": "136",
+          "weight": 32
+        },
+        {
+          "cardNumber": "137",
+          "weight": 32
+        },
+        {
+          "cardNumber": "148",
+          "weight": 32
+        },
+        {
+          "cardNumber": "149",
+          "weight": 32
+        },
+        {
+          "cardNumber": "162",
+          "weight": 32
+        },
+        {
+          "cardNumber": "164",
+          "weight": 32
+        },
+        {
+          "cardNumber": "169",
+          "weight": 32
+        },
+        {
+          "cardNumber": "171",
+          "weight": 32
+        },
+        {
+          "cardNumber": "173",
+          "weight": 32
+        },
+        {
+          "cardNumber": "175",
+          "weight": 32
+        },
+        {
+          "cardNumber": "178",
+          "weight": 32
+        },
+        {
+          "cardNumber": "181",
+          "weight": 28
+        },
+        {
+          "cardNumber": "194",
+          "weight": 28
+        },
+        {
+          "cardNumber": "204",
+          "weight": 28
+        },
+        {
+          "cardNumber": "222",
+          "weight": 28
+        },
+        {
+          "cardNumber": "223",
+          "weight": 24
+        },
+        {
+          "cardNumber": "232",
+          "weight": 28
+        },
+        {
+          "cardNumber": "233",
+          "weight": 28
+        },
+        {
+          "cardNumber": "240",
+          "weight": 28
+        },
+        {
+          "cardNumber": "242",
+          "weight": 28
+        },
+        {
+          "cardNumber": "245",
+          "weight": 28
+        },
+        {
+          "cardNumber": "254",
+          "weight": 28
+        },
+        {
+          "cardNumber": "261",
+          "weight": 28
+        },
+        {
+          "cardNumber": "269",
+          "weight": 28
+        },
+        {
+          "cardNumber": "271",
+          "weight": 28
+        },
+        {
+          "cardNumber": "277",
+          "weight": 28
+        },
+        {
+          "cardNumber": "279",
+          "weight": 28
+        },
+        {
+          "cardNumber": "295",
+          "weight": 28
+        },
+        {
+          "cardNumber": "379",
+          "weight": 28
+        },
+        {
+          "cardNumber": "424",
+          "weight": 12
+        },
+        {
+          "cardNumber": "449",
+          "weight": 12
+        },
+        {
+          "cardNumber": "465",
+          "weight": 24
+        },
+        {
+          "cardNumber": "472",
+          "weight": 24
+        },
+        {
+          "cardNumber": "497",
+          "weight": 32
+        },
+        {
+          "cardNumber": "522",
+          "weight": 24
+        },
+        {
+          "cardNumber": "523",
+          "weight": 32
+        },
+        {
+          "cardNumber": "526",
+          "weight": 24
+        },
+        {
+          "cardNumber": "531",
+          "weight": 24
+        },
+        {
+          "cardNumber": "535",
+          "weight": 32
+        },
+        {
+          "cardNumber": "539",
+          "weight": 54
+        },
+        {
+          "cardNumber": "551",
+          "weight": 32
+        },
+        {
+          "cardNumber": "553",
+          "weight": 54
+        },
+        {
+          "cardNumber": "560",
+          "weight": 54
+        },
+        {
+          "cardNumber": "571",
+          "weight": 24
+        },
+        {
+          "cardNumber": "572",
+          "weight": 24
+        },
+        {
+          "cardNumber": "574",
+          "weight": 54
+        },
+        {
+          "cardNumber": "594",
+          "weight": 24
+        },
+        {
+          "cardNumber": "600",
+          "weight": 54
+        },
+        {
+          "cardNumber": "619",
+          "weight": 12
+        },
+        {
+          "cardNumber": "627",
+          "weight": 24
+        },
+        {
+          "cardNumber": "639",
+          "weight": 16
+        },
+        {
+          "cardNumber": "641",
+          "weight": 16
+        },
+        {
+          "cardNumber": "647",
+          "weight": 32
+        },
+        {
+          "cardNumber": "650",
+          "weight": 32
+        }
+      ]
+    },
+    {
+      "tier": "sa-pow",
+      "entries": [
+        {
+          "cardNumber": "001",
+          "weight": 26
+        },
+        {
+          "cardNumber": "006",
+          "weight": 24
+        },
+        {
+          "cardNumber": "020",
+          "weight": 6
+        },
+        {
+          "cardNumber": "025",
+          "weight": 24
+        },
+        {
+          "cardNumber": "038",
+          "weight": 26
+        },
+        {
+          "cardNumber": "048",
+          "weight": 22
+        },
+        {
+          "cardNumber": "079",
+          "weight": 24
+        },
+        {
+          "cardNumber": "083",
+          "weight": 22
+        },
+        {
+          "cardNumber": "084",
+          "weight": 22
+        },
+        {
+          "cardNumber": "085",
+          "weight": 22
+        },
+        {
+          "cardNumber": "086",
+          "weight": 22
+        },
+        {
+          "cardNumber": "087",
+          "weight": 22
+        },
+        {
+          "cardNumber": "088",
+          "weight": 22
+        },
+        {
+          "cardNumber": "090",
+          "weight": 24
+        },
+        {
+          "cardNumber": "095",
+          "weight": 22
+        },
+        {
+          "cardNumber": "099",
+          "weight": 24
+        },
+        {
+          "cardNumber": "103",
+          "weight": 22
+        },
+        {
+          "cardNumber": "119",
+          "weight": 22
+        },
+        {
+          "cardNumber": "136",
+          "weight": 22
+        },
+        {
+          "cardNumber": "137",
+          "weight": 22
+        },
+        {
+          "cardNumber": "148",
+          "weight": 22
+        },
+        {
+          "cardNumber": "149",
+          "weight": 22
+        },
+        {
+          "cardNumber": "162",
+          "weight": 22
+        },
+        {
+          "cardNumber": "164",
+          "weight": 22
+        },
+        {
+          "cardNumber": "169",
+          "weight": 22
+        },
+        {
+          "cardNumber": "171",
+          "weight": 22
+        },
+        {
+          "cardNumber": "173",
+          "weight": 22
+        },
+        {
+          "cardNumber": "175",
+          "weight": 22
+        },
+        {
+          "cardNumber": "178",
+          "weight": 22
+        },
+        {
+          "cardNumber": "181",
+          "weight": 22
+        },
+        {
+          "cardNumber": "194",
+          "weight": 22
+        },
+        {
+          "cardNumber": "204",
+          "weight": 22
+        },
+        {
+          "cardNumber": "222",
+          "weight": 22
+        },
+        {
+          "cardNumber": "223",
+          "weight": 24
+        },
+        {
+          "cardNumber": "232",
+          "weight": 22
+        },
+        {
+          "cardNumber": "233",
+          "weight": 22
+        },
+        {
+          "cardNumber": "240",
+          "weight": 22
+        },
+        {
+          "cardNumber": "242",
+          "weight": 22
+        },
+        {
+          "cardNumber": "245",
+          "weight": 22
+        },
+        {
+          "cardNumber": "254",
+          "weight": 22
+        },
+        {
+          "cardNumber": "261",
+          "weight": 22
+        },
+        {
+          "cardNumber": "269",
+          "weight": 22
+        },
+        {
+          "cardNumber": "271",
+          "weight": 22
+        },
+        {
+          "cardNumber": "277",
+          "weight": 22
+        },
+        {
+          "cardNumber": "279",
+          "weight": 22
+        },
+        {
+          "cardNumber": "295",
+          "weight": 22
+        },
+        {
+          "cardNumber": "371",
+          "weight": 2
+        },
+        {
+          "cardNumber": "379",
+          "weight": 22
+        },
+        {
+          "cardNumber": "391",
+          "weight": 48
+        },
+        {
+          "cardNumber": "401",
+          "weight": 48
+        },
+        {
+          "cardNumber": "407",
+          "weight": 26
+        },
+        {
+          "cardNumber": "424",
+          "weight": 16
+        },
+        {
+          "cardNumber": "426",
+          "weight": 26
+        },
+        {
+          "cardNumber": "449",
+          "weight": 10
+        },
+        {
+          "cardNumber": "453",
+          "weight": 26
+        },
+        {
+          "cardNumber": "465",
+          "weight": 24
+        },
+        {
+          "cardNumber": "467",
+          "weight": 26
+        },
+        {
+          "cardNumber": "471",
+          "weight": 48
+        },
+        {
+          "cardNumber": "472",
+          "weight": 24
+        },
+        {
+          "cardNumber": "497",
+          "weight": 26
+        },
+        {
+          "cardNumber": "500",
+          "weight": 48
+        },
+        {
+          "cardNumber": "522",
+          "weight": 24
+        },
+        {
+          "cardNumber": "523",
+          "weight": 26
+        },
+        {
+          "cardNumber": "526",
+          "weight": 24
+        },
+        {
+          "cardNumber": "531",
+          "weight": 24
+        },
+        {
+          "cardNumber": "535",
+          "weight": 26
+        },
+        {
+          "cardNumber": "539",
+          "weight": 44
+        },
+        {
+          "cardNumber": "551",
+          "weight": 26
+        },
+        {
+          "cardNumber": "553",
+          "weight": 44
+        },
+        {
+          "cardNumber": "560",
+          "weight": 44
+        },
+        {
+          "cardNumber": "564",
+          "weight": 26
+        },
+        {
+          "cardNumber": "571",
+          "weight": 24
+        },
+        {
+          "cardNumber": "572",
+          "weight": 24
+        },
+        {
+          "cardNumber": "574",
+          "weight": 44
+        },
+        {
+          "cardNumber": "594",
+          "weight": 24
+        },
+        {
+          "cardNumber": "600",
+          "weight": 44
+        },
+        {
+          "cardNumber": "613",
+          "weight": 26
+        },
+        {
+          "cardNumber": "619",
+          "weight": 16
+        },
+        {
+          "cardNumber": "627",
+          "weight": 24
+        },
+        {
+          "cardNumber": "639",
+          "weight": 14
+        },
+        {
+          "cardNumber": "641",
+          "weight": 14
+        },
+        {
+          "cardNumber": "647",
+          "weight": 26
+        },
+        {
+          "cardNumber": "650",
+          "weight": 24
+        }
+      ]
+    },
+    {
+      "tier": "sa-tec",
+      "entries": [
+        {
+          "cardNumber": "006",
+          "weight": 16
+        },
+        {
+          "cardNumber": "020",
+          "weight": 2
+        },
+        {
+          "cardNumber": "025",
+          "weight": 16
+        },
+        {
+          "cardNumber": "048",
+          "weight": 12
+        },
+        {
+          "cardNumber": "083",
+          "weight": 20
+        },
+        {
+          "cardNumber": "084",
+          "weight": 20
+        },
+        {
+          "cardNumber": "086",
+          "weight": 20
+        },
+        {
+          "cardNumber": "087",
+          "weight": 20
+        },
+        {
+          "cardNumber": "088",
+          "weight": 20
+        },
+        {
+          "cardNumber": "095",
+          "weight": 20
+        },
+        {
+          "cardNumber": "103",
+          "weight": 16
+        },
+        {
+          "cardNumber": "119",
+          "weight": 16
+        },
+        {
+          "cardNumber": "136",
+          "weight": 20
+        },
+        {
+          "cardNumber": "137",
+          "weight": 16
+        },
+        {
+          "cardNumber": "148",
+          "weight": 16
+        },
+        {
+          "cardNumber": "149",
+          "weight": 20
+        },
+        {
+          "cardNumber": "162",
+          "weight": 20
+        },
+        {
+          "cardNumber": "164",
+          "weight": 20
+        },
+        {
+          "cardNumber": "169",
+          "weight": 20
+        },
+        {
+          "cardNumber": "171",
+          "weight": 20
+        },
+        {
+          "cardNumber": "173",
+          "weight": 16
+        },
+        {
+          "cardNumber": "175",
+          "weight": 18
+        },
+        {
+          "cardNumber": "178",
+          "weight": 20
+        },
+        {
+          "cardNumber": "181",
+          "weight": 20
+        },
+        {
+          "cardNumber": "194",
+          "weight": 20
+        },
+        {
+          "cardNumber": "204",
+          "weight": 20
+        },
+        {
+          "cardNumber": "222",
+          "weight": 20
+        },
+        {
+          "cardNumber": "232",
+          "weight": 20
+        },
+        {
+          "cardNumber": "233",
+          "weight": 20
+        },
+        {
+          "cardNumber": "240",
+          "weight": 20
+        },
+        {
+          "cardNumber": "242",
+          "weight": 20
+        },
+        {
+          "cardNumber": "245",
+          "weight": 20
+        },
+        {
+          "cardNumber": "254",
+          "weight": 20
+        },
+        {
+          "cardNumber": "261",
+          "weight": 20
+        },
+        {
+          "cardNumber": "269",
+          "weight": 20
+        },
+        {
+          "cardNumber": "271",
+          "weight": 20
+        },
+        {
+          "cardNumber": "277",
+          "weight": 20
+        },
+        {
+          "cardNumber": "279",
+          "weight": 20
+        },
+        {
+          "cardNumber": "295",
+          "weight": 20
+        },
+        {
+          "cardNumber": "302",
+          "weight": 25
+        },
+        {
+          "cardNumber": "303",
+          "weight": 25
+        },
+        {
+          "cardNumber": "308",
+          "weight": 25
+        },
+        {
+          "cardNumber": "311",
+          "weight": 25
+        },
+        {
+          "cardNumber": "314",
+          "weight": 25
+        },
+        {
+          "cardNumber": "315",
+          "weight": 25
+        },
+        {
+          "cardNumber": "324",
+          "weight": 25
+        },
+        {
+          "cardNumber": "328",
+          "weight": 25
+        },
+        {
+          "cardNumber": "329",
+          "weight": 25
+        },
+        {
+          "cardNumber": "336",
+          "weight": 25
+        },
+        {
+          "cardNumber": "337",
+          "weight": 25
+        },
+        {
+          "cardNumber": "343",
+          "weight": 25
+        },
+        {
+          "cardNumber": "344",
+          "weight": 25
+        },
+        {
+          "cardNumber": "345",
+          "weight": 25
+        },
+        {
+          "cardNumber": "349",
+          "weight": 25
+        },
+        {
+          "cardNumber": "379",
+          "weight": 20
+        },
+        {
+          "cardNumber": "449",
+          "weight": 8
+        },
+        {
+          "cardNumber": "497",
+          "weight": 24
+        },
+        {
+          "cardNumber": "523",
+          "weight": 24
+        },
+        {
+          "cardNumber": "535",
+          "weight": 24
+        },
+        {
+          "cardNumber": "539",
+          "weight": 40
+        },
+        {
+          "cardNumber": "551",
+          "weight": 24
+        },
+        {
+          "cardNumber": "553",
+          "weight": 40
+        },
+        {
+          "cardNumber": "560",
+          "weight": 40
+        },
+        {
+          "cardNumber": "574",
+          "weight": 40
+        },
+        {
+          "cardNumber": "600",
+          "weight": 40
+        },
+        {
+          "cardNumber": "639",
+          "weight": 10
+        },
+        {
+          "cardNumber": "641",
+          "weight": 10
+        },
+        {
+          "cardNumber": "647",
+          "weight": 24
+        },
+        {
+          "cardNumber": "650",
+          "weight": 20
+        },
+        {
+          "cardNumber": "653",
+          "weight": 25
+        },
+        {
+          "cardNumber": "656",
+          "weight": 24
+        },
+        {
+          "cardNumber": "661",
+          "weight": 48
+        },
+        {
+          "cardNumber": "665",
+          "weight": 24
+        },
+        {
+          "cardNumber": "666",
+          "weight": 8
+        },
+        {
+          "cardNumber": "668",
+          "weight": 24
+        },
+        {
+          "cardNumber": "671",
+          "weight": 8
+        },
+        {
+          "cardNumber": "672",
+          "weight": 24
+        },
+        {
+          "cardNumber": "673",
+          "weight": 8
+        },
+        {
+          "cardNumber": "674",
+          "weight": 8
+        },
+        {
+          "cardNumber": "675",
+          "weight": 16
+        },
+        {
+          "cardNumber": "676",
+          "weight": 8
+        },
+        {
+          "cardNumber": "677",
+          "weight": 8
+        },
+        {
+          "cardNumber": "678",
+          "weight": 8
+        },
+        {
+          "cardNumber": "679",
+          "weight": 24
+        },
+        {
+          "cardNumber": "680",
+          "weight": 8
+        },
+        {
+          "cardNumber": "684",
+          "weight": 24
+        },
+        {
+          "cardNumber": "685",
+          "weight": 48
+        },
+        {
+          "cardNumber": "686",
+          "weight": 48
+        },
+        {
+          "cardNumber": "687",
+          "weight": 48
+        },
+        {
+          "cardNumber": "688",
+          "weight": 48
+        },
+        {
+          "cardNumber": "691",
+          "weight": 8
+        },
+        {
+          "cardNumber": "692",
+          "weight": 8
+        },
+        {
+          "cardNumber": "693",
+          "weight": 8
+        },
+        {
+          "cardNumber": "694",
+          "weight": 8
+        },
+        {
+          "cardNumber": "695",
+          "weight": 8
+        },
+        {
+          "cardNumber": "697",
+          "weight": 8
+        },
+        {
+          "cardNumber": "698",
+          "weight": 8
+        },
+        {
+          "cardNumber": "699",
+          "weight": 8
+        },
+        {
+          "cardNumber": "700",
+          "weight": 8
+        }
+      ]
+    }
+  ]
+}
