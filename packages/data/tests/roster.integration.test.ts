@@ -33,6 +33,7 @@ describe("roster integration", () => {
     expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
       expect.arrayContaining([
         "forest-mage",
+        "meadow-mage",
         "jono",
         "nitemare",
         "seto-3rd",
@@ -46,7 +47,7 @@ describe("roster integration", () => {
     }
   });
 
-  it.each(["teana", "jono", "nitemare", "forest-mage", "seto-3rd"])(
+  it.each(["teana", "jono", "nitemare", "forest-mage", "seto-3rd", "meadow-mage"])(
     "derives a legal deck for the duelist ported from the original game (%s)",
     async (duelistId) => {
       const result = await loadWithRealCatalog(ROSTER_FILE);
@@ -99,6 +100,56 @@ describe("roster integration", () => {
         entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
         count: 99,
         hash: "e44599c38aaa7aab25aed217256333a3e79630044f53e622567e206102ccfe94",
+      },
+    ];
+    for (const pool of originalPools) {
+      expect(pool.entries).toHaveLength(pool.count);
+      expect(pool.entries.reduce((total, entry) => total + entry.weight, 0)).toBe(2048);
+      expect(createHash("sha256").update(JSON.stringify(pool.entries)).digest("hex")).toBe(
+        pool.hash,
+      );
+    }
+    const roster = await loadWithRealCatalog(ROSTER_FILE);
+    expect(roster.ok).toBe(true);
+    if (!roster.ok) return;
+    const committed = roster.value.duelists.find((duelist) => duelist.id === source.id);
+    expect(toDuelist(source)).toEqual({ ok: true, value: committed });
+  });
+
+  it("preserves Meadow Mage's original pools and reproduces its committed deck", async () => {
+    const source = DuelistSourceSchema.parse(
+      JSON.parse(await readFile(resolve(PACKAGE_ROOT, "data/duelists/meadow-mage.json"), "utf8")),
+    );
+    expect(source).toMatchObject({
+      id: "meadow-mage",
+      name: "Meadow Mage",
+      fmDuelistId: 29,
+      handSize: 14,
+      difficulty: "medium",
+      deckSeed: 20260805,
+    });
+    // SHA-256 of JSON-serialized {cardNumber, weight} entries ordered by CardId,
+    // independently queried from sg4e/YGOFM-gamedata, Duelist=29.
+    const originalPools = [
+      {
+        entries: source.deckPool ?? [],
+        count: 70,
+        hash: "4b270d7ae239addbe56e18033833f874c4393e1aab0e4c23259101a98d432378",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "common")?.entries ?? [],
+        count: 47,
+        hash: "e352cd41199c3b9f9223820e8fff8f280bb2ee649b53216c66055d74bd5e7657",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-pow")?.entries ?? [],
+        count: 52,
+        hash: "903ba6ea6094f651160c56dcb97dd18cc53e98103ac9d7e0bdaedb1c29b4e1b4",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
+        count: 37,
+        hash: "8aa4417531b627548d59ec00bae25d7f5b822ff6bc3292b8f0782b0f2870f232",
       },
     ];
     for (const pool of originalPools) {
