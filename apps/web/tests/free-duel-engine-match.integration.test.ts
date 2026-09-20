@@ -412,4 +412,87 @@ describe("free duel with real engine", () => {
       finalState: { outcome: { status: "decisive", winner: "P2", reason: "lp_depleted" } },
     });
   });
+  it("plays Meadow Mage to an engine-decided finish without refused CPU actions", async () => {
+    const catalog = await getSealedCatalog();
+    expect(catalog.ok).toBe(true);
+    if (!catalog.ok) return;
+
+    const loaded = loadRoster(rawRoster, (number) => catalog.value.getByNumero(number));
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const meadowMage = loaded.value.duelists.find((duelist) => duelist.id === "meadow-mage");
+    expect(meadowMage).toBeDefined();
+    if (meadowMage === undefined) return;
+
+    // The 14 weakest monsters, three copies each: a deliberately losing deck, so
+    // the duel reaches an engine-decided outcome instead of a surrender.
+    const cards = listAllCards(catalog.value);
+    const weakMonsters = cards
+      .filter((card) => card.tipo === "monstro")
+      .sort((left, right) => (left.atk ?? 0) - (right.atk ?? 0))
+      .slice(0, 14);
+    const playerDeck = buildReadyDeck({
+      composition: groupIntoComposition(
+        weakMonsters.flatMap((card) => [card.numero, card.numero, card.numero]).slice(0, 40),
+      ),
+      catalog: (number) => catalog.value.getByNumero(number),
+    });
+    expect(playerDeck.ok).toBe(true);
+    if (!playerDeck.ok) return;
+
+    const cpuSteps: Array<Readonly<{ events: readonly { type: string }[] }>> = [];
+    const incidents: string[] = [];
+    const runtime = createDuelRuntime({ cards, sleep: async () => undefined });
+    const dependencies = {
+      ...runtime.advanceDependencies,
+      apply: ((state, action) => {
+        const result = runtime.advanceDependencies.apply(state, action);
+        expect(result.ok, `Engine refused ${action.type}`).toBe(true);
+        return result;
+      }) satisfies typeof runtime.advanceDependencies.apply,
+      cpuProfile: meadowMage.profile,
+      onStep: (step: { readonly events: readonly { type: string }[] }) => cpuSteps.push(step),
+      logIncident: ({ code }: { readonly code: string }) => incidents.push(code),
+    };
+    const started = runtime.start(
+      {
+        duelistId: meadowMage.id,
+        playerComposition: playerDeck.value.composition,
+        cpuComposition: groupIntoComposition(meadowMage.deck),
+        seed: 2,
+      },
+      meadowMage,
+    );
+    expect(started).toMatchObject({ status: "in_progress" });
+    if (started.status !== "in_progress") return;
+
+    // The player only ever passes, so every decision under test is the CPU's.
+    let session: DuelSession = await advanceCpuDecisions(started, dependencies);
+    expect(session).toMatchObject({ status: "in_progress", currentDecider: "P1" });
+    let returnedToPlayer = false;
+    for (let index = 0; index < 30 && session.status === "in_progress"; index += 1) {
+      const stepsBefore = cpuSteps.length;
+      const applied = await submitPlayerAction(session, { type: "advance_phase" }, dependencies);
+      expect(cpuSteps.length - stepsBefore).toBeLessThan(100);
+      expect(applied.refusal).toBeUndefined();
+      session = applied.session;
+      if (session.status === "in_progress") {
+        expect(session.currentDecider).toBe("P1");
+        returnedToPlayer = true;
+      }
+    }
+
+    expect(incidents).toEqual([]);
+    expect(cpuSteps.length).toBeGreaterThan(0);
+    expect(cpuSteps.length).toBeLessThan(100);
+    const eventTypes = cpuSteps.flatMap((step) => step.events.map((event) => event.type));
+    expect(eventTypes).toContain("onSummon");
+    expect(eventTypes).toContain("onAttackDeclared");
+    expect(returnedToPlayer).toBe(true);
+
+    expect(session).toMatchObject({
+      status: "ended",
+      finalState: { outcome: { status: "decisive", winner: "P2", reason: "lp_depleted" } },
+    });
+  });
 });

@@ -71,3 +71,4 @@ visuais consultadas. O `test-duelist`, que é uma fixture jogável e não um per
 - [Nitemare](nitemare.md) — difícil, chefe final com um pool composto só por monstros
 - [Seto 3rd](seto-3rd.md) — difícil, terceiro encontro com Seto, monstros fortes e suporte de remoção
 - [Forest Mage](forest-mage.md) — média, Mage Soldier que joga o próprio terreno `Forest`
+- [Meadow Mage](meadow-mage.md) — média, id 29, Warrior/Beast-Warrior com suporte de Sogen
