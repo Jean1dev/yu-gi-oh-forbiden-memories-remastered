@@ -33,6 +33,7 @@ describe("roster integration", () => {
     expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
       expect.arrayContaining([
         "forest-mage",
+        "high-mage-atenza",
         "meadow-mage",
         "jono",
         "nitemare",
@@ -47,7 +48,15 @@ describe("roster integration", () => {
     }
   });
 
-  it.each(["teana", "jono", "nitemare", "forest-mage", "seto-3rd", "meadow-mage"])(
+  it.each([
+    "high-mage-atenza",
+    "teana",
+    "jono",
+    "nitemare",
+    "forest-mage",
+    "seto-3rd",
+    "meadow-mage",
+  ])(
     "derives a legal deck for the duelist ported from the original game (%s)",
     async (duelistId) => {
       const result = await loadWithRealCatalog(ROSTER_FILE);
@@ -150,6 +159,58 @@ describe("roster integration", () => {
         entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
         count: 37,
         hash: "8aa4417531b627548d59ec00bae25d7f5b822ff6bc3292b8f0782b0f2870f232",
+      },
+    ];
+    for (const pool of originalPools) {
+      expect(pool.entries).toHaveLength(pool.count);
+      expect(pool.entries.reduce((total, entry) => total + entry.weight, 0)).toBe(2048);
+      expect(createHash("sha256").update(JSON.stringify(pool.entries)).digest("hex")).toBe(
+        pool.hash,
+      );
+    }
+    const roster = await loadWithRealCatalog(ROSTER_FILE);
+    expect(roster.ok).toBe(true);
+    if (!roster.ok) return;
+    const committed = roster.value.duelists.find((duelist) => duelist.id === source.id);
+    expect(toDuelist(source)).toEqual({ ok: true, value: committed });
+  });
+
+  it("preserves High Mage Atenza's original pools and reproduces its committed deck", async () => {
+    const source = DuelistSourceSchema.parse(
+      JSON.parse(
+        await readFile(resolve(PACKAGE_ROOT, "data/duelists/high-mage-atenza.json"), "utf8"),
+      ),
+    );
+    expect(source).toMatchObject({
+      id: "high-mage-atenza",
+      name: "High Mage Atenza",
+      fmDuelistId: 26,
+      handSize: 16,
+      difficulty: "hard",
+      deckSeed: 20260805,
+    });
+    // SHA-256 of JSON-serialized {cardNumber, weight} entries ordered by CardId,
+    // independently queried from sg4e/YGOFM-gamedata, Duelist=26.
+    const originalPools = [
+      {
+        entries: source.deckPool ?? [],
+        count: 149,
+        hash: "bf0a40ac8c72f43c18b496e986ea5bc6716b80e2988f6cbb4ca4cf68574b7602",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "common")?.entries ?? [],
+        count: 57,
+        hash: "d87316867645cf471a9226c7c5ca7ecd5d95a4e8abb95d22ae8dc49e43692152",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-pow")?.entries ?? [],
+        count: 62,
+        hash: "33645d8346be324a06cb71e0ea533d66b8a1570dbea1aff631bad29a05a45d69",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
+        count: 65,
+        hash: "6cc184fc3758b5f215dda3e89bd9759ac2b43750246562d6a8a8fc5d01eb8206",
       },
     ];
     for (const pool of originalPools) {
