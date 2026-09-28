@@ -72,3 +72,4 @@ visuais consultadas. O `test-duelist`, que é uma fixture jogável e não um per
 - [Seto 3rd](seto-3rd.md) — difícil, terceiro encontro com Seto, monstros fortes e suporte de remoção
 - [Forest Mage](forest-mage.md) — média, Mage Soldier que joga o próprio terreno `Forest`
 - [Meadow Mage](meadow-mage.md) — média, id 29, Warrior/Beast-Warrior com suporte de Sogen
+- [High Mage Atenza](high-mage-atenza.md) — difícil, id 26, guardião das montanhas com dragões e Mountain

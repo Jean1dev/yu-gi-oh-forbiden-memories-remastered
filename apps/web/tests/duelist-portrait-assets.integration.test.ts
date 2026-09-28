@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const REAL_DUELIST_IDS = [
   "forest-mage",
+  "high-mage-atenza",
   "meadow-mage",
   "jono",
   "nitemare",
