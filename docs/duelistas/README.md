@@ -73,3 +73,4 @@ visuais consultadas. O `test-duelist`, que é uma fixture jogável e não um per
 - [Forest Mage](forest-mage.md) — média, Mage Soldier que joga o próprio terreno `Forest`
 - [Meadow Mage](meadow-mage.md) — média, id 29, Warrior/Beast-Warrior com suporte de Sogen
 - [High Mage Atenza](high-mage-atenza.md) — difícil, id 26, guardião das montanhas com dragões e Mountain
+- [Guardian Neku](guardian-neku.md) — difícil, id 34, guardião do trecho final com Fiends, Skull Knight e Yami
