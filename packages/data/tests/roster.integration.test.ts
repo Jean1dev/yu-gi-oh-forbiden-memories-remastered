@@ -33,6 +33,7 @@ describe("roster integration", () => {
     expect(result.value.duelists.map((duelist) => duelist.id)).toEqual(
       expect.arrayContaining([
         "forest-mage",
+        "guardian-neku",
         "high-mage-atenza",
         "meadow-mage",
         "jono",
@@ -49,6 +50,7 @@ describe("roster integration", () => {
   });
 
   it.each([
+    "guardian-neku",
     "high-mage-atenza",
     "teana",
     "jono",
@@ -211,6 +213,56 @@ describe("roster integration", () => {
         entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
         count: 65,
         hash: "6cc184fc3758b5f215dda3e89bd9759ac2b43750246562d6a8a8fc5d01eb8206",
+      },
+    ];
+    for (const pool of originalPools) {
+      expect(pool.entries).toHaveLength(pool.count);
+      expect(pool.entries.reduce((total, entry) => total + entry.weight, 0)).toBe(2048);
+      expect(createHash("sha256").update(JSON.stringify(pool.entries)).digest("hex")).toBe(
+        pool.hash,
+      );
+    }
+    const roster = await loadWithRealCatalog(ROSTER_FILE);
+    expect(roster.ok).toBe(true);
+    if (!roster.ok) return;
+    const committed = roster.value.duelists.find((duelist) => duelist.id === source.id);
+    expect(toDuelist(source)).toEqual({ ok: true, value: committed });
+  });
+
+  it("preserves Guardian Neku's original pools and reproduces its committed deck", async () => {
+    const source = DuelistSourceSchema.parse(
+      JSON.parse(await readFile(resolve(PACKAGE_ROOT, "data/duelists/guardian-neku.json"), "utf8")),
+    );
+    expect(source).toMatchObject({
+      id: "guardian-neku",
+      name: "Guardian Neku",
+      fmDuelistId: 34,
+      handSize: 20,
+      difficulty: "hard",
+      deckSeed: 20260805,
+    });
+    // SHA-256 of JSON-serialized {cardNumber, weight} entries ordered by CardId,
+    // independently queried from sg4e/YGOFM-gamedata, Duelist=34.
+    const originalPools = [
+      {
+        entries: source.deckPool ?? [],
+        count: 87,
+        hash: "6e21487d38165ad0031c747bf59b7d1d6ea26ec40a6c2166577b10eb84ac9fd2",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "common")?.entries ?? [],
+        count: 72,
+        hash: "14ef7cb64830c6695a49a876b1964e9587d80fd6a44a4210388ddb42170bffc8",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-pow")?.entries ?? [],
+        count: 77,
+        hash: "02355109de9717bb45dbe7f83df59eb6e9954dd8ff7e3e324759c23ea66245e4",
+      },
+      {
+        entries: source.dropPools.find((pool) => pool.tier === "sa-tec")?.entries ?? [],
+        count: 81,
+        hash: "247100110f3b48e0d691f902dd0a8fe24e1371894cb0b11c50c1e57c46f7516c",
       },
     ];
     for (const pool of originalPools) {
